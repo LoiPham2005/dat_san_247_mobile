@@ -1,0 +1,225 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+
+class BaseResponse<T> {
+  final String? userId;
+  final bool? result;
+  final bool? success;
+  final int? status;
+  final String? message;
+  final T? data;
+  final String? accessToken;
+  final String? refreshToken;
+  final String? tokenType;
+  final String? expiresAt;
+
+  const BaseResponse({
+    this.userId,
+    this.result,
+    this.success,
+    this.status,
+    this.message,
+    this.data,
+    this.accessToken,
+    this.refreshToken,
+    this.tokenType,
+    this.expiresAt,
+  });
+
+  // bool get isSuccess {
+  //   if (result != null) return result == true;
+  //   return status == 200 || status == 201;
+  // }
+
+  bool get isSuccess =>
+      result == true ||
+      success == true ||
+      // data != null ||
+      status == 200 ||
+      status == 201;
+
+  factory BaseResponse.success({
+    required T data,
+    String? message,
+    String? accessToken,
+    String? refreshToken,
+  }) {
+    return BaseResponse(
+      result: true,
+      success: true,
+      status: 200,
+      data: data,
+      message: message,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
+  }
+
+  factory BaseResponse.error({
+    required String message,
+    int? status,
+  }) {
+    return BaseResponse(
+      result: false,
+      message: message,
+      status: status,
+    );
+  }
+
+  BaseResponse<T> copyWith({
+    String? userId,
+    bool? result,
+    bool? success,
+    int? status,
+    String? message,
+    T? data,
+    String? accessToken,
+    String? refreshToken,
+    String? tokenType,
+    String? expiresAt,
+  }) {
+    return BaseResponse<T>(
+      userId: userId ?? this.userId,
+      result: result ?? this.result,
+      success: success ?? this.success,
+      status: status ?? this.status,
+      message: message ?? this.message,
+      data: data ?? this.data,
+      accessToken: accessToken ?? this.accessToken,
+      refreshToken: refreshToken ?? this.refreshToken,
+      tokenType: tokenType ?? this.tokenType,
+      expiresAt: expiresAt ?? this.expiresAt,
+    );
+  }
+
+  /// ✅ In JSON đẹp ra console (dễ đọc hơn)
+  // static void prettyPrintJson(dynamic jsonData) {
+  //   try {
+  //     const encoder = JsonEncoder.withIndent('  ');
+  //     final prettyString = encoder.convert(jsonData);
+  //     debugPrint(prettyString); // Không bị cắt dòng
+  //   } catch (_) {
+  //     debugPrint(jsonData.toString()); // fallback
+  //   }
+  // }
+
+  /// ✅ Parse 1 object từ Dio Response
+  static BaseResponse<T> fromResponse<T>(
+    Response response,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    try {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.data['result'] == true ||
+          response.data['success'] == true ||
+          response.data['status'] == 200) {
+        return BaseResponse<T>(
+          result: response.data['result'] ?? true,
+          success: response.data['success'] ?? true,
+          status: response.statusCode,
+          message: response.data['message'],
+          data: response.data['data'] != null
+              ? fromJson(response.data['data'] as Map<String, dynamic>)
+              : null,
+          accessToken: response.data['accessToken'],
+          refreshToken: response.data['refreshToken'],
+          tokenType: response.data['token_type'],
+          expiresAt: response.data['expires_at'],
+        );
+      } else {
+        // prettyPrintJson(response.data);
+        return BaseResponse<T>(
+          result: false,
+          success: false,
+          status: response.statusCode,
+          message: response.data['message'] ?? 'Request failed',
+        );
+      }
+    } catch (e) {
+      // prettyPrintJson(response.data);
+      return BaseResponse<T>(
+        result: false,
+        success: false,
+        message: 'Failed to parse response: ${e.toString()}',
+      );
+    }
+  }
+
+  /// ✅ Parse danh sách object
+  static BaseResponse<List<T>> listFromResponse<T>(
+    Response response,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    try {
+      if (response.statusCode == 200) {
+        final data = response.data['data'];
+        if (data is List) {
+          final list = data
+              .map((item) => fromJson(item as Map<String, dynamic>))
+              .toList();
+
+          return BaseResponse<List<T>>(
+            result: true,
+            success: true,
+            status: response.statusCode,
+            message: response.data['message'],
+            data: list,
+          );
+        } else {
+          // prettyPrintJson(response.data);
+          return BaseResponse<List<T>>(
+            result: false,
+            success: false,
+            message: 'Invalid data format: expected List',
+          );
+        }
+      } else {
+        // prettyPrintJson(response.data);
+        return BaseResponse<List<T>>(
+          result: false,
+          success: false,
+          status: response.statusCode,
+          message: response.data['message'] ?? 'Request failed',
+        );
+      }
+    } catch (e) {
+      // prettyPrintJson(response.data);
+      return BaseResponse<List<T>>(
+        result: false,
+        success: false,
+        message: 'Failed to parse list response: ${e.toString()}',
+      );
+    }
+  }
+
+  /// ✅ Chuyển lỗi DioException thành BaseResponse
+  static BaseResponse<T> handleError<T>(dynamic error) {
+    if (error is DioException) {
+      switch (error.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
+          return BaseResponse<T>.error(message: '⏱ Timeout, try again later');
+        case DioExceptionType.badResponse:
+          final statusCode = error.response?.statusCode;
+          final msg = error.response?.data?['message'] ?? 'Server error';
+          // prettyPrintJson(error.response?.data);
+          return BaseResponse<T>.error(
+            message: msg,
+            status: statusCode,
+          );
+        case DioExceptionType.cancel:
+          return BaseResponse<T>.error(message: '❌ Request was cancelled');
+        case DioExceptionType.connectionError:
+          return BaseResponse<T>.error(message: '⚠ No internet connection');
+        default:
+          return BaseResponse<T>.error(message: '❓ Unknown Dio error');
+      }
+    }
+
+    return BaseResponse<T>.error(message: '❗ Unexpected error: $error');
+  }
+}
