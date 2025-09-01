@@ -17,10 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final SportCategoryController sportCategoryController =
-      Get.find<SportCategoryController>();
-
-  final VenueController venueController = Get.find<VenueController>();
+  // Inject controllers using GetX
+  final sportCategoryController = Get.find<SportCategoryController>();
+  final venueController = Get.find<VenueController>();
 
   final ScrollController _scrollController = ScrollController();
   bool _isCollapsed = false;

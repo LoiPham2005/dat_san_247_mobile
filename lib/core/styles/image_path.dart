@@ -1,6 +1,5 @@
 class ImagePath {
   // image
-
   static const String logoApp = 'assets/image/logo_app.png';
   static const String intro1 = 'assets/image/intro1.png';
   static const String intro2 = 'assets/image/intro2.png';

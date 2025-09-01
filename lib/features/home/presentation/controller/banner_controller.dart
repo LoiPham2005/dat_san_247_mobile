@@ -4,7 +4,7 @@ import 'package:dat_san_247_mobile/features/home/data/repository/banner_reposito
 import 'package:get/get.dart';
 
 class BannerController extends BaseController {
-  final bannerRepository = Get.find<BannerRepository>();
+  final BannerRepository bannerRepository = Get.find<BannerRepository>();
   RxList<Banner> bannerList = <Banner>[].obs;
 
   @override
@@ -16,6 +16,8 @@ class BannerController extends BaseController {
 
   Future<void> getBanner() {
     return fetchList(
-        action: () => bannerRepository.getBanner(), targetList: bannerList);
+      action: () => bannerRepository.getBanner(),
+      targetList: bannerList,
+    );
   }
 }

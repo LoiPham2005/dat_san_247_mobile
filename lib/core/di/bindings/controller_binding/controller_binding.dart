@@ -5,13 +5,13 @@ import 'package:dat_san_247_mobile/features/venue/data/repository/venue_reposito
 import 'package:dat_san_247_mobile/features/venue/presentation/controller/venue_controller.dart';
 import 'package:get/get.dart';
 
-class ControllerBinding extends Bindings {
+class ControllerBinding implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthController>(() => AuthController());
-    Get.lazyPut<VenueRepository>(() => VenueRepository());
-    Get.lazyPut<BannerController>(() => BannerController());
-    Get.lazyPut<SportCategoryController>(() => SportCategoryController());
-    Get.lazyPut<VenueController>(() => VenueController());
+    // Permanent controllers
+    Get.put(AuthController(), permanent: true);
+    Get.put(SportCategoryController(), permanent: true);
+    Get.put(VenueController(), permanent: true);
+    Get.put(BannerController(), permanent: true);
   }
 }

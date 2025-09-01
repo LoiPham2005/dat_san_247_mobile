@@ -11,20 +11,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeService themeService = Get.put(ThemeService());
-    final LanguageService languageService = Get.put(LanguageService());
+    final themeService = Get.find<ThemeService>();
+    final languageService = Get.find<LanguageService>();
 
-    // có thể chọn nhiều theme
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'App',
       translations: AppTranslations(),
       locale: languageService.currentLocale,
       fallbackLocale: const Locale('en', 'US'),
-      theme: themeService.currentTheme, // 👉 lấy theme hiện tại
+      theme: themeService.currentTheme,
       themeMode: ThemeMode.system,
-      initialBinding: InitialBinding(),
-      home: SplashPage(),
+      home: const SplashPage(),
     );
   }
 }

@@ -4,22 +4,24 @@ import 'package:dat_san_247_mobile/core/api/dio_client.dart';
 import 'package:dat_san_247_mobile/core/lang/language_service.dart';
 import 'package:dat_san_247_mobile/core/theme/theme_service.dart';
 
-class ExternalBinding extends Bindings {
+class ExternalBinding implements Bindings {
   @override
-  void dependencies() {
-    Get.putAsync<SharedPreferences>(() async {
-      return await SharedPreferences.getInstance();
-    });
+  Future<void> dependencies() async {
+    // Core services first
+    final sharedPrefs = await SharedPreferences.getInstance();
+    Get.put(sharedPrefs, permanent: true);
 
-   // Lazy load khi cần
-    Get.put<DioClient>(DioClient());
+    // DioClient depends on SharedPreferences
+    final dioClient = DioClient();
+    Get.put(dioClient, permanent: true);
 
-    // theme
-    final themeService = Get.put<ThemeService>(ThemeService());
-    themeService.loadTheme(); // 🔥 load theme khi start app
+    // App services
+    final themeService = ThemeService();
+    Get.put(themeService, permanent: true);
+    await themeService.loadTheme();
 
-    // language
-    final languageService = Get.put<LanguageService>(LanguageService());
-    languageService.init();
+    final langService = LanguageService();
+    Get.put(langService, permanent: true);
+    await langService.init();
   }
 }

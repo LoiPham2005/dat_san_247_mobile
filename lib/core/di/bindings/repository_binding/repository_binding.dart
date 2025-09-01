@@ -4,14 +4,13 @@ import 'package:dat_san_247_mobile/features/home/data/repository/banner_reposito
 import 'package:dat_san_247_mobile/features/venue/data/repository/venue_repository.dart';
 import 'package:get/get.dart';
 
-class RepositoryBinding extends Bindings {
+class RepositoryBinding implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthRepository>(() => AuthRepository());
-    Get.lazyPut<VenueRepository>(() => VenueRepository());
-    Get.lazyPut<BannerRepository>(() => BannerRepository());
-    Get.lazyPut<SportCategoryRepository>(() => SportCategoryRepository());
-    Get.lazyPut<VenueRepository>(() => VenueRepository());
-    
+    // Register all repositories as singletons
+    Get.put(AuthRepository(), permanent: true);
+    Get.put(VenueRepository(), permanent: true);
+    Get.put(BannerRepository(), permanent: true);
+    Get.put(SportCategoryRepository(), permanent: true);
   }
 }
