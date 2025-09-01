@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:dat_san_247_mobile/core/api/api_path.dart';
-import 'package:dat_san_247_mobile/core/api/auth_service.dart';
+import 'package:dat_san_247_mobile/core/api/check_auth_service.dart';
 import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
 import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
 import 'package:dat_san_247_mobile/core/lang/locale_keys.dart';

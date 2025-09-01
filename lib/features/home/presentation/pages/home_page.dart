@@ -1,86 +1,124 @@
+import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
+import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_carousel_slider.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/widgets/grid_sport_category.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_sliver_appbar.dart';
+import 'package:dat_san_247_mobile/features/venue/presentation/controller/venue_controller.dart';
+import 'package:dat_san_247_mobile/features/venue/presentation/pages/venue_page.dart';
+import 'package:dat_san_247_mobile/features/venue/presentation/widget/list_venue.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/core/ext/widget_ext.dart';
-import 'package:dat_san_247_mobile/core/widget/custom_image.dart';
-import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
-import 'package:dat_san_247_mobile/features/product/data/models/product_model.dart';
-import 'package:dat_san_247_mobile/features/product/data/models/shoes_model.dart';
-import 'package:dat_san_247_mobile/features/product/presentation/controller/product_controller.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({super.key});
 
-  // Lấy controller đã được đăng ký ở GetX
-  final ProductController controller = Get.find<ProductController>();
-  final BannerController bannerController = Get.find<BannerController>();
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final SportCategoryController sportCategoryController =
+      Get.find<SportCategoryController>();
+
+  final VenueController venueController = Get.find<VenueController>();
+
+  final ScrollController _scrollController = ScrollController();
+  bool _isCollapsed = false;
+  bool _showScrollToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.hasClients) {
+      // Kiểm tra ẩn/hiện search box
+      if (_scrollController.offset > 80 && !_isCollapsed) {
+        setState(() => _isCollapsed = true);
+      } else if (_scrollController.offset <= 80 && _isCollapsed) {
+        setState(() => _isCollapsed = false);
+      }
+
+      // Kiểm tra hiển thị nút scroll to top
+      if (_scrollController.offset > 300 && !_showScrollToTop) {
+        setState(() => _showScrollToTop = true);
+      } else if (_scrollController.offset <= 300 && _showScrollToTop) {
+        setState(() => _showScrollToTop = false);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("SNEAK UP"),
-        centerTitle: true,
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => controller.getTopSelling(),
-        child: Column(
-          children: [
-            // hiển thị danh sách banner
-            Obx(() {
-              if (bannerController.bannerList.isEmpty) {
-                return const Center(child: Text("Không có banner"));
-              }
-              return SizedBox(
-                height: 200,
-                child: PageView.builder(
-                  itemCount: bannerController.bannerList.length,
-                  itemBuilder: (context, index) {
-                    final banner = bannerController.bannerList[index];
-                    return CustomImage(imageUrl: banner.media ?? "");
-                  },
-                ),
-              );
-            }).marginOnly(bottom: 10),
+      body: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          // GỌI CUSTOM SLIVER APPBAR
+          CustomSliverAppBar(
+            isCollapsed: _isCollapsed,
+            onSearchTap: () {
+              debugPrint("Icon tìm kiếm được bấm!");
+            },
+          ),
 
-            Obx(() {
-              // Hiển thị loading
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              // Gom tất cả shoes từ tất cả ProductModel
-              final List shoesList = controller.topSellingShoes
-                  .expand((productModel) => productModel.shoes ?? [])
-                  .toList();
-
-              if (shoesList.isEmpty) {
-                return const Center(child: Text("Không có sản phẩm"));
-              }
-
-              return ListView.separated(
-                padding: const EdgeInsets.all(8),
-                itemCount: shoesList.length,
-                separatorBuilder: (_, __) => const Divider(),
-                itemBuilder: (context, index) {
-                  final shoe = shoesList[index];
-                  return ListTile(
-                    leading: shoe.media != null && shoe.media!.isNotEmpty
-                        ? CustomImage(
-                            imageUrl: shoe.media!.first.url ?? "",
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          )
-                        : const SizedBox(width: 50, height: 50),
-                    title: Text(shoe.name ?? "Không tên"),
-                    subtitle: Text(shoe.description ?? ""),
+          // ---------------- NỘI DUNG ----------------
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                10.height,
+                CustomCarouselSlider(),
+                20.height,
+                Obx(() {
+                  if (sportCategoryController.listCategory.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return GridSportCategory(
+                    categories: sportCategoryController.listCategory,
                   );
-                },
-              );
-            }).expand(),
-          ],
-        ),
+                }).paddingOnly(left: 10),
+                10.height,
+                Obx(() {
+                  if (venueController.listVenue.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return ListVenue(venues: venueController.listVenue);
+                }),
+                20.height,
+              ],
+            ),
+          ),
+        ],
       ),
+
+      // NÚT SCROLL TO TOP
+      floatingActionButton: _showScrollToTop
+          ? FloatingActionButton(
+              backgroundColor: Colors.amber,
+              child: const Icon(Icons.arrow_upward, color: Colors.white),
+              onPressed: () {
+                _scrollController.animateTo(
+                  0,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                );
+              },
+            )
+          : null,
     );
   }
 }

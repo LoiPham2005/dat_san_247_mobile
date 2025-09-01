@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/features/venue/presentation/controller/venue_controller.dart';
 import 'package:get/get.dart';
 import 'package:dat_san_247_mobile/core/di/bindings/controller_binding/controller_binding.dart';
 import 'package:dat_san_247_mobile/core/di/bindings/external_binding/external_binding.dart';

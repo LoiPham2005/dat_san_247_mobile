@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:dat_san_247_mobile/core/widget/animation/page_transition.dart';
+import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
 import 'package:dat_san_247_mobile/core/common/function/validator.dart';
-import 'package:dat_san_247_mobile/core/widget/toast/show_toast.dart';
-import 'package:dat_san_247_mobile/core/widget/toast/loading_overlay.dart';
+import 'package:dat_san_247_mobile/core/widgets/toast/show_toast.dart';
+import 'package:dat_san_247_mobile/core/widgets/toast/loading_overlay.dart';
 import 'package:dat_san_247_mobile/core/styles/image_path.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/controller/auth_controller.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/header_auth.dart';
@@ -17,6 +17,7 @@ import 'package:dat_san_247_mobile/features/auth/presentation/widgets/button_aut
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/ask_register.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/footer_auth.dart';
 import 'package:dat_san_247_mobile/features/bottomMenu/screens/bottom_menu_custom.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:toastification/toastification.dart';
 
 class LoginPage extends StatelessWidget {
@@ -34,10 +35,21 @@ class LoginPage extends StatelessWidget {
     final passError = ValidatorApp.checkPass(text: passwordText);
 
     if (emailError != null || passError != null) {
-      ShowToast(
-        context,
-        message: emailError ?? passError ?? "Vui lòng nhập thông tin hợp lệ",
-        type: ToastificationType.error,
+      // ShowToast(
+      //   context,
+      //   message: emailError ?? passError ?? "Vui lòng nhập thông tin hợp lệ",
+      //   type: ToastificationType.error,
+      // );
+
+      Get.snackbar(
+        "Lỗi", // Tiêu đề
+        emailError ?? passError ?? "Vui lòng nhập thông tin hợp lệ",
+        snackPosition: SnackPosition.TOP, // Hiển thị ở dưới màn hình
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(10),
+        borderRadius: 8,
       );
       return;
     }
@@ -45,13 +57,32 @@ class LoginPage extends StatelessWidget {
     final success = await controller.login(emailText, passwordText);
 
     if (success) {
-      ShowToast(context,
-          message: "Đăng nhập thành công", type: ToastificationType.success);
+      print("không chạy vào đây 1111111111111110");
+      // ShowToast(
+      //   context,
+      //   message: "Đăng nhập thành công",
+      //   type: ToastificationType.success,
+      // );
 
-      // Navigator.pushReplacement(
-      //     context, PageTransition.slideTransition(BottomMenuCustom()));
-
-      Get.offAll(() => BottomMenuCustom());
+      Get.snackbar(
+        "Đăng nhập", // Tiêu đề
+        "Đăng nhập thành công",
+        snackPosition: SnackPosition.TOP, // Hiển thị ở dưới màn hình
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(10),
+        borderRadius: 8,
+      );
+      Get.offAll(
+        () => BottomMenuCustom(),
+        transition: Transition.fade,
+        duration: const Duration(milliseconds: 300),
+      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => BottomMenuCustom()),
+      // );
     }
   }
 
@@ -106,14 +137,12 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () {
-        if (controller.isLoading.value) {
-          return CircularProgressIndicator();
-        }
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return LoadingOverlay(child: _buildLoginUI(context));
+      }
 
-        return _buildLoginUI(context);
-      },
-    );
+      return _buildLoginUI(context);
+    });
   }
 }

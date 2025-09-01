@@ -18,14 +18,14 @@ class AuthRepository {
       // return parseResponse(response, (json) => User.fromJson(json));
 
       // Map response data correctly
-      if (response.data['result'] == true || response.data['status'] == 200) {
+      if (response.data['success'] == true || response.data['status'] == 200) {
+        final data = response.data['data'];
         return BaseResponse<User>(
-          result: true,
+          success: true,
           message: response.data['message'],
-          data: User.fromJson(
-              response.data['user']), // Use 'user' instead of 'data'
-          accessToken: response.data['accessToken'],
-          refreshToken: response.data['refreshToken'],
+          data: User.fromJson(data['user']),
+          accessToken: data['accessToken'],
+          refreshToken: data['refreshToken'],
         );
         // return BaseResponse.fromResponse(
         //   response,

@@ -122,7 +122,7 @@ class BaseResponse<T> {
           status: response.statusCode,
           message: response.data['message'],
           data: response.data['data'] != null
-              ? fromJson(response.data['data'] as Map<String, dynamic>)
+              ? fromJson(response.data['data'])
               : null,
           accessToken: response.data['accessToken'],
           refreshToken: response.data['refreshToken'],

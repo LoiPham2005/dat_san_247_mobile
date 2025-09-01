@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:dat_san_247_mobile/features/notification/presentation/pages/notification_page.dart';
 import 'package:dat_san_247_mobile/features/order/presentation/pages/order_page.dart';
-import 'package:dat_san_247_mobile/features/product/presentation/pages/product_page.dart';
-
-import '../../account/screens/account_screen.dart';
+import 'package:dat_san_247_mobile/features/venue/presentation/pages/venue_page.dart';
+import '../../profile/presentation/pages/account_page.dart';
 import '../../home/presentation/pages/home_page.dart';
 
 class BottomMenuCustom extends StatefulWidget {
@@ -18,10 +18,10 @@ class _BottomMenuCustomState extends State<BottomMenuCustom> {
   late PageController _pageController;
 
   final List<Widget> _screens = [
-     HomePage(key: ValueKey('home')),
-    const ProductPage(key: ValueKey('product')),
-    const OrderPage(key: ValueKey('order')),
-    const NotificationPage(key: ValueKey('notification')),
+    HomePage(key: ValueKey('home')),
+    VenuePage(key: ValueKey('venue')),
+    OrderPage(key: ValueKey('order')),
+    NotificationPage(key: ValueKey('notification')),
     AccountScreen(key: ValueKey('account')),
   ];
 
@@ -42,79 +42,33 @@ class _BottomMenuCustomState extends State<BottomMenuCustom> {
     }
   }
 
-  int _previousIndex = 0;
-
-  Widget itemBottom(IconData iconData, String title, int index) {
-    final selected = index == _currentIndex;
-    return InkWell(
-      onTap: () {
-        onTabTapped(index);
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(iconData, color: selected ? Colors.orange : Colors.grey),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w400,
-              color: selected ? Colors.orange : Colors.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: [
-        PageView(
-          controller: _pageController,
-          physics:
-              const NeverScrollableScrollPhysics(), // tắt swipe nếu chỉ muốn nhấn tab
-          children: _screens,
-        ),
-
-        // Thanh menu dưới custom bo góc
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            child: Container(
-              height: 70,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 5,
-                    offset: Offset(0, -1),
-                  )
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  itemBottom(Icons.home, "Trang chủ", 0),
-                  itemBottom(Icons.production_quantity_limits, "Sản phẩm", 1),
-                  itemBottom(Icons.favorite_border, "Đơn hàng", 2),
-                  itemBottom(Icons.notifications, "chatbot", 3),
-                  itemBottom(Icons.people, "Tài khoản", 4),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    ));
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: _screens,
+      ),
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _currentIndex,
+        height: 60,
+        backgroundColor: Colors.transparent, // để PageView hiển thị dưới
+        color: Colors.blue,
+        buttonBackgroundColor: Colors.orange,
+        animationCurve: Curves.easeInOut,
+        animationDuration: const Duration(milliseconds: 300),
+        items: const [
+          Icon(Icons.home, size: 30, color: Colors.white),
+          Icon(Icons.production_quantity_limits, size: 30, color: Colors.white),
+          Icon(Icons.favorite_border, size: 30, color: Colors.white),
+          Icon(Icons.notifications, size: 30, color: Colors.white),
+          Icon(Icons.people, size: 30, color: Colors.white),
+        ],
+        onTap: (index) {
+          onTabTapped(index);
+        },
+      ),
+    );
   }
 }
-

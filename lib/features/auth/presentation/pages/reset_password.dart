@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dat_san_247_mobile/core/widget/animation/page_transition.dart';
+import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
 import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/button_auth.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/header_forgot_auth.dart';

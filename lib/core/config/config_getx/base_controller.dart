@@ -29,7 +29,6 @@ class BaseController extends GetxController {
 
       if (res.isSuccess) {
         final data = res.data;
-
         if (targetList != null && data != null) {
           if (mergeList != null) {
             final updated = mergeList(targetList.toList(), data);
@@ -44,6 +43,8 @@ class BaseController extends GetxController {
       } else {
         showError(res.message ?? 'Có lỗi xảy ra');
       }
+
+      print("Base_controller dataaaaaaaaaaaaaaaaaa: ${res.data}");
     } catch (e) {
       if (showLoading) this.hideLoading();
       showError(e.toString());

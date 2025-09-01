@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+    /// 🎭 Danh sách tất cả Theme
+  static final Map<String, ThemeData> themes = {
+    "Light": lightTheme,
+    "Dark": darkTheme,
+    "Blue": blueTheme,
+    "Green": greenTheme,
+  };
+  
   // 🎨 Màu cơ bản
   static const Color primaryPurple = Colors.deepPurple;
   static const Color primaryBlue = Colors.blue;
@@ -95,11 +103,5 @@ class AppTheme {
     ),
   );
 
-  /// 🎭 Danh sách tất cả Theme
-  static final Map<String, ThemeData> themes = {
-    "Light": lightTheme,
-    "Dark": darkTheme,
-    "Blue": blueTheme,
-    "Green": greenTheme,
-  };
+
 }

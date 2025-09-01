@@ -7,12 +7,13 @@ import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
 
 class ThemeService extends GetxService {
   // danh sách theme
-  final themes = {
-    "Light": AppTheme.lightTheme,
-    "Dark": AppTheme.darkTheme,
-    "Blue": AppTheme.blueTheme,
-    "Green": AppTheme.greenTheme,
-  };
+  final themes = AppTheme.themes;
+  // final themes = {
+  //   "Light": AppTheme.lightTheme,
+  //   "Dark": AppTheme.darkTheme,
+  //   "Blue": AppTheme.blueTheme,
+  //   "Green": AppTheme.greenTheme,
+  // };
 
   // theme hiện tại
   final _currentTheme = "Light".obs;

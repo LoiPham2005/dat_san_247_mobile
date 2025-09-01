@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
 import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
@@ -20,14 +22,43 @@ class AuthController extends BaseController {
   }
 
   /// Lấy user từ SharedPrefs
+  // Future<void> loadUserFromLocal() async {
+  //   final isLogin = await SharedPrefs.getBool(DbKeysLocal.isLogin) ?? false;
+
+  //   if (isLogin) {
+  //     final userJson = await SharedPrefs.getString(DbKeysLocal.user);
+  //     if (userJson != null) {
+  //       final userMap = jsonDecode(userJson); // ✅ Decode từ String -> Map
+  //       final user = User.fromJson(userMap);
+  //       userList.assignAll([user]);
+  //     }
+  //   }
+  // }
+
   Future<void> loadUserFromLocal() async {
     final isLogin = await SharedPrefs.getBool(DbKeysLocal.isLogin) ?? false;
 
     if (isLogin) {
-      final userJson = await SharedPrefs.getString(DbKeysLocal.user);
-      if (userJson != null) {
-        final user = User.fromJson(userJson);
+      final userStored = await SharedPrefs.getString(DbKeysLocal.user);
+
+      if (userStored != null) {
+        User user;
+
+        if (userStored is String) {
+          // Nếu là String, decode thành Map
+          final userMap = jsonDecode(userStored);
+          user = User.fromJson(userMap);
+        } else if (userStored is Map<String, dynamic>) {
+          // Nếu đã là Map, dùng trực tiếp
+          user = User.fromJson(userStored);
+        } else {
+          throw Exception(
+            "Stored user has unsupported type: ${userStored.runtimeType}",
+          );
+        }
+
         userList.assignAll([user]);
+        print("User loaded: ${user.toJson()}");
       }
     }
   }
@@ -37,10 +68,7 @@ class AuthController extends BaseController {
   // ===================
 
   Future<bool> login(String email, String password) async {
-    return _handleMutation(
-      () => _repo.login(email, password),
-      saveAuth: true,
-    );
+    return _handleMutation(() => _repo.login(email, password), saveAuth: true);
   }
 
   Future<bool> register(String username, String email, String password) async {
@@ -67,13 +95,20 @@ class AuthController extends BaseController {
   }
 
   Future<bool> changePassword(
-      String oldPassword, String newPassword, String id) {
+    String oldPassword,
+    String newPassword,
+    String id,
+  ) {
     return _handleMutation(
-        () => _repo.changePassword(oldPassword, newPassword, id));
+      () => _repo.changePassword(oldPassword, newPassword, id),
+    );
   }
 
   Future<bool> editInformation(
-      String oldPassword, String newPassword, String id) {
+    String oldPassword,
+    String newPassword,
+    String id,
+  ) {
     return _handleMutation(
       () => _repo.editInformation(oldPassword, newPassword, id),
       saveAuth: true,
@@ -110,14 +145,17 @@ class AuthController extends BaseController {
       },
     );
 
-    return result;
+    return true;
   }
 
-  Future<void> _saveAuthData(User user,
-      {String? accessToken, String? refreshToken}) async {
+  Future<void> _saveAuthData(
+    User user, {
+    String? accessToken,
+    String? refreshToken,
+  }) async {
     // Ở đây mình giả định token được lưu trong User model hoặc từ repo trả về
     await SharedPrefs.setBool(DbKeysLocal.isLogin, true);
-    await SharedPrefs.setString(DbKeysLocal.user, user.toJson());
+    await SharedPrefs.setString(DbKeysLocal.user, jsonEncode(user.toJson()));
     if (accessToken != null) {
       await SharedPrefs.setString(DbKeysLocal.accessToken, accessToken);
     }

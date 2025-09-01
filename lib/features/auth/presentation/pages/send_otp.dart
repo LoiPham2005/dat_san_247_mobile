@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/core/widget/animation/page_transition.dart';
-import 'package:dat_san_247_mobile/core/widget/toast/show_toast.dart';
+import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
+import 'package:dat_san_247_mobile/core/widgets/toast/show_toast.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/controller/auth_controller.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/reset_password.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/button_auth.dart';

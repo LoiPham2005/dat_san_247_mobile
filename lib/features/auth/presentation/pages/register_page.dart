@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:dat_san_247_mobile/core/widget/animation/page_transition.dart';
+import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
 import 'package:dat_san_247_mobile/core/common/function/validator.dart';
-import 'package:dat_san_247_mobile/core/widget/toast/loading_overlay.dart';
-import 'package:dat_san_247_mobile/core/widget/toast/show_toast.dart';
+import 'package:dat_san_247_mobile/core/widgets/toast/loading_overlay.dart';
+import 'package:dat_san_247_mobile/core/widgets/toast/show_toast.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/controller/auth_controller.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/button_auth.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/clause.dart';
@@ -42,7 +42,8 @@ class RegisterPage extends StatelessWidget {
     if (emailError != null || passError != null || usernameError != null) {
       ShowToast(
         context,
-        message: emailError ??
+        message:
+            emailError ??
             passError ??
             usernameError ??
             "Vui lòng nhập thông tin hợp lệ",
@@ -60,8 +61,11 @@ class RegisterPage extends StatelessWidget {
       return;
     }
 
-    final success =
-        await controller.register(usernameText, emailText, passwordText);
+    final success = await controller.register(
+      usernameText,
+      emailText,
+      passwordText,
+    );
 
     if (success) {
       ShowToast(
@@ -145,14 +149,12 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () {
-        if (controller.isLoading.value) {
-          return const LoadingOverlay(isLoading: true);
-        }
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return LoadingOverlay(child: _buildRegisterForm(context));
+      }
 
-        return _buildRegisterForm(context);
-      },
-    );
+      return _buildRegisterForm(context);
+    });
   }
 }

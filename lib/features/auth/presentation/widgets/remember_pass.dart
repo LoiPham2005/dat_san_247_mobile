@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/widget/animation/page_transition.dart';
+import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
 import 'package:dat_san_247_mobile/core/styles/color_app.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/send_email.dart';
 

@@ -5,6 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefs {
+  // static SharedPreferences _preferences;
   static SharedPreferences _preferences = Get.find<SharedPreferences>();
 
   static Future init() async =>

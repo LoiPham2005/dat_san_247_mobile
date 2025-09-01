@@ -9,6 +9,7 @@ class DbKeysLocal {
   static const String accessToken = 'accessToken';
   static const String refreshToken = 'refreshToken';
   // type bool
+  static const String isFirstRun = 'isFirstRun';
   static const String isLogin = 'isLogin';
   static const String isSaveLogin = '/isSaveLogin';
   static const String isWarning = '/isWarning';
