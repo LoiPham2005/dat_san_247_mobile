@@ -1,5 +1,6 @@
+import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -25,7 +26,7 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController confirmPassword = TextEditingController();
   final AuthController controller = Get.find<AuthController>();
 
-  void _handleRegister(BuildContext context) async {
+  void _handleRegister() async {
     final usernameText = username.text.trim();
     final emailText = email.text.trim();
     final passwordText = password.text.trim();
@@ -40,24 +41,21 @@ class RegisterPage extends StatelessWidget {
     );
 
     if (emailError != null || passError != null || usernameError != null) {
-      ShowToast(
-        context,
-        message:
-            emailError ??
+      Get.snackbar(
+        "Lỗi", // Tiêu đề
+        emailError ??
             passError ??
             usernameError ??
             "Vui lòng nhập thông tin hợp lệ",
-        type: ToastificationType.error,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
       return;
     }
 
     if (passwordText != confirmPassText) {
-      ShowToast(
-        context,
-        message: "Mật khẩu không khớp!",
-        type: ToastificationType.error,
-      );
+      Get.snackbar("Lỗi", "Mật khẩu không khớp!",
+          backgroundColor: Colors.red, colorText: Colors.white);
       return;
     }
 
@@ -68,14 +66,16 @@ class RegisterPage extends StatelessWidget {
     );
 
     if (success) {
-      ShowToast(
-        context,
-        message: "Đăng ký thành công!",
-        type: ToastificationType.success,
+      Get.snackbar(
+        "Thành công",
+        "Đăng ký thành công!",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
       );
-      Navigator.pushReplacement(
-        context,
-        PageTransition.slideTransition(const BottomMenuCustom()),
+
+      Get.offAll(
+        () => BottomMenuCustom(),
+        transition: Transition.fade,
       );
     }
   }
@@ -94,7 +94,7 @@ class RegisterPage extends StatelessWidget {
                     title: "ĐĂNG KÝ",
                     content: "Đăng ký bằng số điện thoại và mật khẩu của bạn",
                   ),
-                  SizedBox(height: 50),
+                  50.height,
                   InputAuth(
                     controller: username,
                     keyboardType: TextInputType.text,
@@ -103,7 +103,7 @@ class RegisterPage extends StatelessWidget {
                     icon: const Icon(Icons.person_outline),
                     suffixIcon: false,
                   ),
-                  SizedBox(height: 12),
+                  12.height,
                   InputAuth(
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
@@ -112,7 +112,7 @@ class RegisterPage extends StatelessWidget {
                     icon: const Icon(Icons.email_outlined),
                     suffixIcon: false,
                   ),
-                  SizedBox(height: 12),
+                  12.height,
                   InputAuth(
                     controller: password,
                     keyboardType: TextInputType.text,
@@ -121,7 +121,7 @@ class RegisterPage extends StatelessWidget {
                     icon: const Icon(Icons.lock_outline),
                     suffixIcon: true,
                   ),
-                  SizedBox(height: 12),
+                  12.height,
                   InputAuth(
                     controller: confirmPassword,
                     keyboardType: TextInputType.text,
@@ -131,12 +131,12 @@ class RegisterPage extends StatelessWidget {
                     suffixIcon: true,
                   ),
                   const Clause(),
-                  SizedBox(height: 30),
+                  30.height,
                   ButtonAuth(
                     name: "Đăng ký",
-                    onPressed: () => _handleRegister(context),
+                    onPressed: _handleRegister,
                   ),
-                  SizedBox(height: 16),
+                  16.height,
                 ],
               ),
             ),

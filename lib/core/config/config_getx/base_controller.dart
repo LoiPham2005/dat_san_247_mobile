@@ -29,6 +29,12 @@ class BaseController extends GetxController {
 
       if (res.isSuccess) {
         final data = res.data;
+
+          // In message server trả về
+        if (res.message != null) {
+          print("Server message: ${res.message}");
+        }
+        
         if (targetList != null && data != null) {
           if (mergeList != null) {
             final updated = mergeList(targetList.toList(), data);

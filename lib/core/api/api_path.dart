@@ -1,8 +1,7 @@
 class ApiPath {
   // static const String domain = 'http://localhost:3000/api/';
-  static const String domain = 'http://192.168.1.31:3000/api/';
-  // static const String domain = 'http://192.168.1.53:3000/api/';
-  // static const String domain = 'https://backend-doantotnghiep-1.onrender.com/api';
+  static const String domain = 'http://192.168.60.102:3000/api/';
+
   static const String domainImage = 'https://tht.nanoweb.vn/';
   static const String domainVideo = 'https://tht.nanoweb.vn/';
   static const String key = 'key_nanoweb_v2_2021_real';

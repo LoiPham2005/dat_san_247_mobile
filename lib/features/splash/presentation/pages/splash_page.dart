@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/common/function/is_first_run.dart';
+import 'package:dat_san_247_mobile/core/common/function/app_preferences.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,17 +15,16 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future.delayed(Duration(milliseconds: 500), () async {
-      final isFirstRun =
-          await SharedPrefs.getBool(DbKeysLocal.isFirstRun) ?? true;
-      final isLogin = await SharedPrefs.getBool(DbKeysLocal.isLogin) ?? false;
+      final firstRun = await AppPreferences.isFirstRun();
+      final loggedIn = await AppPreferences.isLogin();
 
-      print("isFirstRun: $isFirstRun");
-      print("isLogin: $isLogin");
+      print("isFirstRun: $firstRun");
+      print("isLogin: $loggedIn");
 
-      if (!isFirstRun) {
+      if (firstRun) {
         Get.offAll(() => WelcomePage());
       } else {
-        if (isLogin) {
+        if (loggedIn) {
           Get.offAll(() => BottomMenuCustom());
         } else {
           Get.offAll(() => LoginPage());

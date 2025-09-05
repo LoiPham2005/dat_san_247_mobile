@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/styles/image_path.dart';
 
@@ -11,9 +12,7 @@ class HeaderAuth extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 60,
-        ),
+        60.height,
         GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -30,16 +29,12 @@ class HeaderAuth extends StatelessWidget {
           ImagePath.logoApp,
           width: 143,
         ),
-        SizedBox(
-          height: 13,
-        ),
+        13.height,
         Text(
           title,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         ),
-        SizedBox(
-          height: 13,
-        ),
+        13.height,
         Text(
           content,
           style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300),

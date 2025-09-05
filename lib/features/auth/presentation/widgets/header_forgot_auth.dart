@@ -27,7 +27,7 @@ class HeaderForgotAuth extends StatelessWidget {
           width: 206,
           height: 206,
         ),
-        73.withHeight,
+        73.height,
         Text(title,
             style: TextStyle(
               fontSize: 24,

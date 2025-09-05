@@ -1,5 +1,5 @@
+import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
@@ -35,21 +35,11 @@ class LoginPage extends StatelessWidget {
     final passError = ValidatorApp.checkPass(text: passwordText);
 
     if (emailError != null || passError != null) {
-      // ShowToast(
-      //   context,
-      //   message: emailError ?? passError ?? "Vui lòng nhập thông tin hợp lệ",
-      //   type: ToastificationType.error,
-      // );
-
       Get.snackbar(
         "Lỗi", // Tiêu đề
         emailError ?? passError ?? "Vui lòng nhập thông tin hợp lệ",
-        snackPosition: SnackPosition.TOP, // Hiển thị ở dưới màn hình
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-        margin: const EdgeInsets.all(10),
-        borderRadius: 8,
       );
       return;
     }
@@ -58,31 +48,19 @@ class LoginPage extends StatelessWidget {
 
     if (success) {
       print("không chạy vào đây 1111111111111110");
-      // ShowToast(
-      //   context,
-      //   message: "Đăng nhập thành công",
-      //   type: ToastificationType.success,
-      // );
+
 
       Get.snackbar(
         "Đăng nhập", // Tiêu đề
         "Đăng nhập thành công",
-        snackPosition: SnackPosition.TOP, // Hiển thị ở dưới màn hình
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-        margin: const EdgeInsets.all(10),
-        borderRadius: 8,
       );
+
       Get.offAll(
         () => BottomMenuCustom(),
         transition: Transition.fade,
-        duration: const Duration(milliseconds: 300),
       );
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => BottomMenuCustom()),
-      // );
     }
   }
 
@@ -99,7 +77,7 @@ class LoginPage extends StatelessWidget {
                   title: "ĐĂNG NHẬP",
                   content: "Đăng nhập bằng số điện thoại và mật khẩu của bạn",
                 ),
-                SizedBox(height: 50),
+                50.height,
                 InputAuth(
                   controller: email,
                   keyboardType: TextInputType.emailAddress,
@@ -108,7 +86,7 @@ class LoginPage extends StatelessWidget {
                   icon: const Icon(Icons.email_outlined),
                   suffixIcon: false,
                 ),
-                SizedBox(height: 12),
+                12.height,
                 InputAuth(
                   controller: password,
                   keyboardType: TextInputType.text,
@@ -118,12 +96,12 @@ class LoginPage extends StatelessWidget {
                   suffixIcon: true,
                 ),
                 const RememberPass(),
-                SizedBox(height: 30),
+                30.height,
                 ButtonAuth(
                   name: "Đăng nhập",
                   onPressed: () => _handleLogin(context),
                 ),
-                SizedBox(height: 16),
+                16.height,
                 const AskRegister(),
               ],
             ),

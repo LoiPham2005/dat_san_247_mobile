@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -70,10 +71,11 @@ class _SendOtpState extends State<SendOtp> {
   Future<void> handleOtpSubmit() async {
     final otp = _controllers.map((e) => e.text).join();
     if (otp.length < 6) {
-      ShowToast(
-        context,
-        message: "Vui lòng nhập đủ 6 số OTP",
-        type: ToastificationType.error,
+      Get.snackbar(
+        "Lỗi",
+        "Vui lòng nhập đủ 6 số OTP",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
       return;
     }
@@ -85,14 +87,15 @@ class _SendOtpState extends State<SendOtp> {
 
     Get.back(); // Tắt loading
 
-    if (user != null) {
+    if (user) {
       Get.to(() => ResetPassword(email: widget.email, otp: otp),
           transition: Transition.rightToLeft);
     } else {
-      ShowToast(
-        context,
-        message: "Mã OTP không hợp lệ",
-        type: ToastificationType.error,
+      Get.snackbar(
+        "Lỗi",
+        "Mã OTP không hợp lệ",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }
@@ -101,25 +104,22 @@ class _SendOtpState extends State<SendOtp> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 60),
-              const HeaderForgotAuth(title: "Quên mật khẩu"),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(6, _buildOtpBox),
-              ),
-              const SizedBox(height: 24),
-              ButtonAuth(
-                name: "Gửi",
-                onPressed: handleOtpSubmit,
-              )
-            ],
-          ),
-        ),
+        child: Column(
+          children: [
+            60.height,
+            const HeaderForgotAuth(title: "Quên mật khẩu"),
+            40.height,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(6, _buildOtpBox),
+            ),
+            24.height,
+            ButtonAuth(
+              name: "Gửi",
+              onPressed: handleOtpSubmit,
+            )
+          ],
+        ).paddingAll(24),
       ),
     );
   }

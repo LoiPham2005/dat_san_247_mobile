@@ -1,3 +1,5 @@
+import 'package:dat_san_247_mobile/core/common/function/validator.dart';
+import 'package:dat_san_247_mobile/core/ext/string_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
@@ -17,14 +19,15 @@ class SendEmail extends StatelessWidget {
   final TextEditingController email = TextEditingController();
   final AuthController controller = Get.find<AuthController>();
 
-  Future<void> _handleSendEmail(BuildContext context) async {
+  Future<void> _handleSendEmail() async {
     final emailText = email.text.trim();
-    if (emailText.isEmpty) {
-      ShowToast(
-        context,
-        message: "Vui lòng nhập email",
-        type: ToastificationType.error,
-      );
+    if (!ValidatorApp.checkEmail(text: emailText)) {
+      Get.snackbar(
+        "Lỗi",
+        "Vui lòng nhập email",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );  
       return;
     }
 
@@ -33,23 +36,26 @@ class SendEmail extends StatelessWidget {
 
     final success = await controller.sendEmail(emailText);
 
-    Get.back(); // tắt loading
+    Get.back(); 
 
     if (success) {
-      ShowToast(
-        context,
-        message: "Gửi email thành công!",
-        type: ToastificationType.success,
+      Get.snackbar(
+        "Thành công",
+        "Gửi email thành công!",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
       );
-      Navigator.push(
-        context,
-        PageTransition.slideTransition(SendOtp(email: emailText)),
+
+      Get.off(
+        () => SendOtp(email: emailText),
+        transition: Transition.rightToLeft,
       );
     } else {
-      ShowToast(
-        context,
-        message: "Gửi email thất bại!",
-        type: ToastificationType.error,
+      Get.snackbar(
+        "Thất bại",
+        "Gửi email thất bại!",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }
@@ -59,13 +65,11 @@ class SendEmail extends StatelessWidget {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 15,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 15),
           child: Column(
             children: [
               HeaderForgotAuth(title: "Quên mật khẩu"),
-              50.withHeight,
+              50.height,
               InputAuth(
                 controller: email,
                 keyboardType: TextInputType.emailAddress,
@@ -74,10 +78,10 @@ class SendEmail extends StatelessWidget {
                 suffixIcon: false,
                 hintText: "Nhập email",
               ),
-              16.withHeight,
+              16.height,
               ButtonAuth(
                 name: "Gửi",
-                onPressed: () => _handleSendEmail(context),
+                onPressed: _handleSendEmail,
               ),
             ],
           ),

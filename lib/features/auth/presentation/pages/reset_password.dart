@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
 import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/button_auth.dart';
@@ -7,16 +6,16 @@ import 'package:dat_san_247_mobile/features/auth/presentation/widgets/header_for
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/input_auth.dart';
 import 'package:dat_san_247_mobile/features/bottomMenu/screens/bottom_menu_custom.dart';
 
-class ResetPassword extends ConsumerStatefulWidget {
+class ResetPassword extends StatefulWidget {
   final String email;
   final String otp;
   const ResetPassword({super.key, required this.email, required this.otp});
 
   @override
-  ConsumerState<ResetPassword> createState() => _ResetPasswordState();
+  State<ResetPassword> createState() => _ResetPasswordState();
 }
 
-class _ResetPasswordState extends ConsumerState<ResetPassword> {
+class _ResetPasswordState extends State<ResetPassword> {
   @override
   Widget build(BuildContext context) {
     final controller = TextEditingController();
