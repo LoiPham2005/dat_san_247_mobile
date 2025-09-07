@@ -27,55 +27,47 @@ class RegisterPage extends StatelessWidget {
   final AuthController controller = Get.find<AuthController>();
 
   void _handleRegister() async {
-    final usernameText = username.text.trim();
+    final nameText = username.text.trim();
     final emailText = email.text.trim();
     final passwordText = password.text.trim();
-    final confirmPassText = confirmPassword.text.trim();
+    final confirmPasswordText = confirmPassword.text.trim();
+    // final phoneText = phone.text.trim();
 
-    final emailError = ValidatorApp.checkEmail(text: emailText);
-    final passError = ValidatorApp.checkPass(text: passwordText);
-    final usernameError = ValidatorApp.checkMinLength(
-      text: usernameText,
-      minLength: 3,
-      fieldName: "Tên đăng nhập",
+    final message = ValidatorApp.validateRegister(
+      name: nameText,
+      email: emailText,
+      password: passwordText,
+      confirmPassword: confirmPasswordText,
+      // phone: phoneText,
     );
 
-    if (emailError != null || passError != null || usernameError != null) {
+    if (message != null) {
       Get.snackbar(
-        "Lỗi", // Tiêu đề
-        emailError ??
-            passError ??
-            usernameError ??
-            "Vui lòng nhập thông tin hợp lệ",
+        "Thông báo",
+        message,
+        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       return;
     }
 
-    if (passwordText != confirmPassText) {
-      Get.snackbar("Lỗi", "Mật khẩu không khớp!",
-          backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
-
     final success = await controller.register(
-      usernameText,
+      nameText,
       emailText,
       passwordText,
+      // phoneText,
     );
 
     if (success) {
+      Get.offAll(() => BottomMenuCustom(), transition: Transition.fade);
+    } else {
       Get.snackbar(
-        "Thành công",
-        "Đăng ký thành công!",
-        backgroundColor: Colors.green,
+        "Thông báo",
+        "Đăng ký không thành công",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
         colorText: Colors.white,
-      );
-
-      Get.offAll(
-        () => BottomMenuCustom(),
-        transition: Transition.fade,
       );
     }
   }
@@ -132,10 +124,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                   const Clause(),
                   30.height,
-                  ButtonAuth(
-                    name: "Đăng ký",
-                    onPressed: _handleRegister,
-                  ),
+                  ButtonAuth(name: "Đăng ký", onPressed: _handleRegister),
                   16.height,
                 ],
               ),

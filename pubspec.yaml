@@ -56,6 +56,56 @@ dependencies:
   cupertino_icons: ^1.0.8
   curved_navigation_bar: ^1.0.6
   flutter_staggered_grid_view: ^0.7.0
+  device_preview: ^1.3.1
+  jwt_decoder: ^2.0.1
+
+
+
+  # ===================== NHÓM A - CẦN THIẾT ✅ =====================
+  # dartz: ^0.10.1                  # Hỗ trợ lập trình hướng functional, xử lý Either/Option
+  # freezed_annotation: ^2.2.0      # Hỗ trợ tạo model immutable + sealed classes
+  # json_annotation: ^4.8.0         # Dùng để parse JSON với freezed và retrofit/dio
+  validators: ^3.0.0             # Kiểm tra dữ liệu form (email, phone, password, ...)
+  # connectivity_plus: ^4.0.2      # Kiểm tra trạng thái kết nối mạng (WiFi, 4G, Offline)
+  # internet_connection_checker: ^1.0.0+1  # Kiểm tra có Internet thật sự không
+  # flutter_local_notifications: ^14.0.0 # Hiển thị thông báo trong app khi đang mở
+  # device_info_plus: ^9.0.2       # Lấy thông tin thiết bị (model, version, ...)
+  # permission_handler: ^10.4.0    # Xin quyền truy cập camera, gallery, storage, notification
+  # flutter_native_splash: ^2.2.11 # Tạo màn hình Splash Screen khi mở app
+  # flutter_launcher_icons: ^0.13.1 # Tạo icon app khi build release
+  # dio_cache_interceptor: ^5.0.0   # Cache API response để tăng tốc load dữ liệu
+  # path_provider: ^2.0.15         # Lấy đường dẫn bộ nhớ local để lưu file, ảnh, video
+
+  # # ===================== NHÓM B - NÊN CÓ 👍 =====================
+  # flutter_slidable: ^3.0.0       # Vuốt item để xóa, chỉnh sửa trong danh sách
+  # photo_view: ^0.14.0            # Zoom ảnh (dùng để xem chi tiết ảnh sân)
+  # file_picker: ^5.3.1            # Chọn ảnh/video từ thư viện hoặc chụp mới
+  # open_file: ^3.2.1              # Mở file trực tiếp từ app
+  # flutter_inappwebview: ^5.7.1   # Trình duyệt web nâng cao bên trong app
+  # webview_flutter: ^4.2.1        # WebView cơ bản (có thể dùng thay flutter_inappwebview)
+  # flutter_cache_manager: ^3.5.2  # Cache ảnh, video, dữ liệu để load nhanh hơn
+  # infinite_scroll_pagination: ^3.2.0 # Load dữ liệu dạng lazy load, cuộn vô tận
+  # intl_phone_number_input: ^0.7.0+2 # Input số điện thoại có validate, format quốc tế
+  # flutter_multi_formatter: ^2.3.0 # Format số điện thoại, tiền tệ, thẻ ngân hàng
+  # country_pickers: ^2.0.0        # Picker chọn quốc gia (nếu cần chọn số điện thoại quốc tế)
+  # country_code_picker: ^2.0.2    # Picker chọn mã vùng quốc gia
+
+  # # ===================== NHÓM C - TÙY TÍNH NĂNG ⚠️ =====================
+  # app_tracking_transparency: ^2.0.2  # Yêu cầu xin phép tracking trên iOS
+  # timeago: ^3.4.0                    # Format thời gian: "5 phút trước"
+  # highlight_text: ^0.7.1            # Tô sáng từ khóa tìm kiếm
+  # flutter_quill: ^6.3.0             # Trình soạn thảo văn bản (chỉ cần nếu có tính năng viết blog)
+  # zefyrka: ^2.0.0                   # Trình soạn thảo rich text (không cần nếu không viết bài)
+  # flutter_markdown: ^0.6.10         # Hiển thị nội dung Markdown
+  # photo_manager: ^2.6.0           # Quản lý hình ảnh/video trên thiết bị (có thể bỏ nếu chỉ chọn ảnh)
+  # video_player: ^2.6.0            # Phát video (nếu app có video sân)
+  # chewie: ^1.4.0                  # Trình phát video nâng cao, UI đẹp hơn video_player
+  # just_audio: ^0.9.33             # Phát nhạc/audio (không cần nếu app không có audio)
+  # audio_service: ^0.18.0          # Quản lý dịch vụ phát nhạc
+  # audio_session: ^0.1.6           # Điều chỉnh session âm thanh
+  # flutter_sound: ^9.3.5+1         # Thu âm (không cần nếu app không ghi âm)
+  # sticky_headers: ^0.2.0         # Header dính khi cuộn danh sách (chỉ cần nếu UI phức tạp)
+  # rxdart: ^0.28.0                # Xử lý stream nâng cao (chỉ cần nếu GetX chưa đủ)
 
 dev_dependencies:
   flutter_test:

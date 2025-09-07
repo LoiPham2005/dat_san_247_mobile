@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
 import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
@@ -22,19 +23,6 @@ class AuthController extends BaseController {
   }
 
   /// Lấy user từ SharedPrefs
-  // Future<void> loadUserFromLocal() async {
-  //   final isLogin = await SharedPrefs.getBool(DbKeysLocal.isLogin) ?? false;
-
-  //   if (isLogin) {
-  //     final userJson = await SharedPrefs.getString(DbKeysLocal.user);
-  //     if (userJson != null) {
-  //       final userMap = jsonDecode(userJson); // ✅ Decode từ String -> Map
-  //       final user = User.fromJson(userMap);
-  //       userList.assignAll([user]);
-  //     }
-  //   }
-  // }
-
   Future<void> loadUserFromLocal() async {
     final isLogin = await SharedPrefs.getBool(DbKeysLocal.isLogin) ?? false;
 
@@ -130,22 +118,40 @@ class AuthController extends BaseController {
   }) async {
     bool result = false;
 
-    await performAction(
-      action: operation,
-      onSuccess: (data, {accessToken, refreshToken}) async {
+    try {
+      final res = await operation();
+      print("Response success: ${res.success}"); // Debug log
+      print("Response data: ${res.data}"); // Debug log
+
+      if (res.success == true && res.data != null) {
         if (saveAuth) {
           await _saveAuthData(
-            data,
-            accessToken: accessToken,
-            refreshToken: refreshToken,
+            res.data!,
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
           );
         }
-        userList.assignAll([data]);
+        userList.assignAll([res.data!]);
         result = true;
-      },
-    );
+      } else {
+        Get.snackbar(
+          "Lỗi",
+          res.message ?? "Có lỗi xảy ra",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      print("Error in _handleMutation: $e"); // Debug log
+      Get.snackbar(
+        "Lỗi",
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
 
-    return true;
+    return result;
   }
 
   Future<void> _saveAuthData(

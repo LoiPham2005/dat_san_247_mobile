@@ -21,13 +21,14 @@ class SendEmail extends StatelessWidget {
 
   Future<void> _handleSendEmail() async {
     final emailText = email.text.trim();
-    if (!ValidatorApp.checkEmail(text: emailText)) {
+    final emailError = ValidatorApp.checkEmail(text: emailText);
+    if (emailError != null) {
       Get.snackbar(
         "Lỗi",
-        "Vui lòng nhập email",
+        emailError,
         backgroundColor: Colors.red,
         colorText: Colors.white,
-      );  
+      );
       return;
     }
 
@@ -36,7 +37,7 @@ class SendEmail extends StatelessWidget {
 
     final success = await controller.sendEmail(emailText);
 
-    Get.back(); 
+    Get.back();
 
     if (success) {
       Get.snackbar(
@@ -79,10 +80,7 @@ class SendEmail extends StatelessWidget {
                 hintText: "Nhập email",
               ),
               16.height,
-              ButtonAuth(
-                name: "Gửi",
-                onPressed: _handleSendEmail,
-              ),
+              ButtonAuth(name: "Gửi", onPressed: _handleSendEmail),
             ],
           ),
         ),

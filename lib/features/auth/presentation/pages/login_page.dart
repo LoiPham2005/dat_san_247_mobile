@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,18 +28,56 @@ class LoginPage extends StatelessWidget {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final AuthController controller = Get.put(AuthController());
+  String message = '';
 
-  void _handleLogin(BuildContext context) async {
+  // void _handleLogin() async {
+  //   final emailText = email.text.trim();
+  //   final passwordText = password.text.trim();
+
+  //   final emailError = ValidatorApp.checkEmail(text: emailText);
+  //   final passError = ValidatorApp.checkPass(text: passwordText);
+
+  //   if (emailError != null || passError != null) {
+  //     Get.snackbar(
+  //       "Lỗi", // Tiêu đề
+  //       emailError ?? passError ?? "Vui lòng nhập thông tin hợp lệ",
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //     );
+  //     return;
+  //   }
+
+  //   final success = await controller.login(emailText, passwordText);
+
+  //     print('2222222222222' + success.toString());
+  //   if (success) {
+  //     print("chạy vào đây 1111111111111110");
+
+  //     Get.snackbar(
+  //       "Đăng nhập", // Tiêu đề
+  //       "Đăng nhập thành công",
+  //       backgroundColor: Colors.green,
+  //       colorText: Colors.white,
+  //     );
+
+  //     Get.offAll(
+  //       () => BottomMenuCustom(),
+  //       transition: Transition.fade,
+  //     );
+  //   }
+  // }
+
+  void _handleLogin() async {
     final emailText = email.text.trim();
     final passwordText = password.text.trim();
 
-    final emailError = ValidatorApp.checkEmail(text: emailText);
-    final passError = ValidatorApp.checkPass(text: passwordText);
+    final message = ValidatorApp.validateLogin(emailText, passwordText);
 
-    if (emailError != null || passError != null) {
+    if (message != null) {
       Get.snackbar(
-        "Lỗi", // Tiêu đề
-        emailError ?? passError ?? "Vui lòng nhập thông tin hợp lệ",
+        "Thông báo",
+        message,
+        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -45,23 +85,23 @@ class LoginPage extends StatelessWidget {
     }
 
     final success = await controller.login(emailText, passwordText);
-
     if (success) {
-      print("không chạy vào đây 1111111111111110");
-
-
+      Get.offAll(() => BottomMenuCustom(), transition: Transition.fade);
+    } else {
       Get.snackbar(
-        "Đăng nhập", // Tiêu đề
-        "Đăng nhập thành công",
-        backgroundColor: Colors.green,
+        "Thông báo",
+        "Đăng nhập không thành công",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-
-      Get.offAll(
-        () => BottomMenuCustom(),
-        transition: Transition.fade,
-      );
     }
+  }
+
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
   }
 
   Widget _buildLoginUI(BuildContext context) {
@@ -97,10 +137,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 const RememberPass(),
                 30.height,
-                ButtonAuth(
-                  name: "Đăng nhập",
-                  onPressed: () => _handleLogin(context),
-                ),
+                ButtonAuth(name: "Đăng nhập", onPressed: _handleLogin),
                 16.height,
                 const AskRegister(),
               ],

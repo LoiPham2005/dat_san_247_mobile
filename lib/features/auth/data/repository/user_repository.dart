@@ -11,45 +11,44 @@ class AuthRepository {
 
   Future<BaseResponse<User>> login(String email, String password) async {
     try {
-      final response = await _client.post(ApiPath.login, data: {
-        'email': email,
-        'password': password,
-      });
-      // return parseResponse(response, (json) => User.fromJson(json));
+      final response = await _client.post(
+        ApiPath.login,
+        data: {'email': email, 'password': password},
+      );
 
       // Map response data correctly
-      if (response.data['success'] == true || response.data['status'] == 200) {
+      if (response.data['success'] == true) {
         final data = response.data['data'];
+        final user = data['user']; // Lấy user object từ data
+
         return BaseResponse<User>(
           success: true,
           message: response.data['message'],
-          data: User.fromJson(data['user']),
+          data: User.fromJson(user), // Parse user từ user object
           accessToken: data['accessToken'],
           refreshToken: data['refreshToken'],
         );
-        // return BaseResponse.fromResponse(
-        //   response,
-        //   (json) => User.fromJson(json),
-        // );
-      } else {
-        return BaseResponse<User>(
-          result: false,
-          message: response.data['message'],
-        );
       }
+
+      return BaseResponse<User>(
+        success: false,
+        message: response.data['message'] ?? 'Login failed',
+      );
     } catch (e) {
       return BaseResponse.handleError(e);
     }
   }
 
   Future<BaseResponse<User>> register(
-      String username, String email, String password) async {
+    String username,
+    String email,
+    String password,
+  ) async {
     try {
-      final response = await _client.post(ApiPath.register, data: {
-        'username': username,
-        'email': email,
-        'password': password,
-      });
+      final response = await _client.post(
+        ApiPath.register,
+        data: {'username': username, 'email': email, 'password': password},
+      );
       // return parseResponse(response, (json) => User.fromJson(json));
       if (response.data['result'] == true || response.data['status'] == 200) {
         // return BaseResponse<User>(
@@ -81,10 +80,7 @@ class AuthRepository {
     try {
       final response = await _client.post(ApiPath.logout);
       // return parseResponse(response, (json) {});
-      return BaseResponse.fromResponse(
-        response,
-        (json) {},
-      );
+      return BaseResponse.fromResponse(response, (json) {});
     } catch (e) {
       return BaseResponse.handleError(e);
     }
@@ -92,9 +88,10 @@ class AuthRepository {
 
   Future<BaseResponse<User>> sendEmail(String email) async {
     try {
-      final response = await _client.post(ApiPath.sendEmail, data: {
-        'email': email,
-      });
+      final response = await _client.post(
+        ApiPath.sendEmail,
+        data: {'email': email},
+      );
 
       // Kiểm tra status code từ response
       if (response.data['status'] == 200) {
@@ -126,75 +123,75 @@ class AuthRepository {
 
   Future<BaseResponse<User>> sendOtp(String email, String otp) async {
     try {
-      final response = await _client.post(ApiPath.sendOtp, data: {
-        'email': email,
-        'otp': otp,
-      });
+      final response = await _client.post(
+        ApiPath.sendOtp,
+        data: {'email': email, 'otp': otp},
+      );
       // return parseResponse(
       //   response,
       //   (p0) => User.fromJson(p0),
       // );
-      return BaseResponse.fromResponse(
-        response,
-        (json) => User.fromJson(json),
-      );
+      return BaseResponse.fromResponse(response, (json) => User.fromJson(json));
     } catch (e) {
       return BaseResponse.handleError(e);
     }
   }
 
   Future<BaseResponse<User>> resetPassword(
-      String email, String otp, String newPassword) async {
+    String email,
+    String otp,
+    String newPassword,
+  ) async {
     try {
-      final response = await _client.post("${ApiPath.sendOtp}/$email", data: {
-        'email': email,
-        'otp': otp,
-        'newPassword': newPassword,
-      });
+      final response = await _client.post(
+        "${ApiPath.sendOtp}/$email",
+        data: {'email': email, 'otp': otp, 'newPassword': newPassword},
+      );
       // return parseResponse(
       //   response,
       //   (p0) => User.fromJson(p0),
       // );
-      return BaseResponse.fromResponse(
-        response,
-        (json) => User.fromJson(json),
-      );
+      return BaseResponse.fromResponse(response, (json) => User.fromJson(json));
     } catch (e) {
       return BaseResponse.handleError(e);
     }
   }
 
   Future<BaseResponse<User>> changePassword(
-      String oldPassword, String newPassword, String id) async {
+    String oldPassword,
+    String newPassword,
+    String id,
+  ) async {
     try {
-      final response = await _client.post("${ApiPath.changPassword}/$id",
-          data: {'oldPassword': oldPassword, 'newPassword': newPassword});
+      final response = await _client.post(
+        "${ApiPath.changPassword}/$id",
+        data: {'oldPassword': oldPassword, 'newPassword': newPassword},
+      );
       // return parseResponse(
       //   response,
       //   (p0) => User.fromJson(p0),
       // );
-      return BaseResponse.fromResponse(
-        response,
-        (json) => User.fromJson(json),
-      );
+      return BaseResponse.fromResponse(response, (json) => User.fromJson(json));
     } catch (e) {
       return BaseResponse.handleError(e);
     }
   }
 
   Future<BaseResponse<User>> editInformation(
-      String oldPassword, String newPassword, String id) async {
+    String oldPassword,
+    String newPassword,
+    String id,
+  ) async {
     try {
-      final response = await _client.post("${ApiPath.sendOtp}/$id",
-          data: {'oldPassword': oldPassword, 'newPassword': newPassword});
+      final response = await _client.post(
+        "${ApiPath.sendOtp}/$id",
+        data: {'oldPassword': oldPassword, 'newPassword': newPassword},
+      );
       // return parseResponse(
       //   response,
       //   (p0) => User.fromJson(p0),
       // );
-      return BaseResponse.fromResponse(
-        response,
-        (json) => User.fromJson(json),
-      );
+      return BaseResponse.fromResponse(response, (json) => User.fromJson(json));
     } catch (e) {
       return BaseResponse.handleError(e);
     }

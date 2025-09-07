@@ -48,31 +48,45 @@ class DioClient {
       ),
     );
 
-    // === Thêm PrettyDioLogger để log đẹp ===
+    // Sửa lại cấu hình PrettyDioLogger
+    if (kDebugMode) {
+      dio.interceptors.add(
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseBody: true,
+          responseHeader: false,
+          error: true,
+          compact: true,
+          maxWidth: 150, // Tăng độ rộng tối đa để tránh ngắt dòng
+        ),
+      );
+    }
+
     dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
+      InterceptorsWrapper(
+        onRequest: _onRequest,
+        // onResponse: _onResponse, // Thêm onResponse interceptor
+        onError: _onError,
       ),
     );
-
-    // === Thêm Interceptors để xử lý request/response ===
-    dio.interceptors.add(InterceptorsWrapper(
-      onRequest: _onRequest,
-      onError: _onError,
-    ));
   }
 
   /// Gắn token & in log request
   Future<void> _onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     try {
+
+      // Không check refresh token cho API refresh và login
+      if (options.path == '/auth/refresh-token' || 
+          options.path == '/auth/login') {
+        return handler.next(options);
+      }
+
       // check & refresh token trước khi gắn vào header
-      await AuthService.instance.checkAndRefreshToken();
+      await CheckAuthService.instance.checkAndRefreshToken();
 
       final token = await SharedPrefs.getString(DbKeysLocal.accessToken);
       if (token != null) {
@@ -85,6 +99,28 @@ class DioClient {
     }
 
     handler.next(options);
+  }
+
+  // Thêm method xử lý response
+  void _onResponse(Response response, ResponseInterceptorHandler handler) {
+    try {
+      if (response.data is Map) {
+        final data = response.data as Map;
+        if (data['data'] is Map && data['data']['accessToken'] != null) {
+          // Đảm bảo token được xử lý đúng
+          final accessToken = data['data']['accessToken'] as String;
+          final refreshToken = data['data']['refreshToken'] as String;
+
+          // Lưu token ngay khi nhận được
+          SharedPrefs.setString(DbKeysLocal.accessToken, accessToken);
+          SharedPrefs.setString(DbKeysLocal.refreshToken, refreshToken);
+        }
+      }
+    } catch (e) {
+      print('Error processing response: $e');
+    }
+
+    handler.next(response);
   }
 
   /// Xử lý lỗi chung
@@ -135,13 +171,15 @@ class DioClient {
       print("❌ ERROR [${res?.statusCode}]: $message");
     }
 
-    handler.next(DioException(
-      requestOptions: error.requestOptions,
-      response: res,
-      type: error.type,
-      message: message,
-      error: message,
-    ));
+    handler.next(
+      DioException(
+        requestOptions: error.requestOptions,
+        response: res,
+        type: error.type,
+        message: message,
+        error: message,
+      ),
+    );
   }
 
   // === Method wrapper chuẩn ===

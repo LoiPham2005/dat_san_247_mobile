@@ -1,5 +1,9 @@
 import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
+import 'package:dat_san_247_mobile/core/widgets/custom_carousel.dart';
+import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
 import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/pages/search_page.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_carousel_slider.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/grid_sport_category.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_sliver_appbar.dart';
@@ -10,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,6 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // Inject controllers using GetX
+  final BannerController _bannerController = Get.find<BannerController>();
   final sportCategoryController = Get.find<SportCategoryController>();
   final venueController = Get.find<VenueController>();
 
@@ -66,6 +71,7 @@ class _HomePageState extends State<HomePage> {
             isCollapsed: _isCollapsed,
             onSearchTap: () {
               debugPrint("Icon tìm kiếm được bấm!");
+              Get.to(() => SearchPage());
             },
           ),
 
@@ -74,7 +80,20 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 10.height,
-                CustomCarouselSlider(),
+                // CustomCarouselSlider(),
+                CustomCarousel(
+                  items: _bannerController.bannerList.map((banner) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CustomImage(
+                        imageUrl: banner.mediaUrl ?? '',
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  }).toList(),
+                  aspectRatio: 340 / 207,
+                  autoPlay: true,
+                ),
                 20.height,
                 Obx(() {
                   if (sportCategoryController.listCategory.isEmpty) {

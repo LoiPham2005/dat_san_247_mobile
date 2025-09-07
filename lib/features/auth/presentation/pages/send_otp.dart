@@ -2,13 +2,10 @@ import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
-import 'package:dat_san_247_mobile/core/widgets/toast/show_toast.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/controller/auth_controller.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/reset_password.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/button_auth.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/header_forgot_auth.dart';
-import 'package:toastification/toastification.dart';
 
 class SendOtp extends StatefulWidget {
   final String email;
@@ -20,21 +17,18 @@ class SendOtp extends StatefulWidget {
 
 class _SendOtpState extends State<SendOtp> {
   final List<TextEditingController> _controllers =
-      List.generate(6, (index) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
+      List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   final AuthController controller = Get.find<AuthController>();
-  
+
   @override
   void dispose() {
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    for (var focusNode in _focusNodes) {
-      focusNode.dispose();
-    }
+    for (var c in _controllers) c.dispose();
+    for (var f in _focusNodes) f.dispose();
     super.dispose();
   }
 
+  /// Widget ô nhập OTP
   Widget _buildOtpBox(int index) {
     return Container(
       width: 48,
@@ -58,7 +52,7 @@ class _SendOtpState extends State<SendOtp> {
           border: InputBorder.none,
         ),
         onChanged: (value) {
-          if (value.length == 1 && index < 5) {
+          if (value.isNotEmpty && index < 5) {
             FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
           } else if (value.isEmpty && index > 0) {
             FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
@@ -68,9 +62,12 @@ class _SendOtpState extends State<SendOtp> {
     );
   }
 
-  Future<void> handleOtpSubmit() async {
+  /// Xử lý xác nhận OTP
+  Future<void> _handleOtpSubmit() async {
     final otp = _controllers.map((e) => e.text).join();
-    if (otp.length < 6) {
+
+    // Validate OTP: phải đủ 6 số
+    if (!RegExp(r'^\d{6}$').hasMatch(otp)) {
       Get.snackbar(
         "Lỗi",
         "Vui lòng nhập đủ 6 số OTP",
@@ -81,19 +78,31 @@ class _SendOtpState extends State<SendOtp> {
     }
 
     // Hiển thị loading
-    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
 
-    final user = await controller.sendOtp(widget.email, otp);
+    try {
+      final isValidOtp = await controller.sendOtp(widget.email, otp);
+      Get.back(); // Tắt loading
 
-    Get.back(); // Tắt loading
-
-    if (user) {
-      Get.to(() => ResetPassword(email: widget.email, otp: otp),
-          transition: Transition.rightToLeft);
-    } else {
+      if (isValidOtp) {
+        Get.off(() => ResetPassword(email: widget.email, otp: otp),
+            transition: Transition.rightToLeft);
+      } else {
+        Get.snackbar(
+          "Lỗi",
+          "Mã OTP không hợp lệ",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.back();
       Get.snackbar(
         "Lỗi",
-        "Mã OTP không hợp lệ",
+        "Có lỗi xảy ra: $e",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -116,8 +125,8 @@ class _SendOtpState extends State<SendOtp> {
             24.height,
             ButtonAuth(
               name: "Gửi",
-              onPressed: handleOtpSubmit,
-            )
+              onPressed: _handleOtpSubmit,
+            ),
           ],
         ).paddingAll(24),
       ),

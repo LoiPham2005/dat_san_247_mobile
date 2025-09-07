@@ -1,7 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 class BaseResponse<T> {
   final String? userId;
@@ -28,15 +25,9 @@ class BaseResponse<T> {
     this.expiresAt,
   });
 
-  // bool get isSuccess {
-  //   if (result != null) return result == true;
-  //   return status == 200 || status == 201;
-  // }
-
   bool get isSuccess =>
       result == true ||
       success == true ||
-      // data != null ||
       status == 200 ||
       status == 201;
 
@@ -63,6 +54,7 @@ class BaseResponse<T> {
   }) {
     return BaseResponse(
       result: false,
+      success: false,
       message: message,
       status: status,
     );

@@ -106,7 +106,7 @@ class _WelcomePageState extends State<WelcomePage> {
       body: Column(
         children: [
           HeaderIntro(),
-          SizedBox(height: 81),
+          80.height,
           SizedBox(
             height: 400,
             child: PageView.builder(
@@ -155,9 +155,7 @@ class _WelcomePageState extends State<WelcomePage> {
               color: ColorApp.primaryColor,
             ),
           ),
-          SizedBox(
-            height: 40, // 40px từ Figma
-          ),
+          40.height,
           ButtonIntro(onContinue: _nextContent, onSkip: _skipContent),
         ],
       ),
