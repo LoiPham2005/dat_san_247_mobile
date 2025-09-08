@@ -1,107 +1,92 @@
+// import 'package:flutter/material.dart';
+
+// enum AppThemeKey { light, dark, blue, green }
+
+// class AppTheme {
+//   /// 🎭 Danh sách tất cả Theme
+//   static final Map<AppThemeKey, ThemeData> themes = {
+//     AppThemeKey.light: _lightTheme,
+//     AppThemeKey.dark: _darkTheme,
+//     AppThemeKey.blue: _blueTheme,
+//     AppThemeKey.green: _greenTheme,
+//   };
+
+//   // ----------------- LIGHT THEME -----------------
+//   static final ThemeData _lightTheme = ThemeData(
+//     useMaterial3: true,
+//     colorScheme: ColorScheme.fromSeed(
+//       seedColor: Colors.deepPurple,
+//       brightness: Brightness.light,
+//     ),
+//   );
+
+//   // ----------------- DARK THEME -----------------
+//   static final ThemeData _darkTheme = ThemeData(
+//     useMaterial3: true,
+//     colorScheme: ColorScheme.fromSeed(
+//       seedColor: Colors.deepPurple,
+//       brightness: Brightness.dark,
+//     ),
+//   );
+
+//   // ----------------- BLUE THEME -----------------
+//   static final ThemeData _blueTheme = ThemeData(
+//     useMaterial3: true,
+//     colorScheme: ColorScheme.fromSeed(
+//       seedColor: Colors.blue,
+//       brightness: Brightness.light,
+//     ),
+//   );
+
+//   // ----------------- GREEN THEME -----------------
+//   static final ThemeData _greenTheme = ThemeData(
+//     useMaterial3: true,
+//     colorScheme: ColorScheme.fromSeed(
+//       seedColor: Colors.green,
+//       brightness: Brightness.light,
+//     ),
+//   );
+// }
+
+import 'package:dat_san_247_mobile/core/theme/base_theme.dart';
 import 'package:flutter/material.dart';
 
+enum AppThemeKey { light, dark, blue, green }
+
 class AppTheme {
-    /// 🎭 Danh sách tất cả Theme
-  static final Map<String, ThemeData> themes = {
-    "Light": lightTheme,
-    "Dark": darkTheme,
-    "Blue": blueTheme,
-    "Green": greenTheme,
+  /// 🎭 Danh sách tất cả Theme
+  static final Map<AppThemeKey, ThemeData> themes = {
+    AppThemeKey.light: _lightTheme,
+    AppThemeKey.dark: _darkTheme,
+    AppThemeKey.blue: _blueTheme,
+    AppThemeKey.green: _greenTheme,
   };
-  
-  // 🎨 Màu cơ bản
-  static const Color primaryPurple = Colors.deepPurple;
-  static const Color primaryBlue = Colors.blue;
-  static const Color primaryGreen = Colors.green;
-  static const Color secondary = Colors.amber;
 
-  /// ----------------- LIGHT THEME -----------------
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
+  // ----------------- LIGHT THEME -----------------
+  static final ThemeData _lightTheme = BaseTheme.build(
+    seed: Colors.deepPurple,
     brightness: Brightness.light,
-    primaryColor: primaryPurple,
-    scaffoldBackgroundColor: Colors.white,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryPurple,
-      brightness: Brightness.light,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryPurple,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-    ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      bodyLarge: TextStyle(fontSize: 16, color: Colors.black87),
-      bodyMedium: TextStyle(fontSize: 14, color: Colors.black54),
-    ),
+    inversePrimary: Colors.deepPurple.shade200,
   );
 
-  /// ----------------- DARK THEME -----------------
-  static ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
+  // ----------------- DARK THEME -----------------
+  static final ThemeData _darkTheme = BaseTheme.build(
+    seed: Colors.deepPurple,
     brightness: Brightness.dark,
-    primaryColor: primaryPurple,
-    scaffoldBackgroundColor: Colors.black,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryPurple,
-      brightness: Brightness.dark,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-    ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      bodyLarge: TextStyle(fontSize: 16, color: Colors.white),
-      bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
-    ),
+    inversePrimary: Colors.deepPurple.shade200,
   );
 
-  /// ----------------- BLUE THEME -----------------
-  static ThemeData blueTheme = ThemeData(
-    useMaterial3: true,
+  // ----------------- BLUE THEME -----------------
+  static final ThemeData _blueTheme = BaseTheme.build(
+    seed: Colors.blue,
     brightness: Brightness.light,
-    primaryColor: primaryBlue,
-    scaffoldBackgroundColor: Colors.white,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryBlue,
-      brightness: Brightness.light,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryBlue,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primaryBlue,
-        foregroundColor: Colors.white,
-      ),
-    ),
+    inversePrimary: Colors.blue.shade200,
   );
 
-  /// ----------------- GREEN THEME -----------------
-  static ThemeData greenTheme = ThemeData(
-    useMaterial3: true,
+  // ----------------- GREEN THEME -----------------
+  static final ThemeData _greenTheme = BaseTheme.build(
+    seed: Colors.green,
     brightness: Brightness.light,
-    primaryColor: primaryGreen,
-    scaffoldBackgroundColor: Colors.white,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryGreen,
-      brightness: Brightness.light,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryGreen,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: primaryGreen,
-      foregroundColor: Colors.white,
-    ),
+    inversePrimary: Colors.green.shade200,
   );
-
-
 }

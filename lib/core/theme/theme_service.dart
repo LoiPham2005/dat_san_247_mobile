@@ -1,42 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
 import 'app_theme.dart';
-import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
+import '../common/db_keys_local.dart';
 
 class ThemeService extends GetxService {
-  // danh sách theme
   final themes = AppTheme.themes;
-  // final themes = {
-  //   "Light": AppTheme.lightTheme,
-  //   "Dark": AppTheme.darkTheme,
-  //   "Blue": AppTheme.blueTheme,
-  //   "Green": AppTheme.greenTheme,
-  // };
 
-  // theme hiện tại
-  final _currentTheme = "Light".obs;
+  final _currentTheme = AppThemeKey.light.obs;
 
-  String get currentThemeKey => _currentTheme.value;
+  AppThemeKey get currentThemeKey => _currentTheme.value;
   ThemeData get currentTheme => themes[_currentTheme.value]!;
 
-  /// Load theme đã lưu từ SharedPr`eferences
+  /// Load theme đã lưu
   Future<void> loadTheme() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final savedTheme = prefs.getString(DbKeysLocal.themeKey) ?? "Light";
-    _currentTheme.value = savedTheme;
-    Get.changeTheme(themes[savedTheme]!);
+    final savedKey = prefs.getString(DbKeysLocal.themeKey);
+
+    if (savedKey != null) {
+      final themeKey = AppThemeKey.values.firstWhere(
+        (e) => e.toString() == savedKey,
+        orElse: () => AppThemeKey.light,
+      );
+      _currentTheme.value = themeKey;
+      Get.changeTheme(themes[themeKey]!);
+    }
   }
 
   /// Đổi theme + lưu lại
-  Future<void> changeTheme(String key) async {
-     final  SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (themes.containsKey(key)) {
-      _currentTheme.value = key;
-      Get.changeTheme(themes[key]!);
-
-      prefs.setString(DbKeysLocal.themeKey, key);
-    }
+  Future<void> changeTheme(AppThemeKey key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    _currentTheme.value = key;
+    Get.changeTheme(themes[key]!);
+    prefs.setString(DbKeysLocal.themeKey, key.toString());
   }
 }
