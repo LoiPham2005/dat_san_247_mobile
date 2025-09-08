@@ -71,7 +71,11 @@ class _HomePageState extends State<HomePage> {
             isCollapsed: _isCollapsed,
             onSearchTap: () {
               debugPrint("Icon tìm kiếm được bấm!");
-              Get.to(() => SearchPage());
+              Get.to(
+                () => SearchPage(),
+                curve: Curves.easeInOut,
+                transition: Transition.rightToLeft,
+              );
             },
           ),
 

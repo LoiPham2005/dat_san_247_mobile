@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/localization/app_localization.dart';
 import 'package:flutter/material.dart';
 
 class CustomSliverAppBar extends StatelessWidget {
@@ -33,7 +34,7 @@ class CustomSliverAppBar extends StatelessWidget {
                     color: Colors.white,
                   ),
                   duration: const Duration(milliseconds: 300),
-                  child: const Text("SNEAK UP"),
+                  child:  Text(Language.current.nameApp),
                 ),
                 const SizedBox(height: 8),
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dat_san_247_mobile/core/lang/locale_keys.dart';
+import 'package:dat_san_247_mobile/core/localization/app_localization.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -14,20 +15,36 @@ import 'package:dat_san_247_mobile/core/lang/locale_keys.dart';
 abstract class NetworkConstants {
   NetworkConstants._();
 
-  static const ERROR_TITLE = LocaleKeys.error_unknown;
-  static const ERROR_NETWORK = LocaleKeys.error_network;
-  static const ERROR_BAD_REQUEST = LocaleKeys.error_bad_request;
-  static const ERROR_UNAUTHORIZED = LocaleKeys.error_unauthorized;
-  static const ERROR_FORBIDDEN = LocaleKeys.error_forbidden;
-  static const ERROR_NOT_FOUND = LocaleKeys.error_not_found;
-  static const ERROR_METHOD_NOT_ALLOWED = LocaleKeys.error_method_not_allowed;
-  static const ERROR_REQUEST_TIMEOUT = LocaleKeys.error_request_timeout;
-  static const ERROR_CONFLICT = LocaleKeys.error_conflict;
-  static const ERROR_INTERNAL_SERVER_ERROR =
-      LocaleKeys.error_internal_server_error;
-  static const ERROR_SERVER_UNAVAILABLE = LocaleKeys.error_server_unavailable;
-  static const ERROR_GATEWAY_TIMEOUT = LocaleKeys.error_gateway_timeout;
-  static const ERROR_UNKNOWN = LocaleKeys.error_unknown;
+  // static const ERROR_TITLE = LocaleKeys.error_unknown;
+  // static const ERROR_NETWORK = LocaleKeys.error_network;
+  // static const ERROR_BAD_REQUEST = LocaleKeys.error_bad_request;
+  // static const ERROR_UNAUTHORIZED = LocaleKeys.error_unauthorized;
+  // static const ERROR_FORBIDDEN = LocaleKeys.error_forbidden;
+  // static const ERROR_NOT_FOUND = LocaleKeys.error_not_found;
+  // static const ERROR_METHOD_NOT_ALLOWED = LocaleKeys.error_method_not_allowed;
+  // static const ERROR_REQUEST_TIMEOUT = LocaleKeys.error_request_timeout;
+  // static const ERROR_CONFLICT = LocaleKeys.error_conflict;
+  // static const ERROR_INTERNAL_SERVER_ERROR =
+  //     LocaleKeys.error_internal_server_error;
+  // static const ERROR_SERVER_UNAVAILABLE = LocaleKeys.error_server_unavailable;
+  // static const ERROR_GATEWAY_TIMEOUT = LocaleKeys.error_gateway_timeout;
+  // static const ERROR_UNKNOWN = LocaleKeys.error_unknown;
+
+
+  static final ERROR_TITLE = Language.current.errorUnknown;
+  static final ERROR_NETWORK = Language.current.errorNetwork;
+  static final ERROR_BAD_REQUEST = Language.current.errorBadRequest;
+  static final ERROR_UNAUTHORIZED = Language.current.errorUnauthorized;
+  static final ERROR_FORBIDDEN = Language.current.errorForbidden;
+  static final ERROR_NOT_FOUND = Language.current.errorNotFound;
+  static final ERROR_METHOD_NOT_ALLOWED = Language.current.errorMethodNotAllowed;
+  static final ERROR_REQUEST_TIMEOUT = Language.current.errorRequestTimeout;
+  static final ERROR_CONFLICT = Language.current.errorConflict;
+  static final ERROR_INTERNAL_SERVER_ERROR =
+      Language.current.errorInternalServerError;
+  static final ERROR_SERVER_UNAVAILABLE = Language.current.errorServerUnavailable;
+  static final ERROR_GATEWAY_TIMEOUT = Language.current.errorGatewayTimeout;
+  static final ERROR_UNKNOWN = Language.current.errorUnknown;
 }
 
 class DioClient {
