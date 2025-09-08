@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
-import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
-import 'package:dat_san_247_mobile/core/config/repository_helper/base_response.dart';
-import 'package:dat_san_247_mobile/core/config/config_getx/base_controller.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/db_keys_local.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/share_pref.dart';
+import 'package:dat_san_247_mobile/core/config/app/repository_helper/base_response.dart';
+import 'package:dat_san_247_mobile/core/config/app/config_getx/base_controller.dart';
 import 'package:dat_san_247_mobile/features/auth/data/models/user_model.dart';
 import 'package:dat_san_247_mobile/features/auth/data/repository/user_repository.dart';
 

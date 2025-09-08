@@ -1,7 +1,7 @@
-import 'package:dat_san_247_mobile/core/api/api_path.dart';
-import 'package:dat_san_247_mobile/core/api/dio_client.dart';
-import 'package:dat_san_247_mobile/core/config/repository_helper/base_response.dart';
-import 'package:dat_san_247_mobile/core/config/repository_helper/api_helper.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/api/dio_client.dart';
+import 'package:dat_san_247_mobile/core/config/app/repository_helper/base_response.dart';
+import 'package:dat_san_247_mobile/core/config/app/repository_helper/api_helper.dart';
 import 'package:dat_san_247_mobile/features/home/data/models/banner_model.dart';
 
 class BannerRepository {

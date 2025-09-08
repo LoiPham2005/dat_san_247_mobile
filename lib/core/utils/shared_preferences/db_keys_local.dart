@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/share_pref.dart';
 
 class DbKeysLocal {
   static const String urlImagePrdTest =

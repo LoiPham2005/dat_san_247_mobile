@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
+import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
 import 'package:dat_san_247_mobile/core/styles/image_path.dart';
 
 class HeaderForgotAuth extends StatelessWidget {

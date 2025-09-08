@@ -1,6 +1,6 @@
 
 
-import 'package:dat_san_247_mobile/core/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
 
 extension StringX on String? {
 

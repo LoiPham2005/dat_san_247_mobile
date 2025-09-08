@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
+import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

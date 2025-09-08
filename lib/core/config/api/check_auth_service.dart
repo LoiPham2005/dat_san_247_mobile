@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
-import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/db_keys_local.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/share_pref.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'dio_client.dart'; // import DioClient để gọi API refresh token
 import 'package:jwt_decoder/jwt_decoder.dart'; // Thêm package jwt_decoder

@@ -62,7 +62,7 @@
 //   }
 // }
 
-import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
+import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
 import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
 import 'package:dat_san_247_mobile/core/widgets/toast/loading_overlay.dart';
 import 'package:dat_san_247_mobile/features/category/data/model/sport_category.dart';

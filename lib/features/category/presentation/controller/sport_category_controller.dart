@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/config/config_getx/base_controller.dart';
+import 'package:dat_san_247_mobile/core/config/app/config_getx/base_controller.dart';
 import 'package:dat_san_247_mobile/features/category/data/model/sport_category.dart';
 import 'package:dat_san_247_mobile/features/category/data/repository/sport_category_repository.dart';
 import 'package:dat_san_247_mobile/features/category/presentation/pages/sport_category_page.dart';

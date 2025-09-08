@@ -1,7 +1,7 @@
 import 'package:dat_san_247_mobile/core/localization/localization_service.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dat_san_247_mobile/core/api/dio_client.dart';
+import 'package:dat_san_247_mobile/core/config/api/dio_client.dart';
 import 'package:dat_san_247_mobile/core/lang/language_service.dart' hide LanguageService;
 import 'package:dat_san_247_mobile/core/theme/theme_service.dart';
 

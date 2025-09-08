@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
+import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/controller/auth_controller.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/button_auth.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/widgets/header_forgot_auth.dart';

@@ -1,11 +1,11 @@
-import 'package:dat_san_247_mobile/core/common/function/app_preferences.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/app_preferences.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
-import 'package:dat_san_247_mobile/core/common/function/share_pref.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/db_keys_local.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/share_pref.dart';
 import 'package:dat_san_247_mobile/features/bottomMenu/screens/bottom_menu_custom.dart';
 import 'package:dat_san_247_mobile/features/intro/presentation/pages/welcome_page.dart';
 

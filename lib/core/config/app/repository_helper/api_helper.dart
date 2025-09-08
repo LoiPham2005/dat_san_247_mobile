@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/config/repository_helper/base_response.dart';
+import 'package:dat_san_247_mobile/core/config/app/repository_helper/base_response.dart';
 import 'package:dio/dio.dart';
 
 class ApiHelper {

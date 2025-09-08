@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
-import 'package:dat_san_247_mobile/core/api/api_path.dart';
-import 'package:dat_san_247_mobile/core/config/repository_helper/base_response.dart';
-import 'package:dat_san_247_mobile/core/api/dio_client.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/app/repository_helper/base_response.dart';
+import 'package:dat_san_247_mobile/core/config/api/dio_client.dart';
 import 'package:dat_san_247_mobile/features/auth/data/models/user_model.dart';
 
 class AuthRepository {

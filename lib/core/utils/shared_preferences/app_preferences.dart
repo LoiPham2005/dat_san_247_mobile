@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/common/db_keys_local.dart';
+import 'package:dat_san_247_mobile/core/utils/shared_preferences/db_keys_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPreferences {
