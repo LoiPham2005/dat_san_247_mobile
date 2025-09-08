@@ -1,9 +1,9 @@
 // lib/core/localization/app_localization.dart
 import 'package:get/get.dart';
 import 'package:dat_san_247_mobile/core/localization/locale_keys.dart';
-import 'lang/en.dart';
-import 'lang/vi.dart';
-import 'lang/jp.dart';
+import 'languages/en.dart';
+import 'languages/vi.dart';
+import 'languages/jp.dart';
 
 class Language {
   // Sử dụng Rx<LocaleKeys> thay vì khởi tạo với ViLocale
