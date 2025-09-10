@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SprotHub Logo - Tải về</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(46, 125, 50, 0.1);
+            text-align: center;
+            max-width: 510px;
+        }
+
+        .logo-container {
+            background: #fafafa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #ddd;
+        }
+
+        h1 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        .format-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #2E7D32;
+        }
+
+        .instructions {
+            text-align: left;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>SprotHub Logo</h1>
+        <p class="subtitle">Tìm kiếm &amp; Đặt sân thể thao</p>
+
+        <div class="logo-container">
+            <svg id="logo" width="205" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="ballGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="fieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#66BB6A;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#388E3C;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.2" />
+                    </filter>
+                </defs>
+
+                <g transform="translate(10, 10)">
+                    <rect x="0" y="0" width="50" height="35" rx="5" fill="url(#fieldGradient)" filter="url(#shadow)" />
+                    <line x1="5" y1="17.5" x2="45" y2="17.5" stroke="#ffffff" stroke-width="1.5" opacity="0.8" />
+                    <circle cx="25" cy="17.5" r="8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.8" />
+                    <circle cx="25" cy="17.5" r="2" fill="#ffffff" opacity="0.8" />
+                    <rect x="0" y="10" width="8" height="15" fill="none" stroke="#ffffff" stroke-width="1.5"
+                        opacity="0.8" />
+                    <rect x="42" y="10" width="8" height="15" fill="none" stroke="#ffffff" stroke-width="1.5"
+                        opacity="0.8" />
+                    <circle cx="35" cy="12" r="4" fill="url(#ballGradient)" filter="url(#shadow)" />
+                    <path d="M 33 10 Q 35 8 37 10" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.8" />
+                    <path d="M 33 14 Q 35 12 37 14" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.8" />
+                    <circle cx="15" cy="25" r="3" fill="#FF5722" />
+                    <path d="M 15 22 L 15 28" stroke="#FF5722" stroke-width="2" />
+                    <circle cx="15" cy="22" r="2" fill="#FF5722" opacity="0.8" />
+                </g>
+
+                <text x="75" y="35" font-family="Arial, sans-serif" font-size="24" font-weight="bold"
+                    fill="#2E7D32">Sport</text>
+                <text x="138" y="35" font-family="Arial, sans-serif" font-size="24" font-weight="bold"
+                    fill="#FF5722">Hub</text>
+                <text x="75" y="50" font-family="Arial, sans-serif" font-size="10" fill="#666666">Tìm kiếm &amp; Đặt sân
+                    thể thao</text>
+`
+                <circle cx="70" cy="20" r="2" fill="#4CAF50" opacity="0.6" />
+                <circle cx="70" cy="25" r="1.5" fill="#4CAF50" opacity="0.4" />
+                <circle cx="70" cy="30" r="1" fill="#4CAF50" opacity="0.3" />
+            </svg>
+        </div>
+
+        <button class="download-btn" onclick="downloadSVG()">📥 Tải về SVG</button>
+        <button class="download-btn" onclick="downloadPNG()">📥 Tải về PNG</button>
+
+        <div class="format-info">
+            <strong>SVG:</strong> Vector, có thể phóng to không mất chất lượng, phù hợp cho web<br>
+            <strong>PNG:</strong> Hình ảnh bitmap, phù hợp cho in ấn và app icon
+        </div>
+
+        <div class="instructions">
+            <h3>Hướng dẫn sử dụng:</h3>
+            <ol>
+                <li>Nhấn nút "Tải về SVG" hoặc "Tải về PNG"</li>
+                <li>File sẽ được tải về máy tự động</li>
+                <li>Sử dụng SVG cho website, PNG cho app hoặc in ấn</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function downloadSVG() {
+            const svgData = document.getElementById('logo').outerHTML;
+            const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+            const svgUrl = URL.createObjectURL(svgBlob);
+
+            const downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = "SprotHub_Logo.svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        function downloadPNG() {
+            const svg = document.getElementById('logo');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size for high quality (4x scale)
+            canvas.width = 800;
+            canvas.height = 320;
+
+            const img = new Image();
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function () {
+                // Set white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw the image scaled up for better quality
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // Download
+                canvas.toBlob(function (blob) {
+                    const url = URL.createObjectURL(blob);
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = url;
+                    downloadLink.download = "SprotHub_Logo.png";
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    URL.revokeObjectURL(url);
+                });
+
+                URL.revokeObjectURL(url);
+            };
+
+            img.src = url;
+        }
+    </script>
+</body>
+
+</html>

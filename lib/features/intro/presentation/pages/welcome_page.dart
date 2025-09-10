@@ -1,19 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dat_san_247_mobile/core/widgets/animation/page_transition.dart';
-import 'package:dat_san_247_mobile/core/utils/shared_preferences/db_keys_local.dart';
-import 'package:dat_san_247_mobile/core/utils/shared_preferences/share_pref.dart';
-import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
-import 'package:dat_san_247_mobile/core/styles/color_app.dart';
-import 'package:dat_san_247_mobile/core/styles/image_path.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/controller/auth_controller.dart';
+// welcome_page.dart
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
-import 'package:dat_san_247_mobile/features/bottomMenu/screens/bottom_menu_custom.dart';
-import 'package:dat_san_247_mobile/features/intro/presentation/widgets/button_intro.dart';
-import 'package:dat_san_247_mobile/features/intro/presentation/widgets/content_intro.dart';
-import 'package:dat_san_247_mobile/features/intro/presentation/widgets/header_intro.dart';
+import 'package:dat_san_247_mobile/features/intro/data/models/intro_model.dart';
+import 'package:dat_san_247_mobile/features/intro/presentation/widgets/intro_content.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -22,141 +13,308 @@ class WelcomePage extends StatefulWidget {
   State<WelcomePage> createState() => _WelcomePageState();
 }
 
-class _WelcomePageState extends State<WelcomePage> {
+class _WelcomePageState extends State<WelcomePage>
+    with TickerProviderStateMixin {
   int currentIndex = 0;
   final PageController _pageController = PageController();
-  final AuthController controller = Get.find<AuthController>();
-  final List<Map<String, String>> args = [
-    {
-      'image': ImagePath.intro1,
-      'title': "Đặt sân nhanh chóng & tiện lợi",
-      'content':
-          "Chỉ với vài thao tác, bạn có thể dễ dàng đặt sân \ntại các địa điểm thể thao yêu thích. Tiết kiệm \nthời gian, đặt sân mọi lúc, mọi nơi!",
-    },
-    {
-      'image': ImagePath.intro2,
-      'title': "Cập nhật lịch đặt sân theo thời gian thực",
-      'content':
-          "Theo dõi tình trạng sân trống và lịch đặt sân \ntrực tiếp ngay trên ứng dụng. Không lo trùng \nlịch, không bỏ lỡ trận đấu nào!",
-    },
-    {
-      'image': ImagePath.intro2,
-      'title': "Nhận ưu đãi & khuyến mãi hấp dẫn",
-      'content':
-          "Tận hưởng nhiều chương trình giảm giá đặc \nbệt dành riêng cho thành viên. Đặt sân dễ \ndàng, giá cực ưu đãi!",
-    },
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  final List<IntroModel> introData = [
+    IntroModel(
+      icon: Icons.sports_soccer,
+      title: "Tìm Sân Dễ Dàng",
+      subtitle: "Khám phá ngay",
+      description:
+          "Tìm kiếm và khám phá hàng ngàn sân thể thao chất lượng gần bạn với hệ thống tìm kiếm thông minh và bản đồ tương tác.",
+      gradient: [Color(0xff62b766), Color(0xff4fa553)],
+      backgroundColor: Color(0xfff8fff9),
+    ),
+    IntroModel(
+      icon: Icons.schedule,
+      title: "Đặt Sân Nhanh Chóng",
+      subtitle: "Chỉ 30 giây",
+      description:
+          "Đặt sân thể thao yêu thích chỉ với vài chạm. Thanh toán an toàn, xác nhận tức thì, không cần chờ đợi.",
+      gradient: [Color(0xff62b766), Color(0xff4fa553)],
+      backgroundColor: Color(0xfffef9e7),
+    ),
+    IntroModel(
+      icon: Icons.local_offer,
+      title: "Ưu Đãi Đặc Biệt",
+      subtitle: "Tiết kiệm 50%",
+      description:
+          "Nhận voucher giảm giá, tích điểm thưởng và tham gia các chương trình khuyến mãi độc quyền dành cho thành viên.",
+      gradient: [Color(0xff62b766), Color(0xff4fa553)],
+      backgroundColor: Color(0xfff3f8ff),
+    ),
   ];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    checkLogin();
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+
+    _fadeController = AnimationController(
+      duration: Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _slideController = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+        );
+
+    _startAnimations();
   }
 
-  void checkLogin() async {
-    await controller.loadUserFromLocal();
-    if (controller.userList.isNotEmpty) {
-      Navigator.pushReplacement(
-        context,
-        PageTransition.slideTransition(BottomMenuCustom()),
-      );
-    }
+  void _startAnimations() {
+    _fadeController.forward();
+    _slideController.forward();
   }
 
   void _nextContent() {
-    setState(() {
-      if (currentIndex < args.length - 1) {
-        currentIndex++;
-        _pageController.animateToPage(
-          currentIndex,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          PageTransition.slideTransition(LoginPage()),
-        );
-
-        SharedPrefs.setBool(DbKeysLocal.isFirstRun, true);
-      }
-    });
+    if (currentIndex < introData.length - 1) {
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 400),
+        curve: Curves.easeInOutCubic,
+      );
+    } else {
+      _navigateToLogin();
+    }
   }
 
-  void _skipContent() async {
-    // final isLogin = await SharedPrefs.getBool(DbKeysLocal.isLogin) ?? false;
-    // Navigator.pushReplacement(
-    //   context,
-    //   PageTransition.slideTransition(LoginPage()),
-    // );
-
-    SharedPrefs.setBool(DbKeysLocal.isFirstRun, true);
-
-    Get.to(
-      () => LoginPage(),
-      transition: Transition.rightToLeft,
-      duration: Duration(milliseconds: 500),
-    );
+  void _navigateToLogin() {
+    // Navigator logic here
+    Get.offAll(() => LoginPage());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          HeaderIntro(),
-          80.height,
-          SizedBox(
-            height: 400,
-            child: PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  currentIndex = index;
-                });
-              },
-              itemCount: args.length,
-              itemBuilder: (context, index) {
-                final item = args[index];
-                return ContentIntro(
-                  image: item['image']!,
-                  title: item['title']!,
-                  content: item['content']!,
-                );
-              },
-            ),
-          ),
-          10.height,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ...args.map((e) {
-                int index = args.indexOf(e);
-                bool isSelected = index == currentIndex;
-                return AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  width: isSelected ? 16 : 4,
-                  height: 4,
-                  margin: EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    color: isSelected ? ColorApp.primaryColor : Colors.grey,
-                  ),
-                );
-              }),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              introData[currentIndex].backgroundColor.withOpacity(0.3),
+              Colors.white,
+              introData[currentIndex].backgroundColor.withOpacity(0.1),
             ],
           ),
-          20.height,
-          Text(
-            "ĐĂNG NHẬP HOẶC ĐĂNG KÝ",
-            style: TextStyle(
-              fontSize: 16, // 16px từ Figma
-              fontWeight: FontWeight.w300,
-              color: ColorApp.primaryColor,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header với logo và skip button
+              _buildHeader(),
+
+              // Main content
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                    _slideController.reset();
+                    _slideController.forward();
+                  },
+                  itemCount: introData.length,
+                  itemBuilder: (context, index) {
+                    return SlideTransition(
+                      position: _slideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: IntroContent(data: introData[index]),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Bottom section
+              _buildBottomSection(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Logo
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xff62b766), Color(0xff4fa553)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xff62b766).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(Icons.sports_soccer, color: Colors.white, size: 24),
+              ),
+              SizedBox(width: 12),
+              Text(
+                "SprotHub",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff2d5533),
+                ),
+              ),
+            ],
+          ),
+
+          // Skip button
+          if (currentIndex < introData.length - 1)
+            TextButton(
+              onPressed: _navigateToLogin,
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[600]),
+              child: Text(
+                "Bỏ qua",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomSection() {
+    return Padding(
+      padding: EdgeInsets.all(24),
+      child: Column(
+        children: [
+          // Page indicators
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              introData.length,
+              (index) => AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                margin: EdgeInsets.symmetric(horizontal: 4),
+                width: currentIndex == index ? 32 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  gradient: currentIndex == index
+                      ? LinearGradient(
+                          colors: [Color(0xff62b766), Color(0xff4fa553)],
+                        )
+                      : null,
+                  color: currentIndex == index ? null : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
             ),
           ),
-          40.height,
-          ButtonIntro(onContinue: _nextContent, onSkip: _skipContent),
+
+          SizedBox(height: 40),
+
+          // Action button
+          Container(
+            width: double.infinity,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xff62b766), Color(0xff4fa553)],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xff62b766).withOpacity(0.4),
+                  blurRadius: 12,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              onPressed: _nextContent,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    currentIndex == introData.length - 1
+                        ? "Bắt Đầu"
+                        : "Tiếp Tục",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(
+                    currentIndex == introData.length - 1
+                        ? Icons.rocket_launch
+                        : Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SizedBox(height: 20),
+
+          // Login suggestion
+          Text.rich(
+            TextSpan(
+              text: "Đã có tài khoản? ",
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              children: [
+                TextSpan(
+                  text: "Đăng nhập ngay",
+                  style: TextStyle(
+                    color: Color(0xff62b766),
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ],
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -165,6 +323,8 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void dispose() {
     _pageController.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 }

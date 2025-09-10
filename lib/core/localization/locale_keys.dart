@@ -13,6 +13,23 @@ abstract class LocaleKeys {
   String get errorGatewayTimeout;
   String get errorUnknown;
 
+  // === Lỗi nâng cao ===
+  String get errorUnsupportedMediaType;   // 415
+  String get errorTooManyRequests;       // 429
+  String get errorServiceUnavailable;    // 503
+  String get errorFailedDependency;      // 424
+  String get errorInsufficientStorage;   // 507
+  String get errorNetworkAuthRequired;   // 511
+
+  // === Lỗi ngoài HTTP ===
+  String get errorParse;
+  String get errorConnectTimeout;
+  String get errorReceiveTimeout;
+  String get errorSendTimeout;
+  String get errorSSLHandshake;
+  String get errorCanceled;
+  String get errorNoInternet;
+
   // === Common ===
   String get nameApp;
   String get hello;

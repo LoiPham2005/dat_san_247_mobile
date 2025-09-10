@@ -16,6 +16,7 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Future.delayed(Duration(milliseconds: 500), () async {
       final firstRun = await AppPreferences.isFirstRun();
+      // final firstRun = true;
       final loggedIn = await AppPreferences.isLogin();
 
       print("isFirstRun: $firstRun");

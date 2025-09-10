@@ -6,9 +6,9 @@ import 'package:dat_san_247_mobile/features/venue/presentation/controller/venue_
 import 'package:carousel_slider/carousel_slider.dart';
 
 class VenuePage extends GetView<VenueController> {
-   VenuePage({super.key});
+  VenuePage({super.key});
 
-    // 👉 Khởi tạo controller ở đây
+  // 👉 Khởi tạo controller ở đây
   final VenueController venueController = Get.put(VenueController());
 
   @override
@@ -16,7 +16,7 @@ class VenuePage extends GetView<VenueController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Danh sách sân'),
-        backgroundColor: Colors.blue,
+        // backgroundColor: Colors.blue,
       ),
       body: Obx(() {
         if (controller.listVenue.isEmpty) {
@@ -32,20 +32,6 @@ class VenuePage extends GetView<VenueController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Image Carousel
-                  // if (venue.images != null && venue.images!.isNotEmpty)
-                  //   CarouselSlider(
-                  //     options: CarouselOptions(
-                  //       height: 200,
-                  //       viewportFraction: 1,
-                  //       enableInfiniteScroll: false,
-                  //     ),
-                  //     items: venue.images!.map((image) {
-                  //       return CustomImage(
-                  //         imageUrl: image.imageUrl ?? '',
-                  //         fit: BoxFit.cover,
-                  //         width: double.infinity,
-                  //       );
                   CustomImage(
                     imageUrl: venue.images!.isNotEmpty
                         ? venue.images!.first.imageUrl ?? ''

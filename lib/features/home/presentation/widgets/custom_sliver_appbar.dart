@@ -17,7 +17,7 @@ class CustomSliverAppBar extends StatelessWidget {
       pinned: true,
       expandedHeight: 150,
       collapsedHeight: 70,
-      backgroundColor: Colors.amber,
+      // backgroundColor: Colors.amber,
       elevation: 4,
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
@@ -34,7 +34,7 @@ class CustomSliverAppBar extends StatelessWidget {
                     color: Colors.white,
                   ),
                   duration: const Duration(milliseconds: 300),
-                  child:  Text(Language.current.nameApp),
+                  child: Text(Language.current.nameApp),
                 ),
                 const SizedBox(height: 8),
 

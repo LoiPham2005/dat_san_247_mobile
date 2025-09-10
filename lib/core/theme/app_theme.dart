@@ -1,53 +1,4 @@
-// import 'package:flutter/material.dart';
-
-// enum AppThemeKey { light, dark, blue, green }
-
-// class AppTheme {
-//   /// 🎭 Danh sách tất cả Theme
-//   static final Map<AppThemeKey, ThemeData> themes = {
-//     AppThemeKey.light: _lightTheme,
-//     AppThemeKey.dark: _darkTheme,
-//     AppThemeKey.blue: _blueTheme,
-//     AppThemeKey.green: _greenTheme,
-//   };
-
-//   // ----------------- LIGHT THEME -----------------
-//   static final ThemeData _lightTheme = ThemeData(
-//     useMaterial3: true,
-//     colorScheme: ColorScheme.fromSeed(
-//       seedColor: Colors.deepPurple,
-//       brightness: Brightness.light,
-//     ),
-//   );
-
-//   // ----------------- DARK THEME -----------------
-//   static final ThemeData _darkTheme = ThemeData(
-//     useMaterial3: true,
-//     colorScheme: ColorScheme.fromSeed(
-//       seedColor: Colors.deepPurple,
-//       brightness: Brightness.dark,
-//     ),
-//   );
-
-//   // ----------------- BLUE THEME -----------------
-//   static final ThemeData _blueTheme = ThemeData(
-//     useMaterial3: true,
-//     colorScheme: ColorScheme.fromSeed(
-//       seedColor: Colors.blue,
-//       brightness: Brightness.light,
-//     ),
-//   );
-
-//   // ----------------- GREEN THEME -----------------
-//   static final ThemeData _greenTheme = ThemeData(
-//     useMaterial3: true,
-//     colorScheme: ColorScheme.fromSeed(
-//       seedColor: Colors.green,
-//       brightness: Brightness.light,
-//     ),
-//   );
-// }
-
+import 'package:dat_san_247_mobile/core/styles/color_app.dart';
 import 'package:dat_san_247_mobile/core/theme/base_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -85,7 +36,7 @@ class AppTheme {
 
   // ----------------- GREEN THEME -----------------
   static final ThemeData _greenTheme = BaseTheme.build(
-    seed: Colors.green,
+    seed: ColorApp.primary,
     brightness: Brightness.light,
     inversePrimary: Colors.green.shade200,
   );
