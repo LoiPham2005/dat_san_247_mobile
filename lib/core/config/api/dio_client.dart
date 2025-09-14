@@ -54,21 +54,21 @@ abstract class NetworkConstants {
   static final ERROR_GATEWAY_TIMEOUT = Language.current.errorGatewayTimeout;           // 504
 
   // ==== Lỗi nâng cao ====
-  static final ERROR_UNSUPPORTED_MEDIA_TYPE = "Định dạng dữ liệu không được hỗ trợ"; // 415
-  static final ERROR_TOO_MANY_REQUESTS = "Bạn đã gửi quá nhiều yêu cầu, vui lòng thử lại sau"; // 429
-  static final ERROR_SERVICE_UNAVAILABLE = "Dịch vụ hiện tại không khả dụng"; // 503
-  static final ERROR_FAILED_DEPENDENCY = "Một dịch vụ phụ thuộc đã thất bại"; // 424
-  static final ERROR_INSUFFICIENT_STORAGE = "Không đủ dung lượng để xử lý yêu cầu"; // 507
-  static final ERROR_NETWORK_AUTH_REQUIRED = "Cần xác thực mạng trước khi tiếp tục"; // 511
+  static final ERROR_UNSUPPORTED_MEDIA_TYPE = Language.current.errorUnsupportedMediaType; // 415
+  static final ERROR_TOO_MANY_REQUESTS = Language.current.errorTooManyRequests; // 429
+  static final ERROR_SERVICE_UNAVAILABLE = Language.current.errorServiceUnavailable; // 503
+  static final ERROR_FAILED_DEPENDENCY = Language.current.errorFailedDependency; // 424
+  static final ERROR_INSUFFICIENT_STORAGE = Language.current.errorInsufficientStorage; // 507
+  static final ERROR_NETWORK_AUTH_REQUIRED = Language.current.errorNetworkAuthRequired; // 511
 
   // ==== Lỗi ngoài HTTP ====
-  static final ERROR_PARSE = "Không thể xử lý dữ liệu phản hồi từ máy chủ";
-  static final ERROR_CONNECT_TIMEOUT = "Kết nối tới máy chủ quá lâu, vui lòng thử lại";
-  static final ERROR_RECEIVE_TIMEOUT = "Máy chủ không phản hồi kịp thời, vui lòng thử lại";
-  static final ERROR_SEND_TIMEOUT = "Gửi dữ liệu lên máy chủ quá lâu, vui lòng thử lại";
-  static final ERROR_SSL_HANDSHAKE = "Lỗi chứng chỉ bảo mật SSL";
-  static final ERROR_CANCELED = "Yêu cầu đã bị hủy";
-  static final ERROR_NO_INTERNET = "Không có kết nối Internet, vui lòng kiểm tra mạng";
+  static final ERROR_PARSE = Language.current.errorParse;
+  static final ERROR_CONNECT_TIMEOUT = Language.current.errorConnectTimeout;
+  static final ERROR_RECEIVE_TIMEOUT = Language.current.errorReceiveTimeout;
+  static final ERROR_SEND_TIMEOUT = Language.current.errorSendTimeout;
+  static final ERROR_SSL_HANDSHAKE = Language.current.errorSSLHandshake;
+  static final ERROR_CANCELED = Language.current.errorCanceled;
+  static final ERROR_NO_INTERNET = Language.current.errorNoInternet;
 }
 
 

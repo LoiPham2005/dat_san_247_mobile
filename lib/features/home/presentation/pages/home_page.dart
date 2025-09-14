@@ -1,15 +1,12 @@
 import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
-import 'package:dat_san_247_mobile/core/utils/extensions/widget_ext.dart';
 import 'package:dat_san_247_mobile/core/widgets/custom_carousel.dart';
 import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
 import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/pages/search_page.dart';
-import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_carousel_slider.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/grid_sport_category.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_sliver_appbar.dart';
 import 'package:dat_san_247_mobile/features/venue/presentation/controller/venue_controller.dart';
-import 'package:dat_san_247_mobile/features/venue/presentation/pages/venue_page.dart';
 import 'package:dat_san_247_mobile/features/venue/presentation/widget/list_venue.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
