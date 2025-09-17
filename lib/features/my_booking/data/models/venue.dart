@@ -1,8 +1,8 @@
 import 'package:dat_san_247_mobile/features/auth/data/models/user_model.dart';
 import 'package:dat_san_247_mobile/features/category/data/model/sport_category.dart';
-import 'package:dat_san_247_mobile/features/venue/data/models/amenities.dart';
-import 'package:dat_san_247_mobile/features/venue/data/models/venue_images.dart';
-import 'package:dat_san_247_mobile/features/venue/data/models/venue_rules.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/models/amenities.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/models/venue_images.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/models/venue_rules.dart';
 
 class Venue {
   int? venueId;

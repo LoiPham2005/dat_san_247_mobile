@@ -44,4 +44,7 @@ abstract class LocaleKeys {
   String get logoutSuccess;
   String get logout;
   String get dialog;
+  String get logoutFailed;
+  String get notiSnackbar;
+
 }

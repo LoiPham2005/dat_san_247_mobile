@@ -1,131 +1,74 @@
-// import 'package:dat_san_247_mobile/core/ext/int_ext.dart';
-// import 'package:dat_san_247_mobile/core/widget/custom_image.dart';
-// import 'package:dat_san_247_mobile/core/widget/toast/loading_overlay.dart';
-// import 'package:dat_san_247_mobile/features/category/data/model/sport_category.dart';
-// import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/widgets.dart';
-// import 'package:get/get.dart';
-// import 'package:get/utils.dart';
-// import 'package:shimmer/shimmer.dart';
-
-// class GridSportCategory extends StatelessWidget {
-//   final List<SportCategory> categories;
-//   GridSportCategory({super.key, required this.categories});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//       height: 150,
-//       width: double.infinity,
-//       child: GridView.builder(
-//         shrinkWrap: true,
-//         // physics: const NeverScrollableScrollPhysics(),
-//         scrollDirection: Axis.horizontal,
-//         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//           crossAxisCount: 2,
-//           crossAxisSpacing: 8,
-//           mainAxisSpacing: 8,
-//         ),
-//         itemCount: categories.length,
-//         itemBuilder: (context, index) {
-//           final data = categories[index];
-//           return Container(
-//             decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(8),
-//               boxShadow: [
-//                 BoxShadow(
-//                   color: Colors.grey.withOpacity(0.5),
-//                   spreadRadius: 1,
-//                   blurRadius: 5,
-//                   offset: const Offset(0, 3), // changes position of shadow
-//                 ),
-//               ],
-//             ),
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 CustomImage(
-//                   imageUrl: data.iconUrl ?? '',
-//                   height: 30,
-//                   width: 30,
-//                 ),
-//                 10.height,
-//                 Text(data.categoryName ?? '', style: TextStyle(fontSize: 10)),
-//               ],
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
 import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
 import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
-import 'package:dat_san_247_mobile/core/widgets/toast/loading_overlay.dart';
 import 'package:dat_san_247_mobile/features/category/data/model/sport_category.dart';
-import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
-import 'package:get/utils.dart';
-import 'package:shimmer/shimmer.dart';
 
 class GridSportCategory extends StatelessWidget {
   final List<SportCategory> categories;
-  GridSportCategory({super.key, required this.categories});
+  const GridSportCategory({super.key, required this.categories});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 70,
-      width: double.infinity,
-      child: MasonryGridView.count(
-        crossAxisCount: 1,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 4,
-        itemCount: categories.length,
+      height: 120,
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        separatorBuilder: (context, index) => const SizedBox(width: 16),
         itemBuilder: (context, index) {
           final data = categories[index];
-          return Container(
-            margin: EdgeInsets.symmetric(vertical: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomImage(
-                  imageUrl: data.iconUrl ?? '',
-                  height: 30,
-                  width: 30,
-                ),
-                8.height,
-                Flexible(
-                  child: Text(
+          return GestureDetector(
+            onTap: () {
+              // TODO: Xử lý khi chọn danh mục
+            },
+            child: Container(
+              width: 90,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xff62b766).withOpacity(0.10),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(color: Color(0xff62b766).withOpacity(0.12)),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xff62b766), Color(0xff4fa553)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: CustomImage(
+                      imageUrl: data.iconUrl ?? '',
+                      height: 32,
+                      width: 32,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
                     data.categoryName ?? '',
-                    style: const TextStyle(fontSize: 10),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff2d5533),
+                    ),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

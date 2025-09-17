@@ -1,4 +1,4 @@
-// welcome_page.dart
+import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:dat_san_247_mobile/features/intro/data/models/intro_model.dart';
 import 'package:dat_san_247_mobile/features/intro/presentation/widgets/intro_content.dart';
@@ -29,8 +29,8 @@ class _WelcomePageState extends State<WelcomePage>
       subtitle: "Khám phá ngay",
       description:
           "Tìm kiếm và khám phá hàng ngàn sân thể thao chất lượng gần bạn với hệ thống tìm kiếm thông minh và bản đồ tương tác.",
-      gradient: [Color(0xff62b766), Color(0xff4fa553)],
-      backgroundColor: Color(0xfff8fff9),
+      gradient: [const Color(0xff62b766), const Color(0xff4fa553)],
+      backgroundColor: const Color(0xfff8fff9),
     ),
     IntroModel(
       icon: Icons.schedule,
@@ -38,8 +38,8 @@ class _WelcomePageState extends State<WelcomePage>
       subtitle: "Chỉ 30 giây",
       description:
           "Đặt sân thể thao yêu thích chỉ với vài chạm. Thanh toán an toàn, xác nhận tức thì, không cần chờ đợi.",
-      gradient: [Color(0xff62b766), Color(0xff4fa553)],
-      backgroundColor: Color(0xfffef9e7),
+      gradient: [const Color(0xff62b766), const Color(0xff4fa553)],
+      backgroundColor: const Color(0xfffef9e7),
     ),
     IntroModel(
       icon: Icons.local_offer,
@@ -47,8 +47,8 @@ class _WelcomePageState extends State<WelcomePage>
       subtitle: "Tiết kiệm 50%",
       description:
           "Nhận voucher giảm giá, tích điểm thưởng và tham gia các chương trình khuyến mãi độc quyền dành cho thành viên.",
-      gradient: [Color(0xff62b766), Color(0xff4fa553)],
-      backgroundColor: Color(0xfff3f8ff),
+      gradient: [const Color(0xff62b766), const Color(0xff4fa553)],
+      backgroundColor: const Color(0xfff3f8ff),
     ),
   ];
 
@@ -56,19 +56,19 @@ class _WelcomePageState extends State<WelcomePage>
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
+      const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
       ),
     );
 
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
 
@@ -76,8 +76,8 @@ class _WelcomePageState extends State<WelcomePage>
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
 
-    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero)
-        .animate(
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
           CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
         );
 
@@ -92,7 +92,7 @@ class _WelcomePageState extends State<WelcomePage>
   void _nextContent() {
     if (currentIndex < introData.length - 1) {
       _pageController.nextPage(
-        duration: Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOutCubic,
       );
     } else {
@@ -102,7 +102,7 @@ class _WelcomePageState extends State<WelcomePage>
 
   void _navigateToLogin() {
     // Navigator logic here
-    Get.offAll(() => LoginPage());
+    Get.offAll(() => const LoginPage());
   }
 
   @override
@@ -126,8 +126,9 @@ class _WelcomePageState extends State<WelcomePage>
               // Header với logo và skip button
               _buildHeader(),
 
-              // Main content
+              // Main content - Đảm bảo flexible
               Expanded(
+                flex: 6, // Tăng tỷ lệ cho content
                 child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: (index) {
@@ -150,8 +151,11 @@ class _WelcomePageState extends State<WelcomePage>
                 ),
               ),
 
-              // Bottom section
-              _buildBottomSection(),
+              // Bottom section - Giới hạn kích thước
+              Flexible(
+                flex: 2, // Giới hạn tỷ lệ cho bottom section
+                child: _buildBottomSection(),
+              ),
             ],
           ),
         ),
@@ -161,49 +165,64 @@ class _WelcomePageState extends State<WelcomePage>
 
   Widget _buildHeader() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 8,
+      ), // Thêm vertical padding
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Logo
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xff62b766), Color(0xff4fa553)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0xff62b766).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xff62b766), Color(0xff4fa553)],
                     ),
-                  ],
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xff62b766).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.sports_soccer,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
-                child: Icon(Icons.sports_soccer, color: Colors.white, size: 24),
-              ),
-              SizedBox(width: 12),
-              Text(
-                "SprotHub",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xff2d5533),
+                const SizedBox(width: 12),
+                const Flexible(
+                  child: Text(
+                    "SportHub",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff2d5533),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           // Skip button
           if (currentIndex < introData.length - 1)
             TextButton(
               onPressed: _navigateToLogin,
-              style: TextButton.styleFrom(foregroundColor: Colors.grey[600]),
-              child: Text(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey[600],
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              ),
+              child: const Text(
                 "Bỏ qua",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
@@ -214,108 +233,117 @@ class _WelcomePageState extends State<WelcomePage>
   }
 
   Widget _buildBottomSection() {
-    return Padding(
-      padding: EdgeInsets.all(24),
-      child: Column(
-        children: [
-          // Page indicators
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              introData.length,
-              (index) => AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                margin: EdgeInsets.symmetric(horizontal: 4),
-                width: currentIndex == index ? 32 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  gradient: currentIndex == index
-                      ? LinearGradient(
-                          colors: [Color(0xff62b766), Color(0xff4fa553)],
-                        )
-                      : null,
-                  color: currentIndex == index ? null : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(height: 40),
-
-          // Action button
-          Container(
-            width: double.infinity,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xff62b766), Color(0xff4fa553)],
-              ),
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0xff62b766).withOpacity(0.4),
-                  blurRadius: 12,
-                  offset: Offset(0, 6),
-                ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: _nextContent,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    currentIndex == introData.length - 1
-                        ? "Bắt Đầu"
-                        : "Tiếp Tục",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 16,
+        ), // Giảm padding
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Page indicators
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                introData.length,
+                (index) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: currentIndex == index ? 32 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    gradient: currentIndex == index
+                        ? const LinearGradient(
+                            colors: [Color(0xff62b766), Color(0xff4fa553)],
+                          )
+                        : null,
+                    color: currentIndex == index ? null : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  SizedBox(width: 8),
-                  Icon(
-                    currentIndex == introData.length - 1
-                        ? Icons.rocket_launch
-                        : Icons.arrow_forward,
-                    color: Colors.white,
-                    size: 20,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24), // Giảm từ 40
+            // Action button
+            Container(
+              width: double.infinity,
+              height: 52, // Giảm từ 56
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xff62b766), Color(0xff4fa553)],
+                ),
+                borderRadius: BorderRadius.circular(
+                  26,
+                ), // Điều chỉnh theo height
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xff62b766).withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
-            ),
-          ),
-
-          SizedBox(height: 20),
-
-          // Login suggestion
-          Text.rich(
-            TextSpan(
-              text: "Đã có tài khoản? ",
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
-              children: [
-                TextSpan(
-                  text: "Đăng nhập ngay",
-                  style: TextStyle(
-                    color: Color(0xff62b766),
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
+              child: ElevatedButton(
+                onPressed: _nextContent,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      currentIndex == introData.length - 1
+                          ? "Bắt Đầu"
+                          : "Tiếp Tục",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      currentIndex == introData.length - 1
+                          ? Icons.rocket_launch
+                          : Icons.arrow_forward,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+
+            const SizedBox(height: 16), // Giảm từ 20
+            // Login suggestion
+            GestureDetector(
+              onTap: _navigateToLogin,
+              child: Text.rich(
+                TextSpan(
+                  text: "Đã có tài khoản? ",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  children: const [
+                    TextSpan(
+                      text: "Đăng nhập ngay",
+                      style: TextStyle(
+                        color: Color(0xff62b766),
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

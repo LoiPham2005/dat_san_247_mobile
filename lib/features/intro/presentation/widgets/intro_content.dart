@@ -14,8 +14,8 @@ class IntroContent extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          SizedBox(height: 40),
-          
+          SizedBox(height: 10),
+
           // Icon với animation
           TweenAnimationBuilder(
             duration: Duration(milliseconds: 1000),
@@ -38,18 +38,14 @@ class IntroContent extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Icon(
-                    data.icon,
-                    size: 60,
-                    color: Colors.white,
-                  ),
+                  child: Icon(data.icon, size: 60, color: Colors.white),
                 ),
               );
             },
           ),
-          
-          SizedBox(height: 50),
-          
+
+          SizedBox(height: 30),
+
           // Subtitle
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -70,30 +66,30 @@ class IntroContent extends StatelessWidget {
               ),
             ),
           ),
-          
+
           SizedBox(height: 24),
-          
+
           // Title
           Text(
             data.title,
             style: TextStyle(
-              fontSize: 32,
+              fontSize: 25,
               fontWeight: FontWeight.bold,
               color: Color(0xff2d5533),
               height: 1.2,
             ),
             textAlign: TextAlign.center,
           ),
-          
+
           SizedBox(height: 24),
-          
+
           // Description
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               data.description,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
                 height: 1.6,
@@ -101,9 +97,9 @@ class IntroContent extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          
-          SizedBox(height: 40),
-          
+
+          SizedBox(height: 20),
+
           // Decorative elements
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -132,11 +128,7 @@ class IntroContent extends StatelessWidget {
               width: 1,
             ),
           ),
-          child: Icon(
-            icon,
-            color: data.gradient[0],
-            size: 24,
-          ),
+          child: Icon(icon, color: data.gradient[0], size: 24),
         ),
         SizedBox(height: 8),
         Text(

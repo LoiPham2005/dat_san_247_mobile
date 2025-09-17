@@ -48,4 +48,6 @@ class JpLocale extends LocaleKeys {
   @override String get logout => 'ログアウト';
   @override String get dialog => 'ダイアログ';
   @override String get nameApp => "デッサン247";
+  @override String get logoutFailed => 'ログアウトに失敗しました。もう一度お試しください';
+  @override String get notiSnackbar => '通知メッセージ';
 }

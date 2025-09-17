@@ -1,7 +1,7 @@
 import 'package:dat_san_247_mobile/features/auth/data/repository/user_repository.dart';
 import 'package:dat_san_247_mobile/features/category/data/repository/sport_category_repository.dart';
 import 'package:dat_san_247_mobile/features/home/data/repository/banner_repository.dart';
-import 'package:dat_san_247_mobile/features/venue/data/repository/venue_repository.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/repository/venue_repository.dart';
 import 'package:get/get.dart';
 
 class RepositoryBinding implements Bindings {

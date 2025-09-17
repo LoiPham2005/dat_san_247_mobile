@@ -19,7 +19,6 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (_bannerController.bannerList.isEmpty) {
-        print("Banner list is empty");
         return Center(child: CircularProgressIndicator());
       }
 
@@ -29,11 +28,13 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
           CarouselSlider(
             items: _bannerController.bannerList.map((banner) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                   child: CustomImage(
-                    imageUrl: banner.mediaUrl ?? '',
+                    // imageUrl: banner.mediaUrl ?? '',
+                    imageUrl:
+                        "https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg",
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -42,7 +43,8 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
             options: CarouselOptions(
               autoPlay: true,
               aspectRatio: 340 / 207,
-              viewportFraction: 0.9,
+              viewportFraction: 0.92,
+              enlargeCenterPage: true,
               onPageChanged: (index, reason) {
                 setState(() {
                   _currentIndex = index;
@@ -50,7 +52,7 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
               },
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(_bannerController.bannerList.length, (
@@ -58,13 +60,22 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
             ) {
               bool isSelected = index == _currentIndex;
               return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: isSelected ? 18 : 5,
-                height: 5,
+                duration: const Duration(milliseconds: 250),
+                width: isSelected ? 22 : 7,
+                height: 7,
                 margin: const EdgeInsets.symmetric(horizontal: 5),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: isSelected ? Colors.amber : Colors.grey,
+                  borderRadius: BorderRadius.circular(7),
+                  color: isSelected ? Color(0xff62b766) : Colors.grey[300],
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: Color(0xff62b766).withOpacity(0.18),
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ]
+                      : [],
                 ),
               );
             }),

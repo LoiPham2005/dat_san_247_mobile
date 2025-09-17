@@ -42,6 +42,7 @@ class _RegisterPageState extends State<RegisterPage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

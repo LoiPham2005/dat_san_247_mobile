@@ -7,7 +7,6 @@ import 'package:dat_san_247_mobile/my_app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Wait for dependencies initialization
   await InitialBinding().dependencies();
 
   SystemChrome.setPreferredOrientations([
@@ -18,7 +17,7 @@ Future<void> main() async {
   runApp(
     // DevicePreview(
     //   builder: (context) =>
-       const MyApp(),
+    const MyApp(),
     // ),
   );
 }

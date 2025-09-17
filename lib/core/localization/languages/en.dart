@@ -47,5 +47,7 @@ class EnLocale extends LocaleKeys {
   @override String get logout => 'Logout';
   @override String get dialog => 'Dialog';
   @override String get nameApp => "Dat San 247";
+  @override String get logoutFailed => 'Logout failed, please try again';
+  @override String get notiSnackbar => 'Notification message';  
 }
 

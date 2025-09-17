@@ -56,6 +56,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -538,19 +539,25 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     final message = ValidatorApp.validateLogin(emailText, passwordText);
 
     if (message != null) {
-      Get.snackbar(
-        "Thông báo",
-        message,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      // Get.snackbar(
+      //   "Thông báo",
+      //   message,
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.red,
+      //   colorText: Colors.white,
+      // );
       return;
     }
 
     final success = await controller.login(emailText, passwordText);
     if (success) {
       Get.offAll(() => BottomMenuCustom(), transition: Transition.fade);
+      Get.snackbar(
+        "Thông báo",
+        "Đăng nhập  thành công",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
     } else {
       Get.snackbar(
         "Thông báo",

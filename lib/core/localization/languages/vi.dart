@@ -48,4 +48,6 @@ class ViLocale extends LocaleKeys {
   @override String get logout => 'Đăng xuất';
   @override String get dialog => 'Hộp thoại';
   @override String get nameApp => "Đặt Sân 247";
+  @override String get logoutFailed => 'Đăng xuất thất bại, vui lòng thử lại';
+  @override String get notiSnackbar => 'Thông báo';
 }

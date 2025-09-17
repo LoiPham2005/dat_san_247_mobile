@@ -1,6 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Quyền truy cập Internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Quyền truy cập vị trí -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Quyền camera -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Quyền ghi vào bộ nhớ ngoài -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- Quyền mạng trạng thái -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Quyền kiểm tra trạng thái wifi -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application
         android:label="dat_san_247_mobile"

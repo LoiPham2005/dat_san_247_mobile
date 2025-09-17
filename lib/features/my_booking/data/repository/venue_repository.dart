@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/features/venue/data/models/venue.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/models/venue.dart';
 import 'package:get/get.dart';
 import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
 import 'package:dat_san_247_mobile/core/config/api/dio_client.dart';

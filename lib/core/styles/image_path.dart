@@ -1,6 +1,6 @@
 class ImagePath {
   // image
-  static const String logoApp = 'assets/image/logo_app.png';
+  static const String logoApp = 'assets/image/SprotHub_Logo.svg';
   static const String intro1 = 'assets/image/intro1.png';
   static const String intro2 = 'assets/image/intro2.png';
   static const String bgIntroBottom = 'assets/image/bg_intro_bottom.png';

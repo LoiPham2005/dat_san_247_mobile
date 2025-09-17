@@ -104,8 +104,11 @@ class AuthController extends BaseController {
   }
 
   Future<void> logout() async {
-    await DbKeysLocal.clearAuthData();
-    userList.clear();
+     return performAction(action: () => _repo.logout(),
+     onSuccess: (data) {
+        userList.clear();
+        DbKeysLocal.clearAuthData();
+     },);
   }
 
   // ===================
