@@ -1,5 +1,5 @@
 import 'package:dat_san_247_mobile/core/styles/image_path.dart';
-import 'package:dat_san_247_mobile/features/home/presentation/pages/search_page.dart';
+import 'package:dat_san_247_mobile/features/search_venue/presentation/pages/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';

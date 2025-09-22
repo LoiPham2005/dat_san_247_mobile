@@ -157,7 +157,7 @@ import 'package:dat_san_247_mobile/core/widgets/custom_carousel.dart';
 import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
 import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
-import 'package:dat_san_247_mobile/features/home/presentation/pages/search_page.dart';
+import 'package:dat_san_247_mobile/features/search_venue/presentation/pages/search_page.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_appbar.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/custom_carousel_slider.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/grid_sport_category.dart';
@@ -204,224 +204,234 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       appBar: CustomAppBar(
         title: "phamducloi",
         avatarUrl:
             "https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg",
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff62b766).withOpacity(0.08),
-              Colors.white,
-              Color(0xff4fa553).withOpacity(0.04),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () => Future.wait([
+          _bannerController.getBanner(),
+          sportCategoryController.fetchCategories(),
+          venueController.getVenue(),
+        ]),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff62b766).withOpacity(0.08),
+                Colors.white,
+                Color(0xff4fa553).withOpacity(0.04),
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            physics: BouncingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Banner/Carousel
-                  // Obx(() {
-                  //   if (_bannerController.bannerList.isEmpty) {
-                  //     return Container(
-                  //       height: 207,
-                  //       margin: EdgeInsets.symmetric(vertical: 12),
-                  //       decoration: BoxDecoration(
-                  //         color: Colors.white,
-                  //         borderRadius: BorderRadius.circular(16),
-                  //         boxShadow: [
-                  //           BoxShadow(
-                  //             color: Colors.black.withOpacity(0.07),
-                  //             blurRadius: 12,
-                  //             offset: Offset(0, 4),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //       child: Center(child: CircularProgressIndicator()),
-                  //     );
-                  //   }
-                  //   return CustomCarousel(
-                  //     items: _bannerController.bannerList.map((banner) {
-                  //       return ClipRRect(
-                  //         borderRadius: BorderRadius.circular(16),
-                  //         child: CustomImage(
-                  //           imageUrl: banner.mediaUrl ?? '',
-                  //           fit: BoxFit.cover,
-                  //         ),
-                  //       );
-                  //     }).toList(),
-                  //     // aspectRatio: 340 / 207,
-                  //     autoPlay: true,
-                  //   );
-                  // }),
-                  Row(
-                    children: [
-                      Container(
-                        width: 54,
-                        height: 54,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xff62b766), Color(0xff4fa553)],
+          child: SafeArea(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              physics: BouncingScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Banner/Carousel
+                    // Obx(() {
+                    //   if (_bannerController.bannerList.isEmpty) {
+                    //     return Container(
+                    //       height: 207,
+                    //       margin: EdgeInsets.symmetric(vertical: 12),
+                    //       decoration: BoxDecoration(
+                    //         color: Colors.white,
+                    //         borderRadius: BorderRadius.circular(16),
+                    //         boxShadow: [
+                    //           BoxShadow(
+                    //             color: Colors.black.withOpacity(0.07),
+                    //             blurRadius: 12,
+                    //             offset: Offset(0, 4),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       child: Center(child: CircularProgressIndicator()),
+                    //     );
+                    //   }
+                    //   return CustomCarousel(
+                    //     items: _bannerController.bannerList.map((banner) {
+                    //       return ClipRRect(
+                    //         borderRadius: BorderRadius.circular(16),
+                    //         child: CustomImage(
+                    //           imageUrl: banner.mediaUrl ?? '',
+                    //           fit: BoxFit.cover,
+                    //         ),
+                    //       );
+                    //     }).toList(),
+                    //     // aspectRatio: 340 / 207,
+                    //     autoPlay: true,
+                    //   );
+                    // }),
+                    Row(
+                      children: [
+                        Container(
+                          width: 54,
+                          height: 54,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xff62b766), Color(0xff4fa553)],
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xff62b766).withOpacity(0.18),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xff62b766).withOpacity(0.18),
-                              blurRadius: 12,
-                              offset: Offset(0, 4),
+                          child: Icon(
+                            Icons.sports_soccer,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Xin chào, phamducloi 👋",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xff2d5533),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Khám phá sân thể thao gần bạn",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey[700],
+                              ),
                             ),
                           ],
                         ),
-                        child: Icon(
-                          Icons.sports_soccer,
-                          color: Colors.white,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Xin chào, phamducloi 👋",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xff2d5533),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Khám phá sân thể thao gần bạn",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey[700],
-                            ),
+                      ],
+                    ),
+                    SizedBox(height: 24),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xff62b766).withOpacity(0.10),
+                            blurRadius: 12,
+                            offset: Offset(0, 4),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 24),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xff62b766).withOpacity(0.10),
-                          blurRadius: 12,
-                          offset: Offset(0, 4),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Tìm kiếm sân, địa điểm...",
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Color(0xff62b766),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 18,
+                            horizontal: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    CustomCarouselSlider(),
+                    SizedBox(height: 24),
+
+                    // Section: Popular Venues
+                    TitleList(title: "Sân nổi bật"),
+                    SizedBox(height: 10),
+                    Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: ListVenuePopular().paddingSymmetric(vertical: 10),
+                    ),
+                    SizedBox(height: 24),
+
+                    // Section: Sport Categories
+                    TitleList(title: "Danh mục thể thao"),
+                    SizedBox(height: 10),
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Obx(() {
+                          if (sportCategoryController.listCategory.isEmpty) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          return GridSportCategory(
+                            categories: sportCategoryController.listCategory,
+                          );
+                        }),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+
+                    // Section: Venue List
+                    TitleList(title: "Danh sách sân"),
+                    SizedBox(height: 10),
+                    Obx(() {
+                      if (venueController.listVenue.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      return ListVenue(venues: venueController.listVenue);
+                    }),
+                    SizedBox(height: 24),
+
+                    // Quick action buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildQuickAction(
+                          icon: Icons.calendar_month,
+                          label: "Đặt sân nhanh",
+                          color: Color(0xff62b766),
+                          onTap: () {},
+                        ),
+                        _buildQuickAction(
+                          icon: Icons.favorite,
+                          label: "Yêu thích",
+                          color: Color(0xff4fa553),
+                          onTap: () {},
+                        ),
+                        _buildQuickAction(
+                          icon: Icons.map,
+                          label: "Bản đồ",
+                          color: Color(0xff2d5533),
+                          onTap: () {},
                         ),
                       ],
                     ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Tìm kiếm sân, địa điểm...",
-                        hintStyle: TextStyle(color: Colors.grey[500]),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Color(0xff62b766),
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 18,
-                          horizontal: 18,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  CustomCarouselSlider(),
-                  SizedBox(height: 24),
-
-                  // Section: Popular Venues
-                  TitleList(title: "Sân nổi bật"),
-                  SizedBox(height: 10),
-                  Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: ListVenuePopular().paddingSymmetric(vertical: 10),
-                  ),
-                  SizedBox(height: 24),
-
-                  // Section: Sport Categories
-                  TitleList(title: "Danh mục thể thao"),
-                  SizedBox(height: 10),
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Obx(() {
-                        if (sportCategoryController.listCategory.isEmpty) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        return GridSportCategory(
-                          categories: sportCategoryController.listCategory,
-                        );
-                      }),
-                    ),
-                  ),
-                  SizedBox(height: 24),
-
-                  // Section: Venue List
-                  TitleList(title: "Danh sách sân"),
-                  SizedBox(height: 10),
-                  Obx(() {
-                    if (venueController.listVenue.isEmpty) {
-                      return Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-                    return ListVenue(venues: venueController.listVenue);
-                  }),
-                  SizedBox(height: 24),
-
-                  // Quick action buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildQuickAction(
-                        icon: Icons.calendar_month,
-                        label: "Đặt sân nhanh",
-                        color: Color(0xff62b766),
-                        onTap: () {},
-                      ),
-                      _buildQuickAction(
-                        icon: Icons.favorite,
-                        label: "Yêu thích",
-                        color: Color(0xff4fa553),
-                        onTap: () {},
-                      ),
-                      _buildQuickAction(
-                        icon: Icons.map,
-                        label: "Bản đồ",
-                        color: Color(0xff2d5533),
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ),

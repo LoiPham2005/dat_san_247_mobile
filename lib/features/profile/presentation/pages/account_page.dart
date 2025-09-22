@@ -22,14 +22,16 @@ class AccountScreen extends StatelessWidget {
 
   final List<Map<String, dynamic>> items = [
     {"title": "Tài khoản", "icon": Icons.person},
-    {"title": "Đơn hàng", "icon": Icons.shopping_bag},
+    {"title": "Lịch sử đặt sân", "icon": Icons.history},
+    {"title": "Sân đã đặt", "icon": Icons.event_available},
     {"title": "Yêu thích", "icon": Icons.favorite},
-    {"title": "Địa chỉ", "icon": Icons.location_on},
-    {"title": "Thanh toán", "icon": Icons.payment},
+    {"title": "Địa chỉ của tôi", "icon": Icons.location_on},
+    {"title": "Thanh toán & ví", "icon": Icons.account_balance_wallet},
     {"title": "Thông báo", "icon": Icons.notifications},
+    {"title": "Đánh giá của tôi", "icon": Icons.rate_review},
     {"title": "Cài đặt", "icon": Icons.settings},
     {"title": "Trợ giúp", "icon": Icons.help},
-    {"title": "Về chúng tôi", "icon": Icons.info},
+    {"title": "Về ứng dụng", "icon": Icons.info},
   ];
 
   void _confirmLogout(BuildContext context) {
@@ -140,7 +142,6 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -170,12 +171,7 @@ class AccountScreen extends StatelessWidget {
                         height: 32,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              // Color(0xff62b766),
-                              //  Color(0xff4fa553)
-                              colorScheme.primary,
-                              colorScheme.primaryContainer
-                               ],
+                            colors: [Color(0xff62b766), Color(0xff4fa553)],
                           ),
                           borderRadius: BorderRadius.circular(8),
                         ),

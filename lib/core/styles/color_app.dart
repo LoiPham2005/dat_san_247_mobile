@@ -18,7 +18,7 @@ class ColorApp {
 
   // Màu chính (Primary)
   static const Color primary = Color(0xff62b766);
-  static const Color primaryDark = Color(0xff4fa553);
+  static const Color primary2 = Color(0xff4fa553);
 
   // Màu text
   static const Color textPrimary = Color(0xff2d5533);

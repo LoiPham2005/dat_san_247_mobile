@@ -24,10 +24,13 @@ class VenueController extends BaseController {
   }
 
   Future<void> getVenue() {
-    // return fetchList(
-    //   action: () => repo.getVenue(),
-    //   targetList: listVenue
-    //   );
     return performAction(action: () => repo.getVenue(), targetList: listVenue);
+  }
+
+  Future<void> getIdVenue(int venueId) {
+    return performAction(
+      action: () => repo.getIdVenue(venueId),
+      targetList: listVenue,
+    );
   }
 }

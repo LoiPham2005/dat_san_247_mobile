@@ -53,6 +53,7 @@ dependencies:
   rename: ^3.1.0
   shared_preferences: ^2.5.3
   shimmer: ^3.0.0
+  smooth_page_indicator: ^1.2.1
   standard_searchbar: ^2.1.1
   toastification: ^3.0.3
   url_launcher: ^6.3.1
@@ -101,7 +102,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-
 flutter_native_splash:
   color: "#ffffff" # Màu nền splash
   image: assets/image/SprotHub_Logo.png # Đường dẫn tới logo splash của bạn
