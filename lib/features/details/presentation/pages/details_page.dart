@@ -180,7 +180,10 @@ class _DetailsPageState extends State<DetailsPage>
                             VenueStatsRow(venue: venue!),
                             _buildInfoCards(),
                             VenueActionButtons(
-                              onCallPressed: _onCallPressed,
+                              // onCallPressed: _onCallPressed,
+                              phone: "0123456789",
+                              email: "sdgsgdfgs",
+                              message: "dsgfgx",
                               onDirectionsPressed: _onDirectionsPressed,
                               colorScheme: colorScheme,
                             ),

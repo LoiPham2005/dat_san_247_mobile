@@ -169,8 +169,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
       floatingActionButton: _showScrollToTop
           ? FloatingActionButton(
-              backgroundColor: Color(0xff62b766),
-              child: const Icon(Icons.arrow_upward, color: Colors.white),
+              backgroundColor: const Color(0xff62b766),
+              child: const Icon(
+                Icons.arrow_upward,
+                color: Colors.white,
+                size: 20,
+              ), // Giảm size icon
               onPressed: () {
                 _scrollController.animateTo(
                   0,
@@ -178,7 +182,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   curve: Curves.easeInOutCubicEmphasized,
                 );
               },
-              shape: CircleBorder(),
+              shape: const CircleBorder(),
+              mini: true, // Thêm dòng này để thu nhỏ FAB
             )
           : null,
     );
