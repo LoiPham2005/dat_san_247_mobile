@@ -11,11 +11,14 @@ import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_r
 import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_sliver_app_bar.dart';
 import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_stats_row.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:dat_san_247_mobile/features/my_booking/data/models/venue.dart';
 import 'package:dat_san_247_mobile/features/my_booking/presentation/controller/venue_controller.dart';
+import 'package:flutter_map/flutter_map.dart' hide MapController;
+import 'package:latlong2/latlong.dart';
 
 class DetailsPage extends StatefulWidget {
   final int venueId;
@@ -140,42 +143,55 @@ class _DetailsPageState extends State<DetailsPage>
           ? const VenueLoadingScreen()
           : venue == null
           ? const VenueErrorScreen()
-          : CustomScrollView(
-              slivers: [
-                VenueSliverAppBar(
-                  venue: venue!,
-                  venueImages: venueImages,
-                  currentImage: currentImage,
-                  isFavorite: isFavorite,
-                  carouselController: _carouselController,
-                  onImageChanged: _updateCurrentImage,
-                  onFavoriteToggle: _toggleFavorite,
-                  colorScheme: colorScheme,
-                  size: size,
+          : Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xff62b766).withOpacity(0.08),
+                    Colors.white,
+                    Color(0xff4fa553).withOpacity(0.04),
+                  ],
                 ),
-                SliverToBoxAdapter(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Column(
-                        children: [
-                          50.height,
-                          VenueHeaderCard(venue: venue!),
-                          VenueStatsRow(venue: venue!),
-                          _buildInfoCards(),
-                          VenueActionButtons(
-                            onCallPressed: _onCallPressed,
-                            onDirectionsPressed: _onDirectionsPressed,
-                            colorScheme: colorScheme,
-                          ),
-                          const SizedBox(height: 100),
-                        ],
+              ),
+              child: CustomScrollView(
+                slivers: [
+                  VenueSliverAppBar(
+                    venue: venue!,
+                    venueImages: venueImages,
+                    currentImage: currentImage,
+                    isFavorite: isFavorite,
+                    carouselController: _carouselController,
+                    onImageChanged: _updateCurrentImage,
+                    onFavoriteToggle: _toggleFavorite,
+                    colorScheme: colorScheme,
+                    size: size,
+                  ),
+                  SliverToBoxAdapter(
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Column(
+                          children: [
+                            50.height,
+                            VenueHeaderCard(venue: venue!),
+                            VenueStatsRow(venue: venue!),
+                            _buildInfoCards(),
+                            VenueActionButtons(
+                              onCallPressed: _onCallPressed,
+                              onDirectionsPressed: _onDirectionsPressed,
+                              colorScheme: colorScheme,
+                            ),
+                            const SizedBox(height: 100),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
       floatingActionButton: venue != null
           ? VenueFloatingButton(
@@ -191,12 +207,49 @@ class _DetailsPageState extends State<DetailsPage>
     return Column(
       children: [
         if (venue!.owner != null) VenueOwnerCard(owner: venue!.owner!),
-
         if (venue!.amenities != null && venue!.amenities!.isNotEmpty)
           VenueAmenitiesCard(amenities: venue!.amenities!),
-
         if (venue!.venueRules != null && venue!.venueRules!.isNotEmpty)
           VenueRulesCard(rules: venue!.venueRules!),
+        // Thay thế GoogleMap bằng flutter_map (OpenStreetMap)
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          height: 200,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: OSMFlutter(
+              controller: MapController(
+                initPosition: GeoPoint(
+                  latitude: 21.038132,
+                  longitude: 105.770574,
+                ),
+              ),
+              osmOption: OSMOption(
+                zoomOption: const ZoomOption(
+                  minZoomLevel: 3,
+                  maxZoomLevel: 18,
+                  initZoom: 16,
+                ),
+              ),
+              // markerOption: MarkerOption(
+              //   defaultMarker: MarkerIcon(
+              //     icon: Icon(Icons.location_on, color: Colors.red, size: 40),
+              //   ),
+              // ),
+              mapIsLoading: const Center(child: CircularProgressIndicator()),
+            ),
+          ),
+        ),
       ],
     );
   }

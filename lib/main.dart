@@ -3,14 +3,14 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/my_app.dart';
-import 'package:intl/date_symbol_data_local.dart'; // Add this import
+import 'package:intl/date_symbol_data_local.dart'; 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await InitialBinding().dependencies();
 
-  await initializeDateFormatting('vi_VN', null); // Initialize locale data
+  await initializeDateFormatting('vi_VN', null); 
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

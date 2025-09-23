@@ -405,62 +405,75 @@ class _BookingPageState extends State<BookingPage>
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      body: CustomScrollView(
-        slivers: [
-          BookingAppBar(
-            venueName: widget.venueName,
-            venueImage: widget.venueImage,
-            colorScheme: colorScheme,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff62b766).withOpacity(0.08),
+              Colors.white,
+              Color(0xff4fa553).withOpacity(0.04),
+            ],
           ),
-          SliverToBoxAdapter(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Column(
-                  children: [
-                    50.height,
-                    VenueInfoCard(
-                      venueName: widget.venueName,
-                      venueAddress: widget.venueAddress,
-                      pricePerHour: widget.pricePerHour,
-                    ),
-                    DateSelector(
-                      selectedDate: selectedDate,
-                      onDateSelected: _onDateSelected,
-                    ),
-                    TimeSlotsGrid(
-                      availableSlots: availableSlots,
-                      bookedSlots: bookedSlots,
-                      selectedSlot: selectedStartTime,
-                      onSlotSelected: _onTimeSlotSelected,
-                    ),
-                    DurationSelector(
-                      selectedDuration: selectedDuration,
-                      onDurationChanged: _onDurationChanged,
-                    ),
-                    CustomerInfoForm(onInfoChanged: _updateCustomerInfo),
-                    // Thêm voucher widget ở đây
-                    VoucherWidget(
-                      voucherCode: voucherCode,
-                      onTap: _onVoucherTap,
-                    ),
-                    PriceSummaryCard(
-                      pricePerHour: widget.pricePerHour,
-                      duration: selectedDuration,
-                      totalPrice: totalPrice,
-                    ),
-                    PaymentMethodSelector(
-                      selectedMethod: selectedPaymentMethod,
-                      onMethodSelected: _onPaymentMethodChanged,
-                    ),
-                    30.height,
-                  ],
+        ),
+        child: CustomScrollView(
+          slivers: [
+            BookingAppBar(
+              venueName: widget.venueName,
+              venueImage: widget.venueImage,
+              colorScheme: colorScheme,
+            ),
+            SliverToBoxAdapter(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    children: [
+                      50.height,
+                      VenueInfoCard(
+                        venueName: widget.venueName,
+                        venueAddress: widget.venueAddress,
+                        pricePerHour: widget.pricePerHour,
+                      ),
+                      DateSelector(
+                        selectedDate: selectedDate,
+                        onDateSelected: _onDateSelected,
+                      ),
+                      TimeSlotsGrid(
+                        availableSlots: availableSlots,
+                        bookedSlots: bookedSlots,
+                        selectedSlot: selectedStartTime,
+                        onSlotSelected: _onTimeSlotSelected,
+                      ),
+                      DurationSelector(
+                        selectedDuration: selectedDuration,
+                        onDurationChanged: _onDurationChanged,
+                      ),
+                      CustomerInfoForm(onInfoChanged: _updateCustomerInfo),
+                      // Thêm voucher widget ở đây
+                      VoucherWidget(
+                        voucherCode: voucherCode,
+                        onTap: _onVoucherTap,
+                      ),
+                      PriceSummaryCard(
+                        pricePerHour: widget.pricePerHour,
+                        duration: selectedDuration,
+                        totalPrice: totalPrice,
+                      ),
+                      PaymentMethodSelector(
+                        selectedMethod: selectedPaymentMethod,
+                        onMethodSelected: _onPaymentMethodChanged,
+                      ),
+                      30.height,
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: BookingBottomBar(
         canBook: canBook,

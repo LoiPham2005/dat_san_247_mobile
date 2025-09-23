@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:dat_san_247_mobile/features/my_booking/data/models/venue.dart';
+import 'package:share_plus/share_plus.dart';
 
 class VenueSliverAppBar extends StatelessWidget {
   final Venue venue;
@@ -72,6 +76,26 @@ class VenueSliverAppBar extends StatelessWidget {
               color: isFavorite ? Colors.red : colorScheme.primary,
             ),
             onPressed: onFavoriteToggle,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.share, color: Colors.blue),
+            onPressed: () {
+              _showShareSheet(context, venue);
+            },
           ),
         ),
       ],
@@ -179,4 +203,64 @@ class VenueSliverAppBar extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showShareSheet(BuildContext context, Venue venue) {
+  final link = 'https://dat-san-247.com/venue/${venue.venueId}';
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Chia sẻ sân',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          ListTile(
+            leading: const Icon(Icons.link, color: Colors.green),
+            title: const Text('Sao chép liên kết'),
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: link));
+              Navigator.pop(context);
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   const SnackBar(content: Text('Đã sao chép liên kết!')),
+              // );
+              Get.snackbar(
+                'Sao chép liên kết',
+                'Đã sao chép liên kết!',
+                // snackPosition: SnackPosition.BOTTOM,
+                // backgroundColor: Colors.black87,
+                // colorText: Colors.white,
+                margin: const EdgeInsets.all(20),
+                duration: const Duration(seconds: 2),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.share, color: Colors.blue),
+            title: const Text('Chia sẻ qua ứng dụng bất kỳ'),
+            onTap: () {
+              Share.share(link);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
 }

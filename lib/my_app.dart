@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
       // fallbackLocale: const Locale('en', 'US'),
       theme: themeService.currentTheme,
       themeMode: ThemeMode.system,
+      // home: const SplashPage(),
       home: const SplashPage(),
     );
   }

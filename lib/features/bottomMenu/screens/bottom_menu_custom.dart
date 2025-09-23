@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/features/home/presentation2/pages/home_screen2.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:dat_san_247_mobile/features/notification/presentation/pages/notification_page.dart';
@@ -18,7 +19,8 @@ class _BottomMenuCustomState extends State<BottomMenuCustom> {
   late PageController _pageController;
 
   final List<Widget> _screens = [
-    HomePage(key: ValueKey('home')),
+    // HomePage(key: ValueKey('home')),
+    HomeScreen(key: ValueKey('home')),
     MapPage(key: ValueKey('map')),
     MyBookingPage(key: ValueKey('booking')),
     AccountScreen(key: ValueKey('account')),
