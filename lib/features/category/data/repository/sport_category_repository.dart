@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class SportCategoryRepository {
   final DioClient _dio = Get.find<DioClient>();
 
-  Future<BaseResponse<List<SportCategory>>> getCategories() async {
+  Future<BaseResponse<List<SportCategory>>> getCategories() {
     return ApiHelper.handleListRequest(
       apiCall: () => _dio.get(ApiPath.sportCategory),
       fromJson: (json) => SportCategory.fromJson(json),

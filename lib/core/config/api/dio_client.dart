@@ -31,7 +31,6 @@ import 'package:dat_san_247_mobile/core/lang/locale_keys.dart';
 //   // static const ERROR_UNKNOWN = LocaleKeys.error_unknown;
 // }
 
-
 // === Hằng số lỗi mạng ===
 abstract class NetworkConstants {
   NetworkConstants._();
@@ -42,24 +41,35 @@ abstract class NetworkConstants {
   static final ERROR_UNKNOWN = Language.current.errorUnknown;
 
   // ==== Lỗi HTTP cơ bản ====
-  static final ERROR_BAD_REQUEST = Language.current.errorBadRequest;               // 400
-  static final ERROR_UNAUTHORIZED = Language.current.errorUnauthorized;           // 401
-  static final ERROR_FORBIDDEN = Language.current.errorForbidden;                 // 403
-  static final ERROR_NOT_FOUND = Language.current.errorNotFound;                  // 404
-  static final ERROR_METHOD_NOT_ALLOWED = Language.current.errorMethodNotAllowed; // 405
-  static final ERROR_REQUEST_TIMEOUT = Language.current.errorRequestTimeout;      // 408
-  static final ERROR_CONFLICT = Language.current.errorConflict;                   // 409
-  static final ERROR_INTERNAL_SERVER_ERROR = Language.current.errorInternalServerError; // 500
-  static final ERROR_SERVER_UNAVAILABLE = Language.current.errorServerUnavailable;     // 502
-  static final ERROR_GATEWAY_TIMEOUT = Language.current.errorGatewayTimeout;           // 504
+  static final ERROR_BAD_REQUEST = Language.current.errorBadRequest; // 400
+  static final ERROR_UNAUTHORIZED = Language.current.errorUnauthorized; // 401
+  static final ERROR_FORBIDDEN = Language.current.errorForbidden; // 403
+  static final ERROR_NOT_FOUND = Language.current.errorNotFound; // 404
+  static final ERROR_METHOD_NOT_ALLOWED =
+      Language.current.errorMethodNotAllowed; // 405
+  static final ERROR_REQUEST_TIMEOUT =
+      Language.current.errorRequestTimeout; // 408
+  static final ERROR_CONFLICT = Language.current.errorConflict; // 409
+  static final ERROR_INTERNAL_SERVER_ERROR =
+      Language.current.errorInternalServerError; // 500
+  static final ERROR_SERVER_UNAVAILABLE =
+      Language.current.errorServerUnavailable; // 502
+  static final ERROR_GATEWAY_TIMEOUT =
+      Language.current.errorGatewayTimeout; // 504
 
   // ==== Lỗi nâng cao ====
-  static final ERROR_UNSUPPORTED_MEDIA_TYPE = Language.current.errorUnsupportedMediaType; // 415
-  static final ERROR_TOO_MANY_REQUESTS = Language.current.errorTooManyRequests; // 429
-  static final ERROR_SERVICE_UNAVAILABLE = Language.current.errorServiceUnavailable; // 503
-  static final ERROR_FAILED_DEPENDENCY = Language.current.errorFailedDependency; // 424
-  static final ERROR_INSUFFICIENT_STORAGE = Language.current.errorInsufficientStorage; // 507
-  static final ERROR_NETWORK_AUTH_REQUIRED = Language.current.errorNetworkAuthRequired; // 511
+  static final ERROR_UNSUPPORTED_MEDIA_TYPE =
+      Language.current.errorUnsupportedMediaType; // 415
+  static final ERROR_TOO_MANY_REQUESTS =
+      Language.current.errorTooManyRequests; // 429
+  static final ERROR_SERVICE_UNAVAILABLE =
+      Language.current.errorServiceUnavailable; // 503
+  static final ERROR_FAILED_DEPENDENCY =
+      Language.current.errorFailedDependency; // 424
+  static final ERROR_INSUFFICIENT_STORAGE =
+      Language.current.errorInsufficientStorage; // 507
+  static final ERROR_NETWORK_AUTH_REQUIRED =
+      Language.current.errorNetworkAuthRequired; // 511
 
   // ==== Lỗi ngoài HTTP ====
   static final ERROR_PARSE = Language.current.errorParse;
@@ -70,7 +80,6 @@ abstract class NetworkConstants {
   static final ERROR_CANCELED = Language.current.errorCanceled;
   static final ERROR_NO_INTERNET = Language.current.errorNoInternet;
 }
-
 
 class DioClient {
   static final DioClient _instance = DioClient._internal();
@@ -120,9 +129,8 @@ class DioClient {
     RequestInterceptorHandler handler,
   ) async {
     try {
-
       // Không check refresh token cho API refresh và login
-      if (options.path == '/auth/refresh-token' || 
+      if (options.path == '/auth/refresh-token' ||
           options.path == '/auth/login') {
         return handler.next(options);
       }
@@ -167,111 +175,111 @@ class DioClient {
 
   /// Xử lý lỗi chung
   /// Xử lý lỗi chung từ Dio
-void _onError(DioException error, ErrorInterceptorHandler handler) {
-  final res = error.response;
-  String message = NetworkConstants.ERROR_UNKNOWN;
+  void _onError(DioException error, ErrorInterceptorHandler handler) {
+    final res = error.response;
+    String message = NetworkConstants.ERROR_UNKNOWN;
 
-  if (res != null) {
-    switch (res.statusCode) {
-      // ==== Lỗi cơ bản ====
-      case 400:
-        message = NetworkConstants.ERROR_BAD_REQUEST;
-        break;
-      case 401:
-        message = NetworkConstants.ERROR_UNAUTHORIZED;
-        break;
-      case 403:
-        message = NetworkConstants.ERROR_FORBIDDEN;
-        break;
-      case 404:
-        message = NetworkConstants.ERROR_NOT_FOUND;
-        break;
-      case 405:
-        message = NetworkConstants.ERROR_METHOD_NOT_ALLOWED;
-        break;
-      case 408:
-        message = NetworkConstants.ERROR_REQUEST_TIMEOUT;
-        break;
-      case 409:
-        message = NetworkConstants.ERROR_CONFLICT;
-        break;
-      case 500:
-        message = NetworkConstants.ERROR_INTERNAL_SERVER_ERROR;
-        break;
-      case 502:
-        message = NetworkConstants.ERROR_SERVER_UNAVAILABLE;
-        break;
-      case 504:
-        message = NetworkConstants.ERROR_GATEWAY_TIMEOUT;
-        break;
+    if (res != null) {
+      switch (res.statusCode) {
+        // ==== Lỗi cơ bản ====
+        case 400:
+          message = NetworkConstants.ERROR_BAD_REQUEST;
+          break;
+        case 401:
+          message = NetworkConstants.ERROR_UNAUTHORIZED;
+          break;
+        case 403:
+          message = NetworkConstants.ERROR_FORBIDDEN;
+          break;
+        case 404:
+          message = NetworkConstants.ERROR_NOT_FOUND;
+          break;
+        case 405:
+          message = NetworkConstants.ERROR_METHOD_NOT_ALLOWED;
+          break;
+        case 408:
+          message = NetworkConstants.ERROR_REQUEST_TIMEOUT;
+          break;
+        case 409:
+          message = NetworkConstants.ERROR_CONFLICT;
+          break;
+        case 500:
+          message = NetworkConstants.ERROR_INTERNAL_SERVER_ERROR;
+          break;
+        case 502:
+          message = NetworkConstants.ERROR_SERVER_UNAVAILABLE;
+          break;
+        case 504:
+          message = NetworkConstants.ERROR_GATEWAY_TIMEOUT;
+          break;
 
-      // ==== Lỗi nâng cao ====
-      case 415:
-        message = NetworkConstants.ERROR_UNSUPPORTED_MEDIA_TYPE;
-        break;
-      case 424:
-        message = NetworkConstants.ERROR_FAILED_DEPENDENCY;
-        break;
-      case 429:
-        message = NetworkConstants.ERROR_TOO_MANY_REQUESTS;
-        break;
-      case 503:
-        message = NetworkConstants.ERROR_SERVICE_UNAVAILABLE;
-        break;
-      case 507:
-        message = NetworkConstants.ERROR_INSUFFICIENT_STORAGE;
-        break;
-      case 511:
-        message = NetworkConstants.ERROR_NETWORK_AUTH_REQUIRED;
-        break;
+        // ==== Lỗi nâng cao ====
+        case 415:
+          message = NetworkConstants.ERROR_UNSUPPORTED_MEDIA_TYPE;
+          break;
+        case 424:
+          message = NetworkConstants.ERROR_FAILED_DEPENDENCY;
+          break;
+        case 429:
+          message = NetworkConstants.ERROR_TOO_MANY_REQUESTS;
+          break;
+        case 503:
+          message = NetworkConstants.ERROR_SERVICE_UNAVAILABLE;
+          break;
+        case 507:
+          message = NetworkConstants.ERROR_INSUFFICIENT_STORAGE;
+          break;
+        case 511:
+          message = NetworkConstants.ERROR_NETWORK_AUTH_REQUIRED;
+          break;
 
-      default:
-        // Lấy message từ API nếu có
-        message = res.data?['message'] ??
-            res.statusMessage ??
-            NetworkConstants.ERROR_UNKNOWN;
+        default:
+          // Lấy message từ API nếu có
+          message =
+              res.data?['message'] ??
+              res.statusMessage ??
+              NetworkConstants.ERROR_UNKNOWN;
+      }
+    } else {
+      // ==== Lỗi ngoài HTTP ====
+      switch (error.type) {
+        case DioExceptionType.connectionTimeout:
+          message = NetworkConstants.ERROR_CONNECT_TIMEOUT;
+          break;
+        case DioExceptionType.receiveTimeout:
+          message = NetworkConstants.ERROR_RECEIVE_TIMEOUT;
+          break;
+        case DioExceptionType.sendTimeout:
+          message = NetworkConstants.ERROR_SEND_TIMEOUT;
+          break;
+        case DioExceptionType.cancel:
+          message = NetworkConstants.ERROR_CANCELED;
+          break;
+        case DioExceptionType.badCertificate:
+          message = NetworkConstants.ERROR_SSL_HANDSHAKE;
+          break;
+        case DioExceptionType.connectionError:
+          message = NetworkConstants.ERROR_NO_INTERNET;
+          break;
+        default:
+          message = NetworkConstants.ERROR_NETWORK;
+      }
     }
-  } else {
-    // ==== Lỗi ngoài HTTP ====
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-        message = NetworkConstants.ERROR_CONNECT_TIMEOUT;
-        break;
-      case DioExceptionType.receiveTimeout:
-        message = NetworkConstants.ERROR_RECEIVE_TIMEOUT;
-        break;
-      case DioExceptionType.sendTimeout:
-        message = NetworkConstants.ERROR_SEND_TIMEOUT;
-        break;
-      case DioExceptionType.cancel:
-        message = NetworkConstants.ERROR_CANCELED;
-        break;
-      case DioExceptionType.badCertificate:
-        message = NetworkConstants.ERROR_SSL_HANDSHAKE;
-        break;
-      case DioExceptionType.connectionError:
-        message = NetworkConstants.ERROR_NO_INTERNET;
-        break;
-      default:
-        message = NetworkConstants.ERROR_NETWORK;
+
+    if (kDebugMode) {
+      print("❌ ERROR [${res?.statusCode ?? 'NO_STATUS'}]: $message");
     }
+
+    handler.next(
+      DioException(
+        requestOptions: error.requestOptions,
+        response: res,
+        type: error.type,
+        message: message,
+        error: message,
+      ),
+    );
   }
-
-  if (kDebugMode) {
-    print("❌ ERROR [${res?.statusCode ?? 'NO_STATUS'}]: $message");
-  }
-
-  handler.next(
-    DioException(
-      requestOptions: error.requestOptions,
-      response: res,
-      type: error.type,
-      message: message,
-      error: message,
-    ),
-  );
-}
-
 
   // === Method wrapper chuẩn ===
 

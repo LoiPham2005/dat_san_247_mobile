@@ -195,8 +195,8 @@ class _BookingPageState extends State<BookingPage>
               ),
               child: Icon(Icons.check_circle, color: Colors.green[600]),
             ),
-            SizedBox(width: 12),
-            Text('Xác nhận đặt sân'),
+            SizedBox(width: 10),
+            Text('Xác nhận đặt sân', style: TextStyle(fontSize: 15)),
           ],
         ),
         content: Column(
@@ -274,24 +274,78 @@ class _BookingPageState extends State<BookingPage>
     );
   }
 
+  // void _processBooking() {
+  //   // Show loading
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) => Center(
+  //       child: Container(
+  //         padding: EdgeInsets.all(20),
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.circular(16),
+  //         ),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             CircularProgressIndicator(),
+  //             SizedBox(height: 16),
+  //             Text('Đang xử lý đặt sân...'),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+
   void _processBooking() {
-    // Show loading
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Center(
         child: Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [Color(0xff62b766), Color(0xff4fa553), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Đang xử lý đặt sân...'),
+              SizedBox(
+                height: 56,
+                width: 56,
+                child: CircularProgressIndicator(
+                  strokeWidth: 5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xff62b766)),
+                  backgroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Đang xử lý đặt sân...',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff2D3748),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Vui lòng chờ trong giây lát',
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
             ],
           ),
         ),
