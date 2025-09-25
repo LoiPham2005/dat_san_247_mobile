@@ -11,14 +11,16 @@ class SportCategoryRepository {
   Future<BaseResponse<List<SportCategory>>> getCategories() {
     return ApiHelper.handleListRequest(
       apiCall: () => _dio.get(ApiPath.sportCategory),
-      fromJson: (json) => SportCategory.fromJson(json),
+      fromJson: SportCategory.fromJson,
     );
-    // return ApiHelper.handleListRequest(
-    //   apiCall: () => _dio.get(ApiPath.sportCategory),
-    //   fromJson: (json) {
-    //     print("SportCategoryRepository dataaaaaaaaaaaaaaaaaa: $json");
-    //     return SportCategories.fromJson(json);
-    //   },
-    // );
+
+  // Future<BaseResponse<List<SportCategory>>> getCategories() async {
+  //   return BaseResponse.listFromResponse(
+  //     await _dio.get(ApiPath.sportCategory),
+  //     SportCategory.fromJson,
+  //     dataKey: 'data',
+  //     extract: (map) => map['data']?['categories'],
+  //   );
   }
+
 }

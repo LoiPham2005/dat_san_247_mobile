@@ -15,11 +15,17 @@ class VenueRepository {
     );
   }
 
-  Future<BaseResponse<Venue>> getIdVenue(int venueId) {
-    return ApiHelper.handleRequest(
-      apiCall: () => dio.get('${ApiPath.venue}/$venueId'),
-      fromJson: (json) => Venue.fromJson(json),
+  Future<BaseResponse<Venue>> getIdVenue(int venueId) async {
+    // return ApiHelper.handleRequest(
+    //   apiCall: () => dio.get('${ApiPath.venue}/$venueId'),
+    //   fromJson: (json) => Venue.fromJson(json),
+    // );
+
+    return BaseResponse.fromResponse(
+      await dio.get('${ApiPath.venue}/$venueId'),
+       Venue.fromJson,
+      // dataKey: 'data',
+      // extract: (map) => map['data']?['venue'],
     );
   }
-
 }

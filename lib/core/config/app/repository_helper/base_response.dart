@@ -26,10 +26,7 @@ class BaseResponse<T> {
   });
 
   bool get isSuccess =>
-      result == true ||
-      success == true ||
-      status == 200 ||
-      status == 201;
+      result == true || success == true || status == 200 || status == 201;
 
   factory BaseResponse.success({
     required T data,
@@ -48,10 +45,7 @@ class BaseResponse<T> {
     );
   }
 
-  factory BaseResponse.error({
-    required String message,
-    int? status,
-  }) {
+  factory BaseResponse.error({required String message, int? status}) {
     return BaseResponse(
       result: false,
       success: false,
@@ -86,70 +80,67 @@ class BaseResponse<T> {
     );
   }
 
-  /// ✅ In JSON đẹp ra console (dễ đọc hơn)
-  // static void prettyPrintJson(dynamic jsonData) {
-  //   try {
-  //     const encoder = JsonEncoder.withIndent('  ');
-  //     final prettyString = encoder.convert(jsonData);
-  //     debugPrint(prettyString); // Không bị cắt dòng
-  //   } catch (_) {
-  //     debugPrint(jsonData.toString()); // fallback
-  //   }
-  // }
-
   /// ✅ Parse 1 object từ Dio Response
   static BaseResponse<T> fromResponse<T>(
     Response response,
-    T Function(Map<String, dynamic>) fromJson,
-  ) {
+    //  {
+    // required T Function(Map<String, dynamic>) fromJson,
+    T Function(Map<String, dynamic>) fromJson,{
+    String dataKey = 'data',
+    dynamic Function(Map<String, dynamic> map)? extract,
+  }) {
     try {
+      final map = response.data;
+      final dynamic rawData = extract != null ? extract(map) : map[dataKey];
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
-          response.data['result'] == true ||
-          response.data['success'] == true ||
-          response.data['status'] == 200) {
+          map['result'] == true ||
+          map['success'] == true ||
+          map['status'] == 200) {
         return BaseResponse<T>(
-          result: response.data['result'] ?? true,
-          success: response.data['success'] ?? true,
+          result: map['result'] ?? true,
+          success: map['success'] ?? true,
           status: response.statusCode,
-          message: response.data['message'],
-          data: response.data['data'] != null
-              ? fromJson(response.data['data'])
-              : null,
-          accessToken: response.data['accessToken'],
-          refreshToken: response.data['refreshToken'],
-          tokenType: response.data['token_type'],
-          expiresAt: response.data['expires_at'],
+          message: map['message'],
+          data: rawData != null ? fromJson(rawData) : null,
+          accessToken: map['accessToken'],
+          refreshToken: map['refreshToken'],
+          tokenType: map['token_type'],
+          expiresAt: map['expires_at'],
         );
       } else {
-        // prettyPrintJson(response.data);
         return BaseResponse<T>(
           result: false,
           success: false,
           status: response.statusCode,
-          message: response.data['message'] ?? 'Request failed',
+          message: map['message'] ?? 'Request failed',
         );
       }
     } catch (e) {
-      // prettyPrintJson(response.data);
-      return BaseResponse<T>(
-        result: false,
-        success: false,
-        message: 'Failed to parse response: ${e.toString()}',
-      );
+      // return BaseResponse<T>(
+      //   result: false,
+      //   success: false,
+      //   message: 'Failed to parse response: ${e.toString()}',
+      // );
+      return BaseResponse.handleError<T>(e);
     }
   }
 
   /// ✅ Parse danh sách object
   static BaseResponse<List<T>> listFromResponse<T>(
-    Response response,
-    T Function(Map<String, dynamic>) fromJson,
-  ) {
+    Response response, 
+    // {
+    // required T Function(Map<String, dynamic>) fromJson,
+    T Function(Map<String, dynamic>) fromJson,{
+    String dataKey = 'data',
+    dynamic Function(Map<String, dynamic> map)? extract,
+  }) {
     try {
+      final map = response.data;
+      final dynamic rawData = extract != null ? extract(map) : map[dataKey];
       if (response.statusCode == 200) {
-        final data = response.data['data'];
-        if (data is List) {
-          final list = data
+        if (rawData is List) {
+          final list = rawData
               .map((item) => fromJson(item as Map<String, dynamic>))
               .toList();
 
@@ -157,11 +148,10 @@ class BaseResponse<T> {
             result: true,
             success: true,
             status: response.statusCode,
-            message: response.data['message'],
+            message: map['message'],
             data: list,
           );
         } else {
-          // prettyPrintJson(response.data);
           return BaseResponse<List<T>>(
             result: false,
             success: false,
@@ -169,21 +159,20 @@ class BaseResponse<T> {
           );
         }
       } else {
-        // prettyPrintJson(response.data);
         return BaseResponse<List<T>>(
           result: false,
           success: false,
           status: response.statusCode,
-          message: response.data['message'] ?? 'Request failed',
+          message: map['message'] ?? 'Request failed',
         );
       }
     } catch (e) {
-      // prettyPrintJson(response.data);
-      return BaseResponse<List<T>>(
-        result: false,
-        success: false,
-        message: 'Failed to parse list response: ${e.toString()}',
-      );
+      // return BaseResponse<List<T>>(
+      //   result: false,
+      //   success: false,
+      //   message: 'Failed to parse list response: ${e.toString()}',
+      // );
+      return BaseResponse.handleError(e);
     }
   }
 
@@ -199,10 +188,7 @@ class BaseResponse<T> {
           final statusCode = error.response?.statusCode;
           final msg = error.response?.data?['message'] ?? 'Server error';
           // prettyPrintJson(error.response?.data);
-          return BaseResponse<T>.error(
-            message: msg,
-            status: statusCode,
-          );
+          return BaseResponse<T>.error(message: msg, status: statusCode);
         case DioExceptionType.cancel:
           return BaseResponse<T>.error(message: '❌ Request was cancelled');
         case DioExceptionType.connectionError:

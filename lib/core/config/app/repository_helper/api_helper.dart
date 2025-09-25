@@ -9,12 +9,19 @@ class ApiHelper {
   static Future<BaseResponse<T>> handleRequest<T>({
     required Future<Response> Function() apiCall,
     required T Function(Map<String, dynamic>) fromJson,
+    String dataKey = 'data',
+    dynamic Function(Map<String, dynamic> map)? extract,
   }) async {
     try {
       final response = await apiCall();
-      return BaseResponse.fromResponse(response, fromJson);
+      return BaseResponse.fromResponse(
+        response,
+        fromJson,
+        dataKey: dataKey,
+        extract: extract,
+      );
     } catch (e) {
-      return BaseResponse.handleError(e);
+      return BaseResponse.handleError<T>(e);
     }
   }
 
@@ -25,10 +32,17 @@ class ApiHelper {
   static Future<BaseResponse<List<T>>> handleListRequest<T>({
     required Future<Response> Function() apiCall,
     required T Function(Map<String, dynamic>) fromJson,
+    String dataKey = 'data',
+    dynamic Function(Map<String, dynamic> map)? extract,
   }) async {
     try {
       final response = await apiCall();
-      return BaseResponse.listFromResponse(response, fromJson);
+      return BaseResponse.listFromResponse(
+        response,
+        fromJson,
+        dataKey: dataKey,
+        extract: extract,
+      );
     } catch (e) {
       return BaseResponse.handleError(e);
     }
