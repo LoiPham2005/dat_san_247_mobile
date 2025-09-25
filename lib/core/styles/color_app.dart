@@ -4,8 +4,14 @@ class ColorApp {
   ColorApp._();
 
   static final ColorApp instance = ColorApp._();
-
   static const primaryColor = Color(0xff62b766);
+  // Base colors
+  static const Color primaryGreen = Color(0xff4fa553);
+  static const Color lightGreen = Color(0xff62b766);
+  static const Color background = Color(0xffF5F5F5);
+
+  // Gradient colors
+  static List<Color> primaryGradient = [primaryGreen, lightGreen];
 
   static const white = Color(0xffFFFFFF);
   static const whiteF6 = Color(0xfff6f6ff);
@@ -25,7 +31,6 @@ class ColorApp {
   static const Color textSecondary = Color(0xff6c757d);
 
   // Màu nền
-  static const Color background = Colors.white;
   static const Color inputBackground = Color(0xfff8f9fa);
 
   // Màu border

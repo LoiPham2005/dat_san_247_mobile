@@ -17,7 +17,7 @@ class SearchFilterSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
@@ -60,7 +60,7 @@ class SearchFilterSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -78,26 +78,32 @@ class SearchFilterSection extends StatelessWidget {
                 value: selectedStatus,
                 icon: Icon(Icons.expand_more, color: theme.primaryColor),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: 5,
+                  // vertical: 12,
                 ),
                 borderRadius: BorderRadius.circular(16),
-                items: [
-                  'Tất cả',
-                  'Đã xác nhận',
-                  'Chờ xác nhận',
-                  'Đã hoàn thành',
-                  'Đã hủy',
-                ].map((status) => DropdownMenuItem(
-                  value: status,
-                  child: Text(
-                    status,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                )).toList(),
+                items:
+                    [
+                          'Tất cả',
+                          'Đã xác nhận',
+                          'Chờ xác nhận',
+                          'Đã hoàn thành',
+                          'Đã hủy',
+                          'Khách không đến',
+                        ]
+                        .map(
+                          (status) => DropdownMenuItem(
+                            value: status,
+                            child: Text(
+                              status,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
                 onChanged: onStatusChanged,
               ),
             ),

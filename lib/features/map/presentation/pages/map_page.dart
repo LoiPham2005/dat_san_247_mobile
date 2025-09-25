@@ -525,7 +525,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    controller.dispose();
+    if (_isMapReady) {
+      controller.dispose();
+    }
     _searchAnimationController.dispose();
     _fabAnimationController.dispose();
     super.dispose();

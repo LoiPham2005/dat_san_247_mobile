@@ -104,7 +104,7 @@ class _FeaturedVenuesSectionState extends State<FeaturedVenuesSection> {
     return InkWell(
       onTap: () {
         // TODO: Navigate to venue details
-        Get.to(() => DetailsPage(venueId: 1));
+        Get.to(() => DetailsPage(venueId: 4));
       },
       borderRadius: BorderRadius.circular(16),
       child: Container(
@@ -124,7 +124,11 @@ class _FeaturedVenuesSectionState extends State<FeaturedVenuesSection> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(16), // Bo đều 4 góc
+                  // borderRadius: BorderRadius.circular(16), // Bo đều 4 góc
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ), // Bo đều 2 góc bên trái
                   child: Image.network(
                     venue.imageUrl,
                     width: 120,
@@ -144,12 +148,12 @@ class _FeaturedVenuesSectionState extends State<FeaturedVenuesSection> {
                       ),
                     ),
                   ),
-                ).marginOnly(left: 10),
+                ),
 
                 if (venue.isPromoted)
                   Positioned(
                     top: 8,
-                    left: 18,
+                    left: 8,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
@@ -181,7 +185,7 @@ class _FeaturedVenuesSectionState extends State<FeaturedVenuesSection> {
 
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 10, right: 5, left: 5),
+                padding: const EdgeInsets.only(right: 10, left: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

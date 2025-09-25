@@ -52,7 +52,7 @@ class VenueSliverAppBar extends StatelessWidget {
           ],
         ),
         child: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: colorScheme.primary),
+          icon: Icon(Icons.arrow_back_ios_new, color: colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
       ),

@@ -7,23 +7,28 @@ class BaseTheme {
     required Brightness brightness,
     required Color inversePrimary,
   }) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: seed,
-      brightness: brightness,
-      inversePrimary: inversePrimary,
-    );
-
     return ThemeData(
-      useMaterial3: true,
-      colorScheme: colorScheme,
-      brightness: brightness,
+      useMaterial3: false, // Tắt Material 3 đi
+      primaryColor: seed,
+      primarySwatch: MaterialColor(seed.value, {
+        50: seed.withOpacity(0.1),
+        100: seed.withOpacity(0.2),
+        200: seed.withOpacity(0.3),
+        300: seed.withOpacity(0.4),
+        400: seed.withOpacity(0.5),
+        500: seed,
+        600: seed.withOpacity(0.6),
+        700: seed.withOpacity(0.7),
+        800: seed.withOpacity(0.8),
+        900: seed.withOpacity(0.9),
+      }),
       scaffoldBackgroundColor: ColorApp.background,
       fontFamily: 'Roboto',
 
       // 🔹 AppBar
       appBarTheme: AppBarTheme(
         backgroundColor: seed,
-        foregroundColor: colorScheme.onPrimary,
+        foregroundColor: inversePrimary,
         centerTitle: true,
         elevation: 0,
       ),
@@ -31,7 +36,7 @@ class BaseTheme {
       // 🔹 TextButton
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: colorScheme.primary,
+          foregroundColor: seed,
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
@@ -39,8 +44,8 @@ class BaseTheme {
       // 🔹 ElevatedButton
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
+          backgroundColor: seed,
+          foregroundColor: inversePrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -49,8 +54,8 @@ class BaseTheme {
       // 🔹 OutlinedButton
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.primary,
-          side: BorderSide(color: colorScheme.primary, width: 1.5),
+          foregroundColor: seed,
+          side: BorderSide(color: seed, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),

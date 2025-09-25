@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:dat_san_247_mobile/core/lang/locale_keys.dart';
 import 'package:dat_san_247_mobile/core/localization/app_localization.dart';

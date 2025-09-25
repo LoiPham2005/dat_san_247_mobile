@@ -171,9 +171,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ? FloatingActionButton(
               backgroundColor: const Color(0xff62b766),
               child: const Icon(
-                Icons.arrow_upward,
+                Icons.keyboard_arrow_up,
                 color: Colors.white,
-                size: 20,
+                size: 28,
               ), // Giảm size icon
               onPressed: () {
                 _scrollController.animateTo(

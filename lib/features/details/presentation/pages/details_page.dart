@@ -1,4 +1,5 @@
 import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
+import 'package:dat_san_247_mobile/features/auth/data/models/user_model.dart';
 import 'package:dat_san_247_mobile/features/booking/presentation/pages/booking_page.dart';
 import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_action_buttons.dart';
 import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_amenities_card.dart';
@@ -10,6 +11,9 @@ import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_o
 import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_rules_card.dart';
 import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_sliver_app_bar.dart';
 import 'package:dat_san_247_mobile/features/details/presentation/widgets/venue_stats_row.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/models/amenities.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/models/venue_images.dart';
+import 'package:dat_san_247_mobile/features/my_booking/data/models/venue_rules.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
@@ -42,15 +46,30 @@ class _DetailsPageState extends State<DetailsPage>
   final CarouselSliderController _carouselController =
       CarouselSliderController();
 
+  // Thêm biến MapController
+  late MapController mapController;
+  bool isMapReady = false;
+
   @override
   void initState() {
     super.initState();
+    _initializeMap();
     _initializeAnimations();
     _fetchVenue();
   }
 
+  void _initializeMap() {
+    mapController = MapController(
+      initPosition: GeoPoint(latitude: 21.038132, longitude: 105.770574),
+    );
+  }
+
   @override
   void dispose() {
+    // Đảm bảo map đã ready trước khi dispose
+    if (isMapReady) {
+      mapController.dispose();
+    }
     _animationController.dispose();
     super.dispose();
   }
@@ -72,18 +91,83 @@ class _DetailsPageState extends State<DetailsPage>
         );
   }
 
+  // Future<void> _fetchVenue() async {
+  //   setState(() => isLoading = true);
+  //   await venueController.getIdVenue(widget.venueId);
+  //   if (venueController.listVenue.isNotEmpty) {
+  //     setState(() {
+  //       venue = venueController.listVenue.first;
+  //       isLoading = false;
+  //     });
+  //     _animationController.forward();
+  //   } else {
+  //     setState(() => isLoading = false);
+  //   }
+  // }
+
   Future<void> _fetchVenue() async {
     setState(() => isLoading = true);
-    await venueController.getIdVenue(widget.venueId);
-    if (venueController.listVenue.isNotEmpty) {
-      setState(() {
-        venue = venueController.listVenue.first;
-        isLoading = false;
-      });
-      _animationController.forward();
-    } else {
-      setState(() => isLoading = false);
-    }
+
+    // Giả lập delay network
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    final mockVenue = Venue(
+      venueId: widget.venueId,
+      venueName: "Sân Bóng Đá Mini Thành Phát",
+      description:
+          "Sân bóng đá mini 5-7 người với cỏ nhân tạo chất lượng cao, hệ thống chiếu sáng hiện đại và các tiện ích đầy đủ.",
+      address: "123 Lê Văn Lương, Thanh Xuân, Hà Nội",
+      latitude: "21.038132",
+      longitude: "105.770574",
+      phone: "0123456789",
+      email: "thanhphat@gmail.com",
+      categoryId: 1,
+      capacity: 14,
+      status: "active",
+      averageRating: "4.5",
+      totalReviews: 128,
+      totalBookings: 450,
+      images: [
+        VenueImages(
+          imageUrl:
+              "https://www.sporta.vn/wp-content/uploads/2019/09/san-bong-da-mini-co-nhan-tao-5.jpg",
+        ),
+        VenueImages(
+          imageUrl:
+              "https://www.sporta.vn/wp-content/uploads/2019/09/san-bong-da-mini-co-nhan-tao-1.jpg",
+        ),
+        VenueImages(
+          imageUrl:
+              "https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg",
+        ),
+      ],
+      amenities: [
+        Amenities(name: "Wifi miễn phí", available: true),
+        Amenities(name: "Bãi đỗ xe", available: true),
+        Amenities(name: "Phòng thay đồ", available: true),
+        Amenities(name: "Cho thuê giày", available: true),
+        Amenities(name: "Nước uống", available: true),
+      ],
+      venueRules: [
+        VenueRules(rule: "Không hút thuốc trong khuôn viên sân"),
+        VenueRules(rule: "Đặt cọc 30% giá trị khi đặt sân"),
+        VenueRules(rule: "Được phép huỷ trước 24h"),
+      ],
+      owner: User(
+        id: 1,
+        fullname: "Nguyễn Văn A",
+        phone: "0987654321",
+        email: "nguyenvana@gmail.com",
+        avatar: "https://i.pravatar.cc/150?img=11",
+        createdAt: "2023-03-15",
+      ),
+    );
+
+    setState(() {
+      venue = mockVenue;
+      isLoading = false;
+    });
+    _animationController.forward();
   }
 
   List<String> get venueImages {
@@ -149,9 +233,9 @@ class _DetailsPageState extends State<DetailsPage>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xff62b766).withOpacity(0.08),
+                    const Color(0xff62b766).withOpacity(0.08),
                     Colors.white,
-                    Color(0xff4fa553).withOpacity(0.04),
+                    const Color(0xff4fa553).withOpacity(0.04),
                   ],
                 ),
               ),
@@ -207,14 +291,15 @@ class _DetailsPageState extends State<DetailsPage>
   }
 
   Widget _buildInfoCards() {
+    if (venue == null) return const SizedBox.shrink();
+
     return Column(
       children: [
-        if (venue!.owner != null) VenueOwnerCard(owner: venue!.owner!),
-        if (venue!.amenities != null && venue!.amenities!.isNotEmpty)
+        if (venue?.owner != null) VenueOwnerCard(owner: venue!.owner!),
+        if (venue?.amenities != null && venue!.amenities!.isNotEmpty)
           VenueAmenitiesCard(amenities: venue!.amenities!),
-        if (venue!.venueRules != null && venue!.venueRules!.isNotEmpty)
+        if (venue?.venueRules != null && venue!.venueRules!.isNotEmpty)
           VenueRulesCard(rules: venue!.venueRules!),
-        // Thay thế GoogleMap bằng flutter_map (OpenStreetMap)
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           height: 200,
@@ -231,12 +316,7 @@ class _DetailsPageState extends State<DetailsPage>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: OSMFlutter(
-              controller: MapController(
-                initPosition: GeoPoint(
-                  latitude: 21.038132,
-                  longitude: 105.770574,
-                ),
-              ),
+              controller: mapController,
               osmOption: OSMOption(
                 zoomOption: const ZoomOption(
                   minZoomLevel: 3,
@@ -244,12 +324,20 @@ class _DetailsPageState extends State<DetailsPage>
                   initZoom: 16,
                 ),
               ),
-              // markerOption: MarkerOption(
-              //   defaultMarker: MarkerIcon(
-              //     icon: Icon(Icons.location_on, color: Colors.red, size: 40),
-              //   ),
-              // ),
               mapIsLoading: const Center(child: CircularProgressIndicator()),
+              onMapIsReady: (ready) {
+                if (ready) {
+                  setState(() => isMapReady = true);
+                  // if (venue?.latitude != null && venue?.longitude != null) {
+                  //   mapController.changeLocation(
+                  //     GeoPoint(
+                  //       latitude: venue!.latitude!,
+                  //       longitude: venue!.longitude!,
+                  //     ),
+                  //   );
+                  // }
+                }
+              },
             ),
           ),
         ),

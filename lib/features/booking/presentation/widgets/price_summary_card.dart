@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -58,7 +59,7 @@ class PriceSummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Price breakdown
           Container(
             padding: const EdgeInsets.all(16),
@@ -74,19 +75,21 @@ class PriceSummaryCard extends StatelessWidget {
                   isSubtotal: true,
                   context: context,
                 ),
+                5.height,
                 _buildPriceRow(
                   'Thời gian thuê',
                   '$duration giờ',
                   isSubtotal: true,
                   context: context,
                 ),
-                const Divider(height: 20),
+                const Divider(height: 20, color: Colors.black),
                 _buildPriceRow(
                   'Tạm tính',
                   '${NumberFormat('#,##0').format(pricePerHour * duration)}đ',
                   isSubtotal: true,
                   context: context,
                 ),
+                5.height,
                 _buildPriceRow(
                   'Phí dịch vụ',
                   'Miễn phí',
@@ -116,9 +119,9 @@ class PriceSummaryCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Discount info
           Container(
             padding: const EdgeInsets.all(12),
@@ -129,11 +132,7 @@ class PriceSummaryCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.local_offer,
-                  color: Colors.orange[600],
-                  size: 20,
-                ),
+                Icon(Icons.local_offer, color: Colors.orange[600], size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -181,7 +180,9 @@ class PriceSummaryCard extends StatelessWidget {
           style: TextStyle(
             fontSize: isTotal ? 16 : 14,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-            color: color ?? (isTotal ? Theme.of(context!).primaryColor : Colors.grey[700]),
+            color:
+                color ??
+                (isTotal ? Theme.of(context!).primaryColor : Colors.grey[700]),
           ),
         ),
         Text(
@@ -189,7 +190,9 @@ class PriceSummaryCard extends StatelessWidget {
           style: TextStyle(
             fontSize: isTotal ? 18 : 14,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-            color: color ?? (isTotal ? Theme.of(context!).primaryColor : Colors.grey[800]),
+            color:
+                color ??
+                (isTotal ? Theme.of(context!).primaryColor : Colors.grey[800]),
           ),
         ),
       ],

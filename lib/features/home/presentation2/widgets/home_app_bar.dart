@@ -112,7 +112,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           Text(
             "Phạm Đức Lợi",
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ],
       ),

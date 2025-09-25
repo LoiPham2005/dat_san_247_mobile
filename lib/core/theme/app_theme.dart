@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 enum AppThemeKey { light, dark, green, blue }
 
 class AppTheme {
+  static const Color primaryColor = Color(0xff4fa553);
+
   /// 🎭 Danh sách tất cả Theme
   static final Map<AppThemeKey, ThemeData> themes = {
     AppThemeKey.light: _lightTheme,
@@ -15,7 +17,7 @@ class AppTheme {
 
   // ----------------- LIGHT THEME -----------------
   static final ThemeData _lightTheme = BaseTheme.build(
-    seed: Color(0xff62b766),
+    seed: primaryColor,
     brightness: Brightness.light,
     inversePrimary: Colors.deepPurple.shade200,
   );
@@ -36,8 +38,8 @@ class AppTheme {
 
   // ----------------- GREEN THEME -----------------
   static final ThemeData _greenTheme = BaseTheme.build(
-    seed: Color(0xff62b766),
+    seed: primaryColor, // Sử dụng màu primary đã định nghĩa
     brightness: Brightness.light,
-    inversePrimary: Color(0xff4fa553),
+    inversePrimary: primaryColor.withOpacity(0.2),
   );
 }

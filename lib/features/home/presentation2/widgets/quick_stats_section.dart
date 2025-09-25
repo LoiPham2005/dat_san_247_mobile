@@ -14,8 +14,11 @@ class QuickStatsSection extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [theme.primaryColor.withOpacity(0.9), theme.primaryColor],
+          colors: [theme.primaryColor, theme.primaryColor],
+
+          // colors: [Color(0xff62b766), Color(0xff4fa553)],
         ),
+        // color: Color(0xff4fa553),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

@@ -33,7 +33,7 @@ class BookingAppBar extends StatelessWidget {
           ],
         ),
         child: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: colorScheme.primary),
+          icon: Icon(Icons.arrow_back_ios_new, color: colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -108,21 +108,18 @@ class BookingAppBar extends StatelessWidget {
                   ),
                 ),
               ),
-            
+
             // Gradient overlay
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
-                  ],
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
                 ),
               ),
             ),
-            
+
             // Title
             Positioned(
               bottom: 60,
@@ -132,7 +129,10 @@ class BookingAppBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.orange[600],
                       borderRadius: BorderRadius.circular(20),
@@ -140,7 +140,11 @@ class BookingAppBar extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.calendar_month, color: Colors.white, size: 16),
+                        Icon(
+                          Icons.calendar_month,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                         SizedBox(width: 4),
                         Text(
                           'ĐẶT SÂN',
@@ -200,15 +204,16 @@ class BookingAppBar extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.lightbulb_outline, color: Colors.blue[600], size: 20),
+                  Icon(
+                    Icons.lightbulb_outline,
+                    color: Colors.blue[600],
+                    size: 20,
+                  ),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Chúng tôi sẽ liên hệ xác nhận trong vòng 30 phút.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue[700],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.blue[700]),
                     ),
                   ),
                 ],
@@ -250,12 +255,7 @@ class BookingAppBar extends StatelessWidget {
             ),
           ),
           SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 14),
-            ),
-          ),
+          Expanded(child: Text(text, style: TextStyle(fontSize: 14))),
         ],
       ),
     );
