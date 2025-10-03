@@ -759,7 +759,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   Widget _buildSearchResults() {
     return Positioned(
-      top: 120,
+      top: 150,
       left: 16,
       right: 16,
       bottom: 100,

@@ -32,6 +32,8 @@ class _BookingsListSectionState extends State<BookingsListSection> {
     }
 
     return ListView.builder(
+      shrinkWrap: true, // 👈 giới hạn theo nội dung
+      physics: NeverScrollableScrollPhysics(), // 👈 tắt cuộn riêng
       padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: widget.bookings.length,
       itemBuilder: (context, index) {
@@ -40,7 +42,6 @@ class _BookingsListSectionState extends State<BookingsListSection> {
       },
     );
   }
-
 
   Widget _buildBookingCard(
     BookingModel booking,

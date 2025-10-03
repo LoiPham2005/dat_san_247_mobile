@@ -6,6 +6,7 @@ class BaseTheme {
     required Color seed,
     required Brightness brightness,
     required Color inversePrimary,
+    
   }) {
     return ThemeData(
       useMaterial3: false, // Tắt Material 3 đi

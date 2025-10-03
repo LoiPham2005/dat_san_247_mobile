@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/banner_carousel.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/featured_venues_section.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/nearby_venues_section.dart';
@@ -8,6 +9,9 @@ import 'package:dat_san_247_mobile/features/home/presentation2/widgets/sport_cat
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/home_app_bar.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late ScrollController _scrollController;
+  final   _sportCategoryController = Get.find<SportCategoryController>();
 
   String _selectedLocation = "Hà Nội";
   double _scrollOffset = 0.0;
@@ -146,7 +151,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         const BannerCarousel(),
 
                         // Sport Categories
-                        const SportCategories(),
+                         Obx(() {
+                          if(_sportCategoryController.listCategory.isEmpty){
+                            
+                          }
+                           return SportCategories(sportCategory: _sportCategoryController.listCategory,);
+                         }, ),
 
                         // Nearby Venues
                         const NearbyVenuesSection(),

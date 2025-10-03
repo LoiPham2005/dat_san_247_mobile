@@ -1,7 +1,9 @@
+import 'package:dat_san_247_mobile/features/category/data/model/sport_category.dart';
 import 'package:flutter/material.dart';
 
 class SportCategories extends StatefulWidget {
-  const SportCategories({super.key});
+  final List<SportCategory> sportCategory;
+  const SportCategories({super.key, required this.sportCategory});
 
   @override
   State<SportCategories> createState() => _SportCategoriesState();
@@ -95,9 +97,11 @@ class _SportCategoriesState extends State<SportCategories> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              itemCount: categories.length,
+              // itemCount: categories.length,
+              itemCount: widget.sportCategory.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
+                // final category = widget.sportCategory[index];
                 return Container(
                   width: 90,
                   margin: EdgeInsets.only(

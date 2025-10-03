@@ -20,6 +20,7 @@ class AppTheme {
     seed: primaryColor,
     brightness: Brightness.light,
     inversePrimary: Colors.deepPurple.shade200,
+    
   );
 
   // ----------------- DARK THEME -----------------

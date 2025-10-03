@@ -147,21 +147,21 @@ class _MyBookingPageState extends State<MyBookingPage>
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff62b766).withOpacity(0.08),
-                Colors.white,
-                Color(0xff4fa553).withOpacity(0.04),
-              ],
-            ),
-          ),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xff62b766).withOpacity(0.08),
+                    Colors.white,
+                    Color(0xff4fa553).withOpacity(0.04),
+                  ],
+                ),
+              ),
               child: Column(
                 children: [
                   // Header
                   const MyBookingHeader(),
-              
+
                   // Tab bar
                   MyBookingTabBar(
                     selectedIndex: selectedTabIndex,
@@ -171,7 +171,7 @@ class _MyBookingPageState extends State<MyBookingPage>
                       });
                     },
                   ),
-              
+
                   // Search và filter section
                   SearchFilterSection(
                     searchController: searchController,
@@ -185,21 +185,40 @@ class _MyBookingPageState extends State<MyBookingPage>
                       setState(() {});
                     },
                   ),
-              
+
                   // Stats summary section
-                  StatsSummarySection(bookings: _getFilteredBookings()),
-              
-                  // Bookings list section
+                  // StatsSummarySection(bookings: _getFilteredBookings()),
+
+                  // // Bookings list section
+                  // Expanded(
+                  //   child: BookingsListSection(
+                  //     bookings: _getFilteredBookings(),
+                  //     onBookingTap: (booking) {
+                  //       // TODO: Handle booking tap
+                  //     },
+                  //     onCancelBooking: _handleCancelBooking,
+                  //     onBookAgain: (booking) {
+                  //       _bookAgain(booking);
+                  //     },
+                  //   ),
+                  // ),
                   Expanded(
-                    child: BookingsListSection(
-                      bookings: _getFilteredBookings(),
-                      onBookingTap: (booking) {
-                        // TODO: Handle booking tap
-                      },
-                      onCancelBooking: _handleCancelBooking,
-                      onBookAgain: (booking) {
-                        _bookAgain(booking);
-                      },
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: StatsSummarySection(
+                            bookings: _getFilteredBookings(),
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: BookingsListSection(
+                            bookings: _getFilteredBookings(),
+                            onBookingTap: (booking) {},
+                            onCancelBooking: _handleCancelBooking,
+                            onBookAgain: _bookAgain,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -253,8 +272,6 @@ class _MyBookingPageState extends State<MyBookingPage>
       return matchesStatus && matchesTab && matchesSearch;
     }).toList();
   }
-
-
 
   void _bookAgain(BookingModel booking) {
     showDialog(
@@ -320,4 +337,3 @@ class _MyBookingPageState extends State<MyBookingPage>
     });
   }
 }
-
