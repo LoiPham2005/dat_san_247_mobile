@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
+import 'package:dat_san_247_mobile/core/widgets/image/custom_image.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';

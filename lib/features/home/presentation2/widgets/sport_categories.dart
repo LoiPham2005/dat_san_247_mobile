@@ -2,8 +2,9 @@ import 'package:dat_san_247_mobile/features/category/data/model/sport_category.d
 import 'package:flutter/material.dart';
 
 class SportCategories extends StatefulWidget {
-  final List<SportCategory> sportCategory;
-  const SportCategories({super.key, required this.sportCategory});
+  final List<SportCategory> categories; // Đổi tên và kiểu dữ liệu
+
+  const SportCategories({super.key, required this.categories});
 
   @override
   State<SportCategories> createState() => _SportCategoriesState();
@@ -58,6 +59,7 @@ class _SportCategoriesState extends State<SportCategories> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -97,96 +99,10 @@ class _SportCategoriesState extends State<SportCategories> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              // itemCount: categories.length,
-              itemCount: widget.sportCategory.length,
+              itemCount: widget.categories.length,
               itemBuilder: (context, index) {
-                final category = categories[index];
-                // final category = widget.sportCategory[index];
-                return Container(
-                  width: 90,
-                  margin: EdgeInsets.only(
-                    right: index == categories.length - 1 ? 0 : 16,
-                  ),
-                  child: InkWell(
-                    onTap: () {},
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: category.gradient,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: category.color.withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  category.icon,
-                                  color: Colors.white,
-                                  size: 32,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  category.name,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${category.venueCount} sân',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.white.withOpacity(0.8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          if (category.venueCount > 100)
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: const Text(
-                                  'HOT',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
+                final category = widget.categories[index];
+                return _buildCategoryCard(category, theme);
               },
             ),
           ),
@@ -194,7 +110,77 @@ class _SportCategoriesState extends State<SportCategories> {
       ),
     );
   }
+
+  Widget _buildCategoryCard(SportCategory category, ThemeData theme) {
+    return Container(
+      width: 90,
+      margin: const EdgeInsets.only(right: 16),
+      child: InkWell(
+        onTap: () {},
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [theme.primaryColor.withOpacity(0.8), theme.primaryColor],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: theme.primaryColor.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                _getCategoryIcon(category.categoryName ?? ''),
+                color: Colors.white,
+                size: 32,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                category.categoryName ?? '',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getCategoryIcon(String name) {
+    switch (name.toLowerCase()) {
+      case 'bóng đá':
+        return Icons.sports_soccer;
+      case 'cầu lông':
+        return Icons.sports_tennis;
+      case 'bóng rổ':
+        return Icons.sports_basketball;
+      case 'tennis':
+        return Icons.sports_tennis;
+      case 'bóng chuyền':
+        return Icons.sports_volleyball;
+      case 'bơi lội':
+        return Icons.pool;
+      default:
+        return Icons.sports;
+    }
+  }
 }
+
+
+
 
 class SportCategoryItem {
   final String name;

@@ -346,7 +346,7 @@
 import 'package:dat_san_247_mobile/core/localization/app_localization.dart';
 import 'package:dat_san_247_mobile/core/localization/localization_service.dart';
 import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
-import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
+import 'package:dat_san_247_mobile/core/widgets/image/custom_image.dart';
 import 'package:dat_san_247_mobile/features/profile/presentation/pages/page/edit_profile_page.dart';
 import 'package:dat_san_247_mobile/features/profile/presentation/pages/page/setting_page.dart';
 import 'package:flutter/material.dart';

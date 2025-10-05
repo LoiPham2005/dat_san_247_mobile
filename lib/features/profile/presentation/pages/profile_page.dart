@@ -1,6 +1,6 @@
 // User Model
-import 'package:dat_san_247_mobile/features2/bottomMenu/presentations/pages/owner_booking_screen.dart';
-import 'package:dat_san_247_mobile/features2/bottomMenu/presentations/pages/owner_bottom_menu.dart';
+import 'package:dat_san_247_mobile/features-owner/bottomMenu/presentations/pages/owner_booking_screen.dart';
+import 'package:dat_san_247_mobile/features-owner/bottomMenu/presentations/pages/owner_bottom_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

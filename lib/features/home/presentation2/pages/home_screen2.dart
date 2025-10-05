@@ -1,4 +1,7 @@
+import 'package:dat_san_247_mobile/core/widgets/load/load_overlay.dart';
 import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
+import 'package:dat_san_247_mobile/features/favorite/presentation/pages/favorite_page.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/banner_carousel.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/featured_venues_section.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/nearby_venues_section.dart';
@@ -6,6 +9,7 @@ import 'package:dat_san_247_mobile/features/home/presentation2/widgets/quick_act
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/quick_stats_section.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/search_section.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/sport_categories.dart';
+import 'package:dat_san_247_mobile/features/notification/presentation/pages/notification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/features/home/presentation2/widgets/home_app_bar.dart';
@@ -25,7 +29,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late ScrollController _scrollController;
-  final   _sportCategoryController = Get.find<SportCategoryController>();
+  final _sportCategoryController = Get.find<SportCategoryController>();
+  final _bannerController = Get.find<BannerController>();
 
   String _selectedLocation = "Hà Nội";
   double _scrollOffset = 0.0;
@@ -130,6 +135,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     selectedLocation: _selectedLocation,
                     onLocationTap: _showLocationPicker,
                     onNotificationTap: _showNotifications,
+                    onFavoriteTap: _showFavorite,
                   ),
 
                   // Main content
@@ -148,15 +154,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         const QuickStatsSection(),
 
                         // Banner Carousel
-                        const BannerCarousel(),
+                        // Obx(() {
+                        //   if (_bannerController.bannerList.isEmpty) {
+                        //     return Center(child: CircularProgressIndicator());
+                        //   }
+                        //   return BannerCarousel(
+                        //     banners: _bannerController.bannerList,
+                        //   );
+                        // }),
+
+                        LoadOverlay(
+                          isLoading: _sportCategoryController.isLoading,
+                          // isEmpty: _sportCategoryController.listCategory.isEmpty.obs,
+                          shimmerHeight: 180,
+                          shimmerWidth: double.infinity,
+                          child: BannerCarousel(
+                            banners: _bannerController.bannerList,
+                          )
+                        ),
 
                         // Sport Categories
-                         Obx(() {
-                          if(_sportCategoryController.listCategory.isEmpty){
-                            
+                        Obx(() {
+                          if (_sportCategoryController.isLoading.value) {
+                            return Center(child: CircularProgressIndicator());
                           }
-                           return SportCategories(sportCategory: _sportCategoryController.listCategory,);
-                         }, ),
+                         else if (_sportCategoryController.listCategory.isEmpty) {
+                            return Center(child: Text("Không có dữ liệu"));
+                          }
+                          return SportCategories(
+                            categories: _sportCategoryController.listCategory,
+                          );
+                        }),
 
                         // Nearby Venues
                         const NearbyVenuesSection(),
@@ -209,6 +237,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
+
+    Get.to(() => NotificationScreen());
+  }
+
+  void _showFavorite() {
+    // TODO: Implement notifications
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Bạn có 3 thông báo mới'),
+        backgroundColor: Theme.of(context).primaryColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+
+    Get.to(() => FavoriteScreen());
   }
 
   void _showLocationPicker() {

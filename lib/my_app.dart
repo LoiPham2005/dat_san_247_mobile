@@ -1,4 +1,6 @@
 import 'package:dat_san_247_mobile/core/localization/localization_service.dart';
+import 'package:dat_san_247_mobile/core/utils/function/check_internet.dart';
+import 'package:dat_san_247_mobile/core/utils/function/check_version.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dat_san_247_mobile/core/di/bindings/initial_binding.dart';
@@ -15,9 +17,26 @@ class MyApp extends StatelessWidget {
     final themeService = Get.find<ThemeService>();
     // final languageService = Get.find<LanguageService>();
 
+    // Check internet & version khi mở app
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(seconds: 2), () {
+        CheckInternet.check(
+          Get.context!,
+          onConnected: () {
+            // Check version khi có internet
+            CheckVersion.check(
+              Get.context!,
+              androidPackageId: 'com.example.dat_san_247_mobile',
+              iosBundleId: 'com.example.dat_san_247_mobile',
+            );
+          },
+        );
+      });
+    });
+
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'App',
+      title: 'SportHub',
       // translations: AppTranslations(),
       // locale: languageService.currentCode,
       // fallbackLocale: const Locale('en', 'US'),

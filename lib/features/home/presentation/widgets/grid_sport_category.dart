@@ -1,5 +1,5 @@
 import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
-import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
+import 'package:dat_san_247_mobile/core/widgets/image/custom_image.dart';
 import 'package:dat_san_247_mobile/features/category/data/model/sport_category.dart';
 import 'package:flutter/material.dart';
 

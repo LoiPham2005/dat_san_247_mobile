@@ -5,7 +5,7 @@ import 'package:dat_san_247_mobile/core/config/app/repository_helper/api_helper.
 import 'package:dat_san_247_mobile/features/home/data/models/banner_model.dart';
 
 class BannerRepository {
-  DioClient _dio = DioClient();
+  // DioClient _dio = DioClient();
 
   Future<BaseResponse<List<Banner>>> getBanner() async {
     // try {
@@ -20,7 +20,7 @@ class BannerRepository {
     // }
 
     return ApiHelper.handleListRequest(
-      apiCall: () => _dio.get(ApiPath.banner),
+      apiCall: () => DioClient().get(ApiPath.banner),
       fromJson: (json) => Banner.fromJson(json),
     );
   }

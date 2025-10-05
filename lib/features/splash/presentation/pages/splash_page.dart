@@ -1,3 +1,5 @@
+import 'package:dat_san_247_mobile/core/utils/function/check_internet.dart';
+import 'package:dat_san_247_mobile/core/utils/function/check_version.dart';
 import 'package:dat_san_247_mobile/core/utils/shared_preferences/app_preferences.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
@@ -14,25 +16,54 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(milliseconds: 500), () async {
-      final firstRun = await AppPreferences.isFirstRun();
-      // final firstRun = true;
-      final loggedIn = await AppPreferences.isLogin();
+    Future.delayed(Duration(seconds: 1000), () async {
+      // Check internet trước
+      await CheckInternet.check(
+        context,
+        showMessage: false,
+        onConnected: () async {
+          // Check version khi có internet
+          await CheckVersion.check(
+            context,
+            androidPackageId: 'com.example.dat_san_247_mobile',
+            iosBundleId: 'com.example.dat_san_247_mobile',
+          );
 
-      print("isFirstRun: $firstRun");
-      print("isLogin: $loggedIn");
+          final firstRun = await AppPreferences.isFirstRun();
+          // final firstRun = true;
+          final loggedIn = await AppPreferences.isLogin();
 
-      if (firstRun) {
-        Get.offAll(() => WelcomePage());
-      } else {
-        if (loggedIn) {
-          Get.offAll(() => BottomMenuCustom());
-        } else {
-          Get.offAll(() => LoginPage());
-        }
-      }
+          print("isFirstRun: $firstRun");
+          print("isLogin: $loggedIn");
+
+          if (firstRun) {
+            Get.offAll(() => WelcomePage());
+          } else {
+            if (loggedIn) {
+              Get.offAll(() => BottomMenuCustom());
+            } else {
+              Get.offAll(() => LoginPage());
+            }
+          }
+        },
+      );
     });
 
-    return Scaffold(body: Center(child: CircularProgressIndicator()));
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/image/SprotHub_Logo.png',
+              width: 120,
+              height: 120,
+            ),
+            const SizedBox(height: 24),
+            const CircularProgressIndicator(),
+          ],
+        ),
+      ),
+    );
   }
 }

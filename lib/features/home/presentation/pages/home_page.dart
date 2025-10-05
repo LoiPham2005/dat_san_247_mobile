@@ -153,8 +153,8 @@
 // }
 
 import 'package:dat_san_247_mobile/core/utils/extensions/int_ext.dart';
-import 'package:dat_san_247_mobile/core/widgets/custom_carousel.dart';
-import 'package:dat_san_247_mobile/core/widgets/custom_image.dart';
+import 'package:dat_san_247_mobile/core/widgets/carousel/custom_carousel.dart';
+import 'package:dat_san_247_mobile/core/widgets/image/custom_image.dart';
 import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
 import 'package:dat_san_247_mobile/features/search_venue/presentation/pages/search_page.dart';

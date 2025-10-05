@@ -27,6 +27,9 @@ class ApiPath {
   // venue
   static const String venue = '/venues';
 
+  // staticst
+  static const String venueStatistics = '/venue-statistics/quick-stats';
+
   //location
   static const provinces = '/address/province';
   static const district = '/address/district?province_id=';

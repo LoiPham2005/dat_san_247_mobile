@@ -1,8 +1,8 @@
-import 'package:dat_san_247_mobile/features2/bottomMenu/presentations/pages/owner_booking_screen.dart';
-import 'package:dat_san_247_mobile/features2/bottomMenu/presentations/pages/owner_field_screen.dart';
-import 'package:dat_san_247_mobile/features2/bottomMenu/presentations/pages/owner_home_screen.dart';
-import 'package:dat_san_247_mobile/features2/bottomMenu/presentations/pages/owner_profile_screen.dart';
-import 'package:dat_san_247_mobile/features2/bottomMenu/presentations/pages/owner_statistics_screen.dart';
+import 'package:dat_san_247_mobile/features-owner/bottomMenu/presentations/pages/owner_booking_screen.dart';
+import 'package:dat_san_247_mobile/features-owner/bottomMenu/presentations/pages/owner_field_screen.dart';
+import 'package:dat_san_247_mobile/features-owner/bottomMenu/presentations/pages/owner_home_screen.dart';
+import 'package:dat_san_247_mobile/features-owner/bottomMenu/presentations/pages/owner_profile_screen.dart';
+import 'package:dat_san_247_mobile/features-owner/bottomMenu/presentations/pages/owner_statistics_screen.dart';
 import 'package:flutter/material.dart';
 
 class OwnerBottomMenu extends StatefulWidget {

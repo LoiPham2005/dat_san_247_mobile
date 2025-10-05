@@ -5,6 +5,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ThemeData theme;
   final String selectedLocation;
   final Function() onLocationTap;
+  final Function() onFavoriteTap;
   final Function() onNotificationTap;
 
   const HomeAppBar({
@@ -12,7 +13,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.theme,
     required this.selectedLocation,
     required this.onLocationTap,
-    required this.onNotificationTap,
+    required this.onNotificationTap, 
+    required this.onFavoriteTap,
   });
 
   @override
@@ -125,7 +127,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           child: IconButton(
             icon: const Icon(Icons.favorite_border, color: Colors.white),
-            onPressed: () {},
+            onPressed: onFavoriteTap,
           ),
         ),
         Container(

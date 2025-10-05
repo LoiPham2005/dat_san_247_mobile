@@ -1,6 +1,7 @@
 import 'package:dat_san_247_mobile/features/auth/presentation/controller/auth_controller.dart';
 import 'package:dat_san_247_mobile/features/category/presentation/controller/sport_category_controller.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/controller/banner_controller.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/controller/quick_stats_controller.dart';
 import 'package:dat_san_247_mobile/features/my_booking/data/repository/venue_repository.dart';
 import 'package:dat_san_247_mobile/features/my_booking/presentation/controller/venue_controller.dart';
 import 'package:get/get.dart';
@@ -13,5 +14,6 @@ class ControllerBinding implements Bindings {
     Get.put(SportCategoryController(), permanent: true);
     Get.put(VenueController(), permanent: true);
     Get.put(BannerController(), permanent: true);
+    Get.put(QuickStatsController(), permanent: true);
   }
 }

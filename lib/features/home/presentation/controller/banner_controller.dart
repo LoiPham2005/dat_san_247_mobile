@@ -15,7 +15,6 @@ class BannerController extends BaseController {
   }
 
   
-
   Future<void> getBanner() {
     return fetchList(
       action: () => bannerRepository.getBanner(),

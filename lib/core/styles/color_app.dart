@@ -14,13 +14,20 @@ class ColorApp {
   static List<Color> primaryGradient = [primaryGreen, lightGreen];
 
   static const white = Color(0xffFFFFFF);
-  static const whiteF6 = Color(0xfff6f6ff);
+  static const whiteF6 = Color(0xfff6f6ff); 
+
+  static const black = Color(0xff464447); 
+
 
   static const gray46 = Color(0xff464447);
   static const grayE7 = Color(0xffE7E8E9);
   static const gray9B = Color(0xff9B9B9B);
+  static const gray82 = Color(0xff9B9B9B);
+  
   static const grayF6 = Color(0xffF6F6F6);
   static const orangeE6 = Color(0xffE68A37);
+
+  static const redF0 = Color(0xffE68A37);
 
   // Màu chính (Primary)
   static const Color primary = Color(0xff62b766);

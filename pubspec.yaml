@@ -28,6 +28,9 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter:
+    sdk: flutter
+    
   badges: ^3.1.2
   cached_network_image: ^3.4.1
   carousel_slider: ^5.0.0
@@ -35,8 +38,6 @@ dependencies:
   curved_navigation_bar: ^1.0.6
   device_preview: ^1.3.1
   dio: ^5.8.0+1
-  flutter:
-    sdk: flutter
   flutter_map: ^6.1.0
   flutter_native_splash: ^2.4.6
   flutter_osm_plugin: ^1.4.2
@@ -61,7 +62,10 @@ dependencies:
   table_calendar: ^3.2.0
   toastification: ^3.0.3
   url_launcher: ^6.3.1
-  validators: ^3.0.0
+  # validators: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
+  internet_connection_checker: ^3.0.1
+  nb_utils: ^7.1.8
 
 dev_dependencies:
   flutter_lints: ^5.0.0
@@ -112,3 +116,8 @@ flutter_native_splash:
   android: true
   ios: true
   web: false
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/image/SprotHub_Logo.png"
