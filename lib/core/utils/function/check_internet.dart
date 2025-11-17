@@ -96,8 +96,23 @@ class CheckInternet {
           if (onDisconnected != null) onDisconnected();
           break;
         case InternetConnectionStatus.slow:
-          // TODO: Handle this case.
-          throw UnimplementedError();
+          if (showMessage) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: const [
+                    Icon(Icons.signal_wifi_bad, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text('Kết nối mạng yếu'),
+                  ],
+                ),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 3),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+          break;
       }
     });
   }

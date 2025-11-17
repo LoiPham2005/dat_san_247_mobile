@@ -154,24 +154,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         const QuickStatsSection(),
 
                         // Banner Carousel
-                        // Obx(() {
-                        //   if (_bannerController.bannerList.isEmpty) {
-                        //     return Center(child: CircularProgressIndicator());
-                        //   }
-                        //   return BannerCarousel(
-                        //     banners: _bannerController.bannerList,
-                        //   );
-                        // }),
-
-                        LoadOverlay(
-                          isLoading: _sportCategoryController.isLoading,
-                          // isEmpty: _sportCategoryController.listCategory.isEmpty.obs,
-                          shimmerHeight: 180,
-                          shimmerWidth: double.infinity,
-                          child: BannerCarousel(
+                        Obx(() {
+                          if (_bannerController.bannerList.isEmpty) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          return BannerCarousel(
                             banners: _bannerController.bannerList,
-                          )
-                        ),
+                          );
+                        }),
+
+                        // LoadOverlay(
+                        //   isLoading: _sportCategoryController.isLoading,
+                        //   // isEmpty: _sportCategoryController.listCategory.isEmpty.obs,
+                        //   shimmerHeight: 180,
+                        //   shimmerWidth: double.infinity,
+                        //   child: BannerCarousel(
+                        //     banners: _bannerController.bannerList,
+                        //   )
+                        // ),
 
                         // Sport Categories
                         Obx(() {

@@ -1,6 +1,4 @@
-
-
-import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_endpoints.dart';
 
 extension StringX on String? {
 
@@ -45,7 +43,7 @@ extension StringX on String? {
 
   String toImage() {
     if (this == null) return '';
-    return ApiPath.domainImage + this!;
+    return ApiEndpoints.domainImage + this!;
   }
 
   /// Return double value of given string

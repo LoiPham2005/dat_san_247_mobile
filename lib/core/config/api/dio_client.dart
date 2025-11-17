@@ -4,7 +4,7 @@ import 'package:dat_san_247_mobile/core/utils/function/check_internet.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_endpoints.dart';
 import 'package:dat_san_247_mobile/core/utils/function/check_auth_service.dart';
 import 'package:dat_san_247_mobile/core/utils/shared_preferences/db_keys_local.dart';
 import 'package:dat_san_247_mobile/core/utils/shared_preferences/share_pref.dart';
@@ -90,7 +90,7 @@ class DioClient {
   DioClient._internal() {
     dio = Dio(
       BaseOptions(
-        baseUrl: ApiPath.domain,
+        baseUrl: ApiEndpoints.domain,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),

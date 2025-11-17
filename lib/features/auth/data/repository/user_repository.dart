@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
-import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_endpoints.dart';
 import 'package:dat_san_247_mobile/core/config/app/repository_helper/base_response.dart';
 import 'package:dat_san_247_mobile/core/config/api/dio_client.dart';
 import 'package:dat_san_247_mobile/features/auth/data/models/user_model.dart';
@@ -12,7 +12,7 @@ class AuthRepository {
   Future<BaseResponse<User>> login(String email, String password) async {
     try {
       final response = await _client.post(
-        ApiPath.login,
+        ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
 
@@ -46,7 +46,7 @@ class AuthRepository {
   ) async {
     try {
       final response = await _client.post(
-        ApiPath.register,
+        ApiEndpoints.register,
         data: {'username': username, 'email': email, 'password': password},
       );
       // return parseResponse(response, (json) => User.fromJson(json));
@@ -78,7 +78,7 @@ class AuthRepository {
   // đăng xuất
   Future<BaseResponse<void>> logout() async {
     try {
-      final response = await _client.post(ApiPath.logout);
+      final response = await _client.post(ApiEndpoints.logout);
       // return parseResponse(response, (json) {});
       return BaseResponse.fromResponse(response, (json) {});
     } catch (e) {
@@ -89,7 +89,7 @@ class AuthRepository {
   Future<BaseResponse<User>> sendEmail(String email) async {
     try {
       final response = await _client.post(
-        ApiPath.sendEmail,
+        ApiEndpoints.sendEmail,
         data: {'email': email},
       );
 
@@ -124,7 +124,7 @@ class AuthRepository {
   Future<BaseResponse<User>> sendOtp(String email, String otp) async {
     try {
       final response = await _client.post(
-        ApiPath.sendOtp,
+        ApiEndpoints.sendOtp,
         data: {'email': email, 'otp': otp},
       );
       // return parseResponse(
@@ -144,7 +144,7 @@ class AuthRepository {
   ) async {
     try {
       final response = await _client.post(
-        "${ApiPath.sendOtp}/$email",
+        "${ApiEndpoints.sendOtp}/$email",
         data: {'email': email, 'otp': otp, 'newPassword': newPassword},
       );
       // return parseResponse(
@@ -164,7 +164,7 @@ class AuthRepository {
   ) async {
     try {
       final response = await _client.post(
-        "${ApiPath.changPassword}/$id",
+        "${ApiEndpoints.changPassword}/$id",
         data: {'oldPassword': oldPassword, 'newPassword': newPassword},
       );
       // return parseResponse(
@@ -184,11 +184,11 @@ class AuthRepository {
   ) async {
     try {
       final response = await _client.post(
-        "${ApiPath.sendOtp}/$id",
+        "${ApiEndpoints.sendOtp}/$id",
         data: {'oldPassword': oldPassword, 'newPassword': newPassword},
       );
       // return parseResponse(
-      //   response,
+      //   response,P
       //   (p0) => User.fromJson(p0),
       // );
       return BaseResponse.fromResponse(response, (json) => User.fromJson(json));

@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_endpoints.dart';
 import 'package:dat_san_247_mobile/core/config/api/dio_client.dart';
 import 'package:dat_san_247_mobile/core/config/app/repository_helper/base_response.dart';
 import 'package:dat_san_247_mobile/core/config/app/repository_helper/api_helper.dart';
@@ -20,7 +20,7 @@ class BannerRepository {
     // }
 
     return ApiHelper.handleListRequest(
-      apiCall: () => DioClient().get(ApiPath.banner),
+      apiCall: () => DioClient().get(ApiEndpoints.banner),
       fromJson: (json) => Banner.fromJson(json),
     );
   }

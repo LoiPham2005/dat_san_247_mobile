@@ -14,6 +14,6 @@ class ControllerBinding implements Bindings {
     Get.put(SportCategoryController(), permanent: true);
     Get.put(VenueController(), permanent: true);
     Get.put(BannerController(), permanent: true);
-    Get.put(QuickStatsController(), permanent: true);
+    // Get.put(QuickStatsController(), permanent: true);
   }
 }

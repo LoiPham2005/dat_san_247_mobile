@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/core/config/api/api_path.dart';
+import 'package:dat_san_247_mobile/core/config/api/api_endpoints.dart';
 import 'package:dat_san_247_mobile/core/config/api/dio_client.dart';
 import 'package:dat_san_247_mobile/core/config/app/repository_helper/api_helper.dart';
 import 'package:dat_san_247_mobile/core/config/app/repository_helper/base_response.dart';
@@ -17,7 +17,7 @@ class QuickStatsService {
     // }
 
       return ApiHelper.handleRequest(
-      apiCall: () => _dio.get(ApiPath.venueStatistics),
+      apiCall: () => _dio.get(ApiEndpoints.venueStatistics),
       fromJson: (json) => QuickStats.fromJson(json),
     );
   }

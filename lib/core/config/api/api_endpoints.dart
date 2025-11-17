@@ -1,4 +1,4 @@
-class ApiPath {
+class ApiEndpoints {
   // static const String domain = 'http://localhost:3000/api/';
   static const String domain = 'http://192.168.60.103:3000/api/';
 
