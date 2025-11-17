@@ -1,46 +1,135 @@
-import 'package:dat_san_247_mobile/core/styles/color_app.dart';
-import 'package:dat_san_247_mobile/core/theme/base_theme.dart';
+// ========================================
+// 📁 lib/core/theme/app_theme.dart
+// ========================================
 import 'package:flutter/material.dart';
 
-enum AppThemeKey { light, dark, green, blue }
+import 'app_colors.dart';
+import 'base_theme.dart';
+
+// ✅ ENUM cho theme colors
+enum ThemeColorType {
+  blue,
+  green,
+  red,
+  purple,
+  orange,
+  pink,
+  teal,
+  indigo,
+  lime,
+  yellow,
+  black,
+  white,
+}
+
+// ✅ ENUM cho theme mode
+enum AppThemeMode { light, dark, system }
 
 class AppTheme {
-  static const Color primaryColor = Color(0xff4fa553);
+  AppTheme._();
 
-  /// 🎭 Danh sách tất cả Theme
-  static final Map<AppThemeKey, ThemeData> themes = {
-    AppThemeKey.light: _lightTheme,
-    AppThemeKey.dark: _darkTheme,
-    AppThemeKey.green: _greenTheme,
-    AppThemeKey.blue: _blueTheme,
+  // ✅ Theme names & icons
+  static const Map<ThemeColorType, String> themeNames = {
+    ThemeColorType.blue: '🔵 Ocean Blue',
+    ThemeColorType.green: '🟢 Nature Green',
+    ThemeColorType.red: '🔴 Passion Red',
+    ThemeColorType.purple: '🟣 Royal Purple',
+    ThemeColorType.orange: '🟠 Sunset Orange',
+    ThemeColorType.pink: '💗 Sweet Pink',
+    ThemeColorType.teal: '🌊 Calm Teal',
+    ThemeColorType.indigo: '🎨 Deep Indigo',
+    ThemeColorType.lime: '💚 Lime Green',
+    ThemeColorType.yellow: '⭐ Sunny Yellow',
+    ThemeColorType.black: '⚫ Midnight Black',
+    ThemeColorType.white: '⚪ Pure White',
   };
 
-  // ----------------- LIGHT THEME -----------------
-  static final ThemeData _lightTheme = BaseTheme.build(
-    seed: primaryColor,
-    brightness: Brightness.light,
-    inversePrimary: Colors.deepPurple.shade200,
-    
-  );
+  static const Map<ThemeColorType, IconData> themeIcons = {
+    ThemeColorType.blue: Icons.water_drop,
+    ThemeColorType.green: Icons.eco,
+    ThemeColorType.red: Icons.favorite,
+    ThemeColorType.purple: Icons.auto_awesome,
+    ThemeColorType.orange: Icons.wb_sunny,
+    ThemeColorType.pink: Icons.cake,
+    ThemeColorType.teal: Icons.waves,
+    ThemeColorType.indigo: Icons.nights_stay,
+    ThemeColorType.yellow: Icons.star,
+    ThemeColorType.black: Icons.dark_mode,
+    ThemeColorType.white: Icons.light_mode,
+  };
 
-  // ----------------- DARK THEME -----------------
-  static final ThemeData _darkTheme = BaseTheme.build(
-    seed: Colors.deepPurple,
-    brightness: Brightness.dark,
-    inversePrimary: Colors.deepPurple.shade200,
-  );
+  // ✅ Get all theme names
+  static List<ThemeColorType> get allThemes => ThemeColorType.values;
 
-  // ----------------- BLUE THEME -----------------
-  static final ThemeData _blueTheme = BaseTheme.build(
-    seed: Colors.blue,
-    brightness: Brightness.light,
-    inversePrimary: Colors.blue.shade200,
-  );
+  // ✅ Build light theme
+  static ThemeData getLightTheme(ThemeColorType colorType) {
+    final colorKey = colorType.name; // 'blue', 'green', etc.
+    final colors = AppColors.themeColors[colorKey];
 
-  // ----------------- GREEN THEME -----------------
-  static final ThemeData _greenTheme = BaseTheme.build(
-    seed: primaryColor, // Sử dụng màu primary đã định nghĩa
-    brightness: Brightness.light,
-    inversePrimary: primaryColor.withOpacity(0.2),
-  );
+    if (colors == null) {
+      throw Exception('Theme color "$colorKey" not found!');
+    }
+
+    return BaseTheme.buildBaseTheme(
+      colorScheme: ColorScheme.light(
+        primary: colors.primary,
+        secondary: colors.secondary,
+        surface: AppColors.surface,
+        error: AppColors.error,
+        onPrimary: AppColors.white,
+        onSurface: AppColors.textSecondary,
+        outline: AppColors.border,
+      ),
+      scaffoldBackgroundColor: AppColors.scaffoldBackground,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.primary,
+        foregroundColor: AppColors.white,
+        centerTitle: true,
+        elevation: 0,
+      ),
+      bottomNavTheme: BottomNavigationBarThemeData(
+        backgroundColor: AppColors.white,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: AppColors.textSecondary,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+      ),
+    );
+  }
+
+  // ✅ Build dark theme
+  static ThemeData getDarkTheme(ThemeColorType colorType) {
+    final colorKey = colorType.name;
+    final colors = AppColors.themeColors[colorKey];
+
+    if (colors == null) {
+      throw Exception('Theme color "$colorKey" not found!');
+    }
+
+    return BaseTheme.buildBaseTheme(
+      colorScheme: ColorScheme.dark(
+        primary: colors.primaryLight,
+        secondary: colors.secondaryLight,
+        surface: const Color(0xFF1E1E1E),
+        error: AppColors.error,
+        onPrimary: AppColors.black,
+        onSurface: AppColors.white,
+        outline: const Color(0xFF424242),
+      ),
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      appBarTheme: AppBarTheme(
+        backgroundColor: const Color(0xFF1E1E1E),
+        foregroundColor: colors.primaryLight,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      bottomNavTheme: BottomNavigationBarThemeData(
+        backgroundColor: const Color(0xFF1E1E1E),
+        selectedItemColor: colors.primaryLight,
+        unselectedItemColor: AppColors.grey,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+      ),
+    );
+  }
 }

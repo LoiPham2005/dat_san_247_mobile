@@ -1,77 +1,96 @@
-import 'package:dat_san_247_mobile/core/styles/color_app.dart';
 import 'package:flutter/material.dart';
+import 'app_text_styles.dart';
 
 class BaseTheme {
-  static ThemeData build({
-    required Color seed,
-    required Brightness brightness,
-    required Color inversePrimary,
-    
+  BaseTheme._();
+
+  static ThemeData buildBaseTheme({
+    required ColorScheme colorScheme,
+    required Color scaffoldBackgroundColor,
+    required AppBarTheme appBarTheme,
+    required BottomNavigationBarThemeData bottomNavTheme,
   }) {
     return ThemeData(
-      useMaterial3: false, // Tắt Material 3 đi
-      primaryColor: seed,
-      primarySwatch: MaterialColor(seed.value, {
-        50: seed.withOpacity(0.1),
-        100: seed.withOpacity(0.2),
-        200: seed.withOpacity(0.3),
-        300: seed.withOpacity(0.4),
-        400: seed.withOpacity(0.5),
-        500: seed,
-        600: seed.withOpacity(0.6),
-        700: seed.withOpacity(0.7),
-        800: seed.withOpacity(0.8),
-        900: seed.withOpacity(0.9),
-      }),
-      scaffoldBackgroundColor: ColorApp.background,
-      fontFamily: 'Roboto',
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: scaffoldBackgroundColor,
+      appBarTheme: appBarTheme,
 
-      // 🔹 AppBar
-      appBarTheme: AppBarTheme(
-        backgroundColor: seed,
-        foregroundColor: inversePrimary,
-        centerTitle: true,
-        elevation: 0,
-      ),
-
-      // 🔹 TextButton
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: seed,
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colorScheme.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colorScheme.outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
       ),
 
-      // 🔹 ElevatedButton
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: seed,
-          foregroundColor: inversePrimary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          elevation: 2,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
 
-      // 🔹 OutlinedButton
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: seed,
-          side: BorderSide(color: seed, width: 1.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          foregroundColor: colorScheme.primary,
+          side: BorderSide(color: colorScheme.primary),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
 
-      // 🔹 InputDecoration (TextField, TextFormField)
-      inputDecorationTheme: InputDecorationTheme(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        hintStyle: TextStyle(color: Colors.grey[500]),
+      bottomNavigationBarTheme: bottomNavTheme,
+
+      textTheme: const TextTheme(
+        displayLarge: AppTextStyles.displayLarge,
+        displayMedium: AppTextStyles.displayMedium,
+        displaySmall: AppTextStyles.displaySmall,
+        headlineLarge: AppTextStyles.headlineLarge,
+        headlineMedium: AppTextStyles.headlineMedium,
+        headlineSmall: AppTextStyles.headlineSmall,
+        titleLarge: AppTextStyles.titleLarge,
+        titleMedium: AppTextStyles.titleMedium,
+        titleSmall: AppTextStyles.titleSmall,
+        bodyLarge: AppTextStyles.bodyLarge,
+        bodyMedium: AppTextStyles.bodyMedium,
+        bodySmall: AppTextStyles.bodySmall,
+        labelLarge: AppTextStyles.labelLarge,
+        labelMedium: AppTextStyles.labelMedium,
+        labelSmall: AppTextStyles.labelSmall,
       ),
     );
   }

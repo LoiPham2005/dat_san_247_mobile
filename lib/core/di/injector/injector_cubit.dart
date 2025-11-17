@@ -1,5 +1,0 @@
-
-
-injectorCubit() {
-  // di.registerLazySingleton(() => ValidBloc());
-}

@@ -1,0 +1,42 @@
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/image/SprotHub_Logo.png
+  branding: assets/images/branding.png
+  android: true
+  ios: true
+  web: false
+
+
+
+# # ========================
+# # DEVELOPMENT
+# # ========================
+# dev:
+#   android: true
+#   # ios: true  # chỉ dùng nếu trên macOS
+#   web: false
+#   color: "#ffffff"
+#   image: "assets/image/dev_splash.png"       # Splash riêng cho dev
+#   branding: "assets/images/dev_branding.png" # Branding riêng cho dev
+
+# # ========================
+# # STAGING
+# # ========================
+# staging:
+#   android: true
+#   # ios: true
+#   web: false
+#   color: "#ffffff"
+#   image: "assets/image/staging_splash.png"       # Splash riêng cho staging
+#   branding: "assets/images/staging_branding.png" # Branding riêng cho staging
+
+# # ========================
+# # PRODUCTION
+# # ========================
+# prod:
+#   android: true
+#   # ios: true
+#   web: false
+#   color: "#ffffff"
+#   image: "assets/image/prod_splash.png"       # Splash riêng cho prod
+#   branding: "assets/images/prod_branding.png" # Branding riêng cho prod

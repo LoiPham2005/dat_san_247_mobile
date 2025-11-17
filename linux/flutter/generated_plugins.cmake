@@ -4,7 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
-  nb_utils
+  flutter_secure_storage_linux
   url_launcher_linux
 )
 

@@ -1,3 +1,86 @@
 {
-    "liveServer.settings.port": 5501
+  // 🔧 Flutter SDK qua FVM
+  "dart.flutterSdkPath": ".fvm/flutter_sdk",
+  "dart.flutterSdkPaths": [".fvm/flutter_sdk"],
+
+  // 💡 Tự động format và fix lỗi khi lưu
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",  // ✅ Sắp xếp imports
+    "source.fixAll": "explicit"           // ✅ Fix tất cả lỗi có thể
+  },
+
+  // 🎯 Cấu hình riêng cho Dart
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.rulers": [100],                // Hiển thị line ở cột 100
+    "editor.selectionHighlight": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off",
+    "editor.defaultFormatter": "Dart-Code.dart-code"  // ✅ Thêm này
+  },
+
+  // ✨ Giới hạn độ dài dòng code
+  "dart.lineLength": 100,
+
+  // 🔥 Hot reload tự động khi save
+  "dart.flutterHotReloadOnSave": "always",
+  "dart.flutterHotRestartOnSave": "never",
+
+  // 🔍 Không cần debug thư viện hệ thống
+  "dart.debugExternalPackageLibraries": false,
+  "dart.debugSdkLibraries": false,
+
+  // 📊 Hiển thị TODO/FIXME comments
+  "dart.showTodos": true,
+
+  // 🗂️ Liên kết tệp
+  "files.associations": {
+    "*.dart": "dart"
+  },
+
+  // 🚫 Ẩn các thư mục build tool
+  "files.exclude": {
+    "**/.dart_tool": true,
+    "**/.packages": true,
+    // "**/build": true,
+    "**/.idea": true,
+    "**/.gradle": true,
+    "**/.vscode": false,    // ✅ Hiển thị .vscode
+    "**/.fvm": false        // ✅ Hiển thị .fvm để dễ debug
+  },
+
+  // 🧠 Tăng tốc độ IntelliSense
+  "search.exclude": {
+    "**/.dart_tool": true,
+    "**/.fvm": true,        // ✅ Không search trong .fvm
+    "**/build": true,
+    "**/*.freezed.dart": true,  // ✅ Bỏ qua generated files
+    "**/*.g.dart": true,
+    "**/*.gr.dart": true,
+    "**/generated": true
+  },
+
+  // 🧹 Tự động xóa trailing whitespace
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+
+  // 🧱 Hỗ trợ auto-complete tốt hơn
+  "editor.quickSuggestions": {
+    "strings": true,
+    "comments": false,
+    "other": true
+  },
+
+  // 📝 Snippet suggestions
+  "editor.snippetSuggestions": "top",
+  "editor.suggest.localityBonus": true,
+
+  // 🎨 Bracket colorizer (VS Code built-in)
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true
 }

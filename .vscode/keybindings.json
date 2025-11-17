@@ -1,0 +1,103 @@
+// ════════════════════════════════════════════════════════════════
+// 📁 .vscode/keybindings.json (SIMPLIFIED - Flavors Only)
+// ════════════════════════════════════════════════════════════════
+[
+  // ═══════════════════════════════════════════════════════════
+  // 🚀 MAIN ACTIONS (Most Used)
+  // ═══════════════════════════════════════════════════════════
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🚀 Build (Universal)",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+r",
+    "command": "workbench.action.tasks.runTask",
+    "args": "⚡ Build Runner (One-time)",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+w",
+    "command": "workbench.action.tasks.runTask",
+    "args": "👁️ Build Runner (Watch)",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🧹 Clean & Get",
+    "when": "editorTextFocus"
+  },
+  // ═══════════════════════════════════════════════════════════
+  // 🏗️ QUICK BUILDS
+  // ═══════════════════════════════════════════════════════════
+  {
+    "key": "ctrl+shift+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📦 Build APK (Dev)",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+s",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📦 Build APK (Stg)",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📦 Build APK (Prod)",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+a",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🏬 Build AAB (Prod)",
+    "when": "editorTextFocus"
+  },
+  // ═══════════════════════════════════════════════════════════
+  // 📦 PUB COMMANDS
+  // ═══════════════════════════════════════════════════════════
+  {
+    "key": "ctrl+alt+g",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📦 Pub Get",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+u",
+    "command": "workbench.action.tasks.runTask",
+    "args": "⬆️ Pub Upgrade",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+o",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔍 Pub Outdated",
+    "when": "editorTextFocus"
+  },
+  // ═══════════════════════════════════════════════════════════
+  // 🎯 CODE GEN
+  // ═══════════════════════════════════════════════════════════
+  {
+    "key": "ctrl+alt+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🎯 Build Runner (Current File)",
+    "when": "editorLangId == dart"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 Generate l10n",
+    "when": "editorTextFocus"
+  }
+  // ═══════════════════════════════════════════════════════════
+  // 🐛 DEBUG SHORTCUTS (Keep defaults, just document)
+  // ═══════════════════════════════════════════════════════════
+  // F5:              Start Debugging
+  // Ctrl+Shift+F5:   Hot Restart
+  // Shift+F5:        Stop Debugging
+  // Ctrl+F5:         Run Without Debugging
+  // Ctrl+Shift+D:    Show Debug Panel
+]

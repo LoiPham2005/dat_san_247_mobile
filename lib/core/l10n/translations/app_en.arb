@@ -1,0 +1,16 @@
+{
+    "appTitle": "My App",
+    "ddd": "gggg",
+    "hello": "Hello",
+    "ccccc": "cccc",
+    "welcome": "Welcome {name}",
+    "@welcome": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "her": "her",
+    "map":"map"
+}
