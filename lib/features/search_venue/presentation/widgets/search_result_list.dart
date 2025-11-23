@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/features/home/presentation/widgets/list_venue.dart';
+import 'package:dat_san_247_mobile/features/home/presentation2/widgets/list_venue.dart';
 import 'package:dat_san_247_mobile/features/my_booking/presentation/controller/venue_controller.dart';
 
 class SearchResultList extends StatelessWidget {
