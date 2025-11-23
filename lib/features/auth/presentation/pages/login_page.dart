@@ -549,24 +549,26 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       return;
     }
 
-    final success = await controller.login(emailText, passwordText);
-    if (success) {
-      Get.offAll(() => BottomMenuCustom(), transition: Transition.fade);
-      Get.snackbar(
-        "Thông báo",
-        "Đăng nhập  thành công",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    } else {
-      Get.snackbar(
-        "Thông báo",
-        "Đăng nhập không thành công",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
+    Get.offAll(() => BottomMenuCustom(), transition: Transition.fade);
+
+    // final success = await controller.login(emailText, passwordText);
+    // if (success) {
+    //   Get.offAll(() => BottomMenuCustom(), transition: Transition.fade);
+    //   Get.snackbar(
+    //     "Thông báo",
+    //     "Đăng nhập  thành công",
+    //     backgroundColor: Colors.green,
+    //     colorText: Colors.white,
+    //   );
+    // } else {
+    //   Get.snackbar(
+    //     "Thông báo",
+    //     "Đăng nhập không thành công",
+    //     snackPosition: SnackPosition.BOTTOM,
+    //     backgroundColor: Colors.red,
+    //     colorText: Colors.white,
+    //   );
+    // }
   }
 
   @override

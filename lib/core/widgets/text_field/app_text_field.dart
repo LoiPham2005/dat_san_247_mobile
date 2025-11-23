@@ -2,7 +2,6 @@
 import 'package:dat_san_247_mobile/core/styles/color_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nb_utils/nb_utils.dart';
 
 class AppTextField extends StatefulWidget {
   const AppTextField({
@@ -149,7 +148,7 @@ class _AppTextFieldState extends State<AppTextField> {
             style: TextStyle(
               color: ColorApp.redF0,
             ),
-          ).paddingOnly(left:15, top: 5),
+          )
       ],
     );
   }

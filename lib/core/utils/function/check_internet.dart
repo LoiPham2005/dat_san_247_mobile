@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:nb_utils/nb_utils.dart';
 
 class CheckInternet {
   static StreamSubscription? _subscription;

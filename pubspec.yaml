@@ -65,7 +65,7 @@ dependencies:
   # validators: ^3.0.0
   flutter_launcher_icons: ^0.14.4
   internet_connection_checker: ^3.0.1
-  nb_utils: ^7.1.8
+#  nb_utils: ^7.1.8
 
 dev_dependencies:
   flutter_lints: ^5.0.0

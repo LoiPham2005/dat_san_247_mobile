@@ -1,7 +1,6 @@
 
 import 'package:dat_san_247_mobile/core/styles/color_app.dart';
 import 'package:flutter/material.dart';
-import 'package:nb_utils/nb_utils.dart';
 
 class TextTitle extends StatelessWidget {
   const TextTitle({
@@ -25,14 +24,14 @@ class TextTitle extends StatelessWidget {
           height: 20,
           color: ColorApp.primaryColor,
         ),
-        16.width,
+        // 16.width,
         Text(
           title,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
-        ).expand(),
+        ),
         if (action != null) action!,
       ],
     );
@@ -70,7 +69,7 @@ class TextTitle2 extends StatelessWidget {
             fontWeight: FontWeight.w700,
             color: colorContent,
           ),
-        ).expand(),
+        ),
       ],
     );
   }
