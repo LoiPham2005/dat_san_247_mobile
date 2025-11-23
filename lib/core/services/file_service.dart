@@ -5,10 +5,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 
 /// File service for general file operations
-/// 
+///
 /// Responsibilities:
 /// - Download files
 /// - Open files
@@ -32,10 +32,10 @@ class FileService {
     void Function(int received, int total)? onProgress,
   }) async {
     try {
-      final dir = await getDownloadsDirectory() ?? 
+      final dir = await getDownloadsDirectory() ??
                    await getApplicationDocumentsDirectory();
       final folder = Directory('${dir.path}/${folderName ?? "MyAppFiles"}');
-      
+
       if (!await folder.exists()) {
         await folder.create(recursive: true);
       }
@@ -43,7 +43,7 @@ class FileService {
       final filePath = '${folder.path}/${fileName ?? url.split('/').last}';
 
       await _dio.download(
-        url, 
+        url,
         filePath,
         onReceiveProgress: onProgress,
       );
@@ -63,7 +63,7 @@ class FileService {
         Logger.warning('File does not exist: ${file.path}');
         return false;
       }
-      
+
       final result = await OpenFilex.open(file.path);
       return result.type == ResultType.done;
     } catch (e) {
@@ -80,8 +80,8 @@ class FileService {
     void Function(int, int)? onProgress,
   }) async {
     final file = await downloadFile(
-      url, 
-      fileName: fileName, 
+      url,
+      fileName: fileName,
       folderName: folderName,
       onProgress: onProgress,
     );
@@ -114,7 +114,7 @@ class FileService {
   Future<String> getSizeFormatted(String path) async {
     final bytes = await getSize(path);
     if (bytes == null) return 'Unknown';
-    
+
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(2)} KB';
     if (bytes < 1024 * 1024 * 1024) {

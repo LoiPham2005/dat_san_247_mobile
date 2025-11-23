@@ -2,12 +2,12 @@
 // 📁 lib/core/services/auth_service.dart
 // ════════════════════════════════════════════════════════════════
 import 'package:dio/dio.dart';
-import 'package:flutter_base_template/core/config/environment_config.dart';
-import 'package:flutter_base_template/core/constants/api_constants.dart';
-import 'package:flutter_base_template/core/di/injection.dart';
-import 'package:flutter_base_template/core/storage/secure_storage.dart';
-import 'package:flutter_base_template/core/storage/storage_service.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/config/environment_config.dart';
+import 'package:dat_san_247_mobile/core/constants/api_constants.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/storage/secure_storage.dart';
+import 'package:dat_san_247_mobile/core/storage/storage_service.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:injectable/injectable.dart';
 

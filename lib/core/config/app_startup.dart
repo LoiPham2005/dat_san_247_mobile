@@ -2,13 +2,13 @@
 // 📁 lib/core/config/app_startup.dart (FIXED)
 // ════════════════════════════════════════════════════════════════
 import 'package:flutter/material.dart';
-import 'package:flutter_base_template/core/di/injection.dart';
-import 'package:flutter_base_template/core/network/network_info.dart';
-import 'package:flutter_base_template/core/routes/route_names.dart';
-import 'package:flutter_base_template/core/services/app_version_service.dart';
-import 'package:flutter_base_template/core/services/network_monitor.dart';
-import 'package:flutter_base_template/core/storage/storage_service.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/network/network_info.dart';
+import 'package:dat_san_247_mobile/core/routes/route_names.dart';
+import 'package:dat_san_247_mobile/core/services/app_version_service.dart';
+import 'package:dat_san_247_mobile/core/services/network_monitor.dart';
+import 'package:dat_san_247_mobile/core/storage/storage_service.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:go_router/go_router.dart';
 
 /// AppStartup: xử lý logic sau khi AppInitializer xong

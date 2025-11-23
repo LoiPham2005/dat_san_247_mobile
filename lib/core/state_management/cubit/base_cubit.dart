@@ -1,10 +1,10 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/state_management/bloc/base_cubit.dart
 // ════════════════════════════════════════════════════════════════
-import 'package:flutter_base_template/core/errors/failures.dart';
-import 'package:flutter_base_template/core/errors/result.dart';
-import 'package:flutter_base_template/core/state_management/bloc/base_state.dart';
-import 'package:flutter_base_template/core/state_management/bloc/bloc_status.dart';
+import 'package:dat_san_247_mobile/core/errors/failures.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/core/state_management/bloc/bloc_status.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract class BaseCubit<T> extends Cubit<BaseState<T>> {
@@ -17,7 +17,7 @@ abstract class BaseCubit<T> extends Cubit<BaseState<T>> {
   }
 
   /// Thực thi UseCase với full Failure object
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// await executeUseCase(

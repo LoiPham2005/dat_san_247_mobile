@@ -95,7 +95,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_base_template/core/constants/assets_constants.dart';
+import 'package:dat_san_247_mobile/core/constants/assets_constants.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CustomImage extends StatelessWidget {

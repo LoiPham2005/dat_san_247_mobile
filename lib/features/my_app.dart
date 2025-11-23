@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_base_template/core/constants/app_constants.dart';
-import 'package:flutter_base_template/core/di/injection.dart';
-import 'package:flutter_base_template/core/l10n/localization_service.dart';
-import 'package:flutter_base_template/core/theme/app_theme.dart';
-import 'package:flutter_base_template/core/theme/theme_cubit.dart';
-import 'package:flutter_base_template/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:flutter_base_template/gen/l10n/app_localizations.dart';
+import 'package:dat_san_247_mobile/core/constants/app_constants.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/l10n/localization_service.dart';
+import 'package:dat_san_247_mobile/core/theme/app_theme.dart';
+import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
+import 'package:dat_san_247_mobile/gen/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -32,7 +31,7 @@ class MyApp extends StatelessWidget {
               providers: [
                 BlocProvider(create: (_) => localeCubit..initLocale()),
                 BlocProvider(create: (_) => themeCubit..initTheme()),
-                BlocProvider(create: (_) => getIt<AuthBloc>()),
+                // BlocProvider(create: (_) => getIt<AuthBloc>()),
               ],
               // ✅ THAY VÌ lồng BlocBuilder, dùng Builder + context.select()
               child: Builder(
@@ -51,7 +50,7 @@ class MyApp extends StatelessWidget {
                     // theme: AppTheme.lightTheme,
                     // darkTheme: AppTheme.darkTheme,
                     // themeMode: themeState.themeMode,
-                    
+
                     theme: AppTheme.getLightTheme(themeState.colorType),
                     darkTheme: AppTheme.getDarkTheme(themeState.colorType),
                     themeMode: themeState.materialThemeMode,

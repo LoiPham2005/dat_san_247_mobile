@@ -1,6 +1,6 @@
 // lib/core/state_management/base_state.dart
 import 'package:equatable/equatable.dart';
-import 'package:flutter_base_template/core/state_management/bloc/bloc_status.dart';
+import 'package:dat_san_247_mobile/core/state_management/bloc/bloc_status.dart';
 
 /// BaseState dùng chung cho tất cả Cubit.
 /// Tối ưu cho khả năng tái sử dụng, mở rộng, và clean architecture.

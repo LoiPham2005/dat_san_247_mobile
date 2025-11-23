@@ -2,8 +2,8 @@
 // 📁 lib/core/state_management/provider/base_provider.dart
 // ════════════════════════════════════════════════════════════════
 import 'package:flutter/foundation.dart';
-import 'package:flutter_base_template/core/errors/failures.dart';
-import 'package:flutter_base_template/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/errors/failures.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
 
 /// BaseProvider cho Provider pattern
 class BaseProvider extends ChangeNotifier {

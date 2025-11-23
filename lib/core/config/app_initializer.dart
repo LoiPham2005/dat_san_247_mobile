@@ -4,17 +4,17 @@
 import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_base_template/core/config/app_bloc_observer.dart';
-import 'package:flutter_base_template/core/config/app_observer.dart';
-import 'package:flutter_base_template/core/config/environment_config.dart';
-import 'package:flutter_base_template/core/di/injection.dart';
-import 'package:flutter_base_template/core/l10n/localization_service.dart';
-import 'package:flutter_base_template/core/network/cache/cache_config.dart';
-import 'package:flutter_base_template/core/theme/theme_cubit.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
-import 'package:flutter_base_template/core/utils/logger_config.dart';
+import 'package:dat_san_247_mobile/core/cache/app_cache_manager.dart';
+import 'package:dat_san_247_mobile/core/cache/cache_config.dart';
+import 'package:dat_san_247_mobile/core/config/app_bloc_observer.dart';
+import 'package:dat_san_247_mobile/core/config/app_observer.dart';
+import 'package:dat_san_247_mobile/core/config/environment_config.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/l10n/localization_service.dart';
+import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/utils/logger_config.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -30,28 +30,23 @@ class AppInitializer {
     if (_isInitialized) return;
 
     try {
-            final stopwatch = Stopwatch()..start();
+      final stopwatch = Stopwatch()..start();
 
-      // 1️⃣ Environment info
+      // Phase 1: Config & Setup
       EnvironmentConfig.printInfo();
-
-      // 2️⃣ Logger config
       LoggerConfig.configure();
-
-      // 3️⃣ UI config
       await _configureUI();
-
-      // 4️⃣ Observers
       AppObserver().initialize();
       _configureBlocObserver();
 
-      // 5️⃣ Hive & Cache (BEFORE DI)
+      // Phase 2: Cache & Storage
       await _configureHiveAndCache();
 
-      // 6️⃣ DI
+      // Phase 3: DI
       await configureDependencies();
 
-      // 7️⃣ Services
+      // Phase 4: Managers & Services
+      await _initializeCacheManager(); // ✅ NEW!
       await _initializeServices();
 
       stopwatch.stop();
@@ -71,7 +66,7 @@ class AppInitializer {
       AppObserver().dispose();
       await resetDependencies();
       _isInitialized = false;
-      Logger.warning('Cleaned up after initialization failure', tag: 'INIT');
+      Logger.warning('Cleaned up after init failure', tag: 'INIT');
     } catch (e) {
       Logger.error('Cleanup error', error: e, tag: 'INIT');
     }
@@ -93,7 +88,7 @@ class AppInitializer {
         ),
       );
     } catch (e) {
-      Logger.warning('UI configuration warning: $e', tag: 'INIT');
+      Logger.warning('UI config warning: $e', tag: 'INIT');
     }
   }
 
@@ -108,13 +103,14 @@ class AppInitializer {
   static Future<void> _initializeServices() async {
     try {
       await Future.wait([getIt<ThemeCubit>().initTheme(), getIt<LocaleCubit>().initLocale()]);
+      Logger.success('Services initialized', tag: 'INIT');
     } catch (e, stackTrace) {
-      Logger.error('Failed to initialize services', error: e, stackTrace: stackTrace, tag: 'INIT');
+      Logger.error('Failed to init services', error: e, stackTrace: stackTrace, tag: 'INIT');
       rethrow;
     }
   }
 
- // ✅ Fixed: Hive & Cache initialization
+  // ✅ Fixed: Hive & Cache initialization
   static Future<void> _configureHiveAndCache() async {
     try {
       // Init Hive
@@ -124,22 +120,26 @@ class AppInitializer {
       final cacheDir = await getTemporaryDirectory();
 
       // Create Hive cache store
-      final cacheStore = HiveCacheStore(
-        cacheDir.path,
-        hiveBoxName: 'dio_cache',
-      );
+      final cacheStore = HiveCacheStore(cacheDir.path, hiveBoxName: 'dio_cache');
 
       // Initialize cache config
       CacheConfig.initialize(cacheStore);
 
-      Logger.success('Hive & Cache initialized', tag: 'INIT');
+      Logger.success('Hive & CacheConfig initialized', tag: 'INIT');
     } catch (e, stackTrace) {
-      Logger.error(
-        'Failed to initialize Hive & Cache',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'INIT',
-      );
+      Logger.error('Failed to init Hive & Cache', error: e, stackTrace: stackTrace, tag: 'INIT');
+      rethrow;
+    }
+  }
+
+  /// ✅ NEW: Initialize file caches
+  static Future<void> _initializeCacheManager() async {
+    try {
+      final cacheManager = getIt<AppCacheManager>();
+      await cacheManager.initialize();
+      Logger.success('AppCacheManager initialized', tag: 'INIT');
+    } catch (e, stackTrace) {
+      Logger.error('Failed to init AppCacheManager', error: e, stackTrace: stackTrace, tag: 'INIT');
       rethrow;
     }
   }

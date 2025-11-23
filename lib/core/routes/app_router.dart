@@ -3,16 +3,17 @@
 // ════════════════════════════════════════════════════════════════
 // lib/core/routes/app_router.dart
 
-import 'package:flutter_base_template/core/di/injection.dart';
-import 'package:flutter_base_template/core/routes/pages/not_found_page.dart';
-import 'package:flutter_base_template/core/routes/route_names.dart';
-import 'package:flutter_base_template/core/services/navigation_service.dart';
-import 'package:flutter_base_template/features/auth/presentation/pages/login_page.dart';
-import 'package:flutter_base_template/features/home/presentation/pages/home_page.dart';
-import 'package:flutter_base_template/features/splash/presentation/pages/splash_page.dart';
-import 'package:flutter_base_template/features/welcome/presentation/pages/welcom_page.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/routes/pages/not_found_page.dart';
+import 'package:dat_san_247_mobile/core/routes/route_names.dart';
+import 'package:dat_san_247_mobile/core/services/navigation_service.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
+import 'package:dat_san_247_mobile/features/home/presentation/pages/home_page.dart';
+import 'package:dat_san_247_mobile/features/splash/presentation/pages/splash_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+
+import '../../features/intro/presentation/pages/welcome_page.dart';
 
 @LazySingleton()
 class AppRouter {
@@ -37,7 +38,7 @@ class AppRouter {
       GoRoute(
         path: RouteNames.welcome,
         // name: RouteNames.welcomeName,
-        builder: (context, state) => const WelcomPage(),
+        builder: (context, state) => const WelcomePage(),
       ),
 
       GoRoute(
@@ -46,9 +47,9 @@ class AppRouter {
         builder: (context, state) => const LoginPage(),
       ),
 
-      // ═════════════════════════════════════════════════════════════
-      // Main App Routes
-      // ═════════════════════════════════════════════════════════════
+      // // ═════════════════════════════════════════════════════════════
+      // // Main App Routes
+      // // ═════════════════════════════════════════════════════════════
       GoRoute(
         path: RouteNames.home,
         // name: RouteNames.homeName,

@@ -1,7 +1,7 @@
-import 'package:flutter_base_template/core/errors/result.dart';
-import 'package:flutter_base_template/features/auth/data/datasources/auth_remote_datasourse.dart';
-import 'package:flutter_base_template/features/auth/domain/entities/auth_entity.dart';
-import 'package:flutter_base_template/features/auth/domain/repositories/auth_repository.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/features/auth/data/datasources/auth_remote_datasourse.dart';
+import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
+import 'package:dat_san_247_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton(as: AuthRepository)
@@ -69,7 +69,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<AuthUser>> getProfile() async {
+  Future<Result<User>> getProfile() async {
     final result = await _remoteDataSource.getProfile();
     return result.map((model) => model.toEntity());
   }

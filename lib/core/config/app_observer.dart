@@ -2,8 +2,8 @@
 // 📁 lib/core/config/app_observer.dart (TỐI ƯU LOGGER)
 // ════════════════════════════════════════════════════════════════
 import 'package:flutter/widgets.dart';
-import 'package:flutter_base_template/core/config/environment_config.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/config/environment_config.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 
 /// 🔄 Monitor app lifecycle (resume, pause, detached)
 class AppObserver with WidgetsBindingObserver {

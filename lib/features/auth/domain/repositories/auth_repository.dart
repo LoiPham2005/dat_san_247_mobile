@@ -1,4 +1,4 @@
-import 'package:flutter_base_template/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
 import '../entities/auth_entity.dart';
 
 abstract class AuthRepository {
@@ -31,7 +31,7 @@ abstract class AuthRepository {
   Future<Result<bool>> checkLoginStatus();
 
   /// Get current user profile
-  Future<Result<AuthUser>> getProfile();
+  Future<Result<User>> getProfile();
 
   Future<Result<bool>> deleteAccount();
 }

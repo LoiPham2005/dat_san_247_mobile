@@ -1,7 +1,7 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/errors/result.dart
 // ════════════════════════════════════════════════════════════════
-import 'package:flutter_base_template/core/errors/failures.dart';
+import 'package:dat_san_247_mobile/core/errors/failures.dart';
 
 /// Result pattern - Thay thế Either trong functional programming
 sealed class Result<T> {

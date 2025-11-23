@@ -39,115 +39,70 @@ extension ContextExtensions on BuildContext {
   TextStyle? get labelSmall => textTheme.labelSmall;
 
   // ═══════════════════════════════════════════════════════════════
-  // MEDIAQUERY & RESPONSIVE (giữ nguyên)
-  // ═══════════════════════════════════════════════════════════════
-
-  // MediaQueryData get mediaQuery => MediaQuery.of(this);
-  // Size get screenSize => mediaQuery.size;
-  // double get screenWidth => screenSize.width;
-  // double get screenHeight => screenSize.height;
-  // double get statusBarHeight => mediaQuery.padding.top;
-  // double get bottomBarHeight => mediaQuery.padding.bottom;
-  // Orientation get orientation => mediaQuery.orientation;
-  // bool get isLandscape => orientation == Orientation.landscape;
-  // bool get isPortrait => orientation == Orientation.portrait;
-
-  // bool get isMobile => screenWidth < 600;
-  // bool get isTablet => screenWidth >= 600 && screenWidth < 900;
-  // bool get isDesktop => screenWidth >= 900;
-
-  // ═══════════════════════════════════════════════════════════════
   // NAVIGATION (⭐ SỬ DỤNG CHÍNH - 95% cases)
   // ═══════════════════════════════════════════════════════════════
 
-  // NavigatorState get navigator => Navigator.of(this);
+  NavigatorState get nav => Navigator.of(this);
 
-  // /// Pop current route
-  // void pop<T>([T? result]) => Navigator.of(this).pop(result);
+  /// Push widget page with MaterialPageRoute
+  /// Example: context.navPush(DetailsPage())
+  Future<T?> navPush<T>(Widget page) {
+    return Navigator.of(this).push<T>(
+      MaterialPageRoute(builder: (_) => page),
+    );
+  }
 
-  // /// Push new page
-  // Future<T?> push<T>(Widget page) {
-  //   return Navigator.of(this).push<T>(
-  //     MaterialPageRoute(builder: (_) => page),
-  //   );
-  // }
+  /// Push with custom route
+  /// Example: context.navPushRoute(customRoute)
+  Future<T?> navPushRoute<T>(Route<T> route) {
+    return Navigator.of(this).push<T>(route);
+  }
 
-  // /// Push named route
-  // Future<T?> pushNamed<T>(String routeName, {Object? arguments}) {
-  //   return Navigator.of(this).pushNamed<T>(routeName, arguments: arguments);
-  // }
+  /// Push and replace current
+  /// Example: context.navReplace(HomePage())
+  Future<T?> navReplace<T, TO>(Widget page, {TO? result}) {
+    return Navigator.of(this).pushReplacement<T, TO>(
+      MaterialPageRoute(builder: (_) => page),
+      result: result,
+    );
+  }
 
-  // /// Push and replace current
-  // Future<T?> pushReplacement<T, TO>(Widget page, {TO? result}) {
-  //   return Navigator.of(this).pushReplacement<T, TO>(
-  //     MaterialPageRoute(builder: (_) => page),
-  //     result: result,
-  //   );
-  // }
+  /// Push and remove all until predicate
+  /// Example: context.navPushAndClear(HomePage(), (route) => false)
+  Future<T?> navPushAndClear<T>(
+      Widget page,
+      bool Function(Route<dynamic>) predicate,
+      ) {
+    return Navigator.of(this).pushAndRemoveUntil<T>(
+      MaterialPageRoute(builder: (_) => page),
+      predicate,
+    );
+  }
 
-  // /// Push and remove all until predicate
-  // Future<T?> pushAndRemoveUntil<T>(
-  //   Widget page,
-  //   bool Function(Route<dynamic>) predicate,
-  // ) {
-  //   return Navigator.of(this).pushAndRemoveUntil<T>(
-  //     MaterialPageRoute(builder: (_) => page),
-  //     predicate,
-  //   );
-  // }
+  /// Push and clear all (go to root with new page)
+  /// Example: context.navPushAndRemoveAll(LoginPage())
+  Future<T?> navPushAndRemoveAll<T>(Widget page) {
+    return navPushAndClear<T>(page, (route) => false);
+  }
 
-  // /// Pop until predicate
-  // void popUntil(bool Function(Route<dynamic>) predicate) {
-  //   Navigator.of(this).popUntil(predicate);
-  // }
+  /// Pop current route (Navigator)
+  /// Example: context.navPop()
+  void navPop<T>([T? result]) => Navigator.of(this).pop(result);
 
-  // /// Pop to root
-  // void popToRoot() {
-  //   Navigator.of(this).popUntil((route) => route.isFirst);
-  // }
+  /// Pop until predicate
+  /// Example: context.navPopUntil((route) => route.isFirst)
+  void navPopUntil(bool Function(Route<dynamic>) predicate) {
+    Navigator.of(this).popUntil(predicate);
+  }
 
-  // /// Check if can pop
-  // bool canPop() => Navigator.of(this).canPop();
+  /// Pop to root (first route)
+  /// Example: context.navPopToRoot()
+  void navPopToRoot() {
+    Navigator.of(this).popUntil((route) => route.isFirst);
+  }
 
-
-
-
-
-  // ═══════════════════════════════════════════════════════════════
-  // GoRouter Methods (95% use cases)
-  // ═══════════════════════════════════════════════════════════════
-
-  // /// Navigate to a route by path
-  // void goTo(String path, {Object? extra}) => go(path, extra: extra);
-
-  // /// Navigate to a route by name
-  // void goToNamed(String name, {Map<String, String>? pathParameters, Map<String, dynamic>? queryParameters, Object? extra}) {
-  //   goNamed(name, pathParameters: pathParameters ?? {}, queryParameters: queryParameters ?? {}, extra: extra);
-  // }
-
-  // /// Push a new route
-  // void pushTo(String path, {Object? extra}) => push(path, extra: extra);
-
-  // /// Push by name
-  // void pushToNamed(String name, {Map<String, String>? pathParameters, Map<String, dynamic>? queryParameters, Object? extra}) {
-  //   pushNamed(name, pathParameters: pathParameters ?? {}, queryParameters: queryParameters ?? {}, extra: extra);
-  // }
-
-  // /// Replace current route
-  // void replaceTo(String path, {Object? extra}) => replace(path, extra: extra);
-
-  // /// Pop current route
-  // void goBack<T>([T? result]) => pop(result);
-
-  // /// Check if can pop
-  // bool canGoBack() => canPop();
-
-  // /// Pop to root
-  // void popToRoot() {
-  //   while (canPop()) {
-  //     pop();
-  //   }
-  // }
+  /// Check if can pop (Navigator)
+  bool get canNavPop => Navigator.of(this).canPop();
 
 
   // ═══════════════════════════════════════════════════════════════

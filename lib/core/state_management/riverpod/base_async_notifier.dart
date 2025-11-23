@@ -3,13 +3,13 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_base_template/core/errors/failures.dart';
-import 'package:flutter_base_template/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/errors/failures.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
 
 /// BaseAsyncNotifier cho Riverpod
 abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
   /// Thực thi UseCase với full Failure object
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// await executeUseCase(
@@ -87,7 +87,7 @@ abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
   bool get isLoading => state is AsyncLoading;
   bool get hasError => state is AsyncError;
   bool get hasData => state is AsyncData;
-  
+
   /// Get error as Failure if possible
   Failure? get failure {
     final error = state.error;

@@ -40,20 +40,20 @@ class Validators {
     if (value == null || value.isEmpty) {
       return 'Tên người dùng không được để trống';
     }
-    
+
     if (value.length < 3) {
       return 'Tên người dùng phải có ít nhất 3 ký tự';
     }
-    
+
     if (value.length > 20) {
       return 'Tên người dùng không được quá 20 ký tự';
     }
-    
+
     final usernameRegex = RegExp(r'^[a-zA-Z0-9_]+$');
     if (!usernameRegex.hasMatch(value)) {
       return 'Tên người dùng chỉ được chứa chữ, số và dấu gạch dưới';
     }
-    
+
     return null;
   }
 
@@ -62,21 +62,21 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return 'Họ tên không được để trống';
     }
-    
+
     if (value.trim().length < 2) {
       return 'Họ tên quá ngắn';
     }
-    
+
     // Vietnamese characters support
     final nameRegex = RegExp(
       r'^[a-zA-ZÀ-ỹ\s]+$',
       unicode: true,
     );
-    
+
     if (!nameRegex.hasMatch(value)) {
       return 'Họ tên chỉ được chứa chữ cái và khoảng trắng';
     }
-    
+
     return null;
   }
 
@@ -131,11 +131,11 @@ class Validators {
     if (value == null || value.isEmpty) {
       return 'Vui lòng xác nhận mật khẩu';
     }
-    
+
     if (value != password) {
       return 'Mật khẩu xác nhận không khớp';
     }
-    
+
     return null;
   }
 
@@ -169,7 +169,7 @@ class Validators {
     }
 
     final phoneRegex = RegExp(r'^\+?[1-9]\d{1,14}$');
-    
+
     if (!phoneRegex.hasMatch(value)) {
       return 'Số điện thoại không hợp lệ';
     }
@@ -509,8 +509,8 @@ class Validators {
     };
 
     // Check if new password is same as old
-    if (oldPassword != null && 
-        newPassword != null && 
+    if (oldPassword != null &&
+        newPassword != null &&
         oldPassword == newPassword) {
       errors['newPassword'] = 'Mật khẩu mới phải khác mật khẩu hiện tại';
     }

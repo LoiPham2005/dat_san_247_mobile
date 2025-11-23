@@ -1,13 +1,13 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/state_management/bloc/bloc_helpers.dart
 // ════════════════════════════════════════════════════════════════
-import 'package:flutter_base_template/core/errors/failures.dart';
-import 'package:flutter_base_template/core/errors/result.dart';
-import 'package:flutter_base_template/core/state_management/bloc/bloc_status.dart';
+import 'package:dat_san_247_mobile/core/errors/failures.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/state_management/bloc/bloc_status.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Helper function để xử lý UseCase calls trong BLoC
-/// 
+///
 /// Example:
 /// ```dart
 /// await handleUseCaseRequest(
@@ -46,7 +46,7 @@ Future<void> execute<T, S>({
           status: BlocStatus.success,
           data: data,
         ));
-        
+
         // Execute success callback nếu có
         onSuccess?.call(data);
       },
@@ -56,7 +56,7 @@ Future<void> execute<T, S>({
           status: BlocStatus.failure,
           errorMessage: failure.message,
         ));
-        
+
         // Execute failure callback nếu có
         onFailure?.call(failure);
       },
@@ -64,15 +64,15 @@ Future<void> execute<T, S>({
   } catch (exception) {
     // Handle unexpected errors
     const errorMessage = 'Đã xảy ra lỗi không xác định';
-    
+
     emit(stateBuilder(
       status: BlocStatus.failure,
       errorMessage: errorMessage,
     ));
-    
+
     // Log error for debugging
     // Logger.error('Unexpected error in BLoC', error: exception, stackTrace: stackTrace);
-    
+
     // Call failure callback with unknown failure
     onFailure?.call(const UnknownFailure(message: errorMessage));
   }

@@ -1,7 +1,7 @@
-// import 'package:flutter_base_template/core/utils/logger.dart';
-// import 'package:flutter_base_template/env/env_dev.dart';
-// import 'package:flutter_base_template/env/env_prod.dart';
-// import 'package:flutter_base_template/env/env_stg.dart';
+// import 'package:dat_san_247_mobile/core/utils/logger.dart';
+// import 'package:dat_san_247_mobile/env/env_dev.dart';
+// import 'package:dat_san_247_mobile/env/env_prod.dart';
+// import 'package:dat_san_247_mobile/env/env_stg.dart';
 
 // enum Environment { development, staging, production }
 
@@ -127,10 +127,10 @@
 
 
 // lib/core/config/environment_config.dart
-import 'package:flutter_base_template/core/utils/logger.dart';
-import 'package:flutter_base_template/env/env_dev.dart';
-import 'package:flutter_base_template/env/env_prod.dart';
-import 'package:flutter_base_template/env/env_stg.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/env/env_dev.dart';
+import 'package:dat_san_247_mobile/env/env_prod.dart';
+import 'package:dat_san_247_mobile/env/env_stg.dart';
 
 enum Environment { development, staging, production }
 

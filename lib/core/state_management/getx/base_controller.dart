@@ -1,8 +1,8 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/state_management/getx/base_controller.dart
 // ════════════════════════════════════════════════════════════════
-import 'package:flutter_base_template/core/errors/failures.dart';
-import 'package:flutter_base_template/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/errors/failures.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
 import 'package:get/get.dart';
 
 class BaseController extends GetxController {
@@ -13,7 +13,7 @@ class BaseController extends GetxController {
   void hideLoading() => isLoading.value = false;
 
   /// Thực thi UseCase theo Result pattern
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// await executeUseCase(

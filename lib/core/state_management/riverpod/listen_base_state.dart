@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:toastification/toastification.dart';
-import 'package:flutter_base_template/shared/widgets/toast/show_toast.dart';
+import 'package:dat_san_247_mobile/shared/widgets/toast/show_toast.dart';
 
 /// ✅ Lắng nghe thay đổi AsyncValue<T> từ provider
 /// Tự động show toast khi success/error và hỗ trợ callback linh hoạt.

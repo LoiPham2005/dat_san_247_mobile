@@ -1,7 +1,7 @@
 // lib/core/storage/secure_storage.dart
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_base_template/core/storage/storage_keys.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/storage/storage_keys.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton()

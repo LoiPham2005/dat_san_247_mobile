@@ -4,7 +4,7 @@
 // lib/core/services/cache_service.dart
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:injectable/injectable.dart';
-import '../network/cache/cache_config.dart';
+import '../cache/cache_config.dart';
 
 @LazySingleton()
 class CacheService {

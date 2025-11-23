@@ -14,6 +14,9 @@ import 'package:flutter/widgets.dart';
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/SprotHub_Logo.svg
+  String get sprotHubLogo => 'assets/icons/SprotHub_Logo.svg';
+
   /// File path: assets/icons/dev.png
   AssetGenImage get dev => const AssetGenImage('assets/icons/dev.png');
 
@@ -28,18 +31,22 @@ class $AssetsIconsGen {
   AssetGenImage get stg => const AssetGenImage('assets/icons/stg.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [dev, placeholder2, prod, stg];
+  List<dynamic> get values => [sprotHubLogo, dev, placeholder2, prod, stg];
 }
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
+
+  /// File path: assets/images/SprotHub_Logo.png
+  AssetGenImage get sprotHubLogo =>
+      const AssetGenImage('assets/images/SprotHub_Logo.png');
 
   /// File path: assets/images/placeholder.jpg
   AssetGenImage get placeholder =>
       const AssetGenImage('assets/images/placeholder.jpg');
 
   /// List of all assets
-  List<AssetGenImage> get values => [placeholder];
+  List<AssetGenImage> get values => [sprotHubLogo, placeholder];
 }
 
 class Assets {

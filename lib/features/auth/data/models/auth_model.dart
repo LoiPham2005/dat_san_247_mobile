@@ -1,8 +1,8 @@
 // auth_user_model.dart
-import 'package:flutter_base_template/features/auth/domain/entities/auth_entity.dart';
+import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
 
-class AuthUserModel extends AuthUser {
-  const AuthUserModel({
+class UserModel extends User {
+  const UserModel({
     required super.id,
     required super.fullname,
     required super.username,
@@ -27,8 +27,8 @@ class AuthUserModel extends AuthUser {
     super.deletedAt,
   });
 
-  factory AuthUserModel.fromJson(Map<String, dynamic> json) {
-    return AuthUserModel(
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
       id: json['id'],
       fullname: json['fullname'],
       username: json['username'],
@@ -59,8 +59,8 @@ class AuthUserModel extends AuthUser {
   }
 
   /// Chuyển AuthUserModel -> AuthUser (Entity)
-  AuthUser toEntity() {
-    return AuthUser(
+  User toEntity() {
+    return User(
       id: id,
       fullname: fullname,
       username: username,
@@ -123,7 +123,7 @@ class AuthResponseModel extends AuthResponse {
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
     return AuthResponseModel(
-      user: AuthUserModel.fromJson(json['user']),
+      user: UserModel.fromJson(json['user']),
       accessToken: json['accessToken'],
       refreshToken: json['refreshToken'],
     );
@@ -132,7 +132,7 @@ class AuthResponseModel extends AuthResponse {
   /// Chuyển AuthResponseModel -> AuthResponse (Entity)
   AuthResponse toEntity() {
     return AuthResponse(
-      user: (user as AuthUserModel).toEntity(),
+      user: (user as UserModel).toEntity(),
       accessToken: accessToken,
       refreshToken: refreshToken,
     );
@@ -140,7 +140,7 @@ class AuthResponseModel extends AuthResponse {
 
   Map<String, dynamic> toJson() {
     return {
-      'user': (user as AuthUserModel).toJson(),
+      'user': (user as UserModel).toJson(),
       'accessToken': accessToken,
       'refreshToken': refreshToken,
     };

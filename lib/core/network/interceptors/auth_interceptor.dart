@@ -2,11 +2,11 @@
 // 📁 lib/core/network/interceptors/auth_interceptor.dart
 // ════════════════════════════════════════════════════════════════
 import 'package:dio/dio.dart';
-import 'package:flutter_base_template/core/constants/api_constants.dart';
-import 'package:flutter_base_template/core/di/injection.dart';
-import 'package:flutter_base_template/core/storage/secure_storage.dart';
-import 'package:flutter_base_template/core/services/auth_service.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/constants/api_constants.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/storage/secure_storage.dart';
+import 'package:dat_san_247_mobile/core/services/auth_service.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton()

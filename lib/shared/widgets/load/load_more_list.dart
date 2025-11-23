@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_base_template/core/theme/app_colors.dart';
+import 'package:dat_san_247_mobile/core/theme/app_colors.dart';
 
 Widget LoadMoreList({bool isLoad = true, bool isMax = false}) {
   return Padding(

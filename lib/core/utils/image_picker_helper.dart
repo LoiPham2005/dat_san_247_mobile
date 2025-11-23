@@ -5,11 +5,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_base_template/core/services/permission_service.dart';
-import 'package:flutter_base_template/core/utils/logger.dart';
+import 'package:dat_san_247_mobile/core/services/permission_service.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 
 /// Image picker helper
-/// 
+///
 /// Responsibilities:
 /// - Pick images from gallery/camera (with permission check)
 /// - Compress images
@@ -97,7 +97,7 @@ class ImagePickerHelper {
   }) async {
     try {
       final targetPath = '${file.parent.path}/compressed_${file.path.split('/').last}';
-      
+
       final result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path,
         targetPath,
@@ -110,7 +110,7 @@ class ImagePickerHelper {
         final originalSize = await file.length();
         final compressedSize = await File(result.path).length();
         final saved = ((1 - compressedSize / originalSize) * 100).toInt();
-        
+
         Logger.info('Image compressed: saved $saved%');
         return File(result.path);
       }

@@ -1,6 +1,6 @@
-import 'package:flutter_base_template/core/constants/api_constants.dart';
-import 'package:flutter_base_template/core/errors/result.dart';
-import 'package:flutter_base_template/core/network/api_client.dart';
+import 'package:dat_san_247_mobile/core/constants/api_constants.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/network/api_client.dart';
 import 'package:injectable/injectable.dart';
 import '../models/auth_model.dart';
 
@@ -30,7 +30,7 @@ abstract class AuthRemoteDataSource {
 
   Future<Result<bool>> checkLoginStatus();
 
-  Future<Result<AuthUserModel>> getProfile();
+  Future<Result<UserModel>> getProfile();
 
   Future<Result<bool>> deleteAccount();
 }
@@ -45,7 +45,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String password,
   }) async {
-    return _apiClient.postResult(
+    return _apiClient.post(
       ApiConstants.login,
       (json) => AuthResponseModel.fromJson(json),
       data: {'email': email, 'password': password},
@@ -54,7 +54,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Result<bool>> logout() async {
-    return _apiClient.postResult(ApiConstants.logout, (json) => true);
+    return _apiClient.post(ApiConstants.logout, (json) => true);
   }
 
   @override
@@ -65,7 +65,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String passwordConfirm,
   }) async {
-    return _apiClient.postResult(
+    return _apiClient.post(
       ApiConstants.register,
       (json) => AuthResponseModel.fromJson(json),
       data: {
@@ -80,7 +80,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Result<bool>> forgotPassword({required String email}) async {
-    return _apiClient.postResult(
+    return _apiClient.post(
       ApiConstants.forgotPassword,
       (json) => true,
       data: {'email': email},
@@ -93,7 +93,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String passwordConfirm,
   }) async {
-    return _apiClient.postResult(
+    return _apiClient.post(
       ApiConstants.resetPassword,
       (json) => true,
       data: {
@@ -106,19 +106,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Result<bool>> checkLoginStatus() async {
-    return _apiClient.getResult(ApiConstants.profile, (json) => true);
+    return _apiClient.get(ApiConstants.profile, (json) => true);
   }
 
   @override
-  Future<Result<AuthUserModel>> getProfile() async {
-    return _apiClient.getResult(
+  Future<Result<UserModel>> getProfile() async {
+    return _apiClient.get(
       ApiConstants.profile,
-      (json) => AuthUserModel.fromJson(json),
+      (json) => UserModel.fromJson(json),
     );
   }
 
   @override
   Future<Result<bool>> deleteAccount() async {
-    return _apiClient.deleteResult(ApiConstants.profile);
+    return _apiClient.delete(ApiConstants.profile);
   }
 }

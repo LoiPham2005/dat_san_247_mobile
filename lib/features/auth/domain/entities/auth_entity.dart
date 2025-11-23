@@ -1,4 +1,6 @@
-class AuthUser {
+import 'package:equatable/equatable.dart';
+
+class User extends Equatable {
   final int id;
   final String fullname;
   final String username;
@@ -22,7 +24,7 @@ class AuthUser {
   final DateTime updatedAt;
   final DateTime? deletedAt;
 
-  const AuthUser({
+  const User({
     required this.id,
     required this.fullname,
     required this.username,
@@ -46,10 +48,36 @@ class AuthUser {
     required this.updatedAt,
     this.deletedAt,
   });
+
+  @override
+  List<Object?> get props => [
+    id,
+    fullname,
+    username,
+    email,
+    phone,
+    gender,
+    birthDate,
+    avatar,
+    roleId,
+    isVerified,
+    address,
+    latitude,
+    longitude,
+    isActive,
+    specialStatus,
+    emailVerified,
+    phoneVerified,
+    provider,
+    providerId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
 }
 
-class AuthResponse {
-  final AuthUser user;
+class AuthResponse extends Equatable {
+  final User user;
   final String accessToken;
   final String refreshToken;
 
@@ -58,4 +86,7 @@ class AuthResponse {
     required this.accessToken,
     required this.refreshToken,
   });
+
+  @override
+  List<Object?> get props => [user, accessToken, refreshToken];
 }
