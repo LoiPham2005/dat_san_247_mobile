@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/extensions/context_extensions.dart';
 import 'package:dat_san_247_mobile/core/extensions/number_extensions.dart';
 import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
 import 'package:dat_san_247_mobile/features/booking/presentation/pages/booking_page.dart';
@@ -208,8 +209,20 @@ class _DetailsPageState extends State<DetailsPage>
     // TODO: Navigate to booking page
     print('Navigate to booking page for venue: ${venue?.venueName}');
 
-    Get.to(
-      () => BookingPage(
+    // Get.to(
+    //   () => BookingPage(
+    //     venueId: venue!.venueId!,
+    //     venueName: venue!.venueName ?? "Sân thể thao",
+    //     venueAddress: venue!.address ?? "Địa chỉ không xác định",
+    //     venueImage: venue!.images?.isNotEmpty == true
+    //         ? venue!.images!.first.imageUrl
+    //         : null,
+    //     pricePerHour: 150000, // Replace with actual price
+    //   ),
+    // );
+
+    context.navPush(
+      BookingPage(
         venueId: venue!.venueId!,
         venueName: venue!.venueName ?? "Sân thể thao",
         venueAddress: venue!.address ?? "Địa chỉ không xác định",

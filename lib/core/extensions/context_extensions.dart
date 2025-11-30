@@ -2,7 +2,10 @@
 // 📁 lib/extensions/context_extensions.dart (SỬ DỤNG CHÍNH)
 // ════════════════════════════════════════════════════════════════
 import 'package:flutter/material.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/services/toast_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:toastification/toastification.dart';
 
 extension ContextExtensions on BuildContext {
   // ═══════════════════════════════════════════════════════════════
@@ -296,4 +299,145 @@ extension ContextExtensions on BuildContext {
   void unfocus() => FocusScope.of(this).unfocus();
   void requestFocus(FocusNode node) => FocusScope.of(this).requestFocus(node);
   void hideKeyboard() => FocusScope.of(this).unfocus();
+}
+
+
+
+
+// Thêm extension này vào cuối file ContextExtensions
+extension ContextToastExtensions on BuildContext {
+  // ═══════════════════════════════════════════════════════════════
+  // TOAST SHORTCUTS (Ultra Easy!)
+  // ═══════════════════════════════════════════════════════════════
+
+  ToastService get toast => getIt<ToastService>();
+
+  /// Show success toast
+  /// Example: context.showSuccess('Login successful!')
+  ToastificationItem showSuccess(
+    String message, {
+    String? title,
+    Duration? duration,
+  }) {
+    return toast.success(
+      message,
+      title: title,
+      duration: duration,
+      context: this,
+    );
+  }
+
+  /// Show error toast
+  /// Example: context.showError('Login failed!')
+  ToastificationItem showError(
+    String message, {
+    String? title,
+    Duration? duration,
+  }) {
+    return toast.error(
+      message,
+      title: title,
+      duration: duration,
+      context: this,
+    );
+  }
+
+  /// Show warning toast
+  /// Example: context.showWarning('Please check your input')
+  ToastificationItem showWarning(
+    String message, {
+    String? title,
+    Duration? duration,
+  }) {
+    return toast.warning(
+      message,
+      title: title,
+      duration: duration,
+      context: this,
+    );
+  }
+
+  /// Show info toast
+  /// Example: context.showInfo('New update available')
+  ToastificationItem showInfo(
+    String message, {
+    String? title,
+    Duration? duration,
+  }) {
+    return toast.info(
+      message,
+      title: title,
+      duration: duration,
+      context: this,
+    );
+  }
+
+  /// Show loading toast
+  /// Example:
+  /// ```dart
+  /// final loading = context.showLoading('Processing...');
+  /// await doWork();
+  /// context.dismissToast(loading);
+  /// ```
+  ToastificationItem showLoading(
+    String message, {
+    String? title,
+  }) {
+    return toast.loading(
+      message,
+      title: title,
+      context: this,
+    );
+  }
+
+  /// Show custom toast
+  /// Example:
+  /// ```dart
+  /// context.showCustomToast(
+  ///   message: 'Custom',
+  ///   icon: Icons.star,
+  ///   color: Colors.purple,
+  /// )
+  /// ```
+  ToastificationItem showCustomToast({
+    required String message,
+    String? title,
+    IconData? icon,
+    Color? color,
+    Duration? duration,
+  }) {
+    return toast.custom(
+      message: message,
+      title: title,
+      icon: icon,
+      color: color,
+      duration: duration,
+      context: this,
+    );
+  }
+
+  /// Dismiss specific toast
+  /// Example: context.dismissToast(toastItem)
+  void dismissToast(ToastificationItem item) {
+    toast.dismiss(item);
+  }
+
+  /// Dismiss all toasts
+  /// Example: context.dismissAllToasts()
+  void dismissAllToasts() {
+    toast.dismissAll();
+  }
+
+  /// Show toast from exception
+  /// Example: context.showException(error)
+  ToastificationItem showException(
+    dynamic exception, {
+    String? title,
+  }) {
+    return toast.fromException(
+      exception,
+      title: title,
+      context: this,
+    );
+  }
 }

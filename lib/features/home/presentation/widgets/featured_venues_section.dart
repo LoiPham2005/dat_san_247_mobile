@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/extensions/context_extensions.dart';
 import 'package:dat_san_247_mobile/features/details/presentation/pages/details_page.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/widgets/nearby_venues_section.dart';
 import 'package:flutter/material.dart';
@@ -104,7 +105,8 @@ class _FeaturedVenuesSectionState extends State<FeaturedVenuesSection> {
     return InkWell(
       onTap: () {
         // TODO: Navigate to venue details
-        Get.to(() => DetailsPage(venueId: 4));
+        // Get.to(() => DetailsPage(venueId: 4));
+        context.navPush(DetailsPage(venueId: 4));
       },
       borderRadius: BorderRadius.circular(16),
       child: Container(

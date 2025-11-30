@@ -52,8 +52,8 @@ app.*.map.json
 
 
 # Environment files (BẮT BUỘC)
-.env*
-!.env.example
+# .env*
+# !.env.example
 
 # Generated files
 *.g.dart
