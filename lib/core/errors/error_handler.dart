@@ -1,166 +1,290 @@
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/errors/error_handler.dart
+// 📁 lib/core/errors/error_handler.dart (PRODUCTION)
 // ════════════════════════════════════════════════════════════════
+
 import 'dart:io';
-import 'package:dio/dio.dart';
+
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
+import 'package:dio/dio.dart';
+
 import 'exceptions.dart';
 import 'failures.dart';
 
 class ErrorHandler {
   ErrorHandler._();
 
-  /// Convert Exception thành Failure (để dùng trong UI)
-  static Failure exceptionToFailure(Object exception) {
-    if (exception is ServerException) {
-      return ServerFailure(message: exception.message, code: exception.code);
-    }
+  // ════════════════════════════════════════════════════════════
+  // Main Entry Point
+  // ════════════════════════════════════════════════════════════
 
-    if (exception is NetworkException) {
-      return NetworkFailure(message: exception.message, code: exception.code);
-    }
+  /// Convert error to Failure + Log exception/stackTrace
+  static Failure toFailure(Object error, [StackTrace? stackTrace]) {
+    // ✅ LOG NGAY TẠI ĐÂY - Tách biệt logging và Failure
+    _logError(error, stackTrace);
 
-    if (exception is CacheException) {
-      return CacheFailure(message: exception.message, code: exception.code);
-    }
-
-    if (exception is AuthenticationException) {
-      return AuthenticationFailure(message: exception.message, code: exception.code);
-    }
-
-    if (exception is UnauthorizedException) {
-      return UnauthorizedFailure(message: exception.message, code: exception.code);
-    }
-
-    if (exception is NotFoundException) {
-      return NotFoundFailure(message: exception.message, code: exception.code);
-    }
-
-    if (exception is ValidationException) {
-      return ValidationFailure(
-        message: exception.message,
-        code: exception.code,
-        errors: exception.errors,
-      );
-    }
-
-    if (exception is TimeoutException) {
-      return TimeoutFailure(message: exception.message, code: exception.code);
-    }
-
-    return UnknownFailure(message: exception.toString());
+    return switch (error) {
+      Failure() => error,
+      DioException() => _fromDio(error),
+      AppException() => _fromAppException(error),
+      SocketException() => const NetworkFailure(message: 'Không có kết nối mạng'),
+      Exception() => UnknownFailure(message: error.toString().replaceAll('Exception: ', '')),
+      _ => UnknownFailure(message: error.toString()),
+    };
   }
 
-  /// Parse DioException thành AppException
-  static AppException parseDioException(DioException error) {
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return TimeoutException(message: 'Hết thời gian chờ kết nối');
+  // ════════════════════════════════════════════════════════════
+  // Logging (Tách riêng)
+  // ════════════════════════════════════════════════════════════
 
-      case DioExceptionType.badResponse:
-        return _parseHttpStatusCode(
-          error.response?.statusCode,
-          error.response?.data,
-        );
+  static void _logError(Object error, [StackTrace? stackTrace]) {
+    // Log error với đầy đủ context
+    Logger.error('Error occurred: ${error.runtimeType}', error: error, stackTrace: stackTrace);
 
-      case DioExceptionType.cancel:
-        return AppException(message: 'Yêu cầu đã bị hủy');
-
-      case DioExceptionType.connectionError:
-        return NetworkException(message: 'Không có kết nối mạng');
-
-      case DioExceptionType.unknown:
-        if (error.error is SocketException) {
-          return NetworkException(message: 'Không có kết nối mạng');
-        }
-        return AppException(message: 'Đã xảy ra lỗi không xác định');
-
-      default:
-        return AppException(message: 'Đã xảy ra lỗi không xác định');
-    }
+    // TODO: Thêm error tracking (Firebase Crashlytics, Sentry, etc.)
+    // crashlytics.recordError(error, stackTrace);
   }
 
-  /// Parse HTTP status code thành Exception tương ứng
-  static AppException _parseHttpStatusCode(int? statusCode, dynamic responseData) {
-    final message = _extractErrorMessage(responseData);
+  // ════════════════════════════════════════════════════════════
+  // Dio Exception → Failure
+  // ════════════════════════════════════════════════════════════
 
-    switch (statusCode) {
-      case 400:
-        return ValidationException(
-          message: message,
-          code: '400',
-          errors: _extractValidationErrors(responseData),
-        );
+  static Failure _fromDio(DioException e) {
+    return switch (e.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout => const TimeoutFailure(),
 
-      case 401:
-        return AuthenticationException(
-          message: message.isNotEmpty ? message : 'Phiên đăng nhập hết hạn',
-        );
+      DioExceptionType.connectionError => const NetworkFailure(),
 
-      case 403:
-        return UnauthorizedException(
-          message: message.isNotEmpty ? message : 'Bạn không có quyền truy cập',
-        );
+      DioExceptionType.cancel => CancelledFailure(message: e.message ?? 'Đã hủy'),
 
-      case 404:
-        return NotFoundException(
-          message: message.isNotEmpty ? message : 'Không tìm thấy dữ liệu',
-        );
+      DioExceptionType.badCertificate => const NetworkFailure(
+        message: 'Lỗi chứng chỉ bảo mật',
+        code: 'SSL_ERROR',
+      ),
 
-      case 422:
-        return ValidationException(
-          message: message,
-          code: '422',
-          errors: _extractValidationErrors(responseData),
-        );
+      DioExceptionType.badResponse => _fromHttpResponse(e.response),
 
-      case 500:
-      case 502:
-      case 503:
-        return ServerException(
-          message: 'Lỗi máy chủ, vui lòng thử lại sau',
-          code: statusCode.toString(),
-        );
+      DioExceptionType.unknown when e.error is SocketException => const NetworkFailure(),
 
-      default:
-        return ServerException(
-          message: message.isNotEmpty ? message : 'Đã xảy ra lỗi',
-          code: statusCode?.toString(),
-        );
-    }
+      DioExceptionType.unknown => UnknownFailure(message: e.message ?? 'Lỗi không xác định'),
+    };
   }
 
-  /// Trích xuất error message từ response
-  static String _extractErrorMessage(dynamic data) {
+  // ════════════════════════════════════════════════════════════
+  // HTTP Response → Failure
+  // ════════════════════════════════════════════════════════════
+
+  static Failure _fromHttpResponse(Response? response) {
+    final statusCode = response?.statusCode;
+    final data = response?.data;
+    final message = _extractMessage(data);
+
+    return switch (statusCode) {
+      // Auth
+      401 => AuthFailure(
+        message: message.ifEmpty('Phiên đăng nhập hết hạn'),
+        type: _isTokenExpired(data)
+            ? AuthFailureType.tokenExpired
+            : AuthFailureType.unauthenticated,
+        statusCode: 401,
+      ),
+      403 => AuthFailure(
+        message: message.ifEmpty('Không có quyền truy cập'),
+        type: AuthFailureType.unauthorized,
+        statusCode: 403,
+      ),
+
+      // Data
+      400 || 422 => DataFailure(
+        message: message.ifEmpty('Dữ liệu không hợp lệ'),
+        type: DataFailureType.validation,
+        fieldErrors: _extractFieldErrors(data),
+        globalErrors: _extractGlobalErrors(data),
+        statusCode: statusCode,
+      ),
+      404 => DataFailure(
+        message: message.ifEmpty('Không tìm thấy'),
+        type: DataFailureType.notFound,
+        statusCode: 404,
+      ),
+      409 => DataFailure(
+        message: message.ifEmpty('Dữ liệu đã tồn tại'),
+        type: DataFailureType.conflict,
+        statusCode: 409,
+      ),
+      413 => DataFailure(
+        message: message.ifEmpty('Dữ liệu quá lớn'),
+        type: DataFailureType.payloadTooLarge,
+        maxSize: _extractInt(data, ['maxSize', 'maxFileSize']),
+        statusCode: 413,
+      ),
+
+      // Server
+      429 => ServerFailure(
+        message: message.ifEmpty('Quá nhiều yêu cầu'),
+        retryAfter: _extractRetryAfter(response),
+        statusCode: 429,
+      ),
+      500 ||
+      502 ||
+      504 => ServerFailure(message: 'Lỗi máy chủ, vui lòng thử lại', statusCode: statusCode),
+      503 when _isMaintenance(data) => ServerFailure(
+        message: message.ifEmpty('Hệ thống đang bảo trì'),
+        maintenanceEndTime: _extractDateTime(data, ['estimatedEndTime', 'endTime']),
+        statusCode: 503,
+      ),
+      503 => const ServerFailure(message: 'Dịch vụ tạm thời không khả dụng', statusCode: 503),
+
+      _ => ServerFailure(message: message.ifEmpty('Đã xảy ra lỗi'), statusCode: statusCode),
+    };
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // App Exception → Failure
+  // ════════════════════════════════════════════════════════════
+
+  static Failure _fromAppException(AppException e) {
+    return switch (e) {
+      NetworkException() => NetworkFailure(message: e.message),
+      TimeoutException() => TimeoutFailure(message: e.message),
+      ServerException() => ServerFailure(message: e.message, statusCode: e.statusCode),
+      AuthException() => AuthFailure(
+        message: e.message,
+        type: _mapAuthType(e.type),
+        statusCode: e.statusCode,
+      ),
+      DataException() => DataFailure(
+        message: e.message,
+        type: _mapDataType(e.type),
+        fieldErrors: e.fieldErrors,
+        statusCode: e.statusCode,
+      ),
+      StorageException() => StorageFailure(message: e.message, type: _mapStorageType(e.type)),
+      _ => UnknownFailure(message: e.message),
+    };
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // Extractors
+  // ════════════════════════════════════════════════════════════
+
+  static String _extractMessage(dynamic data) {
     if (data is Map<String, dynamic>) {
-      // Thử các key phổ biến
       return data['message']?.toString() ??
-             data['error']?.toString() ??
-             data['msg']?.toString() ??
-             '';
+          data['error']?.toString() ??
+          data['msg']?.toString() ??
+          '';
     }
-    return '';
+    return data is String ? data : '';
   }
 
-  /// Trích xuất validation errors từ response
-  static Map<String, String>? _extractValidationErrors(dynamic data) {
+  static Map<String, String>? _extractFieldErrors(dynamic data) {
     if (data is! Map<String, dynamic>) return null;
-
-    final errors = data['errors'];
+    final errors = data['errors'] ?? data['fieldErrors'];
     if (errors is! Map<String, dynamic>) return null;
+    return errors.map((k, v) => MapEntry(k, v is List ? v.first.toString() : v.toString()));
+  }
 
-    return errors.map((key, value) {
-      if (value is List && value.isNotEmpty) {
-        return MapEntry(key, value.first.toString());
+  static List<String>? _extractGlobalErrors(dynamic data) {
+    if (data is! Map<String, dynamic>) return null;
+    final errors = data['globalErrors'];
+    return errors is List ? errors.map((e) => e.toString()).toList() : null;
+  }
+
+  static int? _extractInt(dynamic data, List<String> keys) {
+    if (data is! Map<String, dynamic>) return null;
+    for (final key in keys) {
+      final value = data[key];
+      if (value is int) return value;
+    }
+    return null;
+  }
+
+  static DateTime? _extractDateTime(dynamic data, List<String> keys) {
+    if (data is! Map<String, dynamic>) return null;
+    for (final key in keys) {
+      final value = data[key];
+      if (value is String) {
+        final parsed = DateTime.tryParse(value);
+        if (parsed != null) return parsed;
       }
-      return MapEntry(key, value.toString());
-    });
+    }
+    return null;
   }
 
-  /// Log error cho debugging
-  static void logError(Object error, [StackTrace? stackTrace]) {
-    Logger.error('Unhandled error: $error', error: error, stackTrace: stackTrace);
+  static Duration? _extractRetryAfter(Response? response) {
+    final retryAfter = response?.headers.value('retry-after');
+    if (retryAfter == null) return null;
+    final seconds = int.tryParse(retryAfter);
+    return seconds != null ? Duration(seconds: seconds) : null;
   }
+
+  static bool _isTokenExpired(dynamic data) {
+    if (data is! Map<String, dynamic>) return false;
+    final code = (data['code'] ?? data['errorCode'])?.toString().toLowerCase() ?? '';
+    return code.contains('token_expired') || code.contains('jwt_expired');
+  }
+
+  static bool _isMaintenance(dynamic data) {
+    if (data is! Map<String, dynamic>) return false;
+    final code = (data['code'] ?? data['errorCode'])?.toString().toLowerCase() ?? '';
+    return code.contains('maintenance');
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // Type Mappers
+  // ════════════════════════════════════════════════════════════
+
+  static AuthFailureType _mapAuthType(AuthExceptionType t) => switch (t) {
+    AuthExceptionType.unauthenticated => AuthFailureType.unauthenticated,
+    AuthExceptionType.unauthorized => AuthFailureType.unauthorized,
+    AuthExceptionType.tokenExpired => AuthFailureType.tokenExpired,
+    AuthExceptionType.refreshFailed => AuthFailureType.refreshFailed,
+  };
+
+  static DataFailureType _mapDataType(DataExceptionType t) => switch (t) {
+    DataExceptionType.notFound => DataFailureType.notFound,
+    DataExceptionType.validation => DataFailureType.validation,
+    DataExceptionType.conflict => DataFailureType.conflict,
+    DataExceptionType.payloadTooLarge => DataFailureType.payloadTooLarge,
+    DataExceptionType.unknown => DataFailureType.unknown,
+  };
+
+  static StorageFailureType _mapStorageType(StorageExceptionType t) => switch (t) {
+    StorageExceptionType.cache => StorageFailureType.cacheNotFound,
+    StorageExceptionType.database => StorageFailureType.databaseError,
+    StorageExceptionType.file => StorageFailureType.fileNotFound,
+    StorageExceptionType.unknown => StorageFailureType.unknown,
+  };
+
+  // ════════════════════════════════════════════════════════════
+  // Quick Checks
+  // ════════════════════════════════════════════════════════════
+
+  static bool isNetworkError(Object e) =>
+      e is NetworkException ||
+      e is NetworkFailure ||
+      e is SocketException ||
+      (e is DioException &&
+          (e.type == DioExceptionType.connectionError ||
+              e.type == DioExceptionType.connectionTimeout));
+
+  static bool isAuthError(Object e) =>
+      e is AuthException ||
+      e is AuthFailure ||
+      (e is DioException && [401, 403].contains(e.response?.statusCode));
+
+  static bool isRetryable(Object e) {
+    if (e is Failure) return e.isRetryable;
+    return isNetworkError(e) || (e is DioException && (e.response?.statusCode ?? 0) >= 500);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// String Extension Helper
+// ════════════════════════════════════════════════════════════
+
+extension _StringX on String {
+  String ifEmpty(String fallback) => isEmpty ? fallback : this;
 }

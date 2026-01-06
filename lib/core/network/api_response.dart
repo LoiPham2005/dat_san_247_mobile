@@ -48,7 +48,9 @@ class ApiResponse<T> {
       message: json['message']?.toString(),
       data: json['data'] != null ? fromJsonT(json['data']) : null,
       error: json['error']?.toString(),
-      code: json['code'] is int ? json['code'] : int.tryParse('${json['code']}'),
+      code: json['code'] is int
+          ? json['code']
+          : int.tryParse('${json['code']}'),
       tokenExpired: tokenExpiredValue,
     );
   }

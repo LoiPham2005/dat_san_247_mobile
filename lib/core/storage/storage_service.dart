@@ -1,5 +1,6 @@
 // lib/core/storage/storage_service.dart
 import 'dart:convert';
+
 import 'package:dat_san_247_mobile/core/storage/storage_keys.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -82,22 +83,18 @@ class StorageService {
   // /// Get theme mode
   // String? getThemeMode() => get<String>(StorageKeys.themeMode);
 
-
   // ✅ Theme Color
   String? getThemeColor() => _prefs.getString(StorageKeys.keyThemeColor);
 
-  Future<bool> saveThemeColor(String color) =>
-      _prefs.setString(StorageKeys.keyThemeColor, color);
+  Future<bool> saveThemeColor(String color) => _prefs.setString(StorageKeys.keyThemeColor, color);
 
   // ✅ Theme Mode
   String? getThemeMode() => _prefs.getString(StorageKeys.keyThemeMode);
 
-  Future<bool> saveThemeMode(String mode) =>
-      _prefs.setString(StorageKeys.keyThemeMode, mode);
+  Future<bool> saveThemeMode(String mode) => _prefs.setString(StorageKeys.keyThemeMode, mode);
 
   /// Save language code
-  Future<bool> saveLanguageCode(String code) =>
-      set(StorageKeys.languageCode, code);
+  Future<bool> saveLanguageCode(String code) => set(StorageKeys.languageCode, code);
 
   /// Get language code
   String? getLanguageCode() => get<String>(StorageKeys.languageCode);

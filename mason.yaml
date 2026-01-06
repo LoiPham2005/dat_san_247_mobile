@@ -1,0 +1,6 @@
+# Mason configuration
+# https://docs.brickhub.dev
+
+bricks:
+  feature:
+    path: bricks/feature

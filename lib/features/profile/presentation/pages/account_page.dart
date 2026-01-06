@@ -345,11 +345,11 @@
 
 import 'package:dat_san_247_mobile/features/profile/presentation/pages/page/edit_profile_page.dart';
 import 'package:dat_san_247_mobile/features/profile/presentation/pages/page/setting_page.dart';
-import 'package:dat_san_247_mobile/shared/widgets/image/custom_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
+
+import '../../../../shared/widgets/image/custom_image.dart';
 
 class AccountScreen extends StatefulWidget {
   AccountScreen({super.key});

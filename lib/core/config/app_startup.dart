@@ -1,7 +1,6 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/config/app_startup.dart (FIXED)
 // ════════════════════════════════════════════════════════════════
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/network/network_info.dart';
 import 'package:dat_san_247_mobile/core/routes/route_names.dart';
@@ -9,6 +8,7 @@ import 'package:dat_san_247_mobile/core/services/app_version_service.dart';
 import 'package:dat_san_247_mobile/core/services/network_monitor.dart';
 import 'package:dat_san_247_mobile/core/storage/storage_service.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// AppStartup: xử lý logic sau khi AppInitializer xong
@@ -57,14 +57,14 @@ class AppStartup {
     if (!context.mounted) return;
 
     if (firstRun) {
-    // ✅ Dùng context.go() thay vì pushReplacement
-    context.go(RouteNames.welcome);
-  } else {
-    if (loggedIn) {
-      context.go(RouteNames.home);
+      // ✅ Dùng context.go() thay vì pushReplacement
+      context.go(RouteNames.welcome);
     } else {
-      context.go(RouteNames.login);
+      if (loggedIn) {
+        context.go(RouteNames.home);
+      } else {
+        context.go(RouteNames.login);
+      }
     }
-  }
   }
 }

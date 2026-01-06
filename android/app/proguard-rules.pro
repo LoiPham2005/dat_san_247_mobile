@@ -45,7 +45,7 @@
 -keep class android.app.WallpaperManager { *; }
 -keep class android.app.WallpaperManager$** { *; }
 
-# Cache Manager rules  
+# Cache Manager rules
 -keep class flutter_cache_manager.** { *; }
 -keep class com.github.cachemanager.** { *; }
 
@@ -74,7 +74,7 @@
 -keep class io.flutter.plugins.**  { *; }
 
 # Keep your model classes
--keep class com.example.flutter_base_template.data.models.** { *; }
+-keep class com.example.dat_san_247_mobile.data.models.** { *; }
 
 # Retrofit
 -keepattributes Signature
@@ -100,7 +100,7 @@
 -keep class com.google.flutter.** { *; }
 
 # Keep your app's main classes
--keep class com.example.flutter_base_template.** { *; }
+-keep class com.example.dat_san_247_mobile.** { *; }
 
 # Keep model classes (Serializable)
 -keepclassmembers class * implements java.io.Serializable {

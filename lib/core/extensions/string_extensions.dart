@@ -1,3 +1,5 @@
+import 'package:dat_san_247_mobile/core/utils/validators.dart';
+
 extension StringExtensions on String {
   // ═══════════════════════════════════════════════════════════════
   // NULL & EMPTY CHECK
@@ -19,24 +21,20 @@ extension StringExtensions on String {
   /// Capitalize each word
   String get capitalizeWords {
     if (isEmpty) return this;
-    return split(
-      ' ',
-    ).map((word) => word.isEmpty ? word : word.capitalize).join(' ');
+    return split(' ').map((word) => word.isEmpty ? word : word.capitalize).join(' ');
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // VALIDATION
+  // VALIDATION (Reuse from Validators - DRY principle)
   // ═══════════════════════════════════════════════════════════════
 
   /// Check if valid email
-  bool get isValidEmail {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(this);
-  }
+  /// Returns true if passes Validators.email
+  bool get isValidEmail => Validators.email(this) == null;
 
   /// Check if valid Vietnamese phone number
-  bool get isValidPhoneVN {
-    return RegExp(r'^(0|\+84)[3|5|7|8|9][0-9]{8}$').hasMatch(this);
-  }
+  /// Returns true if passes Validators.phoneVN
+  bool get isValidPhoneVN => Validators.phoneVN(this) == null;
 
   // ═══════════════════════════════════════════════════════════════
   // VIETNAMESE

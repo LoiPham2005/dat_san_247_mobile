@@ -1,9 +1,9 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/extensions/context_extensions.dart (SỬ DỤNG CHÍNH)
 // ════════════════════════════════════════════════════════════════
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/services/toast_service.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
@@ -50,9 +50,7 @@ extension ContextExtensions on BuildContext {
   /// Push widget page with MaterialPageRoute
   /// Example: context.navPush(DetailsPage())
   Future<T?> navPush<T>(Widget page) {
-    return Navigator.of(this).push<T>(
-      MaterialPageRoute(builder: (_) => page),
-    );
+    return Navigator.of(this).push<T>(MaterialPageRoute(builder: (_) => page));
   }
 
   /// Push with custom route
@@ -64,22 +62,17 @@ extension ContextExtensions on BuildContext {
   /// Push and replace current
   /// Example: context.navReplace(HomePage())
   Future<T?> navReplace<T, TO>(Widget page, {TO? result}) {
-    return Navigator.of(this).pushReplacement<T, TO>(
-      MaterialPageRoute(builder: (_) => page),
-      result: result,
-    );
+    return Navigator.of(
+      this,
+    ).pushReplacement<T, TO>(MaterialPageRoute(builder: (_) => page), result: result);
   }
 
   /// Push and remove all until predicate
   /// Example: context.navPushAndClear(HomePage(), (route) => false)
-  Future<T?> navPushAndClear<T>(
-      Widget page,
-      bool Function(Route<dynamic>) predicate,
-      ) {
-    return Navigator.of(this).pushAndRemoveUntil<T>(
-      MaterialPageRoute(builder: (_) => page),
-      predicate,
-    );
+  Future<T?> navPushAndClear<T>(Widget page, bool Function(Route<dynamic>) predicate) {
+    return Navigator.of(
+      this,
+    ).pushAndRemoveUntil<T>(MaterialPageRoute(builder: (_) => page), predicate);
   }
 
   /// Push and clear all (go to root with new page)
@@ -107,15 +100,11 @@ extension ContextExtensions on BuildContext {
   /// Check if can pop (Navigator)
   bool get canNavPop => Navigator.of(this).canPop();
 
-
   // ═══════════════════════════════════════════════════════════════
   // DIALOGS
   // ═══════════════════════════════════════════════════════════════
 
-  Future<T?> showCustomDialog<T>({
-    required Widget child,
-    bool barrierDismissible = true,
-  }) {
+  Future<T?> showCustomDialog<T>({required Widget child, bool barrierDismissible = true}) {
     return showDialog<T>(
       context: this,
       barrierDismissible: barrierDismissible,
@@ -135,14 +124,8 @@ extension ContextExtensions on BuildContext {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
-            onPressed: () => pop(false),
-            child: Text(cancelText),
-          ),
-          TextButton(
-            onPressed: () => pop(true),
-            child: Text(confirmText),
-          ),
+          TextButton(onPressed: () => pop(false), child: Text(cancelText)),
+          TextButton(onPressed: () => pop(true), child: Text(confirmText)),
         ],
       ),
     );
@@ -154,12 +137,7 @@ extension ContextExtensions on BuildContext {
         icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
         title: const Text('Thành công'),
         content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => pop(),
-            child: const Text('OK'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => pop(), child: const Text('OK'))],
       ),
     );
   }
@@ -170,12 +148,7 @@ extension ContextExtensions on BuildContext {
         icon: const Icon(Icons.error_outline, color: Colors.red, size: 48),
         title: const Text('Lỗi'),
         content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => pop(),
-            child: const Text('OK'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => pop(), child: const Text('OK'))],
       ),
     );
   }
@@ -193,10 +166,7 @@ extension ContextExtensions on BuildContext {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator(),
-                  if (message != null) ...[
-                    const SizedBox(height: 16),
-                    Text(message),
-                  ],
+                  if (message != null) ...[const SizedBox(height: 16), Text(message)],
                 ],
               ),
             ),
@@ -242,10 +212,7 @@ extension ContextExtensions on BuildContext {
       SnackBar(
         content: Row(
           children: [
-            if (icon != null) ...[
-              Icon(icon, color: Colors.white),
-              const SizedBox(width: 12),
-            ],
+            if (icon != null) ...[Icon(icon, color: Colors.white), const SizedBox(width: 12)],
             Expanded(child: Text(message)),
           ],
         ),
@@ -301,9 +268,6 @@ extension ContextExtensions on BuildContext {
   void hideKeyboard() => FocusScope.of(this).unfocus();
 }
 
-
-
-
 // Thêm extension này vào cuối file ContextExtensions
 extension ContextToastExtensions on BuildContext {
   // ═══════════════════════════════════════════════════════════════
@@ -314,62 +278,26 @@ extension ContextToastExtensions on BuildContext {
 
   /// Show success toast
   /// Example: context.showSuccess('Login successful!')
-  ToastificationItem showSuccess(
-    String message, {
-    String? title,
-    Duration? duration,
-  }) {
-    return toast.success(
-      message,
-      title: title,
-      duration: duration,
-      context: this,
-    );
+  ToastificationItem showSuccess(String message, {String? title, Duration? duration}) {
+    return toast.success(message, title: title, duration: duration, context: this);
   }
 
   /// Show error toast
   /// Example: context.showError('Login failed!')
-  ToastificationItem showError(
-    String message, {
-    String? title,
-    Duration? duration,
-  }) {
-    return toast.error(
-      message,
-      title: title,
-      duration: duration,
-      context: this,
-    );
+  ToastificationItem showError(String message, {String? title, Duration? duration}) {
+    return toast.error(message, title: title, duration: duration, context: this);
   }
 
   /// Show warning toast
   /// Example: context.showWarning('Please check your input')
-  ToastificationItem showWarning(
-    String message, {
-    String? title,
-    Duration? duration,
-  }) {
-    return toast.warning(
-      message,
-      title: title,
-      duration: duration,
-      context: this,
-    );
+  ToastificationItem showWarning(String message, {String? title, Duration? duration}) {
+    return toast.warning(message, title: title, duration: duration, context: this);
   }
 
   /// Show info toast
   /// Example: context.showInfo('New update available')
-  ToastificationItem showInfo(
-    String message, {
-    String? title,
-    Duration? duration,
-  }) {
-    return toast.info(
-      message,
-      title: title,
-      duration: duration,
-      context: this,
-    );
+  ToastificationItem showInfo(String message, {String? title, Duration? duration}) {
+    return toast.info(message, title: title, duration: duration, context: this);
   }
 
   /// Show loading toast
@@ -379,15 +307,8 @@ extension ContextToastExtensions on BuildContext {
   /// await doWork();
   /// context.dismissToast(loading);
   /// ```
-  ToastificationItem showLoading(
-    String message, {
-    String? title,
-  }) {
-    return toast.loading(
-      message,
-      title: title,
-      context: this,
-    );
+  ToastificationItem showLoading(String message, {String? title}) {
+    return toast.loading(message, title: title, context: this);
   }
 
   /// Show custom toast
@@ -430,14 +351,7 @@ extension ContextToastExtensions on BuildContext {
 
   /// Show toast from exception
   /// Example: context.showException(error)
-  ToastificationItem showException(
-    dynamic exception, {
-    String? title,
-  }) {
-    return toast.fromException(
-      exception,
-      title: title,
-      context: this,
-    );
+  ToastificationItem showException(dynamic exception, {String? title}) {
+    return toast.fromException(exception, title: title, context: this);
   }
 }

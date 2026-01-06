@@ -1,9 +1,9 @@
 // import 'dart:async';
-// import 'package:flutter_base_template/core/state_management/riverpod/provider_helper/base_async_notifier.dart';
+// import 'package:dat_san_247_mobile/core/state_management/riverpod/provider_helper/base_async_notifier.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_base_template/core/di/injection.dart';
-// import 'package:flutter_base_template/features/auth/domain/entities/auth_entity.dart';
-// import 'package:flutter_base_template/features/auth/domain/usecases/login_usecase.dart';
+// import 'package:dat_san_247_mobile/core/di/injection.dart';
+// import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
+// import 'package:dat_san_247_mobile/features/auth/domain/usecases/login_usecase.dart';
 
 // /// ✅ Provider Riverpod 3.x
 // final authProvider =

@@ -1,25 +1,12 @@
-
-// // ════════════════════════════════════════════════════════════════
-// // 🌍 L10N SYNC + AUTO TRANSLATION - PRODUCTION READY
-// // ════════════════════════════════════════════════════════════════
-// // Features:
-// // - Sync keys from app_en.arb to other languages
-// // - Auto-translate missing values using Google Translate API
-// // - Smart caching to avoid re-translating
-// // - Fallback to English if translation fails
-// // ════════════════════════════════════════════════════════════════
-
 // // tool/l10n_sync.dart
 // import 'dart:convert';
 // import 'dart:io';
-// import 'package:http/http.dart' as http;
 
 // void main(List<String> arguments) async {
 //   final syncer = L10nSyncer();
 //   await syncer.sync(
 //     dryRun: arguments.contains('--dry-run'),
 //     verbose: arguments.contains('--verbose'),
-//     translate: arguments.contains('--translate'), // ✅ NEW FLAG
 //   );
 // }
 
@@ -28,46 +15,31 @@
 //   static const _sourceFile = 'app_en.arb';
 //   static const _indent = '  ';
 
-//   // ✅ Language mapping (ARB locale -> Google Translate code)
-//   static const _languageMap = {
-//     'app_vi.arb': 'vi',  // Vietnamese
-//     'app_ja.arb': 'ja',  // Japanese
-//     'app_ko.arb': 'ko',  // Korean
-//     'app_zh.arb': 'zh',  // Chinese
-//     'app_es.arb': 'es',  // Spanish
-//     'app_fr.arb': 'fr',  // French
-//     'app_de.arb': 'de',  // German
-//     'app_ar.arb': 'ar',  // Arabic
-//     'app_th.arb': 'th',  // Thai
-//     'app_id.arb': 'id',  // Indonesian
-//   };
-
-//   // Console colors
+//   // Colors for console output
 //   static const _green = '\x1B[32m';
 //   static const _yellow = '\x1B[33m';
 //   static const _red = '\x1B[31m';
 //   static const _blue = '\x1B[34m';
-//   static const _cyan = '\x1B[36m';
 //   static const _reset = '\x1B[0m';
 
-//   Future<void> sync({
-//     bool dryRun = false,
-//     bool verbose = false,
-//     bool translate = false,
-//   }) async {
-//     print('$_blue════════════════════════════════════════════════════════$_reset');
-//     print('$_blue🌍 L10n Sync Tool${dryRun ? ' (DRY RUN)' : ''}${translate ? ' + Translation' : ''}$_reset');
-//     print('$_blue════════════════════════════════════════════════════════$_reset\n');
+//   Future<void> sync({bool dryRun = false, bool verbose = false}) async {
+//     print(
+//       '$_blue════════════════════════════════════════════════════════$_reset',
+//     );
+//     print('$_blue🌍 L10n Sync Tool${dryRun ? ' (DRY RUN)' : ''}$_reset');
+//     print(
+//       '$_blue════════════════════════════════════════════════════════$_reset\n',
+//     );
 
 //     try {
-//       // 1. Validate
+//       // 1. Validate l10n directory
 //       final l10nDir = Directory(_l10nPath);
 //       if (!l10nDir.existsSync()) {
 //         _error('Directory not found: $_l10nPath');
 //         exit(1);
 //       }
 
-//       // 2. Load source
+//       // 2. Load source file (app_en.arb)
 //       final sourceFile = File('$_l10nPath/$_sourceFile');
 //       if (!sourceFile.existsSync()) {
 //         _error('Source file not found: $_sourceFile');
@@ -83,7 +55,7 @@
 //       }
 //       print('');
 
-//       // 3. Find targets
+//       // 3. Find target files
 //       final targetFiles = _findTargetFiles(l10nDir);
 //       if (targetFiles.isEmpty) {
 //         _warning('No target files found');
@@ -92,10 +64,10 @@
 
 //       _info('Found ${targetFiles.length} target file(s):\n');
 
-//       // 4. Process files
+//       // 4. Process each target file
 //       var totalAdded = 0;
 //       var totalRemoved = 0;
-//       var totalTranslated = 0;
+//       var totalUpdated = 0;
 
 //       for (final file in targetFiles) {
 //         final result = await _processFile(
@@ -104,27 +76,28 @@
 //           sourceKeys,
 //           dryRun: dryRun,
 //           verbose: verbose,
-//           translate: translate,
 //         );
 
 //         totalAdded += result.added;
 //         totalRemoved += result.removed;
-//         totalTranslated += result.translated;
+//         totalUpdated += result.updated;
 //       }
 
 //       // 5. Summary
-//       print('\n$_blue════════════════════════════════════════════════════════$_reset');
+//       print(
+//         '\n$_blue════════════════════════════════════════════════════════$_reset',
+//       );
 //       print('$_green✅ Sync completed!$_reset\n');
-//       print('  Added:      $_green$totalAdded$_reset keys');
-//       print('  Removed:    $_red$totalRemoved$_reset keys');
-//       if (translate) {
-//         print('  Translated: $_cyan$totalTranslated$_reset keys');
-//       }
+//       print('  Added:   $_green$totalAdded$_reset keys');
+//       print('  Removed: $_red$totalRemoved$_reset keys');
+//       print('  Updated: $_yellow$totalUpdated$_reset metadata');
 
 //       if (dryRun) {
 //         print('\n$_yellow⚠️  DRY RUN: No files were modified$_reset');
 //       }
-//       print('$_blue════════════════════════════════════════════════════════$_reset');
+//       print(
+//         '$_blue════════════════════════════════════════════════════════$_reset',
+//       );
 //     } catch (e, stackTrace) {
 //       _error('Fatal error: $e');
 //       if (verbose) {
@@ -144,67 +117,26 @@
 //     Set<String> sourceKeys, {
 //     required bool dryRun,
 //     required bool verbose,
-//     required bool translate,
 //   }) async {
 //     final fileName = file.path.split('/').last;
 //     print('$_blue📄 $fileName$_reset');
 
 //     final targetContent = _loadArb(file);
 //     final targetKeys = _extractTranslationKeys(targetContent);
-//     final targetLang = _languageMap[fileName];
 
 //     final added = <String>[];
 //     final removed = <String>[];
-//     var translated = 0;
+//     final updated = <String>[];
 
-//     // Add missing keys or translate English values
+//     // Find missing keys (in source but not in target)
 //     for (final key in sourceKeys) {
-//       final sourceValue = sourceContent[key] as String;
-//       final isNewKey = !targetKeys.contains(key);
-//       final currentValue = targetContent[key] as String?;
-
-//       // ✅ Translate if:
-//       // 1. New key (doesn't exist)
-//       // 2. Value is same as English (not translated yet)
-//       final needsTranslation = isNewKey || (currentValue == sourceValue);
-
-//       if (needsTranslation) {
-//         // ✅ Auto-translate if enabled
-//         if (translate && targetLang != null) {
-//           try {
-//             if (verbose || isNewKey) {
-//               print('  $_cyan🔄 Translating "$key": "$sourceValue"$_reset');
-//             }
-
-//             final translatedValue = await _translate(
-//               sourceValue,
-//               targetLang,
-//             );
-
-//             targetContent[key] = translatedValue;
-//             translated++;
-
-//             if (verbose) {
-//               print('    $_cyan✓ "$sourceValue" → "$translatedValue"$_reset');
-//             }
-//           } catch (e) {
-//             if (verbose) {
-//               _warning('Translation failed for "$key", using English');
-//             }
-//             targetContent[key] = sourceValue; // Fallback to English
-//           }
-//         } else {
-//           // No translation, use English
-//           targetContent[key] = sourceValue;
-//         }
-
-//         if (isNewKey) {
-//           added.add(key);
-//         }
+//       if (!targetKeys.contains(key)) {
+//         targetContent[key] = sourceContent[key];
+//         added.add(key);
 //       }
 //     }
 
-//     // Remove extra keys
+//     // Find extra keys (in target but not in source) - Remove them
 //     for (final key in targetKeys) {
 //       if (!sourceKeys.contains(key)) {
 //         targetContent.remove(key);
@@ -212,23 +144,27 @@
 //       }
 //     }
 
-//     // Sync metadata
+//     // Sync metadata (@-prefixed keys)
 //     for (final key in sourceContent.keys) {
 //       if (key.startsWith('@')) {
 //         final baseKey = key.substring(1);
-//         if (targetContent.containsKey(baseKey)) {
+//         if (targetKeys.contains(baseKey)) {
+//           // Update metadata for existing translations
 //           targetContent[key] = sourceContent[key];
+//           if (verbose) {
+//             updated.add(key);
+//           }
 //         }
 //       }
 //     }
 
-//     // Sort
+//     // Sort keys (translations first, then metadata)
 //     final sortedContent = _sortArbContent(targetContent);
 
 //     // Print changes
 //     if (added.isNotEmpty) {
 //       print('  $_green+ Added: ${added.length}$_reset');
-//       if (verbose && !translate) {
+//       if (verbose) {
 //         for (final key in added) {
 //           print('    $_green+ $key$_reset');
 //         }
@@ -244,16 +180,17 @@
 //       }
 //     }
 
-//     if (translated > 0) {
-//       print('  $_cyan🌐 Translated: $translated$_reset');
+//     if (updated.isNotEmpty && verbose) {
+//       print('  $_yellow~ Updated metadata: ${updated.length}$_reset');
 //     }
 
-//     if (added.isEmpty && removed.isEmpty) {
+//     if (added.isEmpty && removed.isEmpty && updated.isEmpty) {
 //       print('  $_green✓ Already in sync$_reset');
 //     }
 
-//     // Write
-//     if (!dryRun && (added.isNotEmpty || removed.isNotEmpty)) {
+//     // Write file
+//     if (!dryRun &&
+//         (added.isNotEmpty || removed.isNotEmpty || updated.isNotEmpty)) {
 //       _writeArb(file, sortedContent);
 //       print('  $_green✓ Saved$_reset');
 //     }
@@ -263,108 +200,8 @@
 //     return SyncResult(
 //       added: added.length,
 //       removed: removed.length,
-//       translated: translated,
+//       updated: updated.length,
 //     );
-//   }
-
-//   // ═══════════════════════════════════════════════════════════════
-//   // Translation API
-//   // ═══════════════════════════════════════════════════════════════
-
-//   Future<String> _translate(String text, String targetLang) async {
-//     // ✅ Option 1: Google Translate API (Free - No API Key)
-//     // Uses unofficial endpoint (rate limited)
-//     return await _translateGoogleFree(text, targetLang);
-
-//     // ✅ Option 2: Google Translate API (Official - Requires API Key)
-//     // Uncomment and add your API key
-//     // return await _translateGoogleOfficial(text, targetLang);
-
-//     // ✅ Option 3: LibreTranslate (Free & Open Source)
-//     // return await _translateLibre(text, targetLang);
-//   }
-
-//   // Free Google Translate (No API key)
-//   Future<String> _translateGoogleFree(String text, String targetLang) async {
-//     // Skip placeholders
-//     if (text.contains('{') && text.contains('}')) {
-//       _warning('Skipping translation for text with placeholders: $text');
-//       return text;
-//     }
-
-//     try {
-//       final url = Uri.parse(
-//         'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=$targetLang&dt=t&q=${Uri.encodeComponent(text)}',
-//       );
-
-//       final response = await http.get(url).timeout(
-//         const Duration(seconds: 10),
-//       );
-
-//       if (response.statusCode == 200) {
-//         final decoded = jsonDecode(response.body);
-//         final translated = decoded[0][0][0] as String;
-//         return translated;
-//       } else {
-//         throw Exception('HTTP ${response.statusCode}');
-//       }
-//     } catch (e) {
-//       throw Exception('Translation failed: $e');
-//     }
-//   }
-
-//   // Official Google Translate API (Requires API key)
-//   Future<String> _translateGoogleOfficial(String text, String targetLang) async {
-//     const apiKey = 'YOUR_GOOGLE_TRANSLATE_API_KEY'; // ⚠️ Add your key
-
-//     if (apiKey == 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
-//       throw Exception('Google Translate API key not configured');
-//     }
-
-//     final url = Uri.parse(
-//       'https://translation.googleapis.com/language/translate/v2?key=$apiKey',
-//     );
-
-//     final response = await http.post(
-//       url,
-//       headers: {'Content-Type': 'application/json'},
-//       body: jsonEncode({
-//         'q': text,
-//         'source': 'en',
-//         'target': targetLang,
-//         'format': 'text',
-//       }),
-//     );
-
-//     if (response.statusCode == 200) {
-//       final decoded = jsonDecode(response.body);
-//       return decoded['data']['translations'][0]['translatedText'];
-//     } else {
-//       throw Exception('HTTP ${response.statusCode}');
-//     }
-//   }
-
-//   // LibreTranslate (Free & Open Source)
-//   Future<String> _translateLibre(String text, String targetLang) async {
-//     final url = Uri.parse('https://libretranslate.de/translate');
-
-//     final response = await http.post(
-//       url,
-//       headers: {'Content-Type': 'application/json'},
-//       body: jsonEncode({
-//         'q': text,
-//         'source': 'en',
-//         'target': targetLang,
-//         'format': 'text',
-//       }),
-//     );
-
-//     if (response.statusCode == 200) {
-//       final decoded = jsonDecode(response.body);
-//       return decoded['translatedText'];
-//     } else {
-//       throw Exception('HTTP ${response.statusCode}');
-//     }
 //   }
 
 //   // ═══════════════════════════════════════════════════════════════
@@ -393,7 +230,7 @@
 //   void _writeArb(File file, Map<String, dynamic> content) {
 //     try {
 //       final json = JsonEncoder.withIndent(_indent).convert(content);
-//       file.writeAsStringSync('$json\n');
+//       file.writeAsStringSync('$json\n'); // Add trailing newline
 //     } catch (e) {
 //       _error('Failed to write ${file.path}: $e');
 //       exit(1);
@@ -406,10 +243,14 @@
 
 //   Map<String, dynamic> _sortArbContent(Map<String, dynamic> content) {
 //     final sorted = <String, dynamic>{};
-//     final translationKeys = content.keys.where((k) => !k.startsWith('@')).toList()..sort();
 
+//     // First, add all translation keys (sorted)
+//     final translationKeys =
+//         content.keys.where((k) => !k.startsWith('@')).toList()..sort();
 //     for (final key in translationKeys) {
 //       sorted[key] = content[key];
+
+//       // Add metadata if exists
 //       final metaKey = '@$key';
 //       if (content.containsKey(metaKey)) {
 //         sorted[metaKey] = content[metaKey];
@@ -434,27 +275,28 @@
 //   const SyncResult({
 //     required this.added,
 //     required this.removed,
-//     required this.translated,
+//     required this.updated,
 //   });
 
 //   final int added;
 //   final int removed;
-//   final int translated;
+//   final int updated;
 // }
 
 
 
 
-
-
-
-
-
-// tool/l10n_sync.dart
+// ════════════════════════════════════════════════════════════════
+// 📁 tool/l10n_sync.dart (UPGRADED with ansicolor)
+// ════════════════════════════════════════════════════════════════
 import 'dart:convert';
 import 'dart:io';
+import 'package:ansicolor/ansicolor.dart';
 
 void main(List<String> arguments) async {
+  // Enable ANSI colors for all platforms
+  ansiColorDisabled = false;
+
   final syncer = L10nSyncer();
   await syncer.sync(
     dryRun: arguments.contains('--dry-run'),
@@ -467,20 +309,28 @@ class L10nSyncer {
   static const _sourceFile = 'app_en.arb';
   static const _indent = '  ';
 
-  // Colors for console output
-  static const _green = '\x1B[32m';
-  static const _yellow = '\x1B[33m';
-  static const _red = '\x1B[31m';
-  static const _blue = '\x1B[34m';
-  static const _reset = '\x1B[0m';
+  // ═══════════════════════════════════════════════════════════════
+  // Color pens (Clean & Maintainable)
+  // ═══════════════════════════════════════════════════════════════
+  static final _green = AnsiPen()..green();
+  static final _yellow = AnsiPen()..yellow();
+  static final _red = AnsiPen()..red();
+  static final _blue = AnsiPen()..blue();
+  static final _cyan = AnsiPen()..cyan();
+  static final _magenta = AnsiPen()..magenta();
+  static final _gray = AnsiPen()..gray();
 
-  Future<void> sync({
-    bool dryRun = false,
-    bool verbose = false,
-  }) async {
-    print('$_blue════════════════════════════════════════════════════════$_reset');
-    print('$_blue🌍 L10n Sync Tool${dryRun ? ' (DRY RUN)' : ''}$_reset');
-    print('$_blue════════════════════════════════════════════════════════$_reset\n');
+  // Bright/bold variants (using xterm method)
+  static final _greenBold = AnsiPen()..green(bold: true);
+  static final _redBold = AnsiPen()..red(bold: true);
+  static final _blueBold = AnsiPen()..blue(bold: true);
+  static final _yellowBold = AnsiPen()..yellow(bold: true);
+
+  // ═══════════════════════════════════════════════════════════════
+  // Main sync method
+  // ═══════════════════════════════════════════════════════════════
+  Future<void> sync({bool dryRun = false, bool verbose = false}) async {
+    _printHeader(dryRun);
 
     try {
       // 1. Validate l10n directory
@@ -500,7 +350,8 @@ class L10nSyncer {
       final sourceContent = _loadArb(sourceFile);
       final sourceKeys = _extractTranslationKeys(sourceContent);
 
-      _info('Source file: $_sourceFile (${sourceKeys.length} keys)');
+      _info('Source file: ${_cyan(_sourceFile)} '
+          '(${_greenBold('${sourceKeys.length}')} keys)');
       if (verbose) {
         _printKeys(sourceKeys, '  ');
       }
@@ -513,7 +364,7 @@ class L10nSyncer {
         exit(0);
       }
 
-      _info('Found ${targetFiles.length} target file(s):\n');
+      _info('Found ${_cyan('${targetFiles.length}')} target file(s):\n');
 
       // 4. Process each target file
       var totalAdded = 0;
@@ -535,20 +386,11 @@ class L10nSyncer {
       }
 
       // 5. Summary
-      print('\n$_blue════════════════════════════════════════════════════════$_reset');
-      print('$_green✅ Sync completed!$_reset\n');
-      print('  Added:   $_green$totalAdded$_reset keys');
-      print('  Removed: $_red$totalRemoved$_reset keys');
-      print('  Updated: $_yellow$totalUpdated$_reset metadata');
-
-      if (dryRun) {
-        print('\n$_yellow⚠️  DRY RUN: No files were modified$_reset');
-      }
-      print('$_blue════════════════════════════════════════════════════════$_reset');
+      _printSummary(totalAdded, totalRemoved, totalUpdated, dryRun);
     } catch (e, stackTrace) {
       _error('Fatal error: $e');
       if (verbose) {
-        print(stackTrace);
+        print(_gray(stackTrace.toString()));
       }
       exit(1);
     }
@@ -557,17 +399,15 @@ class L10nSyncer {
   // ═══════════════════════════════════════════════════════════════
   // Process single file
   // ═══════════════════════════════════════════════════════════════
-
   Future<SyncResult> _processFile(
     File file,
     Map<String, dynamic> sourceContent,
-    Set<String> sourceKeys,
-    {
+    Set<String> sourceKeys, {
     required bool dryRun,
     required bool verbose,
   }) async {
     final fileName = file.path.split('/').last;
-    print('$_blue📄 $fileName$_reset');
+    print(_blueBold('📄 $fileName'));
 
     final targetContent = _loadArb(file);
     final targetKeys = _extractTranslationKeys(targetContent);
@@ -597,7 +437,6 @@ class L10nSyncer {
       if (key.startsWith('@')) {
         final baseKey = key.substring(1);
         if (targetKeys.contains(baseKey)) {
-          // Update metadata for existing translations
           targetContent[key] = sourceContent[key];
           if (verbose) {
             updated.add(key);
@@ -611,35 +450,36 @@ class L10nSyncer {
 
     // Print changes
     if (added.isNotEmpty) {
-      print('  $_green+ Added: ${added.length}$_reset');
+      print('  ${_green('+ Added: ${added.length}')}');
       if (verbose) {
         for (final key in added) {
-          print('    $_green+ $key$_reset');
+          print('    ${_green('+ $key')}');
         }
       }
     }
 
     if (removed.isNotEmpty) {
-      print('  $_red- Removed: ${removed.length}$_reset');
+      print('  ${_red('- Removed: ${removed.length}')}');
       if (verbose) {
         for (final key in removed) {
-          print('    $_red- $key$_reset');
+          print('    ${_red('- $key')}');
         }
       }
     }
 
     if (updated.isNotEmpty && verbose) {
-      print('  $_yellow~ Updated metadata: ${updated.length}$_reset');
+      print('  ${_yellow('~ Updated metadata: ${updated.length}')}');
     }
 
     if (added.isEmpty && removed.isEmpty && updated.isEmpty) {
-      print('  $_green✓ Already in sync$_reset');
+      print('  ${_green('✓ Already in sync')}');
     }
 
     // Write file
-    if (!dryRun && (added.isNotEmpty || removed.isNotEmpty || updated.isNotEmpty)) {
+    if (!dryRun &&
+        (added.isNotEmpty || removed.isNotEmpty || updated.isNotEmpty)) {
       _writeArb(file, sortedContent);
-      print('  $_green✓ Saved$_reset');
+      print('  ${_green('✓ Saved')}');
     }
 
     print('');
@@ -654,7 +494,6 @@ class L10nSyncer {
   // ═══════════════════════════════════════════════════════════════
   // Helper methods
   // ═══════════════════════════════════════════════════════════════
-
   List<File> _findTargetFiles(Directory dir) {
     return dir
         .listSync()
@@ -692,8 +531,8 @@ class L10nSyncer {
     final sorted = <String, dynamic>{};
 
     // First, add all translation keys (sorted)
-    final translationKeys = content.keys.where((k) => !k.startsWith('@')).toList()
-      ..sort();
+    final translationKeys =
+        content.keys.where((k) => !k.startsWith('@')).toList()..sort();
     for (final key in translationKeys) {
       sorted[key] = content[key];
 
@@ -709,13 +548,40 @@ class L10nSyncer {
 
   void _printKeys(Set<String> keys, String prefix) {
     for (final key in keys.toList()..sort()) {
-      print('$prefix- $key');
+      print('$prefix${_gray('- $key')}');
     }
   }
 
-  void _info(String message) => print('$_blue$message$_reset');
-  void _warning(String message) => print('$_yellow⚠️  $message$_reset');
-  void _error(String message) => print('$_red❌ $message$_reset');
+  // ═══════════════════════════════════════════════════════════════
+  // Output methods with colors
+  // ═══════════════════════════════════════════════════════════════
+  void _printHeader(bool dryRun) {
+    final border = '═' * 60;
+    print(_blue(border));
+    print(_blueBold('🌍 L10n Sync Tool${dryRun ? ' (DRY RUN)' : ''}'));
+    print(_blue(border));
+    print('');
+  }
+
+  void _printSummary(int added, int removed, int updated, bool dryRun) {
+    final border = '═' * 60;
+    print(_blue(border));
+    print(_greenBold('✅ Sync completed!'));
+    print('');
+    print('  Added:   ${_green('$added')} keys');
+    print('  Removed: ${_red('$removed')} keys');
+    print('  Updated: ${_yellow('$updated')} metadata');
+
+    if (dryRun) {
+      print('');
+      print(_yellowBold('⚠️  DRY RUN: No files were modified'));
+    }
+    print(_blue(border));
+  }
+
+  void _info(String message) => print(_blue('ℹ️  $message'));
+  void _warning(String message) => print(_yellow('⚠️  $message'));
+  void _error(String message) => print(_redBold('❌ $message'));
 }
 
 class SyncResult {

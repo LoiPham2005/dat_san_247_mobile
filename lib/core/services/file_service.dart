@@ -2,10 +2,11 @@
 // 📁 lib/core/services/file_service.dart (CHỈ FILE OPERATIONS)
 // ════════════════════════════════════════════════════════════════
 import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:open_filex/open_filex.dart';
+
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
+import 'package:dio/dio.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// File service for general file operations
 ///
@@ -32,8 +33,7 @@ class FileService {
     void Function(int received, int total)? onProgress,
   }) async {
     try {
-      final dir = await getDownloadsDirectory() ??
-                   await getApplicationDocumentsDirectory();
+      final dir = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
       final folder = Directory('${dir.path}/${folderName ?? "MyAppFiles"}');
 
       if (!await folder.exists()) {
@@ -42,11 +42,7 @@ class FileService {
 
       final filePath = '${folder.path}/${fileName ?? url.split('/').last}';
 
-      await _dio.download(
-        url,
-        filePath,
-        onReceiveProgress: onProgress,
-      );
+      await _dio.download(url, filePath, onReceiveProgress: onProgress);
 
       Logger.info('File downloaded: $filePath');
       return File(filePath);

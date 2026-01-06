@@ -6,7 +6,7 @@ linter:
     avoid_print: true
     avoid_relative_lib_imports: true
     avoid_types_as_parameter_names: true
-    
+
     # Style rules
     always_declare_return_types: true
     always_require_non_null_named_parameters: true
@@ -49,6 +49,7 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "bricks/**/__brick__/**"
   errors:
     invalid_annotation_target: ignore
     # avoid_print: ignore

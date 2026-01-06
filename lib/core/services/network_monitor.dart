@@ -78,7 +78,7 @@ class NetworkMonitor {
   ) {
     _isSnackBarShown = false;
     final connectionType = _getConnectionTypeName(results);
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -97,7 +97,7 @@ class NetworkMonitor {
 
   void _showDisconnectedSnackBar(BuildContext context) {
     _isSnackBarShown = true;
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -120,8 +120,8 @@ class NetworkMonitor {
   }
 
   bool _isConnected(List<ConnectivityResult> results) {
-    return results.isNotEmpty && 
-           !results.every((result) => result == ConnectivityResult.none);
+    return results.isNotEmpty &&
+        !results.every((result) => result == ConnectivityResult.none);
   }
 
   String _getConnectionTypeName(List<ConnectivityResult> results) {

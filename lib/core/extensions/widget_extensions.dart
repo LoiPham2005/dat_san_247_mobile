@@ -38,19 +38,30 @@ extension WidgetExtensions on Widget {
     double bottom = 0,
   }) {
     return Padding(
-      padding: EdgeInsets.only(left: left, top: top, right: right, bottom: bottom),
+      padding: EdgeInsets.only(
+        left: left,
+        top: top,
+        right: right,
+        bottom: bottom,
+      ),
       child: this,
     );
   }
 
   /// Horizontal padding
   Widget paddingHorizontal(double value) {
-    return Padding(padding: EdgeInsets.symmetric(horizontal: value), child: this);
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: value),
+      child: this,
+    );
   }
 
   /// Vertical padding
   Widget paddingVertical(double value) {
-    return Padding(padding: EdgeInsets.symmetric(vertical: value), child: this);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: value),
+      child: this,
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -83,7 +94,12 @@ extension WidgetExtensions on Widget {
     double bottom = 0,
   }) {
     return Container(
-      margin: EdgeInsets.only(left: left, top: top, right: right, bottom: bottom),
+      margin: EdgeInsets.only(
+        left: left,
+        top: top,
+        right: right,
+        bottom: bottom,
+      ),
       child: this,
     );
   }
@@ -101,11 +117,16 @@ extension WidgetExtensions on Widget {
   Widget alignTopLeft() => Align(alignment: Alignment.topLeft, child: this);
   Widget alignTopCenter() => Align(alignment: Alignment.topCenter, child: this);
   Widget alignTopRight() => Align(alignment: Alignment.topRight, child: this);
-  Widget alignCenterLeft() => Align(alignment: Alignment.centerLeft, child: this);
-  Widget alignCenterRight() => Align(alignment: Alignment.centerRight, child: this);
-  Widget alignBottomLeft() => Align(alignment: Alignment.bottomLeft, child: this);
-  Widget alignBottomCenter() => Align(alignment: Alignment.bottomCenter, child: this);
-  Widget alignBottomRight() => Align(alignment: Alignment.bottomRight, child: this);
+  Widget alignCenterLeft() =>
+      Align(alignment: Alignment.centerLeft, child: this);
+  Widget alignCenterRight() =>
+      Align(alignment: Alignment.centerRight, child: this);
+  Widget alignBottomLeft() =>
+      Align(alignment: Alignment.bottomLeft, child: this);
+  Widget alignBottomCenter() =>
+      Align(alignment: Alignment.bottomCenter, child: this);
+  Widget alignBottomRight() =>
+      Align(alignment: Alignment.bottomRight, child: this);
 
   // ═══════════════════════════════════════════════════════════════
   // FLEX
@@ -135,7 +156,8 @@ extension WidgetExtensions on Widget {
   Widget withHeight(double height) => SizedBox(height: height, child: this);
 
   /// Square size
-  Widget square(double size) => SizedBox(width: size, height: size, child: this);
+  Widget square(double size) =>
+      SizedBox(width: size, height: size, child: this);
 
   // ═══════════════════════════════════════════════════════════════
   // VISIBILITY & OPACITY
@@ -247,12 +269,19 @@ extension WidgetExtensions on Widget {
     required Decoration decoration,
     DecorationPosition position = DecorationPosition.background,
   }) {
-    return DecoratedBox(decoration: decoration, position: position, child: this);
+    return DecoratedBox(
+      decoration: decoration,
+      position: position,
+      child: this,
+    );
   }
 
   /// Background color
   Widget backgroundColor(Color color) {
-    return DecoratedBox(decoration: BoxDecoration(color: color), child: this);
+    return DecoratedBox(
+      decoration: BoxDecoration(color: color),
+      child: this,
+    );
   }
 
   /// Rounded corners

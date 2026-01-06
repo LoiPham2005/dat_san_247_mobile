@@ -1,7 +1,7 @@
 // lib/core/storage/secure_storage.dart
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dat_san_247_mobile/core/storage/storage_keys.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton()
@@ -39,9 +39,9 @@ class SecureStorage {
   Future<void> delete(String key) async {
     try {
       await _storage.delete(key: key);
-      Logger.debug('✅ Secure delete: $key');
+      Logger.debug('Secure delete: $key');
     } catch (e) {
-      Logger.error('❌ Secure delete error: $key', error: e);
+      Logger.error('Secure delete error: $key', error: e);
       rethrow;
     }
   }
@@ -50,9 +50,9 @@ class SecureStorage {
   Future<void> deleteAll() async {
     try {
       await _storage.deleteAll();
-      Logger.debug('✅ Secure deleteAll completed');
+      Logger.debug('Secure deleteAll completed');
     } catch (e) {
-      Logger.error('❌ Secure deleteAll error', error: e);
+      Logger.error('Secure deleteAll error', error: e);
       rethrow;
     }
   }
@@ -62,7 +62,7 @@ class SecureStorage {
     try {
       return await _storage.containsKey(key: key);
     } catch (e) {
-      Logger.error('❌ Secure containsKey error: $key', error: e);
+      Logger.error('Secure containsKey error: $key', error: e);
       return false;
     }
   }
@@ -72,7 +72,7 @@ class SecureStorage {
     try {
       return await _storage.readAll();
     } catch (e) {
-      Logger.error('❌ Secure readAll error', error: e);
+      Logger.error('Secure readAll error', error: e);
       return {};
     }
   }
@@ -200,7 +200,7 @@ class SecureStorage {
       await disableBiometric();
       Logger.success('🔐 All sensitive data cleared');
     } catch (e) {
-      Logger.error('❌ Failed to clear all sensitive data', error: e);
+      Logger.error('Failed to clear all sensitive data', error: e);
       rethrow;
     }
   }

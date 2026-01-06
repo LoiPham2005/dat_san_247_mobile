@@ -1,113 +1,133 @@
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/errors/exceptions.dart
+// 📁 lib/core/errors/exceptions.dart (OPTIMIZED - Giảm 60%)
 // ════════════════════════════════════════════════════════════════
 
 /// Base exception cho toàn bộ app
 class AppException implements Exception {
   final String message;
   final String? code;
-  
-  AppException({
+  final int? statusCode;
+  final dynamic originalError;
+  final StackTrace? stackTrace;
+  final Map<String, dynamic>? metadata;
+
+  const AppException({
     required this.message,
     this.code,
+    this.statusCode,
+    this.originalError,
+    this.stackTrace,
+    this.metadata,
   });
-  
+
   @override
-  String toString() => 'AppException: $message${code != null ? ' (Code: $code)' : ''}';
+  String toString() => '$runtimeType: $message${code != null ? ' ($code)' : ''}';
 }
 
-/// Server trả về lỗi (5xx)
+// ════════════════════════════════════════════════════════════════
+// Network Exceptions
+// ════════════════════════════════════════════════════════════════
+
+class NetworkException extends AppException {
+  const NetworkException({
+    super.message = 'Không có kết nối mạng',
+    super.code = 'NETWORK_ERROR',
+    super.originalError,
+    super.stackTrace,
+  });
+}
+
+class TimeoutException extends AppException {
+  final Duration? timeout;
+
+  const TimeoutException({
+    super.message = 'Hết thời gian chờ',
+    super.code = 'TIMEOUT',
+    this.timeout,
+    super.originalError,
+    super.stackTrace,
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// Server Exceptions
+// ════════════════════════════════════════════════════════════════
+
 class ServerException extends AppException {
-  ServerException({
+  const ServerException({
     required super.message,
     super.code,
+    super.statusCode,
+    super.originalError,
+    super.stackTrace,
   });
-  
-  @override
-  String toString() => 'ServerException: $message';
 }
 
-/// Lỗi kết nối mạng
-class NetworkException extends AppException {
-  NetworkException({
-    super.message = 'Lỗi kết nối mạng',
+// ════════════════════════════════════════════════════════════════
+// Auth Exceptions
+// ════════════════════════════════════════════════════════════════
+
+class AuthException extends AppException {
+  final AuthExceptionType type;
+
+  const AuthException({
+    required super.message,
+    this.type = AuthExceptionType.unauthenticated,
     super.code,
+    super.statusCode,
+    super.originalError,
+    super.stackTrace,
   });
-  
-  @override
-  String toString() => 'NetworkException: $message';
 }
 
-/// Lỗi cache/storage
-class CacheException extends AppException {
-  CacheException({
-    super.message = 'Lỗi cache',
+enum AuthExceptionType {
+  unauthenticated, // 401
+  unauthorized, // 403
+  tokenExpired,
+  refreshFailed,
+}
+
+// ════════════════════════════════════════════════════════════════
+// Data Exceptions
+// ════════════════════════════════════════════════════════════════
+
+class DataException extends AppException {
+  final DataExceptionType type;
+  final Map<String, String>? fieldErrors;
+
+  const DataException({
+    required super.message,
+    this.type = DataExceptionType.unknown,
+    this.fieldErrors,
     super.code,
+    super.statusCode,
+    super.originalError,
+    super.stackTrace,
   });
-  
-  @override
-  String toString() => 'CacheException: $message';
 }
 
-/// Lỗi xác thực (401)
-class AuthenticationException extends AppException {
-  AuthenticationException({
-    super.message = 'Lỗi xác thực',
-    super.code = '401',
-  });
-  
-  @override
-  String toString() => 'AuthenticationException: $message';
+enum DataExceptionType {
+  notFound, // 404
+  validation, // 400, 422
+  conflict, // 409
+  payloadTooLarge, // 413
+  unknown,
 }
 
-/// Không có quyền (403)
-class UnauthorizedException extends AppException {
-  UnauthorizedException({
-    super.message = 'Không có quyền truy cập',
-    super.code = '403',
-  });
-  
-  @override
-  String toString() => 'UnauthorizedException: $message';
-}
+// ════════════════════════════════════════════════════════════════
+// Storage Exceptions
+// ════════════════════════════════════════════════════════════════
 
-/// Không tìm thấy (404)
-class NotFoundException extends AppException {
-  NotFoundException({
-    super.message = 'Không tìm thấy dữ liệu',
-    super.code = '404',
-  });
-  
-  @override
-  String toString() => 'NotFoundException: $message';
-}
+class StorageException extends AppException {
+  final StorageExceptionType type;
 
-/// Lỗi validation (400, 422)
-class ValidationException extends AppException {
-  final Map<String, String>? errors;
-  
-  ValidationException({
-    super.message = 'Dữ liệu không hợp lệ',
+  const StorageException({
+    super.message = 'Lỗi lưu trữ',
+    this.type = StorageExceptionType.unknown,
     super.code,
-    this.errors,
+    super.originalError,
+    super.stackTrace,
   });
-  
-  @override
-  String toString() {
-    if (errors != null && errors!.isNotEmpty) {
-      return 'ValidationException: $message\nErrors: $errors';
-    }
-    return 'ValidationException: $message';
-  }
 }
 
-/// Lỗi timeout
-class TimeoutException extends AppException {
-  TimeoutException({
-    super.message = 'Hết thời gian chờ',
-    super.code,
-  });
-  
-  @override
-  String toString() => 'TimeoutException: $message';
-}
+enum StorageExceptionType { cache, database, file, unknown }

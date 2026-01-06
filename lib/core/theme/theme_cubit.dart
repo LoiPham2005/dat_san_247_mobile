@@ -25,11 +25,15 @@ class ThemeCubit extends Cubit<ThemeState> {
     try {
       // Load color type
       final savedColor = _storageService.getThemeColor();
-      final colorType = savedColor != null ? _parseThemeColor(savedColor) : ThemeColorType.blue;
+      final colorType = savedColor != null
+          ? _parseThemeColor(savedColor)
+          : ThemeColorType.green;
 
       // Load theme mode
       final savedMode = _storageService.getThemeMode();
-      final themeMode = savedMode != null ? _parseThemeMode(savedMode) : AppThemeMode.light;
+      final themeMode = savedMode != null
+          ? _parseThemeMode(savedMode)
+          : AppThemeMode.light;
 
       emit(state.copyWith(colorType: colorType, themeMode: themeMode));
     } catch (e) {

@@ -5,7 +5,11 @@
       "id": "buildEnv",
       "type": "pickString",
       "description": "Chọn environment",
-      "options": ["dev", "stg", "prod"],
+      "options": [
+        "dev",
+        "stg",
+        "prod"
+      ],
       "default": "dev"
     }
   ],
@@ -60,7 +64,6 @@
         "clear": true
       }
     },
-
     // ═══════════════════════════════════════════════════════════
     // 🎯 UNIVERSAL BUILD - iOS
     // ═══════════════════════════════════════════════════════════
@@ -106,7 +109,6 @@
         "clear": true
       }
     },
-
     // ═══════════════════════════════════════════════════════════
     // 🏗️ QUICK BUILDS - DEV
     // ═══════════════════════════════════════════════════════════
@@ -140,7 +142,6 @@
       "group": "build",
       "problemMatcher": []
     },
-
     // ═══════════════════════════════════════════════════════════
     // 🏗️ QUICK BUILDS - STAGING
     // ═══════════════════════════════════════════════════════════
@@ -176,7 +177,6 @@
       "group": "build",
       "problemMatcher": []
     },
-
     // ═══════════════════════════════════════════════════════════
     // 🏗️ QUICK BUILDS - PRODUCTION
     // ═══════════════════════════════════════════════════════════
@@ -216,7 +216,6 @@
       "group": "build",
       "problemMatcher": []
     },
-
     // ═══════════════════════════════════════════════════════════
     // 🧩 CODE GENERATION
     // ═══════════════════════════════════════════════════════════
@@ -270,11 +269,27 @@
       "label": "🌐 Generate l10n",
       "type": "shell",
       "command": "flutter",
-      "args": ["gen-l10n"],
+      "args": [
+        "gen-l10n"
+      ],
       "group": "build",
       "problemMatcher": []
     },
-
+    {
+      "label": "🌐 Sync l10n (arb)",
+      "type": "shell",
+      "command": "dart",
+      "args": [
+        "run",
+        "lib/core/l10n/tool/l10n_sync.dart"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
     // ═══════════════════════════════════════════════════════════
     // 🧹 MAINTENANCE
     // ═══════════════════════════════════════════════════════════
@@ -293,7 +308,10 @@
       "label": "📦 Pub Get",
       "type": "shell",
       "command": "flutter",
-      "args": ["pub", "get"],
+      "args": [
+        "pub",
+        "get"
+      ],
       "group": "build",
       "problemMatcher": []
     },
@@ -301,7 +319,10 @@
       "label": "⬆️ Pub Upgrade",
       "type": "shell",
       "command": "flutter",
-      "args": ["pub", "upgrade"],
+      "args": [
+        "pub",
+        "upgrade"
+      ],
       "group": "build",
       "problemMatcher": []
     },
@@ -309,11 +330,13 @@
       "label": "🔍 Pub Outdated",
       "type": "shell",
       "command": "flutter",
-      "args": ["pub", "outdated"],
+      "args": [
+        "pub",
+        "outdated"
+      ],
       "group": "build",
       "problemMatcher": []
     },
-
     // ═══════════════════════════════════════════════════════════
     // 🔧 FLUTTER COMMANDS
     // ═══════════════════════════════════════════════════════════
@@ -321,7 +344,10 @@
       "label": "🔧 Flutter Doctor",
       "type": "shell",
       "command": "flutter",
-      "args": ["doctor", "-v"],
+      "args": [
+        "doctor",
+        "-v"
+      ],
       "group": "build",
       "problemMatcher": []
     },
@@ -329,7 +355,9 @@
       "label": "📊 Flutter Analyze",
       "type": "shell",
       "command": "flutter",
-      "args": ["analyze"],
+      "args": [
+        "analyze"
+      ],
       "group": "build",
       "problemMatcher": []
     },
@@ -337,11 +365,13 @@
       "label": "✨ Dart Format",
       "type": "shell",
       "command": "dart",
-      "args": ["format", "."],
+      "args": [
+        "format",
+        "."
+      ],
       "group": "build",
       "problemMatcher": []
     },
-
     // ═══════════════════════════════════════════════════════════
     // 🎯 DEBUG RUNS (with hot reload)
     // ═══════════════════════════════════════════════════════════
@@ -389,6 +419,19 @@
       "group": "build",
       "problemMatcher": [],
       "isBackground": true
+    },
+    {
+      "label": "🧱 Mason: Generate Feature",
+      "type": "shell",
+      "command": "mason",
+      "args": [
+        "make",
+        "feature",
+        "--on-conflict",
+        "overwrite"
+      ],
+      "problemMatcher": [],
+      "group": "build"
     }
   ]
 }

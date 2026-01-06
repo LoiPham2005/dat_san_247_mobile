@@ -1,0 +1,89 @@
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/network/api_client.dart';
+import 'package:injectable/injectable.dart';
+import '../../../../core/constants/api_constants.dart';
+import '../models/{{feature_name.snakeCase()}}_model.dart';
+
+abstract class {{feature_name.pascalCase()}}void RemoteDataSource {
+  {{#has_list}}
+  Future<Result<List<{{feature_name.pascalCase()}}Model>>> get{{feature_name.pascalCase()}}s({
+    Map<String, dynamic>? params,
+  });
+  {{/has_list}}
+  {{#has_detail}}
+  Future<Result<{{feature_name.pascalCase()}}Model>> get{{feature_name.pascalCase()}}Detail(String id);
+  {{/has_detail}}
+  {{#has_create}}
+  Future<Result<{{feature_name.pascalCase()}}Model>> create{{feature_name.pascalCase()}}(Map<String, dynamic> data);
+  {{/has_create}}
+  {{#has_update}}
+  Future<Result<{{feature_name.pascalCase()}}Model>> update{{feature_name.pascalCase()}}(
+    String id,
+    Map<String, dynamic> data,
+  );
+  {{/has_update}}
+  {{#has_delete}}
+  Future<Result<bool>> delete{{feature_name.pascalCase()}}(String id);
+  {{/has_delete}}
+}
+
+@LazySingleton(as: {{feature_name.pascalCase()}}RemoteDataSource)
+class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_name.pascalCase()}}void RemoteDataSource {
+  {{feature_name.pascalCase()}}RemoteDataSourceImpl(this._apiClient);
+  final ApiClient apiClient;
+
+  {{#has_list}}
+  @override
+  Future<Result<List<{{feature_name.pascalCase()}}Model>>> get{{feature_name.pascalCase()}}Future<Future<Result>> s({
+    Map<String, dynamic>? params,
+  }) async {
+    return apiClient.get(
+      ApiConstants.apiEndpoints,
+      (json) => json.map((e) => {{feature_name.pascalCase()}}Model.fromJson(e)).toList(),
+      queryParameters: params,
+    );
+  }
+  {{/has_list}}
+
+  {{#has_detail}}
+  @override
+  Future<Result<{{feature_name.pascalCase()}}Model>> get{{feature_name.pascalCase()}}Future<Result<Set<Set<dynamic>>>> Detail(String id) {
+    return apiClient.get(
+      '${ApiConstants.apiEndpoints}/$id',
+      (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
+    );
+  }
+  {{/has_detail}}
+
+  {{#has_create}}
+  @override
+  Future<Result<{{feature_name.pascalCase()}}Model>> create{{feature_name.pascalCase()}}(Map<String, dynamic> data) {
+    return apiClient.post(
+      ApiConstants.apiEndpoints,
+      (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
+      data: data,
+    );
+  }
+  {{/has_create}}
+
+  {{#has_update}}
+  @override
+  Future<Result<{{feature_name.pascalCase()}}Model>> update{{feature_name.pascalCase()}}(
+    String id,
+    Map<String, dynamic> data,
+  ) {
+    return apiClient.put(
+      '${ApiConstants.apiEndpoints}/$id',
+      (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
+      data: data,
+    );
+  }
+  {{/has_update}}
+
+  {{#has_delete}}
+  @override
+  Future<Result<bool>> delete{{feature_name.pascalCase()}}(String id) {
+    return apiClient.delete('${ApiConstants.apiEndpoints}/$id');
+  }
+  {{/has_delete}}
+}

@@ -30,6 +30,7 @@ import 'package:dat_san_247_mobile/core/services/auth_service.dart' as _i455;
 import 'package:dat_san_247_mobile/core/services/cache_service.dart' as _i412;
 import 'package:dat_san_247_mobile/core/services/navigation_service.dart'
     as _i724;
+import 'package:dat_san_247_mobile/core/services/toast_service.dart' as _i248;
 import 'package:dat_san_247_mobile/core/storage/secure_storage.dart' as _i47;
 import 'package:dat_san_247_mobile/core/storage/storage_service.dart' as _i926;
 import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart' as _i711;
@@ -91,6 +92,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i863.AppRouter>(() => _i863.AppRouter());
     gh.lazySingleton<_i412.CacheService>(() => _i412.CacheService());
     gh.lazySingleton<_i724.NavigationService>(() => _i724.NavigationService());
+    gh.lazySingleton<_i248.ToastService>(() => _i248.ToastService());
     gh.lazySingleton<_i926.StorageService>(
       () => _i926.StorageService(gh<_i460.SharedPreferences>()),
     );
@@ -108,12 +110,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i711.ThemeCubit>(
       () => _i711.ThemeCubit(gh<_i926.StorageService>()),
-    );
-    gh.lazySingleton<_i455.AuthService>(
-      () => _i455.AuthService(
-        gh<_i926.StorageService>(),
-        gh<_i47.SecureStorage>(),
-      ),
     );
     gh.lazySingleton<_i297.DioClient>(
       () => _i297.DioClient(
@@ -152,6 +148,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i565.ResetPasswordUseCase>(
       () => _i565.ResetPasswordUseCase(gh<_i376.AuthRepository>()),
+    );
+    gh.lazySingleton<_i455.AuthService>(
+      () => _i455.AuthService(
+        gh<_i47.SecureStorage>(),
+        gh<_i926.StorageService>(),
+        gh<_i649.ApiClient>(),
+      ),
     );
     gh.lazySingleton<_i983.SportCategoryRepository>(
       () => _i288.SportCategoryRepositoryImpl(

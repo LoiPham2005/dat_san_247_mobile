@@ -28,7 +28,7 @@ extension IntExtensions on int {
 
     final result = <int>[];
     var current = this;
-    
+
     if (step > 0) {
       while (current <= end) {
         result.add(current);
@@ -69,7 +69,9 @@ extension DoubleExtensions on double {
 
   // Currency with decimals
   String toCurrency({String symbol = '₫', int decimals = 0}) {
-    final formatter = NumberFormat('#,###${decimals > 0 ? '.${"#" * decimals}' : ''}');
+    final formatter = NumberFormat(
+      '#,###${decimals > 0 ? '.${"#" * decimals}' : ''}',
+    );
     return '${formatter.format(this)}$symbol';
   }
 
@@ -87,21 +89,23 @@ extension NumExtensions on num {
 
   // Padding helpers
   EdgeInsets get paddingAll => EdgeInsets.all(toDouble());
-  
+
   // BorderRadius helpers
   BorderRadius get radius => BorderRadius.circular(toDouble());
   Radius get circularRadius => Radius.circular(toDouble());
 
   // Universal currency formatter
   String formatCurrency({String symbol = '₫', int decimals = 0}) {
-    return this is int 
-      ? (this as int).toCurrency(symbol: symbol)
-      : (this as double).toCurrency(symbol: symbol, decimals: decimals);
+    return this is int
+        ? (this as int).toCurrency(symbol: symbol)
+        : (this as double).toCurrency(symbol: symbol, decimals: decimals);
   }
 
   // Universal number formatter
   String formatNumber({int decimals = 0}) {
-    final formatter = NumberFormat('#,###${decimals > 0 ? '.${"#" * decimals}' : ''}');
+    final formatter = NumberFormat(
+      '#,###${decimals > 0 ? '.${"#" * decimals}' : ''}',
+    );
     return formatter.format(this);
   }
 }

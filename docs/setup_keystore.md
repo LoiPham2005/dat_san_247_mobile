@@ -38,34 +38,34 @@ android {
         multiDexEnabled = true
     }
 
-//  signingConfigs {
-//      create("release") {
-//          keyAlias = keystoreProperties["keyAlias"] as String
-//          keyPassword = keystoreProperties["keyPassword"] as String
-//         storeFile = file(keystoreProperties["storeFile"] as String)
-//         storePassword = keystoreProperties["storePassword"] as String
-//      }
-//  }
+ //  signingConfigs {
+ //      create("release") {
+ //          keyAlias = keystoreProperties["keyAlias"] as String
+ //          keyPassword = keystoreProperties["keyPassword"] as String
+ //         storeFile = file(keystoreProperties["storeFile"] as String)
+ //         storePassword = keystoreProperties["storePassword"] as String
+ //      }
+ //  }
 
-//     flavorDimensions += "environment"
-//     productFlavors {
-//         create("development") {
-//             dimension = "environment"
-//             applicationIdSuffix = ".dev"
-//             versionNameSuffix = "-dev"
-//             resValue("string", "app_name", "Base App Dev")
-//         }
-//         create("staging") {
-//             dimension = "environment"
-//             applicationIdSuffix = ".stg"
-//             versionNameSuffix = "-stg"
-//             resValue("string", "app_name", "Base App Stg")
-//         }
-//         create("production") {
-//             dimension = "environment"
-//             resValue("string", "app_name", "Base App")
-//         }
-//     }
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "Base App Dev")
+        }
+        create("stg") {
+            dimension = "environment"
+            applicationIdSuffix = ".stg"
+            versionNameSuffix = "-stg"
+            resValue("string", "app_name", "Base App Stg")
+        }
+        create("prod") {
+            dimension = "environment"
+            resValue("string", "app_name", "Base App")
+        }
+    }
 
     buildTypes {
         debug {
@@ -113,5 +113,3 @@ dependencies {
 flutter {
     source = "../.."
 }
-
-

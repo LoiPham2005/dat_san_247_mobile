@@ -10,7 +10,7 @@ class DeviceInfo {
   DeviceInfo._();
 
   static final _plugin = DeviceInfoPlugin();
-  
+
   // Cache
   static Map<String, dynamic>? _cachedInfo;
   static String? _cachedDeviceId;
@@ -25,7 +25,7 @@ class DeviceInfo {
   static bool get isWindows => Platform.isWindows;
   static bool get isLinux => Platform.isLinux;
   static bool get isWeb => kIsWeb;
-  
+
   static bool get isMobile => isAndroid || isIOS;
   static bool get isDesktop => isMacOS || isWindows || isLinux;
 
@@ -114,13 +114,13 @@ class DeviceInfo {
     if (_cachedDeviceId != null) return _cachedDeviceId;
 
     final info = await getInfo();
-    
+
     if (isAndroid) {
       _cachedDeviceId = info['androidId'] as String?;
     } else if (isIOS) {
       _cachedDeviceId = info['identifierForVendor'] as String?;
     }
-    
+
     return _cachedDeviceId;
   }
 
@@ -139,12 +139,12 @@ class DeviceInfo {
   static Future<String> getInfoString() async {
     final info = await getInfo();
     final buffer = StringBuffer();
-    
+
     buffer.writeln('Device Information:');
     info.forEach((key, value) {
       buffer.writeln('  $key: $value');
     });
-    
+
     return buffer.toString();
   }
 

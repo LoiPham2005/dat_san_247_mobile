@@ -10,8 +10,9 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     // Darwin = iOS + macOS
     const DarwinInitializationSettings darwinSettings = DarwinInitializationSettings();
@@ -27,11 +28,11 @@ class NotificationService {
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         // Xử lý click notification
         final payload = response.payload;
-      if (payload != null) {
-        Logger.info('🔔 Notification clicked: $payload');
-      } else {
-        Logger.debug('Notification clicked with no payload');
-      }
+        if (payload != null) {
+          Logger.info('🔔 Notification clicked: $payload');
+        } else {
+          Logger.debug('Notification clicked with no payload');
+        }
       },
     );
   }
@@ -58,12 +59,6 @@ class NotificationService {
       macOS: darwinDetails,
     );
 
-    await _flutterLocalNotificationsPlugin.show(
-      id,
-      title,
-      body,
-      platformDetails,
-      payload: payload,
-    );
+    await _flutterLocalNotificationsPlugin.show(id, title, body, platformDetails, payload: payload);
   }
 }

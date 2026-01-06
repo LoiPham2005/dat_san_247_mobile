@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/theme/theme_state.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dat_san_247_mobile/core/theme/app_theme.dart';
 import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
+import 'package:dat_san_247_mobile/core/theme/theme_state.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemePicker extends StatelessWidget {
   const ThemePicker({super.key});
@@ -21,10 +21,7 @@ class ThemePicker extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // ✅ Color Selection
-                Text(
-                  'Màu sắc',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text('Màu sắc', style: Theme.of(context).textTheme.titleMedium),
                 SizedBox(height: 12.h),
                 GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -49,10 +46,7 @@ class ThemePicker extends StatelessWidget {
                 SizedBox(height: 24.h),
 
                 // ✅ Mode Selection (Light/Dark/System)
-                Text(
-                  'Chế độ',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text('Chế độ', style: Theme.of(context).textTheme.titleMedium),
                 SizedBox(height: 12.h),
                 Row(
                   children: [
@@ -90,12 +84,7 @@ class ThemePicker extends StatelessWidget {
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Đóng'),
-            ),
-          ],
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Đóng'))],
         );
       },
     );
@@ -108,11 +97,7 @@ class _ThemeColorButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _ThemeColorButton({
-    required this.themeType,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const _ThemeColorButton({required this.themeType, required this.isSelected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -129,10 +114,7 @@ class _ThemeColorButton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              AppTheme.themeIcons[themeType],
-              size: 24.sp,
-            ),
+            Icon(AppTheme.themeIcons[themeType], size: 24.sp),
             SizedBox(height: 4.h),
             Text(
               themeType.name.toUpperCase(),

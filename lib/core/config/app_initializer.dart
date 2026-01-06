@@ -1,9 +1,7 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/config/app_initializer.dart (TỐI ƯU LOGGER)
 // ════════════════════════════════════════════════════════════════
-import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:dat_san_247_mobile/core/ads/services/ad_manager.dart';
 import 'package:dat_san_247_mobile/core/cache/app_cache_manager.dart';
 import 'package:dat_san_247_mobile/core/cache/cache_config.dart';
 import 'package:dat_san_247_mobile/core/config/app_bloc_observer.dart';
@@ -14,6 +12,9 @@ import 'package:dat_san_247_mobile/core/l10n/localization_service.dart';
 import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:dat_san_247_mobile/core/utils/logger_config.dart';
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,10 +28,16 @@ class AppInitializer {
 
   /// ✅ Entry point: Khởi tạo app
   static Future<void> initialize() async {
-    if (_isInitialized) return;
+    if (_isInitialized) {
+      Logger.warning('App already initialized, skipping...', tag: 'INIT');
+      return;
+    }
 
     try {
       final stopwatch = Stopwatch()..start();
+
+      // Initialize Firebase
+      // await Firebase.initializeApp();
 
       // Phase 1: Config & Setup
       EnvironmentConfig.printInfo();
@@ -42,11 +49,14 @@ class AppInitializer {
       // Phase 2: Cache & Storage
       await _configureHiveAndCache();
 
-      // Phase 3: DI
+      // Phase 3: DI (DI PHẢI TRƯỚC Ads)
       await configureDependencies();
 
       // Phase 4: Managers & Services
-      await _initializeCacheManager(); // ✅ NEW!
+      // final adManager = await getIt.getAsync<AdManager>();
+      // await adManager.initialize();
+
+      await _initializeCacheManager();
       await _initializeServices();
 
       stopwatch.stop();
@@ -55,6 +65,7 @@ class AppInitializer {
       Logger.success('App initialized in ${stopwatch.elapsedMilliseconds}ms', tag: 'INIT');
     } catch (e, stackTrace) {
       Logger.error('Failed to initialize app', error: e, stackTrace: stackTrace, tag: 'INIT');
+      _isInitialized = false;
       await _handleInitializationError();
       rethrow;
     }

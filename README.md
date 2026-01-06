@@ -37,7 +37,7 @@
 ```bash
 # 1. Clone & install
 git clone <your-repo-url>
-cd flutter_base_template
+cd dat_san_247_mobile
 flutter pub get
 
 # 2. Generate code

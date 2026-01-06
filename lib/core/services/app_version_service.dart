@@ -45,11 +45,14 @@ class AppVersionService {
 
   Future<String?> _getLatestAndroidVersion() async {
     try {
-      const url = 'https://play.google.com/store/apps/details?id=$androidPackageName&hl=vi';
+      const url =
+          'https://play.google.com/store/apps/details?id=$androidPackageName&hl=vi';
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode == 200) {
-        final match = RegExp(r'\[\[\["([0-9.]+)"\]\]').firstMatch(response.body);
+        final match = RegExp(
+          r'\[\[\["([0-9.]+)"\]\]',
+        ).firstMatch(response.body);
         return match?.group(1);
       }
     } catch (e) {
@@ -62,7 +65,7 @@ class AppVersionService {
     try {
       const url = 'https://itunes.apple.com/lookup?id=$iosAppId&country=vn';
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['resultCount'] > 0) {
@@ -79,28 +82,31 @@ class AppVersionService {
   bool isUpdateAvailable(String current, String store) {
     final currentParts = current.split('.').map(int.parse).toList();
     final storeParts = store.split('.').map(int.parse).toList();
-    
-    final maxLength = currentParts.length > storeParts.length 
-        ? currentParts.length 
+
+    final maxLength = currentParts.length > storeParts.length
+        ? currentParts.length
         : storeParts.length;
-    
+
     for (int i = 0; i < maxLength; i++) {
       final curr = i < currentParts.length ? currentParts[i] : 0;
       final stor = i < storeParts.length ? storeParts[i] : 0;
-      
+
       if (stor > curr) return true;
       if (stor < curr) return false;
     }
-    
+
     return false;
   }
 
   /// Check for update and show dialog
-  Future<void> checkForUpdate(BuildContext context, {bool showNoUpdateDialog = false}) async {
+  Future<void> checkForUpdate(
+    BuildContext context, {
+    bool showNoUpdateDialog = false,
+  }) async {
     try {
       final current = await getCurrentVersion();
       final latest = await getLatestVersion();
-      
+
       if (latest != null && isUpdateAvailable(current, latest)) {
         if (context.mounted) {
           _showUpdateDialog(context, current, latest);
@@ -162,7 +168,7 @@ class AppVersionService {
     final url = Platform.isAndroid
         ? 'https://play.google.com/store/apps/details?id=$androidPackageName'
         : 'https://apps.apple.com/app/id$iosAppId';
-    
+
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);

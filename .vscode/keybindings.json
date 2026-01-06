@@ -173,6 +173,12 @@
     "command": "workbench.action.tasks.runTask",
     "args": "🐛 Run Debug (Prod)",
     "when": "editorTextFocus"
+  },
+    {
+    "key": "ctrl+alt+s",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 Sync l10n (arb)",
+    "when": "editorTextFocus"
   }
 
   // ═══════════════════════════════════════════════════════════

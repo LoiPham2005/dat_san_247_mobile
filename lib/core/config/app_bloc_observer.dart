@@ -6,7 +6,7 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
-    if (LogConfig.enableBlocLogs && event != null) {
+    if (event != null) {
       Logger.blocEvent(bloc.runtimeType.toString(), event);
     }
   }
@@ -14,9 +14,7 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    if (LogConfig.enableBlocLogs) {
-      Logger.blocState(bloc.runtimeType.toString(), change.currentState, change.nextState);
-    }
+    Logger.blocState(bloc.runtimeType.toString(), change.currentState, change.nextState);
   }
 
   @override

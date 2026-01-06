@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/storage/storage_keys.dart';
 import 'package:dat_san_247_mobile/core/storage/storage_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -10,11 +10,7 @@ class LocaleCubit extends Cubit<Locale> {
 
   final StorageService _storageService;
 
-  static const supportedLanguages = {
-    'vi': 'Tiếng Việt',
-    'en': 'English',
-    'ja': '日本語',
-  };
+  static const supportedLanguages = {'vi': 'Tiếng Việt', 'en': 'English', 'ja': '日本語'};
 
   Future<void> initLocale() async {
     final savedLocale = _storageService.get<String>(StorageKeys.languageCode);

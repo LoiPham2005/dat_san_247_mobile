@@ -17,6 +17,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/SprotHub_Logo.svg
   String get sprotHubLogo => 'assets/icons/SprotHub_Logo.svg';
 
+  /// File path: assets/icons/copy.svg
+  String get copy => 'assets/icons/copy.svg';
+
   /// File path: assets/icons/dev.png
   AssetGenImage get dev => const AssetGenImage('assets/icons/dev.png');
 
@@ -31,7 +34,14 @@ class $AssetsIconsGen {
   AssetGenImage get stg => const AssetGenImage('assets/icons/stg.png');
 
   /// List of all assets
-  List<dynamic> get values => [sprotHubLogo, dev, placeholder2, prod, stg];
+  List<dynamic> get values => [
+    sprotHubLogo,
+    copy,
+    dev,
+    placeholder2,
+    prod,
+    stg,
+  ];
 }
 
 class $AssetsImagesGen {

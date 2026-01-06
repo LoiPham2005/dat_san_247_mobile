@@ -1,11 +1,60 @@
+// // lib/core/constants/api_constants.dart
+// class ApiConstants {
+//   ApiConstants._();
+
+//   // domain
+//   static const String domainDev = 'http://192.168.2.4:3000';
+//   static const String domainStg = 'http://192.168.2.7:3000';
+//   static const String domainProd = 'http://192.168.2.7:3000';
+
+//   // Base URLs
+//   static const String baseUrlDev = '$domainDev/api';
+//   static const String baseUrlStg = '$domainStg/api';
+//   static const String baseUrlProd = '$domainProd/api';
+
+//   // test
+//   static const String apiEndpoints = '/apiEndpoints';
+
+//   // Endpoints
+//   static const String login = '/auth/login';
+//   static const String register = '/auth/register';
+//   static const String refreshToken = '/auth/refresh-token';
+//   static const String forgotPassword = '/auth/forgot-password';
+//   static const String resetPassword = '/auth/reset-password';
+//   static const String profile = '/user/profile';
+//   static const String logout = '/auth/logout';
+
+//   static const String products = '/products';
+//   static const String categories = '/categories';
+
+//   // 🔓 Danh sách các API public (không cần xác thực)
+//   static const List<String> publicEndpoints = [
+//     login,
+//     register,
+//     refreshToken,
+//     forgotPassword,
+//     resetPassword,
+//   ];
+// }
+
+
+
 // lib/core/constants/api_constants.dart
 class ApiConstants {
   ApiConstants._();
 
+  // domain
+  static const String domainDev = 'http://192.168.2.4:3000';
+  static const String domainStg = 'http://192.168.2.7:3000';
+  static const String domainProd = 'http://192.168.2.7:3000';
+
   // Base URLs
-  // static const String baseUrlDev = 'http://192.168.60.102:3000/api';
-  // static const String baseUrlStaging = 'http://192.168.60.103:3000/api';
-  // static const String baseUrlProd = 'http://192.168.60.103:3000/api';
+  static const String baseUrlDev = '$domainDev/api';
+  static const String baseUrlStg = '$domainStg/api';
+  static const String baseUrlProd = '$domainProd/api';
+
+  // test
+  static const String apiEndpoints = '/apiEndpoints';
 
 
   // Endpoints

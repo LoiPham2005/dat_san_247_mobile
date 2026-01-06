@@ -1,161 +1,187 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/services/auth_service.dart
 // ════════════════════════════════════════════════════════════════
-import 'package:dio/dio.dart';
-import 'package:dat_san_247_mobile/core/config/environment_config.dart';
-import 'package:dat_san_247_mobile/core/constants/api_constants.dart';
-import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'dart:async';
+
+import 'package:dat_san_247_mobile/core/network/api_client.dart';
 import 'package:dat_san_247_mobile/core/storage/secure_storage.dart';
 import 'package:dat_san_247_mobile/core/storage/storage_service.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:injectable/injectable.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
-@lazySingleton
+/// Auth state enum
+enum AuthStatus { unknown, authenticated, unauthenticated }
+
+/// ════════════════════════════════════════════════════════════════
+/// 📁 AuthService - Manages authentication state
+/// ════════════════════════════════════════════════════════════════
+@LazySingleton()
 class AuthService {
-  final StorageService _storageService;
   final SecureStorage _secureStorage;
+  final StorageService _storageService;
+  final ApiClient _apiClient;
 
-  AuthService(this._storageService, this._secureStorage);
+  AuthService(this._secureStorage, this._storageService, this._apiClient);
 
-  bool _isRefreshing = false;
+  // Stream để broadcast auth state changes
+  final _authStateController = StreamController<AuthStatus>.broadcast();
+  Stream<AuthStatus> get authStateStream => _authStateController.stream;
 
-  /// Kiểm tra và refresh token nếu cần
-  /// Returns: true nếu token còn hợp lệ hoặc refresh thành công
-  Future<bool> checkAndRefreshToken() async {
-    if (_isRefreshing) {
-      Logger.debug('🔄 Refresh đang diễn ra, bỏ qua request mới.');
+  AuthStatus _currentStatus = AuthStatus.unknown;
+  AuthStatus get currentStatus => _currentStatus;
+
+  // ═══════════════════════════════════════════════════════════════
+  // Token Management
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Check if user is logged in
+  Future<bool> isLoggedIn() async {
+    final token = await _secureStorage.getAccessToken();
+    if (token == null || token.isEmpty) {
+      _updateStatus(AuthStatus.unauthenticated);
       return false;
     }
 
-    // ✅ Lấy từ SecureStorage (encrypted)
-    final accessToken = await _secureStorage.getAccessToken();
-    final refreshTokenValue = await _secureStorage.getRefreshToken();
-
-    if (accessToken == null || refreshTokenValue == null) {
-      Logger.debug('🔑 Không có token, bỏ qua kiểm tra.');
-      return false;
-    }
-
-    try {
-      if (JwtDecoder.isExpired(refreshTokenValue)) {
-        Logger.error('⏰ Refresh token hết hạn → Đăng xuất.');
-        await logout();
+    // Check if token is expired
+    if (isTokenExpired(token)) {
+      // Try to refresh
+      final refreshed = await refreshToken();
+      if (!refreshed) {
+        _updateStatus(AuthStatus.unauthenticated);
         return false;
       }
+    }
 
-      if (!JwtDecoder.isExpired(accessToken)) {
-        Logger.debug('🔒 Access token vẫn hợp lệ.');
-        return true;
-      }
+    _updateStatus(AuthStatus.authenticated);
+    return true;
+  }
 
-      Logger.info('♻️ Access token hết hạn → Bắt đầu refresh...');
-      return await refreshToken();
-    } catch (e, stack) {
-      Logger.error('💥 Lỗi khi kiểm tra token', error: e, stackTrace: stack);
-      await logout();
-      return false;
+  /// Check if token is expired
+  bool isTokenExpired(String token) {
+    try {
+      return JwtDecoder.isExpired(token);
+    } catch (e) {
+      Logger.warning('Invalid JWT token', tag: 'AUTH');
+      return true;
+    }
+  }
+
+  /// Check if token will expire soon (within 5 minutes)
+  bool isTokenExpiringSoon(String token, {Duration threshold = const Duration(minutes: 5)}) {
+    try {
+      final expiryDate = JwtDecoder.getExpirationDate(token);
+      return DateTime.now().isAfter(expiryDate.subtract(threshold));
+    } catch (e) {
+      return true;
     }
   }
 
   /// Refresh token
-  /// Returns: true nếu refresh thành công
   Future<bool> refreshToken() async {
-    if (_isRefreshing) {
-      Logger.warning('⚠️ Refresh đang diễn ra, không gọi lại.');
-      return false;
-    }
-
-    // ✅ Lấy từ SecureStorage
-    final currentRefreshToken = await _secureStorage.getRefreshToken();
-    if (currentRefreshToken == null) {
-      Logger.error('❌ Không có refresh token để thực hiện refresh.');
-      return false;
-    }
-
-    _isRefreshing = true;
-
     try {
-      // Tạo Dio instance riêng để tránh trigger interceptor
-      final dio = Dio(
-        BaseOptions(
-          baseUrl: EnvironmentConfig.apiBaseUrl,
-          connectTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
-        ),
-      );
-
-      final response = await dio.post(
-        ApiConstants.refreshToken,
-        data: {'refreshToken': currentRefreshToken},
-      );
-
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        final newAccessToken = response.data['data']['accessToken'] as String;
-        final newRefreshToken = response.data['data']['refreshToken'] as String;
-
-        // ✅ Lưu vào SecureStorage
-        await _secureStorage.saveAccessToken(newAccessToken);
-        await _secureStorage.saveRefreshToken(newRefreshToken);
-
-        Logger.success('✅ Refresh token thành công.');
-        return true;
-      } else {
-        Logger.error('❌ Refresh token thất bại: ${response.data}');
-        await logout();
+      final refreshToken = await _secureStorage.getRefreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        Logger.warning('No refresh token available', tag: 'AUTH');
         return false;
       }
-    } catch (e, stack) {
-      Logger.error('💥 Lỗi khi refresh token', error: e, stackTrace: stack);
-      await logout();
+
+      // Call refresh API
+      final result = await _apiClient.post(
+        '/auth/refresh',
+        (json) => json as Map<String, dynamic>,
+        data: {'refresh_token': refreshToken},
+      );
+
+      // ✅ FIX: Dùng named arguments
+      return result.fold(
+        onFailure: (failure) {
+          Logger.error('Token refresh failed: ${failure.message}', tag: 'AUTH');
+          return false;
+        },
+        onSuccess: (data) async {
+          final newAccessToken = data['access_token'] as String?;
+          final newRefreshToken = data['refresh_token'] as String?;
+
+          if (newAccessToken != null) {
+            await _secureStorage.saveAccessToken(newAccessToken);
+          }
+          if (newRefreshToken != null) {
+            await _secureStorage.saveRefreshToken(newRefreshToken);
+          }
+
+          Logger.success('Token refreshed successfully', tag: 'AUTH');
+          return true;
+        },
+      );
+    } catch (e) {
+      Logger.error('Token refresh error', error: e, tag: 'AUTH');
       return false;
-    } finally {
-      _isRefreshing = false;
     }
   }
 
-  /// Đăng xuất và xóa dữ liệu xác thực
+  /// Check and refresh token if needed
+  Future<bool> checkAndRefreshToken() async {
+    final token = await _secureStorage.getAccessToken();
+    if (token == null) return false;
+
+    if (isTokenExpiringSoon(token)) {
+      return await refreshToken();
+    }
+    return true;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Auth Actions
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Logout user
   Future<void> logout() async {
     try {
-      // 1. Clear tokens từ SecureStorage
-      await _secureStorage.clearTokens();
-      Logger.info('📝 Tokens cleared from secure storage');
+      // Clear tokens
+      await _secureStorage.deleteAccessToken();
+      await _secureStorage.deleteRefreshToken();
 
-      // 2. Clear user data từ StorageService
+      // Clear user data
+      await _storageService.setLoggedIn(false);
       await _storageService.clearAuthData();
-      Logger.info('📝 User data cleared from storage');
 
-      // 3. Reset DI (xóa cached instances)
-      await resetDependencies();
-      Logger.info('🔄 Dependencies reset');
+      // Cancel pending requests
+      _apiClient.cancelAllRequests('Logged out');
 
-      // 4. Re-initialize DI (tạo instances mới)
-      await configureDependencies();
-      Logger.info('✅ Dependencies re-configured');
-
-      Logger.success('🚪 Logout successful');
-    } catch (e, stackTrace) {
-      Logger.error('❌ Logout failed', error: e, stackTrace: stackTrace);
-      rethrow;
-    }
-  }
-
-  /// Kiểm tra xem user đã đăng nhập chưa
-  bool get isLoggedIn {
-    return _storageService.isLoggedIn();
-  }
-
-  /// Lấy thông tin từ token
-  Future<Map<String, dynamic>?> getTokenPayload() async {
-    // ✅ Lấy từ SecureStorage
-    final token = await _secureStorage.getAccessToken();
-    if (token == null) return null;
-
-    try {
-      return JwtDecoder.decode(token);
+      _updateStatus(AuthStatus.unauthenticated);
+      Logger.success('Logged out successfully', tag: 'AUTH');
     } catch (e) {
-      Logger.error('❌ Không thể decode token', error: e);
-      return null;
+      Logger.error('Logout error', error: e, tag: 'AUTH');
     }
+  }
+
+  /// Save auth data after login
+  Future<void> saveAuthData({
+    required String accessToken,
+    required String refreshToken,
+    required Map<String, dynamic> user,
+  }) async {
+    await _secureStorage.saveAccessToken(accessToken);
+    await _secureStorage.saveRefreshToken(refreshToken);
+    await _storageService.saveUser(user);
+    await _storageService.setLoggedIn(true);
+    _updateStatus(AuthStatus.authenticated);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Private Methods
+  // ═══════════════════════════════════════════════════════════════
+
+  void _updateStatus(AuthStatus status) {
+    if (_currentStatus != status) {
+      _currentStatus = status;
+      _authStateController.add(status);
+      Logger.info('Auth status changed: $status', tag: 'AUTH');
+    }
+  }
+
+  void dispose() {
+    _authStateController.close();
   }
 }

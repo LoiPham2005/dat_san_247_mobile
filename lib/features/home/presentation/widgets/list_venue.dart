@@ -24,7 +24,7 @@ class ListVenue extends StatelessWidget {
         return InkWell(
           onTap: () {
             Get.to(()=> DetailsPage(venueId: venue.venueId ?? 0));
-          },  
+          },
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
@@ -34,7 +34,7 @@ class ListVenue extends StatelessWidget {
                   color: Colors.grey.withOpacity(0.1),
                   spreadRadius: 2,
                   blurRadius: 6,
-                  offset: Offset(0, 3),
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -43,7 +43,7 @@ class ListVenue extends StatelessWidget {
               children: [
                 // Ảnh sân
                 ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   child: CustomImage(
                     // imageUrl: venue.images?.isNotEmpty == true
                     //     ? venue.images!.first.imageUrl ?? ''
@@ -63,7 +63,7 @@ class ListVenue extends StatelessWidget {
                       // Tên sân
                       Text(
                         venue.venueName ?? 'Chưa có tên',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xff2d5533),
@@ -71,16 +71,16 @@ class ListVenue extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       // Địa chỉ
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.location_on,
                             size: 16,
                             color: Color(0xff62b766),
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               venue.address ?? 'Chưa có địa chỉ',
@@ -91,23 +91,23 @@ class ListVenue extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       // Đánh giá
                       Row(
                         children: [
-                          Icon(Icons.star, size: 16, color: Colors.amber),
-                          SizedBox(width: 4),
+                          const Icon(Icons.star, size: 16, color: Colors.amber),
+                          const SizedBox(width: 4),
                           Text(
                             venue.averageRating ?? '0.0',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
                             ' (${venue.totalReviews ?? 0} đánh giá)',
-                            style: TextStyle(color: Colors.grey),
+                            style: const TextStyle(color: Colors.grey),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       // Tiện ích
                       if (venue.amenities != null && venue.amenities!.isNotEmpty)
                         Wrap(
@@ -118,9 +118,9 @@ class ListVenue extends StatelessWidget {
                                 (amenity) => Chip(
                                   label: Text(
                                     amenity.name ?? '',
-                                    style: TextStyle(fontSize: 12),
+                                    style: const TextStyle(fontSize: 12),
                                   ),
-                                  backgroundColor: Color(
+                                  backgroundColor: const Color(
                                     0xff62b766,
                                   ).withOpacity(0.12),
                                 ),

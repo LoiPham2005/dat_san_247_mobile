@@ -1,4 +1,3 @@
-
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/utils/validators.dart (ENHANCED VERSION)
 // ════════════════════════════════════════════════════════════════
@@ -68,10 +67,7 @@ class Validators {
     }
 
     // Vietnamese characters support
-    final nameRegex = RegExp(
-      r'^[a-zA-ZÀ-ỹ\s]+$',
-      unicode: true,
-    );
+    final nameRegex = RegExp(r'^[a-zA-ZÀ-ỹ\s]+$', unicode: true);
 
     if (!nameRegex.hasMatch(value)) {
       return 'Họ tên chỉ được chứa chữ cái và khoảng trắng';
@@ -503,9 +499,15 @@ class Validators {
     required String? confirmPassword,
   }) {
     final errors = <String, String?>{
-      'oldPassword': Validators.required(oldPassword, fieldName: 'Mật khẩu hiện tại'),
+      'oldPassword': Validators.required(
+        oldPassword,
+        fieldName: 'Mật khẩu hiện tại',
+      ),
       'newPassword': Validators.strongPassword(newPassword),
-      'confirmPassword': Validators.confirmPassword(confirmPassword, newPassword),
+      'confirmPassword': Validators.confirmPassword(
+        confirmPassword,
+        newPassword,
+      ),
     };
 
     // Check if new password is same as old

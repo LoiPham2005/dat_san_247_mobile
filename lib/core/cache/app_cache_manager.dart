@@ -3,10 +3,11 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:io';
 
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:dat_san_247_mobile/core/cache/cache_config.dart';
 import 'package:dat_san_247_mobile/core/cache/models/cache_stats.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart'; // Thêm import Logger
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:injectable/injectable.dart';
@@ -60,9 +61,9 @@ class AppCacheManager {
       _initFileCaches();
 
       sw.stop();
-      print('✅ Cache initialized in ${sw.elapsedMilliseconds}ms');
+      Logger.success('✅ Cache initialized in ${sw.elapsedMilliseconds}ms');
     } catch (e, stack) {
-      print('❌ Cache init failed: $e\n$stack');
+      Logger.error('❌ Cache init failed', error: e, stackTrace: stack);
       rethrow;
     }
   }
@@ -82,9 +83,9 @@ class AppCacheManager {
       // Register with CacheConfig
       CacheConfig.initialize(_apiCacheStore);
 
-      print('✅ API cache (Hive) ready');
+      Logger.success('✅ API cache (Hive) ready');
     } catch (e) {
-      print('⚠️ Hive failed, using MemCache: $e');
+      Logger.warning('⚠️ Hive failed, using MemCache: $e');
       _apiCacheStore = MemCacheStore();
       CacheConfig.initialize(_apiCacheStore);
     }
@@ -104,7 +105,7 @@ class AppCacheManager {
       Config(_docCacheKey, stalePeriod: const Duration(days: 90), maxNrOfCacheObjects: 100),
     );
 
-    print('✅ File caches ready');
+    Logger.success('✅ File caches ready');
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -135,9 +136,9 @@ class AppCacheManager {
     try {
       await _apiCacheStore.clean();
       _lastCleared = DateTime.now();
-      print('✅ API cache cleared');
+      Logger.success('✅ API cache cleared');
     } catch (e) {
-      print('❌ Clear API cache failed: $e');
+      Logger.error('❌ Clear API cache failed: $e');
     }
   }
 
@@ -149,9 +150,9 @@ class AppCacheManager {
         _videoCacheManager.emptyCache(),
         _documentCacheManager.emptyCache(),
       ]);
-      print('✅ File caches cleared');
+      Logger.success('✅ File caches cleared');
     } catch (e) {
-      print('❌ Clear file caches failed: $e');
+      Logger.error('❌ Clear file caches failed: $e');
     }
   }
 
@@ -160,7 +161,7 @@ class AppCacheManager {
     await clearApiCache();
     await clearFileCaches();
     resetStats();
-    print('✅ All caches cleared');
+    Logger.success('✅ All caches cleared');
   }
 
   /// Smart clear - Remove old entries only
@@ -169,9 +170,9 @@ class AppCacheManager {
       if (_lastCleared == null || DateTime.now().difference(_lastCleared!) > maxAge) {
         await clearApiCache();
       }
-      print('✅ Stale cache cleared');
+      Logger.success('✅ Stale cache cleared');
     } catch (e) {
-      print('❌ Clear stale failed: $e');
+      Logger.error('❌ Clear stale failed: $e');
     }
   }
 
@@ -182,7 +183,6 @@ class AppCacheManager {
   /// Get cache statistics
   Future<CacheStats> getStats() async {
     try {
-      // ✅ FIX: Count files correctly using cache key constants
       final imageCount = await _countCacheFilesByKey(_imageCacheKey);
       final videoCount = await _countCacheFilesByKey(_videoCacheKey);
       final docCount = await _countCacheFilesByKey(_docCacheKey);
@@ -198,20 +198,18 @@ class AppCacheManager {
         lastCleared: _lastCleared,
       );
     } catch (e) {
-      print('❌ Get stats failed: $e');
+      Logger.error('❌ Get stats failed: $e');
       return CacheStats.empty();
     }
   }
 
-  /// ✅ CORRECT: Count cache files by key
-  /// flutter_cache_manager stores files in: temp/flutter_cache_manager/{key}/
+  /// Count cache files by key
   Future<int> _countCacheFilesByKey(String cacheKey) async {
     try {
       final baseCacheDir = await getTemporaryDirectory();
       final cacheDir = Directory('${baseCacheDir.path}/flutter_cache_manager/$cacheKey');
 
       if (await cacheDir.exists()) {
-        // Count all files recursively
         final files = await cacheDir
             .list(recursive: true)
             .where((entity) => entity is File)
@@ -221,30 +219,60 @@ class AppCacheManager {
 
       return 0;
     } catch (e) {
-      print('⚠️ Error counting cache files for $cacheKey: $e');
+      Logger.warning('⚠️ Error counting cache files for $cacheKey: $e');
       return 0;
     }
   }
 
   /// Print statistics to console
+  // Future<void> printStats() async {
+  //   final stats = await getStats();
+  //   Logger.info('');
+  //   Logger.info('📊 ═══════════════════════════════════════════════════════');
+  //   Logger.info('📊 CACHE STATISTICS');
+  //   Logger.info('📊 ═══════════════════════════════════════════════════════');
+  //   Logger.info('  📷 Images:    ${stats.imageCount} files');
+  //   Logger.info('  🎬 Videos:    ${stats.videoCount} files');
+  //   Logger.info('  📄 Documents: ${stats.docCount} files');
+  //   Logger.info('  ─────────────────────────────────');
+  //   Logger.info('  📊 Total:     ${stats.totalCount} files');
+  //   Logger.info('  🎯 Hit Rate:  ${(stats.hitRate * 100).toStringAsFixed(1)}%');
+  //   Logger.info('  💾 Hits:      ${stats.hits}');
+  //   Logger.info('  ❌ Misses:    ${stats.misses}');
+  //   if (stats.lastCleared != null) {
+  //     Logger.info('  🕐 Last cleared: ${stats.lastCleared}');
+  //   }
+  //   Logger.info('📊 ═══════════════════════════════════════════════════════');
+  //   Logger.info('');
+  // }
+
   Future<void> printStats() async {
     final stats = await getStats();
-    print('');
-    print('📊 ═══════════════════════════════════════════════════════');
-    print('📊 CACHE STATISTICS');
-    print('📊 ═══════════════════════════════════════════════════════');
-    print('  📷 Images:    ${stats.imageCount} files');
-    print('  🎬 Videos:    ${stats.videoCount} files');
-    print('  📄 Documents: ${stats.docCount} files');
-    print('  ─────────────────────────────────');
-    print('  📊 Total:     ${stats.totalCount} files');
-    print('  🎯 Hit Rate:  ${(stats.hitRate * 100).toStringAsFixed(1)}%');
-    print('  💾 Hits:      ${stats.hits}');
-    print('  ❌ Misses:    ${stats.misses}');
-    if (stats.lastCleared != null) {
-      print('  🕐 Last cleared: ${stats.lastCleared}');
+    const borderWidth = 50;
+    String pad(String text) => text.padRight(borderWidth - 2);
+
+    final info = [
+      '📊 CACHE STATISTICS',
+      'Images:    ${stats.imageCount} files',
+      'Videos:    ${stats.videoCount} files',
+      'Documents: ${stats.docCount} files',
+      '────────────────────────────────',
+      'Total:     ${stats.totalCount} files',
+      'Hit Rate:  ${(stats.hitRate * 100).toStringAsFixed(1)}%',
+      'Hits:      ${stats.hits}',
+      'Misses:    ${stats.misses}',
+      if (stats.lastCleared != null) 'Last cleared: ${stats.lastCleared}',
+    ];
+
+    final buffer = StringBuffer()..writeln('╔${'═' * (borderWidth - 1)}');
+    for (final line in info) {
+      buffer.writeln('║ ${pad(line)}');
+      if (line.startsWith('📊')) {
+        buffer.writeln('╠${'═' * (borderWidth - 1)}');
+      }
     }
-    print('📊 ═══════════════════════════════════════════════════════');
-    print('');
+    buffer.writeln('╚${'═' * (borderWidth - 1)}');
+
+    Logger.info('\n${buffer.toString()}', tag: 'CACHE');
   }
 }

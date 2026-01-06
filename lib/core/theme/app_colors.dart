@@ -160,7 +160,7 @@ class AppColors {
 
   // Neutral Colors
   static const Color white = Color(0xFFFFFFFF);
-  // static const Color black = Color(0xFF000000);
+  static const Color black = Color(0xFF000000);
   static const Color grey = Color(0xFF9E9E9E);
   static const Color greyLight = Color(0xFFE0E0E0);
   static const Color greyDark = Color(0xFF616161);
@@ -169,19 +169,19 @@ class AppColors {
   static const Color background = Color(0xFFF5F5F5);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color scaffoldBackground = Color(0xFFFAFAFA);
+  static const Color secondary = Color(0xFFFAFAFA);
 
   // Text Colors
-  // static const Color textPrimary = Color(0xFF212121);
-  // static const Color textSecondary = Color(0xFF757575);
+  static const Color textPrimary = Color(0xFF212121);
+  static const Color textSecondary = Color(0xFF757575);
   static const Color textHint = Color(0xFFBDBDBD);
   static const Color textDisabled = Color(0xFFE0E0E0);
 
   // Border Colors
-  // static const Color border = Color(0xFFE0E0E0);
+  static const Color border = Color(0xFFE0E0E0);
   static const Color divider = Color(0xFFBDBDBD);
 
-
-    static const primaryColor = Color(0xff62b766);
+  static const primaryColor = Color(0xff62b766);
   // Base colors
   static const Color primaryGreen = Color(0xff4fa553);
   static const Color lightGreen = Color(0xff62b766);
@@ -193,8 +193,7 @@ class AppColors {
   // static const white = Color(0xffFFFFFF);
   static const whiteF6 = Color(0xfff6f6ff);
 
-  static const black = Color(0xff464447);
-
+  // static const black = Color(0xff464447);
 
   static const gray46 = Color(0xff464447);
   static const grayE7 = Color(0xffE7E8E9);
@@ -211,14 +210,14 @@ class AppColors {
   static const Color primary2 = Color(0xff4fa553);
 
   // Màu text
-  static const Color textPrimary = Color(0xff2d5533);
-  static const Color textSecondary = Color(0xff6c757d);
+  // static const Color textPrimary = Color(0xff2d5533);
+  // static const Color textSecondary = Color(0xff6c757d);
 
   // Màu nền
   static const Color inputBackground = Color(0xfff8f9fa);
 
   // Màu border
-  static const Color border = Color(0xffe0e0e0);
+  // static const Color border = Color(0xffe0e0e0);
 
   // Màu phụ trợ
   static const Color google = Color(0xffdb4437);

@@ -1,12 +1,13 @@
 // lib/core/theme/app_text_styles.dart
 import 'package:flutter/material.dart';
+import '../../gen/fonts.gen.dart';
 
 class AppTextStyles {
   AppTextStyles._();
 
   // Display
   static const TextStyle displayLarge = TextStyle(
-    fontFamily: 'Inter', // ✅ Set font family
+    fontFamily: FontFamily.inter, // ✅ Set font family
     fontSize: 57,
     fontWeight: FontWeight.w400,
     letterSpacing: -0.25,

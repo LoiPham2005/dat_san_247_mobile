@@ -2,13 +2,6 @@
 
 Hướng dẫn đầy đủ cho build, code generation, và management dự án với **3 flavors: dev, stg, prod** (chỉ dùng Flavors + file main riêng).
 
-
-```bash
-
-flutter pub run flutter_flavorizr
-
-```
-
 ---
 
 ## 1. Code Generation (Build Runner)

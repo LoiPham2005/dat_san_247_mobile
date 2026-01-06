@@ -1,68 +1,148 @@
-// lib/core/state_management/base_state.dart
-import 'package:equatable/equatable.dart';
-import 'package:dat_san_247_mobile/core/state_management/bloc/bloc_status.dart';
+// ════════════════════════════════════════════════════════════════
+// 📁 lib/core/state_management/bloc/base_state.dart (FINAL UPDATED)
+// ════════════════════════════════════════════════════════════════
 
-/// BaseState dùng chung cho tất cả Cubit.
-/// Tối ưu cho khả năng tái sử dụng, mở rộng, và clean architecture.
+import 'package:dat_san_247_mobile/core/state_management/bloc/bloc_status.dart';
+import 'package:equatable/equatable.dart';
+
+/// Base State cho tất cả BLoCs
 class BaseState<T> extends Equatable {
+  final BlocStatus status;
+  final T? data;
+  final String? error;
+  final String? message;
+  final int retryCount;
+  final Map<String, dynamic>? metadata;
+  final StackTrace? stackTrace; // ✅ NEW: debug lỗi
+
   const BaseState({
     required this.status,
     this.data,
     this.error,
     this.message,
+    this.retryCount = 0,
+    this.metadata,
+    this.stackTrace,
   });
 
-  /// Trạng thái khởi tạo ban đầu
-  factory BaseState.initial({T? data}) =>
-      BaseState(status: BlocStatus.initial, data: data, message: 'Chưa có dữ liệu');
+  // ════════════════════════════════════════════════════════════
+  // Factories
+  // ════════════════════════════════════════════════════════════
 
-  /// Trạng thái hiện tại của Cubit
-  final BlocStatus status;
+  factory BaseState.initial() => const BaseState(status: BlocStatus.initial);
 
-  /// Dữ liệu (có thể là model, danh sách, primitive...)
-  final T? data;
+  factory BaseState.loading({T? previousData}) =>
+      BaseState(status: BlocStatus.loading, data: previousData);
 
-  /// Lỗi (nếu có)
-  final String? error;
+  factory BaseState.loaded(T data, {Map<String, dynamic>? metadata}) =>
+      BaseState(status: BlocStatus.loaded, data: data, metadata: metadata);
 
-  /// Message hiển thị cho UI (ví dụ: "Lưu thành công", "Đăng nhập thất bại")
-  final String? message;
+  factory BaseState.empty({String? message}) =>
+      BaseState(status: BlocStatus.empty, message: message ?? 'Không có dữ liệu');
 
-  /// === Helper getter cho dễ dùng trong Cubit hoặc UI ===
+  factory BaseState.failure({
+    required String error,
+    StackTrace? stackTrace, // ✅ NEW
+    T? previousData,
+  }) => BaseState(
+    status: BlocStatus.failure,
+    error: error,
+    stackTrace: stackTrace, // ✅ NEW
+    data: previousData,
+  );
+
+  factory BaseState.success({T? data, String? message}) =>
+      BaseState(status: BlocStatus.success, data: data, message: message);
+
+  factory BaseState.submitting({T? data}) => BaseState(status: BlocStatus.submitting, data: data);
+
+  factory BaseState.refreshing({required T currentData}) =>
+      BaseState(status: BlocStatus.refreshing, data: currentData);
+
+  // ════════════════════════════════════════════════════════════
+  // Getters
+  // ════════════════════════════════════════════════════════════
+
   bool get isInitial => status == BlocStatus.initial;
   bool get isLoading => status == BlocStatus.loading;
-  bool get isSuccess => status == BlocStatus.success;
+  bool get isLoaded => status == BlocStatus.loaded;
+  bool get isEmpty => status == BlocStatus.empty;
   bool get isFailure => status == BlocStatus.failure;
+  bool get isSuccess => status == BlocStatus.success;
+  bool get isSubmitting => status == BlocStatus.submitting;
+  bool get isRefreshing => status == BlocStatus.refreshing;
 
-  /// === Message helpers ===
-  /// Trả về message hiển thị phù hợp với trạng thái hiện tại
+  bool get hasData => data != null;
+  bool get hasError => error != null && error!.isNotEmpty;
+  bool get isProcessing => isLoading || isSubmitting || isRefreshing;
+  bool get canRetry => isFailure && retryCount < 3;
+
+  // ════════════════════════════════════════════════════════════
+  // Display Message
+  // ════════════════════════════════════════════════════════════
+
   String get displayMessage {
-    if (isLoading) return message ?? 'Đang tải dữ liệu...';
-    if (isFailure) return error ?? message ?? 'Đã xảy ra lỗi';
-    if (isSuccess) return message ?? 'Thao tác thành công';
-    return message ?? '';
+    if (message != null) return message!;
+    if (error != null) return error!;
+
+    return switch (status) {
+      BlocStatus.initial => '',
+      BlocStatus.loading => 'Đang tải...',
+      BlocStatus.refreshing => 'Đang làm mới...',
+      BlocStatus.submitting => 'Đang xử lý...',
+      BlocStatus.empty => 'Không có dữ liệu',
+      BlocStatus.failure => 'Đã xảy ra lỗi',
+      BlocStatus.success => 'Thành công',
+      BlocStatus.loaded => '',
+      BlocStatus.loadingMore => 'Đang tải thêm...',
+    };
   }
 
-  /// === CopyWith để cập nhật state mới mà không mất dữ liệu cũ ===
+  // ════════════════════════════════════════════════════════════
+  // CopyWith
+  // ════════════════════════════════════════════════════════════
+
   BaseState<T> copyWith({
     BlocStatus? status,
     T? data,
     String? error,
     String? message,
+    int? retryCount,
+    Map<String, dynamic>? metadata,
+    StackTrace? stackTrace, // ✅ NEW
+    bool clearError = false,
+    bool clearMessage = false,
   }) {
-    return BaseState(
+    return BaseState<T>(
       status: status ?? this.status,
       data: data ?? this.data,
-      error: error ?? this.error,
-      message: message ?? this.message,
+      error: clearError ? null : (error ?? this.error),
+      message: clearMessage ? null : (message ?? this.message),
+      retryCount: retryCount ?? this.retryCount,
+      metadata: metadata ?? this.metadata,
+      stackTrace: stackTrace ?? this.stackTrace, // ✅ NEW
     );
   }
 
-  @override
-  List<Object?> get props => [status, data, error, message];
+  // ════════════════════════════════════════════════════════════
+  // Retry Helper
+  // ════════════════════════════════════════════════════════════
+
+  BaseState<T> incrementRetry() => copyWith(retryCount: retryCount + 1);
+  BaseState<T> resetRetry() => copyWith(retryCount: 0);
 
   @override
-  String toString() {
-    return 'BaseState(status: $status, data: $data, error: $error, message: $message)';
-  }
+  List<Object?> get props => [
+    status,
+    data,
+    error,
+    message,
+    retryCount,
+    metadata,
+    stackTrace, // ✅ NEW
+  ];
+
+  @override
+  String toString() =>
+      'BaseState(status: $status, hasData: $hasData, error: $error, stackTrace: $stackTrace)';
 }

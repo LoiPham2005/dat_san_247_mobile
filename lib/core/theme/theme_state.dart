@@ -29,10 +29,7 @@ class ThemeState {
     }
   }
 
-  ThemeState copyWith({
-    ThemeColorType? colorType,
-    AppThemeMode? themeMode,
-  }) {
+  ThemeState copyWith({ThemeColorType? colorType, AppThemeMode? themeMode}) {
     return ThemeState(
       colorType: colorType ?? this.colorType,
       themeMode: themeMode ?? this.themeMode,

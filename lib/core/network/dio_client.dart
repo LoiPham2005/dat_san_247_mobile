@@ -1,8 +1,10 @@
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/network/dio_client.dart (OPTIMIZED)
+// 📁 lib/core/network/dio_client.dart (UPDATED)
 // ════════════════════════════════════════════════════════════════
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+
 import '../config/environment_config.dart';
 import '../constants/app_constants.dart';
 import 'interceptors/auth_interceptor.dart';
@@ -10,7 +12,6 @@ import 'interceptors/error_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/smart_cache_interceptor.dart';
 
-/// 🔧 Low-level Dio wrapper
 @LazySingleton()
 class DioClient {
   late final Dio _dio;
@@ -26,19 +27,43 @@ class DioClient {
         baseUrl: EnvironmentConfig.apiBaseUrl,
         connectTimeout: AppConstants.connectionTimeout,
         receiveTimeout: AppConstants.receiveTimeout,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
       ),
     );
 
-    // Interceptor order matters!
+    // ✅ UPDATED: Thứ tự interceptors rất quan trọng!
     _dio.interceptors.addAll([
       cacheInterceptor,      // 1. Cache
-      authInterceptor,       // 2. Auth
-      errorInterceptor,      // 3. Error handling
-      loggingInterceptor,    // 4. Logging
+      authInterceptor,       // 2. Auth (token + 401 refresh)
+      errorInterceptor,      // 3. Error logging
+      loggingInterceptor,    // 4. Request/Response logging
+
+
+      // PrettyDioLogger(
+      //   requestHeader: false,
+      //   requestBody: true,
+      //   responseBody: true,
+      //   responseHeader: false,
+      //   error: true,
+      //   compact: true,
+      //   maxWidth: 90,
+      //   logPrint: (log) {
+      //     final msg = log.toString(); // ép Object -> String
+      //     if (msg.startsWith('Request:')) {
+      //       print('🚀 $msg');
+      //     } else if (msg.startsWith('│ Body:') || msg.contains('"')) {
+      //       print('📦 $msg');
+      //     } else if (msg.startsWith('Response:')) {
+      //       print('📥 $msg');
+      //     } else if (msg.startsWith('Error:') || msg.contains('DioError')) {
+      //       print('❌ $msg');
+      //     } else {
+      //       print('🔎 $msg');
+      //     }
+      //   },
+      // )
+
+
     ]);
   }
 
@@ -53,13 +78,12 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
-  }) =>
-      _dio.get<T>(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
+  }) => _dio.get<T>(
+    path,
+    queryParameters: queryParameters,
+    options: options,
+    cancelToken: cancelToken,
+  );
 
   Future<Response<T>> post<T>(
     String path, {
@@ -68,15 +92,14 @@ class DioClient {
     Options? options,
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
-  }) =>
-      _dio.post<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-      );
+  }) => _dio.post<T>(
+    path,
+    data: data,
+    queryParameters: queryParameters,
+    options: options,
+    cancelToken: cancelToken,
+    onSendProgress: onSendProgress,
+  );
 
   Future<Response<T>> put<T>(
     String path, {
@@ -84,14 +107,13 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
-  }) =>
-      _dio.put<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
+  }) => _dio.put<T>(
+    path,
+    data: data,
+    queryParameters: queryParameters,
+    options: options,
+    cancelToken: cancelToken,
+  );
 
   Future<Response<T>> patch<T>(
     String path, {
@@ -99,14 +121,13 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
-  }) =>
-      _dio.patch<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
+  }) => _dio.patch<T>(
+    path,
+    data: data,
+    queryParameters: queryParameters,
+    options: options,
+    cancelToken: cancelToken,
+  );
 
   Future<Response<T>> delete<T>(
     String path, {
@@ -114,14 +135,13 @@ class DioClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
-  }) =>
-      _dio.delete<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
+  }) => _dio.delete<T>(
+    path,
+    data: data,
+    queryParameters: queryParameters,
+    options: options,
+    cancelToken: cancelToken,
+  );
 
   Future<Response<T>> uploadFile<T>(
     String path,
@@ -136,12 +156,7 @@ class DioClient {
       ...?data,
     });
 
-    return _dio.post<T>(
-      path,
-      data: formData,
-      options: options,
-      onSendProgress: onSendProgress,
-    );
+    return _dio.post<T>(path, data: formData, options: options, onSendProgress: onSendProgress);
   }
 
   Future<Response> downloadFile(
@@ -150,12 +165,11 @@ class DioClient {
     Options? options,
     ProgressCallback? onReceiveProgress,
     CancelToken? cancelToken,
-  }) =>
-      _dio.download(
-        url,
-        savePath,
-        options: options,
-        onReceiveProgress: onReceiveProgress,
-        cancelToken: cancelToken,
-      );
+  }) => _dio.download(
+    url,
+    savePath,
+    options: options,
+    onReceiveProgress: onReceiveProgress,
+    cancelToken: cancelToken,
+  );
 }

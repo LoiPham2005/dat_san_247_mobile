@@ -9,11 +9,10 @@ import 'package:dat_san_247_mobile/core/routes/route_names.dart';
 import 'package:dat_san_247_mobile/core/services/navigation_service.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:dat_san_247_mobile/features/home/presentation/pages/home_page.dart';
+import 'package:dat_san_247_mobile/features/intro/presentation/pages/welcome_page.dart';
 import 'package:dat_san_247_mobile/features/splash/presentation/pages/splash_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
-
-import '../../features/intro/presentation/pages/welcome_page.dart';
 
 @LazySingleton()
 class AppRouter {
@@ -47,9 +46,9 @@ class AppRouter {
         builder: (context, state) => const LoginPage(),
       ),
 
-      // // ═════════════════════════════════════════════════════════════
-      // // Main App Routes
-      // // ═════════════════════════════════════════════════════════════
+      // ═════════════════════════════════════════════════════════════
+      // Main App Routes
+      // ═════════════════════════════════════════════════════════════
       GoRoute(
         path: RouteNames.home,
         // name: RouteNames.homeName,
