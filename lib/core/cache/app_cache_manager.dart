@@ -3,20 +3,34 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:io';
 
+import 'package:dat_san_247_mobile/core/cache/cache_config.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_db_store/dio_cache_interceptor_db_store.dart';
-import 'package:dat_san_247_mobile/core/cache/cache_config.dart';
-import 'package:dat_san_247_mobile/core/cache/models/cache_stats.dart';
-import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:injectable/injectable.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../database/daos/local_cache_dao.dart';
+import '../utils/logger.dart';
+import 'models/cache_stats.dart';
+
 /// 🎯 Unified Cache Manager
-/// Manages both API cache (Hive) and file cache (flutter_cache_manager)
+///
+/// Manages 3 cache layers:
+/// 1. **API Cache** (SQLite via dio_cache_interceptor) — HTTP response caching
+/// 2. **File Cache** (flutter_cache_manager) — Images, videos, documents
+/// 3. **Local Cache** (Drift/SQLite via LocalCacheDao) — Key-value data caching
 @lazySingleton
 class AppCacheManager {
+  // ═══════════════════════════════════════════════════════════════
+  // Dependencies
+  // ═══════════════════════════════════════════════════════════════
+
+  final LocalCacheDao _localCacheDao;
+
+  AppCacheManager(this._localCacheDao);
+
   // ═══════════════════════════════════════════════════════════════
   // Cache keys (constants)
   // ═══════════════════════════════════════════════════════════════
@@ -54,11 +68,14 @@ class AppCacheManager {
     try {
       final sw = Stopwatch()..start();
 
-      // 1. Initialize API cache (Hive)
+      // 1. Initialize API cache (SQLite)
       await _initApiCache();
 
       // 2. Initialize file caches
       _initFileCaches();
+
+      // 3. Auto cleanup expired entries on startup
+      await _autoCleanup();
 
       sw.stop();
       Logger.success('✅ Cache initialized in ${sw.elapsedMilliseconds}ms');
@@ -106,6 +123,26 @@ class AppCacheManager {
     Logger.success('✅ File caches ready');
   }
 
+  /// Auto cleanup on startup
+  Future<void> _autoCleanup() async {
+    try {
+      // Clean expired API cache
+      await _apiCacheStore.clean(staleOnly: true);
+
+      // Clean expired local cache entries
+      final expiredCount = await _localCacheDao.clearExpired();
+
+      if (expiredCount > 0) {
+        Logger.info(
+          '🧹 Auto-cleanup: removed $expiredCount expired local cache entries',
+          tag: 'CACHE',
+        );
+      }
+    } catch (e) {
+      Logger.warning('⚠️ Auto-cleanup failed: $e', tag: 'CACHE');
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // Public Getters
   // ═══════════════════════════════════════════════════════════════
@@ -113,6 +150,9 @@ class AppCacheManager {
   CacheManager get imageCache => _imageCacheManager;
   CacheManager get videoCache => _videoCacheManager;
   CacheManager get documentCache => _documentCacheManager;
+
+  /// Access local cache DAO for key-value caching
+  LocalCacheDao get localCache => _localCacheDao;
 
   // ═══════════════════════════════════════════════════════════════
   // Cache Operations
@@ -154,11 +194,21 @@ class AppCacheManager {
     }
   }
 
+  /// Clear local cache (Drift key-value)
+  Future<void> clearLocalCache() async {
+    try {
+      final count = await _localCacheDao.clearAll();
+      Logger.success('✅ Local cache cleared ($count entries)');
+    } catch (e) {
+      Logger.error('❌ Clear local cache failed: $e');
+    }
+  }
+
   /// Clear everything
   Future<void> clearAll() async {
-    await clearApiCache();
-    await clearFileCaches();
+    await Future.wait([clearApiCache(), clearFileCaches(), clearLocalCache()]);
     resetStats();
+    _lastCleared = DateTime.now();
     Logger.success('✅ All caches cleared');
   }
 
@@ -175,17 +225,17 @@ class AppCacheManager {
     }
   }
 
-  /// Clear expired cache entries only
+  /// Clear expired cache entries only (all layers)
   Future<void> clearExpired() async {
     try {
-      await _apiCacheStore.clean(staleOnly: true);
+      await Future.wait([_apiCacheStore.clean(staleOnly: true), _localCacheDao.clearExpired()]);
       Logger.success('✅ Expired cache cleared');
     } catch (e) {
       Logger.error('❌ Clear expired failed: $e');
     }
   }
 
-  /// Delete cache by specific key
+  /// Delete cache by specific key (API cache)
   Future<void> deleteByKey(String key) async {
     try {
       await _apiCacheStore.delete(key);
@@ -208,29 +258,80 @@ class AppCacheManager {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // Statistics - FIXED ✅
+  // Statistics & Monitoring
   // ═══════════════════════════════════════════════════════════════
 
-  /// Get cache statistics
+  /// Get comprehensive cache statistics
   Future<CacheStats> getStats() async {
     try {
-      final imageCount = await _countCacheFilesByKey(_imageCacheKey);
-      final videoCount = await _countCacheFilesByKey(_videoCacheKey);
-      final docCount = await _countCacheFilesByKey(_docCacheKey);
+      final results = await Future.wait([
+        _countCacheFilesByKey(_imageCacheKey),
+        _countCacheFilesByKey(_videoCacheKey),
+        _countCacheFilesByKey(_docCacheKey),
+        _localCacheDao.count(),
+        _getApiCacheSizeBytes(),
+        _getFileCacheSizeBytes(),
+      ]);
+
+      final imageCount = results[0];
+      final videoCount = results[1];
+      final docCount = results[2];
+      final localCacheCount = results[3];
+      final apiCacheSize = results[4];
+      final fileCacheSize = results[5];
 
       return CacheStats(
         imageCount: imageCount,
         videoCount: videoCount,
         docCount: docCount,
-        totalCount: imageCount + videoCount + docCount,
+        totalFileCount: imageCount + videoCount + docCount,
+        localCacheCount: localCacheCount,
         hits: _hits,
         misses: _misses,
         hitRate: hitRate,
+        apiCacheSizeBytes: apiCacheSize,
+        fileCacheSizeBytes: fileCacheSize,
+        totalSizeBytes: apiCacheSize + fileCacheSize,
         lastCleared: _lastCleared,
       );
     } catch (e) {
       Logger.error('❌ Get stats failed: $e');
       return CacheStats.empty();
+    }
+  }
+
+  /// Get API cache database size in bytes
+  Future<int> _getApiCacheSizeBytes() async {
+    try {
+      final docDir = await getApplicationDocumentsDirectory();
+      final dbFile = File(p.join(docDir.path, 'app_cache.db'));
+      return dbFile.existsSync() ? await dbFile.length() : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  /// Get total file cache size in bytes
+  Future<int> _getFileCacheSizeBytes() async {
+    try {
+      int totalSize = 0;
+      final baseCacheDir = await getTemporaryDirectory();
+
+      for (final key in [_imageCacheKey, _videoCacheKey, _docCacheKey]) {
+        final cacheDir = Directory('${baseCacheDir.path}/flutter_cache_manager/$key');
+
+        if (await cacheDir.exists()) {
+          await for (final entity in cacheDir.list(recursive: true)) {
+            if (entity is File) {
+              totalSize += await entity.length();
+            }
+          }
+        }
+      }
+
+      return totalSize;
+    } catch (_) {
+      return 0;
     }
   }
 
@@ -256,49 +357,33 @@ class AppCacheManager {
   }
 
   /// Print statistics to console
-  // Future<void> printStats() async {
-  //   final stats = await getStats();
-  //   Logger.info('');
-  //   Logger.info('📊 ═══════════════════════════════════════════════════════');
-  //   Logger.info('📊 CACHE STATISTICS');
-  //   Logger.info('📊 ═══════════════════════════════════════════════════════');
-  //   Logger.info('  📷 Images:    ${stats.imageCount} files');
-  //   Logger.info('  🎬 Videos:    ${stats.videoCount} files');
-  //   Logger.info('  📄 Documents: ${stats.docCount} files');
-  //   Logger.info('  ─────────────────────────────────');
-  //   Logger.info('  📊 Total:     ${stats.totalCount} files');
-  //   Logger.info('  🎯 Hit Rate:  ${(stats.hitRate * 100).toStringAsFixed(1)}%');
-  //   Logger.info('  💾 Hits:      ${stats.hits}');
-  //   Logger.info('  ❌ Misses:    ${stats.misses}');
-  //   if (stats.lastCleared != null) {
-  //     Logger.info('  🕐 Last cleared: ${stats.lastCleared}');
-  //   }
-  //   Logger.info('📊 ═══════════════════════════════════════════════════════');
-  //   Logger.info('');
-  // }
-
   Future<void> printStats() async {
     final stats = await getStats();
-    const borderWidth = 50;
+    const borderWidth = 55;
     String pad(String text) => text.padRight(borderWidth - 2);
 
     final info = [
       '📊 CACHE STATISTICS',
-      'Images:    ${stats.imageCount} files',
-      'Videos:    ${stats.videoCount} files',
-      'Documents: ${stats.docCount} files',
-      '────────────────────────────────',
-      'Total:     ${stats.totalCount} files',
-      'Hit Rate:  ${(stats.hitRate * 100).toStringAsFixed(1)}%',
-      'Hits:      ${stats.hits}',
-      'Misses:    ${stats.misses}',
-      if (stats.lastCleared != null) 'Last cleared: ${stats.lastCleared}',
+      '📷 Images:       ${stats.imageCount} files',
+      '🎬 Videos:       ${stats.videoCount} files',
+      '📄 Documents:    ${stats.docCount} files',
+      '🗄️ Local Cache:  ${stats.localCacheCount} entries',
+      '────────────────────────────────────────',
+      '📦 Total Files:  ${stats.totalFileCount}',
+      '💾 API Cache:    ${stats.formattedApiCacheSize}',
+      '📁 File Cache:   ${stats.formattedFileCacheSize}',
+      '📊 Total Size:   ${stats.formattedTotalSize}',
+      '────────────────────────────────────────',
+      '🎯 Hit Rate:     ${(stats.hitRate * 100).toStringAsFixed(1)}%',
+      '💚 Hits:         ${stats.hits}',
+      '❌ Misses:       ${stats.misses}',
+      if (stats.lastCleared != null) '🕐 Last cleared: ${stats.lastCleared}',
     ];
 
     final buffer = StringBuffer()..writeln('╔${'═' * (borderWidth - 1)}');
     for (final line in info) {
       buffer.writeln('║ ${pad(line)}');
-      if (line.startsWith('📊')) {
+      if (line.startsWith('📊 CACHE')) {
         buffer.writeln('╠${'═' * (borderWidth - 1)}');
       }
     }

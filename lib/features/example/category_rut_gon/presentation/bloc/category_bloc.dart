@@ -6,7 +6,7 @@ import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../data/category_repository.dart';
+import '../../data/repositories/category_repository.dart';
 import 'category_event.dart';
 
 @injectable

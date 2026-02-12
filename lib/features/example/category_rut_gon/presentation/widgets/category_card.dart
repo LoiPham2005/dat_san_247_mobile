@@ -3,7 +3,8 @@
 // ════════════════════════════════════════════════════════════════
 import 'package:flutter/material.dart';
 
-import '../../data/category_model.dart';
+import '../../data/models/category_model.dart';
+
 
 class CategoryCard extends StatelessWidget {
   final CategoryRutGonModel category;

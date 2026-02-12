@@ -12,9 +12,7 @@ class CacheConfig {
   /// Get cache store (primary getter)
   static CacheStore get store {
     if (_store == null) {
-      throw StateError(
-        '❌ CacheConfig not initialized! Call initialize() first',
-      );
+      throw StateError('❌ CacheConfig not initialized! Call initialize() first');
     }
     return _store!;
   }
@@ -30,10 +28,7 @@ class CacheConfig {
   /// Get cache options based on strategy
   static CacheOptions getOptions(CacheStrategy strategy) {
     return switch (strategy) {
-      CacheStrategy.noCache => CacheOptions(
-        store: store,
-        policy: CachePolicy.noCache,
-      ),
+      CacheStrategy.noCache => CacheOptions(store: store, policy: CachePolicy.noCache),
 
       CacheStrategy.shortTerm => CacheOptions(
         store: store,

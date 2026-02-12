@@ -5,8 +5,8 @@ import 'package:dat_san_247_mobile/core/errors/result.dart';
 import 'package:dat_san_247_mobile/core/mixins/api_handler_mixin.dart';
 import 'package:injectable/injectable.dart';
 
-import 'category_model.dart';
-import 'category_service.dart';
+import '../models/category_model.dart';
+import '../services/category_service.dart';
 
 /// CategoryRepository — Gộp DataSource + Repository + UseCase
 @LazySingleton()

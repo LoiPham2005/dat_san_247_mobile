@@ -19,6 +19,8 @@ import 'package:dat_san_247_mobile/core/ads/services/ad_manager.dart' as _i882;
 import 'package:dat_san_247_mobile/core/ads/services/ad_service.dart' as _i532;
 import 'package:dat_san_247_mobile/core/cache/app_cache_manager.dart' as _i681;
 import 'package:dat_san_247_mobile/core/database/app_database.dart' as _i676;
+import 'package:dat_san_247_mobile/core/database/daos/local_cache_dao.dart'
+    as _i178;
 import 'package:dat_san_247_mobile/core/di/injection.dart' as _i741;
 import 'package:dat_san_247_mobile/core/l10n/localization_service.dart'
     as _i534;
@@ -106,10 +108,10 @@ import 'package:dat_san_247_mobile/features/example/category_ket_hop/domain/usec
     as _i344;
 import 'package:dat_san_247_mobile/features/example/category_ket_hop/presentation/bloc/category_bloc.dart'
     as _i95;
-import 'package:dat_san_247_mobile/features/example/category_rut_gon/data/category_repository.dart'
-    as _i1005;
-import 'package:dat_san_247_mobile/features/example/category_rut_gon/data/category_service.dart'
-    as _i141;
+import 'package:dat_san_247_mobile/features/example/category_rut_gon/data/repositories/category_repository.dart'
+    as _i879;
+import 'package:dat_san_247_mobile/features/example/category_rut_gon/data/services/category_service.dart'
+    as _i594;
 import 'package:dat_san_247_mobile/features/example/category_rut_gon/presentation/bloc/category_bloc.dart'
     as _i348;
 import 'package:dat_san_247_mobile/features/example/category_thu_cong/data/datasources/category_remote_datasource.dart'
@@ -126,6 +128,8 @@ import 'package:dat_san_247_mobile/features/example/category_toi_uu/data/reposit
     as _i879;
 import 'package:dat_san_247_mobile/features/example/category_toi_uu/data/services/category_service.dart'
     as _i856;
+import 'package:dat_san_247_mobile/features/example/category_toi_uu/presentation/bloc/category_bloc.dart'
+    as _i900;
 import 'package:dat_san_247_mobile/routes/app_router.dart' as _i850;
 import 'package:dat_san_247_mobile/routes/app_routes_observer.dart' as _i1062;
 import 'package:dat_san_247_mobile/routes/route_guards.dart' as _i899;
@@ -152,7 +156,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i1062.AppRoutesObserver>(() => _i1062.AppRoutesObserver());
     gh.lazySingleton<_i352.AdRemoteConfig>(() => _i352.AdRemoteConfig());
-    gh.lazySingleton<_i681.AppCacheManager>(() => _i681.AppCacheManager());
     gh.lazySingleton<_i676.AppDatabase>(() => _i676.AppDatabase());
     gh.lazySingleton<_i558.FlutterSecureStorage>(
       () => registerModule.secureStorage,
@@ -199,11 +202,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i296.CategoryService>(
       () => _i296.CategoryService.new(gh<_i361.Dio>()),
     );
-    gh.lazySingleton<_i141.CategoryRutGonService>(
-      () => _i141.CategoryRutGonService.new(gh<_i361.Dio>()),
-    );
     gh.lazySingleton<_i856.CategoryService>(
       () => _i856.CategoryService.new(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i594.CategoryRutGonService>(
+      () => _i594.CategoryRutGonService.new(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i879.CategoryRutGonRepository>(
+      () => _i879.CategoryRutGonRepository(gh<_i594.CategoryRutGonService>()),
+    );
+    gh.lazySingleton<_i178.LocalCacheDao>(
+      () => _i178.LocalCacheDao(gh<_i676.AppDatabase>()),
     );
     gh.lazySingleton<_i616.NetworkInfo>(
       () => _i616.NetworkInfoImpl(gh<_i161.InternetConnection>()),
@@ -229,8 +238,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i879.CategoryRepository>(
       () => _i879.CategoryRepository(gh<_i856.CategoryService>()),
     );
-    gh.lazySingleton<_i1005.CategoryRutGonRepository>(
-      () => _i1005.CategoryRutGonRepository(gh<_i141.CategoryRutGonService>()),
+    gh.lazySingleton<_i681.AppCacheManager>(
+      () => _i681.AppCacheManager(gh<_i178.LocalCacheDao>()),
+    );
+    gh.factory<_i348.CategoryRutGonBloc>(
+      () => _i348.CategoryRutGonBloc(gh<_i879.CategoryRutGonRepository>()),
     );
     gh.lazySingletonAsync<_i882.AdManager>(
       () async => _i882.AdManager(
@@ -252,8 +264,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i348.SmartCacheInterceptor>(),
       ),
     );
-    gh.factory<_i348.CategoryRutGonBloc>(
-      () => _i348.CategoryRutGonBloc(gh<_i1005.CategoryRutGonRepository>()),
+    gh.factory<_i900.CategoryBloc>(
+      () => _i900.CategoryBloc(gh<_i879.CategoryRepository>()),
     );
     gh.lazySingleton<_i649.ApiClient>(
       () => _i649.ApiClient(gh<_i297.DioClient>(), gh<_i616.NetworkInfo>()),

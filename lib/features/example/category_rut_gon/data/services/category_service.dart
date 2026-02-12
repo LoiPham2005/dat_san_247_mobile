@@ -5,8 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '../../../../core/constants/api_constants.dart';
-import 'category_model.dart';
+import '../../../../../core/constants/api_constants.dart';
+import '../models/category_model.dart';
 
 part 'category_service.g.dart';
 

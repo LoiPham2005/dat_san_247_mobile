@@ -7,8 +7,8 @@ import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/state_management/riverpod/base_async_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/category_model.dart';
-import '../../data/category_repository.dart';
+import '../../data/models/category_model.dart';
+import '../../data/repositories/category_repository.dart';
 
 /// ✅ Provider defined for CategoryRutGonRepository
 final categoryRutGonRepositoryProvider = Provider<CategoryRutGonRepository>((ref) {

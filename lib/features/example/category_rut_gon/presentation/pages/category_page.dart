@@ -6,7 +6,7 @@ import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/category_model.dart';
+import '../../data/models/category_model.dart';
 import '../bloc/category_bloc.dart';
 import '../bloc/category_event.dart';
 import '../widgets/category_card.dart';

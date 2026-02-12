@@ -4,3 +4,5 @@
 bricks:
   feature:
     path: bricks/feature
+  feature_rut_gon:
+    path: bricks/feature_rut_gon

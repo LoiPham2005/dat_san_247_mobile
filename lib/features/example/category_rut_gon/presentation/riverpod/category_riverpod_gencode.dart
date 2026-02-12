@@ -91,8 +91,8 @@ import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/state_management/riverpod/result_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../data/category_model.dart';
-import '../../data/category_repository.dart';
+import '../../data/models/category_model.dart';
+import '../../data/repositories/category_repository.dart';
 
 part 'category_riverpod_gencode.g.dart';
 
