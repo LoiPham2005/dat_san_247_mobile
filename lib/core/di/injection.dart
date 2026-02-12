@@ -1,8 +1,11 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
+import 'package:dat_san_247_mobile/core/network/dio_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'injection.config.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -23,12 +26,12 @@ abstract class RegisterModule {
   @lazySingleton
   FlutterSecureStorage get secureStorage => const FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
-    iOptions: IOSOptions(
-      accessibility: KeychainAccessibility.first_unlock,
-      synchronizable: true,
-    ),
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock, synchronizable: true),
   );
 
   @lazySingleton
-  Connectivity get connectivity => Connectivity();
+  InternetConnection get internetConnection => InternetConnection();
+
+  @lazySingleton
+  Dio get dio => getIt<DioClient>().dio;
 }

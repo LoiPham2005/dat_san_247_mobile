@@ -2,12 +2,12 @@
 // 📁 lib/core/state_management/bloc/base_state.dart (FINAL UPDATED)
 // ════════════════════════════════════════════════════════════════
 
-import 'package:dat_san_247_mobile/core/state_management/bloc/bloc_status.dart';
 import 'package:equatable/equatable.dart';
+import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
 
 /// Base State cho tất cả BLoCs
 class BaseState<T> extends Equatable {
-  final BlocStatus status;
+  final BaseStatus status;
   final T? data;
   final String? error;
   final String? message;
@@ -29,52 +29,56 @@ class BaseState<T> extends Equatable {
   // Factories
   // ════════════════════════════════════════════════════════════
 
-  factory BaseState.initial() => const BaseState(status: BlocStatus.initial);
+  factory BaseState.initial() => const BaseState(status: BaseStatus.initial);
 
   factory BaseState.loading({T? previousData}) =>
-      BaseState(status: BlocStatus.loading, data: previousData);
+      BaseState(status: BaseStatus.loading, data: previousData);
 
   factory BaseState.loaded(T data, {Map<String, dynamic>? metadata}) =>
-      BaseState(status: BlocStatus.loaded, data: data, metadata: metadata);
+      BaseState(status: BaseStatus.loaded, data: data, metadata: metadata);
 
   factory BaseState.empty({String? message}) =>
-      BaseState(status: BlocStatus.empty, message: message ?? 'Không có dữ liệu');
+      BaseState(status: BaseStatus.empty, message: message ?? 'Không có dữ liệu');
 
   factory BaseState.failure({
     required String error,
     StackTrace? stackTrace, // ✅ NEW
     T? previousData,
   }) => BaseState(
-    status: BlocStatus.failure,
+    status: BaseStatus.failure,
     error: error,
     stackTrace: stackTrace, // ✅ NEW
     data: previousData,
   );
 
   factory BaseState.success({T? data, String? message}) =>
-      BaseState(status: BlocStatus.success, data: data, message: message);
+      BaseState(status: BaseStatus.success, data: data, message: message);
 
-  factory BaseState.submitting({T? data}) => BaseState(status: BlocStatus.submitting, data: data);
+  factory BaseState.submitting({T? data}) => BaseState(status: BaseStatus.submitting, data: data);
 
   factory BaseState.refreshing({required T currentData}) =>
-      BaseState(status: BlocStatus.refreshing, data: currentData);
+      BaseState(status: BaseStatus.refreshing, data: currentData);
+
+  factory BaseState.loadingMore({required T currentData}) =>
+      BaseState(status: BaseStatus.loadingMore, data: currentData);
 
   // ════════════════════════════════════════════════════════════
   // Getters
   // ════════════════════════════════════════════════════════════
 
-  bool get isInitial => status == BlocStatus.initial;
-  bool get isLoading => status == BlocStatus.loading;
-  bool get isLoaded => status == BlocStatus.loaded;
-  bool get isEmpty => status == BlocStatus.empty;
-  bool get isFailure => status == BlocStatus.failure;
-  bool get isSuccess => status == BlocStatus.success;
-  bool get isSubmitting => status == BlocStatus.submitting;
-  bool get isRefreshing => status == BlocStatus.refreshing;
+  bool get isInitial => status == BaseStatus.initial;
+  bool get isLoading => status == BaseStatus.loading;
+  bool get isLoaded => status == BaseStatus.loaded;
+  bool get isEmpty => status == BaseStatus.empty;
+  bool get isFailure => status == BaseStatus.failure;
+  bool get isSuccess => status == BaseStatus.success;
+  bool get isSubmitting => status == BaseStatus.submitting;
+  bool get isRefreshing => status == BaseStatus.refreshing;
+  bool get isLoadingMore => status == BaseStatus.loadingMore;
 
   bool get hasData => data != null;
   bool get hasError => error != null && error!.isNotEmpty;
-  bool get isProcessing => isLoading || isSubmitting || isRefreshing;
+  bool get isProcessing => isLoading || isSubmitting || isRefreshing || isLoadingMore;
   bool get canRetry => isFailure && retryCount < 3;
 
   // ════════════════════════════════════════════════════════════
@@ -86,15 +90,15 @@ class BaseState<T> extends Equatable {
     if (error != null) return error!;
 
     return switch (status) {
-      BlocStatus.initial => '',
-      BlocStatus.loading => 'Đang tải...',
-      BlocStatus.refreshing => 'Đang làm mới...',
-      BlocStatus.submitting => 'Đang xử lý...',
-      BlocStatus.empty => 'Không có dữ liệu',
-      BlocStatus.failure => 'Đã xảy ra lỗi',
-      BlocStatus.success => 'Thành công',
-      BlocStatus.loaded => '',
-      BlocStatus.loadingMore => 'Đang tải thêm...',
+      BaseStatus.initial => '',
+      BaseStatus.loading => 'Đang tải...',
+      BaseStatus.refreshing => 'Đang làm mới...',
+      BaseStatus.submitting => 'Đang xử lý...',
+      BaseStatus.empty => 'Không có dữ liệu',
+      BaseStatus.failure => 'Đã xảy ra lỗi',
+      BaseStatus.success => 'Thành công',
+      BaseStatus.loaded => '',
+      BaseStatus.loadingMore => 'Đang tải thêm...',
     };
   }
 
@@ -103,7 +107,7 @@ class BaseState<T> extends Equatable {
   // ════════════════════════════════════════════════════════════
 
   BaseState<T> copyWith({
-    BlocStatus? status,
+    BaseStatus? status,
     T? data,
     String? error,
     String? message,

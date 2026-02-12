@@ -2,10 +2,9 @@
 // 📁 lib/core/network/dio_client.dart (UPDATED)
 // ════════════════════════════════════════════════════════════════
 import 'package:dio/dio.dart';
+import 'package:dat_san_247_mobile/config/environment_config.dart';
 import 'package:injectable/injectable.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-import '../config/environment_config.dart';
 import '../constants/app_constants.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
@@ -33,11 +32,10 @@ class DioClient {
 
     // ✅ UPDATED: Thứ tự interceptors rất quan trọng!
     _dio.interceptors.addAll([
-      cacheInterceptor,      // 1. Cache
-      authInterceptor,       // 2. Auth (token + 401 refresh)
-      errorInterceptor,      // 3. Error logging
-      loggingInterceptor,    // 4. Request/Response logging
-
+      cacheInterceptor, // 1. Cache
+      authInterceptor, // 2. Auth (token + 401 refresh)
+      errorInterceptor, // 3. Error logging
+      loggingInterceptor, // 4. Request/Response logging
 
       // PrettyDioLogger(
       //   requestHeader: false,
@@ -62,8 +60,6 @@ class DioClient {
       //     }
       //   },
       // )
-
-
     ]);
   }
 
@@ -172,4 +168,9 @@ class DioClient {
     onReceiveProgress: onReceiveProgress,
     cancelToken: cancelToken,
   );
+
+  /// ✅ NEW: Clear authorization header
+  void clearAuthorization() {
+    _dio.options.headers.remove('Authorization');
+  }
 }

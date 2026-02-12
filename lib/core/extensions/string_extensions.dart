@@ -83,4 +83,24 @@ extension StringExtensions on String {
   double toDoubleOrDefault([double defaultValue = 0.0]) {
     return double.tryParse(this) ?? defaultValue;
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // FORMATTING (Consolidated from Formatters)
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Mask phone: 0912***345
+  String get maskPhone {
+    if (length < 7) return this;
+    return '${substring(0, 4)}***${substring(length - 3)}';
+  }
+
+  /// Mask email: a***@gmail.com
+  String get maskEmail {
+    if (!contains('@')) return this;
+    final parts = split('@');
+    final name = parts[0];
+    final domain = parts[1];
+    if (name.length <= 2) return this;
+    return '${name[0]}***@$domain';
+  }
 }

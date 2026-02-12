@@ -1,48 +1,3 @@
-// // lib/core/theme/app_colors.dart
-// import 'package:flutter/material.dart';
-
-// class AppColors {
-//   AppColors._();
-
-//   // Primary Colors
-//   static const Color primary = Color(0xFF2196F3);
-//   static const Color primaryLight = Color(0xFF64B5F6);
-//   static const Color primaryDark = Color(0xFF1976D2);
-
-//   // Secondary Colors
-//   static const Color secondary = Color(0xFFFF9800);
-//   static const Color secondaryLight = Color(0xFFFFB74D);
-//   static const Color secondaryDark = Color(0xFFF57C00);
-
-//   // Status Colors
-//   static const Color success = Color(0xFF4CAF50);
-//   static const Color warning = Color(0xFFFFC107);
-//   static const Color error = Color(0xFFF44336);
-//   static const Color info = Color(0xFF2196F3);
-
-//   // Neutral Colors
-//   static const Color white = Color(0xFFFFFFFF);
-//   static const Color black = Color(0xFF000000);
-//   static const Color grey = Color(0xFF9E9E9E);
-//   static const Color greyLight = Color(0xFFE0E0E0);
-//   static const Color greyDark = Color(0xFF616161);
-
-//   // Background Colors
-//   static const Color background = Color(0xFFF5F5F5);
-//   static const Color surface = Color(0xFFFFFFFF);
-//   static const Color scaffoldBackground = Color(0xFFFAFAFA);
-
-//   // Text Colors
-//   static const Color textPrimary = Color(0xFF212121);
-//   static const Color textSecondary = Color(0xFF757575);
-//   static const Color textHint = Color(0xFFBDBDBD);
-//   static const Color textDisabled = Color(0xFFE0E0E0);
-
-//   // Border Colors
-//   static const Color border = Color(0xFFE0E0E0);
-//   static const Color divider = Color(0xFFBDBDBD);
-// }
-
 // ========================================
 // 📁 lib/core/theme/app_colors.dart
 // ========================================
@@ -53,6 +8,14 @@ class AppColors {
 
   // ✅ ĐỊNH NGHĨA TẤT CẢ THEME COLORS
   static const Map<String, ColorSet> themeColors = {
+    'court': ColorSet(
+      primary: Color(0xFF27AE60), // Sporty Green
+      primaryLight: Color(0xFF58D68D),
+      primaryDark: Color(0xFF1E8449),
+      secondary: Color(0xFFF1C40F), // Tennis Yellow
+      secondaryLight: Color(0xFFF7DC6F),
+      secondaryDark: Color(0xFFD4AC0D),
+    ),
     'blue': ColorSet(
       primary: Color(0xFF2196F3),
       primaryLight: Color(0xFF64B5F6),
@@ -62,7 +25,7 @@ class AppColors {
       secondaryDark: Color(0xFFF57C00),
     ),
     'green': ColorSet(
-      primary: Color(0xFF4CAF50),
+      primary: Color(0xFF27AE60),
       primaryLight: Color(0xFF81C784),
       primaryDark: Color(0xFF388E3C),
       secondary: Color(0xFFFF5722),
@@ -159,79 +122,30 @@ class AppColors {
   static const Color info = Color(0xFF2196F3);
 
   // Neutral Colors
+  static const Color primary = Color(0xFF27AE60);
+  static const Color primaryLight = Color(0xFF58D68D);
+  static const Color primaryDark = Color(0xFF1E8449);
+  static const Color secondary = Color(0xFFF1C40F);
   static const Color white = Color(0xFFFFFFFF);
-  static const Color black = Color(0xFF000000);
-  static const Color grey = Color(0xFF9E9E9E);
-  static const Color greyLight = Color(0xFFE0E0E0);
-  static const Color greyDark = Color(0xFF616161);
+  static const Color black = Color(0xFF2C3E50);
+  static const Color grey = Color(0xFF95A5A6);
+  static const Color greyLight = Color(0xFFECF0F1);
+  static const Color greyDark = Color(0xFF7F8C8D);
 
   // Background Colors
-  static const Color background = Color(0xFFF5F5F5);
+  static const Color background = Color(0xFFF8F9FA);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color scaffoldBackground = Color(0xFFFAFAFA);
-  static const Color secondary = Color(0xFFFAFAFA);
+  static const Color scaffoldBackground = Color(0xFFF8F9FA);
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textHint = Color(0xFFBDBDBD);
-  static const Color textDisabled = Color(0xFFE0E0E0);
+  static const Color textPrimary = Color(0xFF2C3E50);
+  static const Color textSecondary = Color(0xFF7F8C8D);
+  static const Color textHint = Color(0xFFBDC3C7);
+  static const Color textDisabled = Color(0xFFD5DBDB);
 
   // Border Colors
-  static const Color border = Color(0xFFE0E0E0);
-  static const Color divider = Color(0xFFBDBDBD);
-
-  static const primaryColor = Color(0xff62b766);
-  // Base colors
-  static const Color primaryGreen = Color(0xff4fa553);
-  static const Color lightGreen = Color(0xff62b766);
-  // static const Color background = Color(0xffF5F5F5);
-
-  // Gradient colors
-  static List<Color> primaryGradient = [primaryGreen, lightGreen];
-
-  // static const white = Color(0xffFFFFFF);
-  static const whiteF6 = Color(0xfff6f6ff);
-
-  // static const black = Color(0xff464447);
-
-  static const gray46 = Color(0xff464447);
-  static const grayE7 = Color(0xffE7E8E9);
-  static const gray9B = Color(0xff9B9B9B);
-  static const gray82 = Color(0xff9B9B9B);
-
-  static const grayF6 = Color(0xffF6F6F6);
-  static const orangeE6 = Color(0xffE68A37);
-
-  static const redF0 = Color(0xffE68A37);
-
-  // Màu chính (Primary)
-  static const Color primary = Color(0xff62b766);
-  static const Color primary2 = Color(0xff4fa553);
-
-  // Màu text
-  // static const Color textPrimary = Color(0xff2d5533);
-  // static const Color textSecondary = Color(0xff6c757d);
-
-  // Màu nền
-  static const Color inputBackground = Color(0xfff8f9fa);
-
-  // Màu border
-  // static const Color border = Color(0xffe0e0e0);
-
-  // Màu phụ trợ
-  static const Color google = Color(0xffdb4437);
-  static const Color facebook = Color(0xff4267b2);
-
-  // Màu thông báo
-  // static const Color error = Colors.red;
-  // static const Color success = Color(0xff28a745);
-
-  static const gradient = LinearGradient(
-    colors: [Color(0xff62b766), Color(0xff4fa553)],
-    end: Alignment.centerRight,
-    begin: Alignment.centerLeft,
-  );
+  static const Color border = Color(0xFFD5DBDB);
+  static const Color divider = Color(0xFFE5E8E8);
 }
 
 // ✅ ColorSet class

@@ -1,10 +1,4 @@
-// ════════════════════════════════════════════════════════════════
-// 📁 lib/core/extensions/widget_extensions.dart
-// ════════════════════════════════════════════════════════════════
 import 'package:flutter/material.dart';
-
-// ❌ XÓA PHẦN NÀY (đã có trong number_extensions.dart)
-// extension NumExtensions on num { ... }
 
 // ✅ CHỈ GIỮ PHẦN NÀY
 extension WidgetExtensions on Widget {
@@ -31,19 +25,9 @@ extension WidgetExtensions on Widget {
   }
 
   /// Padding only specific sides
-  Widget paddingOnly({
-    double left = 0,
-    double top = 0,
-    double right = 0,
-    double bottom = 0,
-  }) {
+  Widget paddingOnly({double left = 0, double top = 0, double right = 0, double bottom = 0}) {
     return Padding(
-      padding: EdgeInsets.only(
-        left: left,
-        top: top,
-        right: right,
-        bottom: bottom,
-      ),
+      padding: EdgeInsets.only(left: left, top: top, right: right, bottom: bottom),
       child: this,
     );
   }
@@ -87,19 +71,9 @@ extension WidgetExtensions on Widget {
   }
 
   /// Margin only specific sides
-  Widget marginOnly({
-    double left = 0,
-    double top = 0,
-    double right = 0,
-    double bottom = 0,
-  }) {
+  Widget marginOnly({double left = 0, double top = 0, double right = 0, double bottom = 0}) {
     return Container(
-      margin: EdgeInsets.only(
-        left: left,
-        top: top,
-        right: right,
-        bottom: bottom,
-      ),
+      margin: EdgeInsets.only(left: left, top: top, right: right, bottom: bottom),
       child: this,
     );
   }
@@ -117,16 +91,11 @@ extension WidgetExtensions on Widget {
   Widget alignTopLeft() => Align(alignment: Alignment.topLeft, child: this);
   Widget alignTopCenter() => Align(alignment: Alignment.topCenter, child: this);
   Widget alignTopRight() => Align(alignment: Alignment.topRight, child: this);
-  Widget alignCenterLeft() =>
-      Align(alignment: Alignment.centerLeft, child: this);
-  Widget alignCenterRight() =>
-      Align(alignment: Alignment.centerRight, child: this);
-  Widget alignBottomLeft() =>
-      Align(alignment: Alignment.bottomLeft, child: this);
-  Widget alignBottomCenter() =>
-      Align(alignment: Alignment.bottomCenter, child: this);
-  Widget alignBottomRight() =>
-      Align(alignment: Alignment.bottomRight, child: this);
+  Widget alignCenterLeft() => Align(alignment: Alignment.centerLeft, child: this);
+  Widget alignCenterRight() => Align(alignment: Alignment.centerRight, child: this);
+  Widget alignBottomLeft() => Align(alignment: Alignment.bottomLeft, child: this);
+  Widget alignBottomCenter() => Align(alignment: Alignment.bottomCenter, child: this);
+  Widget alignBottomRight() => Align(alignment: Alignment.bottomRight, child: this);
 
   // ═══════════════════════════════════════════════════════════════
   // FLEX
@@ -156,8 +125,7 @@ extension WidgetExtensions on Widget {
   Widget withHeight(double height) => SizedBox(height: height, child: this);
 
   /// Square size
-  Widget square(double size) =>
-      SizedBox(width: size, height: size, child: this);
+  Widget square(double size) => SizedBox(width: size, height: size, child: this);
 
   // ═══════════════════════════════════════════════════════════════
   // VISIBILITY & OPACITY
@@ -269,11 +237,7 @@ extension WidgetExtensions on Widget {
     required Decoration decoration,
     DecorationPosition position = DecorationPosition.background,
   }) {
-    return DecoratedBox(
-      decoration: decoration,
-      position: position,
-      child: this,
-    );
+    return DecoratedBox(decoration: decoration, position: position, child: this);
   }
 
   /// Background color
@@ -291,10 +255,7 @@ extension WidgetExtensions on Widget {
 
   /// ClipRRect
   Widget clipRRect({double radius = 8.0, BorderRadius? borderRadius}) {
-    return ClipRRect(
-      borderRadius: borderRadius ?? BorderRadius.circular(radius),
-      child: this,
-    );
+    return ClipRRect(borderRadius: borderRadius ?? BorderRadius.circular(radius), child: this);
   }
 
   /// Clip oval
@@ -416,12 +377,7 @@ extension WidgetExtensions on Widget {
   // ═══════════════════════════════════════════════════════════════
 
   /// Constrained box
-  Widget constrained({
-    double? minWidth,
-    double? maxWidth,
-    double? minHeight,
-    double? maxHeight,
-  }) {
+  Widget constrained({double? minWidth, double? maxWidth, double? minHeight, double? maxHeight}) {
     return ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: minWidth ?? 0.0,

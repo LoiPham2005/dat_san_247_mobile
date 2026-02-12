@@ -2,10 +2,12 @@ Một số lệnh FVM hữu ích
 Lệnh	Chức năng
 fvm list	Liệt kê các Flutter version đã cài
 fvm releases	Liệt kê tất cả version Flutter có thể cài
+fvm use 3.22.1	Đặt Flutter mặc định cho toàn máy
 fvm remove 3.13.9	Xóa version Flutter không dùng
 fvm flutter doctor	Chạy flutter doctor bằng FVM
 fvm global 3.22.1	Đặt Flutter mặc định cho toàn máy
-
+fvm global 3.22.1 --remove	Xóa Flutter mặc định
+fvm global	Xem Flutter mặc định
 
 
 

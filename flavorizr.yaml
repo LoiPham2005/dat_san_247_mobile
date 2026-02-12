@@ -9,14 +9,14 @@ flavors:
   # ════════════════════════════════════════════════════════════
   dev:
     app:
-      name: "MyApp Dev"
+      name: "Dặt Sân 247 Dev"
     android:
-      applicationId: "com.example.dat_san_247_mobile.dev"
+      applicationId: "com.datsan247.mobile.dev"
       icon: "assets/icons/dev.png"
       # firebase:
       #   config: "firebase/dev/google-services.json"
     ios:
-      bundleId: "com.example.dat_san_247_mobile.dev"
+      bundleId: "com.datsan247.mobile.dev"
       icon: "assets/icons/dev.png"
       # firebase:
       #   config: "firebase/dev/GoogleService-Info.plist"
@@ -26,14 +26,14 @@ flavors:
   # ════════════════════════════════════════════════════════════
   stg:
     app:
-      name: "MyApp Stg"
+      name: "Dặt Sân 247 Stg"
     android:
-      applicationId: "com.example.dat_san_247_mobile.stg"
+      applicationId: "com.datsan247.mobile.stg"
       icon: "assets/icons/stg.png"
       # firebase:
       #   config: "firebase/staging/google-services.json"
     ios:
-      bundleId: "com.example.dat_san_247_mobile.stg"
+      bundleId: "com.datsan247.mobile.stg"
       icon: "assets/icons/stg.png"
       # firebase:
       #   config: "firebase/staging/GoogleService-Info.plist"
@@ -43,27 +43,14 @@ flavors:
   # ════════════════════════════════════════════════════════════
   prod:
     app:
-      name: "MyApp"
+      name: "Dặt Sân 247"
     android:
-      applicationId: "com.example.dat_san_247_mobile"
+      applicationId: "com.datsan247.mobile"
       icon: "assets/icons/prod.png"
       # firebase:
       #   config: "firebase/prod/google-services.json"
     ios:
-      bundleId: "com.example.dat_san_247_mobile"
+      bundleId: "com.datsan247.mobile"
       icon: "assets/icons/prod.png"
       # firebase:
       #   config: "firebase/prod/GoogleService-Info.plist"
-
-# Instructions
-instructions:
-  - android:androidManifest
-  - android:buildGradle
-  - android:icons
-  - ios:xcconfig
-  - ios:buildTargets
-  - ios:schema
-  - ios:icons
-  - ios:plist
-  - assets:download
-  - ide:config

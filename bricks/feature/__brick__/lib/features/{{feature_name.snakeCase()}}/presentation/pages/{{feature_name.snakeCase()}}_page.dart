@@ -7,7 +7,7 @@ import '../widgets/{{feature_name.snakeCase()}}_item.dart';
 import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
 
 /// {{feature_name.pascalCase()}} page
-class {{feature_name.pascalCase()}}Page extends void StatelessWidget {
+class {{feature_name.pascalCase()}}Page extends StatelessWidget {
   const {{feature_name.pascalCase()}}Page({super.key});
 
   @override

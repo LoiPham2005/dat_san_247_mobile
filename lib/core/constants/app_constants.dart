@@ -3,8 +3,10 @@ class AppConstants {
   AppConstants._();
 
   // PackageId
-  static const String androidPackageId = 'com.example.dat_san_247_mobile';
+  // PackageId
+  static const String androidPackageName = 'com.example.dat_san_247_mobile';
   static const String iosBundleId = 'com.example.dat_san_247_mobile';
+  static const String appStoreId = '123456789'; // TODO: Update with real App Store ID
   // App Info
   static const String appName = 'My Flutter App';
   static const String appNameDev = 'Base App (Dev)';
@@ -31,4 +33,7 @@ class AppConstants {
   static const int maxRetries = 3;
   static const Duration retryDelay = Duration(seconds: 1);
   static const List<int> retryStatusCodes = [408, 500, 502, 503, 504];
+
+  // Remote Config
+  static const String adConfigKey = 'ad_config';
 }

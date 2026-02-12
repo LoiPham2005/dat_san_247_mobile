@@ -329,36 +329,6 @@ jobs:
           path: build/app/outputs/flutter-apk/app-*.apk
 ```
 
----
-
-## 10. So sánh Flavors vs --dart-define (Deprecated)
-
-| Tiêu chí              | Flavors (✅ Dùng) | --dart-define (❌ Không dùng) |
-|----------------------|------------------|----------------------|
-| Đổi appId            | ✅ Tự động       | ❌ Không thể        |
-| Đổi tên app display  | ✅ Tự động       | ❌ Không thể        |
-| Đổi icon             | ✅ Tự động       | ❌ Không thể        |
-| Đổi API URL          | ✅ Qua env files | ⚠️ String-based      |
-| Đổi Firebase config  | ✅ Tự động       | ❌ Không thể        |
-| Cài song song        | ✅ Có            | ❌ Không            |
-| CI/CD integration    | ✅ Tốt           | ⚠️ Dễ sai lệnh      |
-| Đa nền tảng          | ✅ Native + Dart | ⚠️ Chỉ Dart         |
-
-**Khuyến nghị:**
-- ✅ **Chỉ dùng Flavors** cho cấu hình native + Dart.
-- ❌ **Bỏ --dart-define=ENV** vì có Entrypoint riêng cho mỗi flavor.
-
----
-
-## 11. Notes
-
-- **Luôn truyền đúng cả flavor và entrypoint** khi build/run.
-- **Environment được set tại khởi tạo app** trong `mainCommon(Environment env)`.
-- **Không cần truyền --dart-define** vì entrypoint đã xác định rõ.
-- **Flavor scope**: Android + iOS (từ native side).
-
----
-
 ## 🔗 Related Docs
 
 - 📖 [docs/build_flavor.md](build_flavor.md)

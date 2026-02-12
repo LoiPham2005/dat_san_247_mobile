@@ -30,7 +30,7 @@ abstract class AuthRemoteDataSource {
 
   Future<Result<bool>> checkLoginStatus();
 
-  Future<Result<UserModel>> getProfile();
+  Future<Result<AuthUserModel>> getProfile();
 
   Future<Result<bool>> deleteAccount();
 }
@@ -110,10 +110,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Result<UserModel>> getProfile() async {
+  Future<Result<AuthUserModel>> getProfile() async {
     return _apiClient.get(
       ApiConstants.profile,
-      (json) => UserModel.fromJson(json),
+      (json) => AuthUserModel.fromJson(json),
     );
   }
 

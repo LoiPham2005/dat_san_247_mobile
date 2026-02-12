@@ -1,8 +1,8 @@
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/network/network_info.dart (FIXED - Support List)
+// 📁 lib/core/network/network_info.dart (UPGRADED)
 // ════════════════════════════════════════════════════════════════
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:injectable/injectable.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 /// Core network connectivity checker
 /// - Không phụ thuộc UI/BuildContext
@@ -10,34 +10,26 @@ import 'package:injectable/injectable.dart';
 /// - Dùng trong business logic, repositories, use cases
 abstract class NetworkInfo {
   Future<bool> get isConnected;
-  Future<List<ConnectivityResult>> get connectionTypes;
-  Stream<List<ConnectivityResult>> get onConnectivityChanged;
+  Stream<InternetStatus> get onStatusChange;
 
   // Helper methods
-  bool isConnectedFromResult(List<ConnectivityResult> results);
-  String getConnectionTypeName(List<ConnectivityResult> results);
+  String getConnectionTypeName(InternetStatus status);
 }
 
 @LazySingleton(as: NetworkInfo)
 class NetworkInfoImpl implements NetworkInfo {
-  final Connectivity _connectivity;
+  final InternetConnection _internetConnection;
 
-  NetworkInfoImpl(this._connectivity);
+  NetworkInfoImpl(this._internetConnection);
 
   @override
   Future<bool> get isConnected async {
-    final results = await _connectivity.checkConnectivity();
-    return isConnectedFromResult(results);
+    return await _internetConnection.hasInternetAccess;
   }
 
   @override
-  Future<List<ConnectivityResult>> get connectionTypes async {
-    return await _connectivity.checkConnectivity();
-  }
-
-  @override
-  Stream<List<ConnectivityResult>> get onConnectivityChanged {
-    return _connectivity.onConnectivityChanged;
+  Stream<InternetStatus> get onStatusChange {
+    return _internetConnection.onStatusChange;
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -45,38 +37,12 @@ class NetworkInfoImpl implements NetworkInfo {
   // ═══════════════════════════════════════════════════════════════
 
   @override
-  bool isConnectedFromResult(List<ConnectivityResult> results) {
-    return results.isNotEmpty &&
-        !results.every((result) => result == ConnectivityResult.none);
-  }
-
-  @override
-  String getConnectionTypeName(List<ConnectivityResult> results) {
-    if (results.isEmpty || results.every((r) => r == ConnectivityResult.none)) {
-      return 'No Connection';
-    }
-
-    // Get first non-none result
-    final result = results.firstWhere(
-      (r) => r != ConnectivityResult.none,
-      orElse: () => ConnectivityResult.none,
-    );
-
-    switch (result) {
-      case ConnectivityResult.wifi:
-        return 'WiFi';
-      case ConnectivityResult.mobile:
-        return 'Mobile Data';
-      case ConnectivityResult.ethernet:
-        return 'Ethernet';
-      case ConnectivityResult.bluetooth:
-        return 'Bluetooth';
-      case ConnectivityResult.vpn:
-        return 'VPN';
-      case ConnectivityResult.none:
-        return 'No Connection';
-      default:
-        return 'Unknown';
+  String getConnectionTypeName(InternetStatus status) {
+    switch (status) {
+      case InternetStatus.connected:
+        return 'Connected';
+      case InternetStatus.disconnected:
+        return 'Disconnected';
     }
   }
 }

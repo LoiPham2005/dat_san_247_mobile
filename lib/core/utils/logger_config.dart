@@ -2,7 +2,7 @@
 // 📁 lib/core/config/logger_config.dart
 // ════════════════════════════════════════════════════════════════
 
-import 'package:dat_san_247_mobile/core/config/environment_config.dart';
+import 'package:dat_san_247_mobile/config/environment_config.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 
 class LoggerConfig {

@@ -1,101 +1,67 @@
 [
-  // ═══════════════════════════════════════════════════════════
-  // 🚀 MAIN ACTIONS (Most Used)
-  // ═══════════════════════════════════════════════════════════
+  // CORE BUILD TASKS
   {
     "key": "ctrl+shift+b",
     "command": "workbench.action.tasks.runTask",
-    "args": "🚀 Build APK (Universal)",
+    "args": "🚀 Build APK",
     "when": "editorTextFocus"
   },
   {
+    "key": "ctrl+shift+a",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🏬 Build AAB",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🍎 Build iOS",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "� Build IPA",
+    "when": "editorTextFocus"
+  },
+  // CODE GENERATION
+  {
     "key": "ctrl+shift+r",
     "command": "workbench.action.tasks.runTask",
-    "args": "⚡ Build Runner (One-time)",
+    "args": "⚡ Build Runner",
     "when": "editorTextFocus"
   },
   {
     "key": "ctrl+shift+w",
     "command": "workbench.action.tasks.runTask",
-    "args": "👁️ Build Runner (Watch)",
+    "args": "👁️ Build Runner Watch",
     "when": "editorTextFocus"
   },
+  {
+    "key": "ctrl+alt+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 Generate l10n",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+s",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 Sync l10n (arb)",
+    "when": "editorTextFocus"
+  },
+  // MAINTENANCE
   {
     "key": "ctrl+shift+c",
     "command": "workbench.action.tasks.runTask",
     "args": "🧹 Clean & Get",
     "when": "editorTextFocus"
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // 🏗️ QUICK BUILDS - APK
-  // ═══════════════════════════════════════════════════════════
   {
-    "key": "ctrl+shift+1",
+    "key": "ctrl+shift+g",
     "command": "workbench.action.tasks.runTask",
-    "args": "📦 Build APK (Dev)",
+    "args": "🔄 Full Regenerate",
     "when": "editorTextFocus"
   },
-  {
-    "key": "ctrl+shift+2",
-    "command": "workbench.action.tasks.runTask",
-    "args": "📦 Build APK (Stg)",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+shift+3",
-    "command": "workbench.action.tasks.runTask",
-    "args": "📦 Build APK (Prod)",
-    "when": "editorTextFocus"
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // 🏗️ QUICK BUILDS - AAB
-  // ═══════════════════════════════════════════════════════════
-  {
-    "key": "ctrl+shift+a",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🏬 Build AAB (Universal)",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+alt+1",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🏬 Build AAB (Dev)",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+alt+2",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🏬 Build AAB (Stg)",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+alt+3",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🏬 Build AAB (Prod)",
-    "when": "editorTextFocus"
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // 🍎 iOS BUILDS
-  // ═══════════════════════════════════════════════════════════
-  {
-    "key": "ctrl+shift+i",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🍎 Build iOS (Universal)",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+shift+p",
-    "command": "workbench.action.tasks.runTask",
-    "args": "📦 Build IPA (Universal)",
-    "when": "editorTextFocus"
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // 📦 PUB COMMANDS
-  // ═══════════════════════════════════════════════════════════
   {
     "key": "ctrl+alt+g",
     "command": "workbench.action.tasks.runTask",
@@ -108,32 +74,7 @@
     "args": "⬆️ Pub Upgrade",
     "when": "editorTextFocus"
   },
-  {
-    "key": "ctrl+alt+o",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🔍 Pub Outdated",
-    "when": "editorTextFocus"
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // 🎯 CODE GENERATION
-  // ═══════════════════════════════════════════════════════════
-  {
-    "key": "ctrl+alt+b",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🎯 Build Runner (Current File)",
-    "when": "editorLangId == dart"
-  },
-  {
-    "key": "ctrl+alt+l",
-    "command": "workbench.action.tasks.runTask",
-    "args": "🌐 Generate l10n",
-    "when": "editorTextFocus"
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // 🔧 FLUTTER COMMANDS
-  // ═══════════════════════════════════════════════════════════
+  // QUALITY & ANALYSIS
   {
     "key": "ctrl+alt+d",
     "command": "workbench.action.tasks.runTask",
@@ -143,50 +84,95 @@
   {
     "key": "ctrl+alt+a",
     "command": "workbench.action.tasks.runTask",
-    "args": "📊 Flutter Analyze",
+    "args": "� Analyze & Fix",
     "when": "editorTextFocus"
   },
   {
     "key": "ctrl+alt+f",
     "command": "workbench.action.tasks.runTask",
-    "args": "✨ Dart Format",
+    "args": "✨ Format",
     "when": "editorTextFocus"
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // 🐛 DEBUG RUNS
-  // ═══════════════════════════════════════════════════════════
+  // TESTING
   {
-    "key": "ctrl+alt+shift+1",
+    "key": "ctrl+alt+t",
     "command": "workbench.action.tasks.runTask",
-    "args": "🐛 Run Debug (Dev)",
+    "args": "🧪 Test",
     "when": "editorTextFocus"
   },
   {
-    "key": "ctrl+alt+shift+2",
+    "key": "ctrl+alt+shift+t",
     "command": "workbench.action.tasks.runTask",
-    "args": "🐛 Run Debug (Stg)",
+    "args": "📈 Test Coverage",
+    "when": "editorTextFocus"
+  },
+  // MASON & FLAVORIZR
+  {
+    "key": "ctrl+alt+m",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🧱 Mason: Generate Feature",
     "when": "editorTextFocus"
   },
   {
-    "key": "ctrl+alt+shift+3",
+    "key": "ctrl+alt+shift+f",
     "command": "workbench.action.tasks.runTask",
-    "args": "🐛 Run Debug (Prod)",
+    "args": "� Flutter Flavorizr",
     "when": "editorTextFocus"
   },
-    {
-    "key": "ctrl+alt+s",
+  // ICONS & SPLASH
+  {
+    "key": "ctrl+alt+i",
     "command": "workbench.action.tasks.runTask",
-    "args": "🌐 Sync l10n (arb)",
+    "args": "🎨 Generate App Icons",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+n",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌊 Generate Native Splash",
+    "when": "editorTextFocus"
+  },
+  // FVM MANAGEMENT
+  {
+    "key": "ctrl+alt+shift+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📋 FVM List",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+shift+r",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 FVM Releases",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+shift+g",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔍 FVM Global",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+shift+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔧 FVM Doctor",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+shift+i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📥 FVM Install",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+shift+u",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🔧 FVM Use",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+shift+x",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🗑️ FVM Remove",
     "when": "editorTextFocus"
   }
-
-  // ═══════════════════════════════════════════════════════════
-  // 🐛 DEFAULT DEBUG SHORTCUTS (Keep VSCode defaults)
-  // ═══════════════════════════════════════════════════════════
-  // F5:              Start Debugging
-  // Ctrl+Shift+F5:   Hot Restart
-  // Shift+F5:        Stop Debugging
-  // Ctrl+F5:         Run Without Debugging
-  // Ctrl+Shift+D:    Show Debug Panel
 ]

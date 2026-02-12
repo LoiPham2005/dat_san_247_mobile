@@ -17,7 +17,7 @@ import '../../domain/usecases/{{feature_name.snakeCase()}}_usecases.dart';
 
 {{#has_list}}
 /// Fetch {{feature_name.lowerCase()}}s list
-class Fetch{{feature_name.pascalCase()}}sEvent extends void BaseEvent {
+class Fetch{{feature_name.pascalCase()}}sEvent extends BaseEvent {
   final Map<String, dynamic>? params;
   final bool refresh;
 
@@ -27,56 +27,56 @@ class Fetch{{feature_name.pascalCase()}}sEvent extends void BaseEvent {
   });
 
   @override
-  List<Object?> get List<Object?> props => [params, refresh];
+  List<Object?> get props => [params, refresh];
 }
 {{/has_list}}
 
 {{#has_detail}}
 /// Fetch {{feature_name.lowerCase()}} detail
-class Fetch{{feature_name.pascalCase()}}DetailEvent extends void BaseEvent {
+class Fetch{{feature_name.pascalCase()}}DetailEvent extends BaseEvent {
   final String id;
 
   const Fetch{{feature_name.pascalCase()}}DetailEvent(this.id);
 
   @override
-  List<Object?> get List<String> props => [id];
+  List<Object?> get props => [id];
 }
 {{/has_detail}}
 
 {{#has_create}}
 /// Create {{feature_name.lowerCase()}}
-class Create{{feature_name.pascalCase()}}Event extends void BaseEvent {
+class Create{{feature_name.pascalCase()}}Event extends BaseEvent {
   final Map<String, dynamic> data;
 
   const Create{{feature_name.pascalCase()}}Event(this.data);
 
   @override
-  List<Object?> get List<Map<String, dynamic>> props => [data];
+  List<Object?> get props => [data];
 }
 {{/has_create}}
 
 {{#has_update}}
 /// Update {{feature_name.lowerCase()}}
-class Update{{feature_name.pascalCase()}}Event extends void BaseEvent {
+class Update{{feature_name.pascalCase()}}Event extends BaseEvent {
   final String id;
   final Map<String, dynamic> data;
 
   const Update{{feature_name.pascalCase()}}Event(this.id, this.data);
 
   @override
-  List<Object?> get List<Object> props => [id, data];
+  List<Object?> get props => [id, data];
 }
 {{/has_update}}
 
 {{#has_delete}}
 /// Delete {{feature_name.lowerCase()}}
-class Delete{{feature_name.pascalCase()}}Event extends void BaseEvent {
+class Delete{{feature_name.pascalCase()}}Event extends BaseEvent {
   final String id;
 
   const Delete{{feature_name.pascalCase()}}Event(this.id);
 
   @override
-  List<Object?> get List<String> props => [id];
+  List<Object?> get props => [id];
 }
 {{/has_delete}}
 
@@ -85,12 +85,12 @@ class Delete{{feature_name.pascalCase()}}Event extends void BaseEvent {
 // ════════════════════════════════════════════════════════════════
 
 @injectable
-class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
-  {{#has_list}}final Get{{feature_name.pascalCase()}}sUseCase get{{feature_name.pascalCase()}}sUseCase;{{/has_list}}
-  {{#has_detail}}final Get{{feature_name.pascalCase()}}DetailUseCase get{{feature_name.pascalCase()}}DetailUseCase;{{/has_detail}}
-  {{#has_create}}final Create{{feature_name.pascalCase()}}UseCase create{{feature_name.pascalCase()}}UseCase;{{/has_create}}
-  {{#has_update}}final Update{{feature_name.pascalCase()}}UseCase update{{feature_name.pascalCase()}}UseCase;{{/has_update}}
-  {{#has_delete}}final Delete{{feature_name.pascalCase()}}UseCase delete{{feature_name.pascalCase()}}UseCase;{{/has_delete}}
+class {{feature_name.pascalCase()}}Bloc extends BaseBloc {
+  {{#has_list}}final Get{{feature_name.pascalCase()}}sUseCase _get{{feature_name.pascalCase()}}sUseCase;{{/has_list}}
+  {{#has_detail}}final Get{{feature_name.pascalCase()}}DetailUseCase _get{{feature_name.pascalCase()}}DetailUseCase;{{/has_detail}}
+  {{#has_create}}final Create{{feature_name.pascalCase()}}UseCase _create{{feature_name.pascalCase()}}UseCase;{{/has_create}}
+  {{#has_update}}final Update{{feature_name.pascalCase()}}UseCase _update{{feature_name.pascalCase()}}UseCase;{{/has_update}}
+  {{#has_delete}}final Delete{{feature_name.pascalCase()}}UseCase _delete{{feature_name.pascalCase()}}UseCase;{{/has_delete}}
 
   {{feature_name.pascalCase()}}Bloc({
     {{#has_list}}required Get{{feature_name.pascalCase()}}sUseCase get{{feature_name.pascalCase()}}sUseCase,{{/has_list}}
@@ -98,22 +98,22 @@ class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
     {{#has_create}}required Create{{feature_name.pascalCase()}}UseCase create{{feature_name.pascalCase()}}UseCase,{{/has_create}}
     {{#has_update}}required Update{{feature_name.pascalCase()}}UseCase update{{feature_name.pascalCase()}}UseCase,{{/has_update}}
     {{#has_delete}}required Delete{{feature_name.pascalCase()}}UseCase delete{{feature_name.pascalCase()}}UseCase,{{/has_delete}}
-  }) : {{#has_list}}get{{feature_name.pascalCase()}}sUseCase = get{{feature_name.pascalCase()}}sUseCase,{{/has_list}}
-       {{#has_detail}}get{{feature_name.pascalCase()}}DetailUseCase = get{{feature_name.pascalCase()}}DetailUseCase,{{/has_detail}}
-       {{#has_create}}create{{feature_name.pascalCase()}}UseCase = create{{feature_name.pascalCase()}}UseCase,{{/has_create}}
-       {{#has_update}}update{{feature_name.pascalCase()}}UseCase = update{{feature_name.pascalCase()}}UseCase,{{/has_update}}
-       {{#has_delete}}delete{{feature_name.pascalCase()}}UseCase = delete{{feature_name.pascalCase()}}UseCase,{{/has_delete}}
+  }) : {{#has_list}}_get{{feature_name.pascalCase()}}sUseCase = get{{feature_name.pascalCase()}}sUseCase,{{/has_list}}
+       {{#has_detail}}_get{{feature_name.pascalCase()}}DetailUseCase = get{{feature_name.pascalCase()}}DetailUseCase,{{/has_detail}}
+       {{#has_create}}_create{{feature_name.pascalCase()}}UseCase = create{{feature_name.pascalCase()}}UseCase,{{/has_create}}
+       {{#has_update}}_update{{feature_name.pascalCase()}}UseCase = update{{feature_name.pascalCase()}}UseCase,{{/has_update}}
+       {{#has_delete}}_delete{{feature_name.pascalCase()}}UseCase = delete{{feature_name.pascalCase()}}UseCase,{{/has_delete}}
        super(BaseState.initial()) {
-    {{#has_list}}on<Fetch{{feature_name.pascalCase()}}sEvent>(onFetch{{feature_name.pascalCase()}}s);{{/has_list}}
-    {{#has_detail}}on<Fetch{{feature_name.pascalCase()}}DetailEvent>(onFetch{{feature_name.pascalCase()}}Detail);{{/has_detail}}
-    {{#has_create}}on<Create{{feature_name.pascalCase()}}Event>(onCreate{{feature_name.pascalCase()}});{{/has_create}}
-    {{#has_update}}on<Update{{feature_name.pascalCase()}}Event>(onUpdate{{feature_name.pascalCase()}});{{/has_update}}
-    {{#has_delete}}on<Delete{{feature_name.pascalCase()}}Event>(onDelete{{feature_name.pascalCase()}});{{/has_delete}}
+    {{#has_list}}on<Fetch{{feature_name.pascalCase()}}sEvent>(_onFetch{{feature_name.pascalCase()}}s);{{/has_list}}
+    {{#has_detail}}on<Fetch{{feature_name.pascalCase()}}DetailEvent>(_onFetch{{feature_name.pascalCase()}}Detail);{{/has_detail}}
+    {{#has_create}}on<Create{{feature_name.pascalCase()}}Event>(_onCreate{{feature_name.pascalCase()}});{{/has_create}}
+    {{#has_update}}on<Update{{feature_name.pascalCase()}}Event>(_onUpdate{{feature_name.pascalCase()}});{{/has_update}}
+    {{#has_delete}}on<Delete{{feature_name.pascalCase()}}Event>(_onDelete{{feature_name.pascalCase()}});{{/has_delete}}
   }
 
   {{#has_list}}
   /// ✅ Fetch {{feature_name.lowerCase()}}s - dùng execute() hoặc executeRefresh()
-  Future<void> onFetch{{feature_name.pascalCase()}}Future<void> s(
+  Future<void> _onFetch{{feature_name.pascalCase()}}s(
     Fetch{{feature_name.pascalCase()}}sEvent event,
     Emitter<BaseState> emit,
   ) async {
@@ -122,7 +122,7 @@ class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
       await executeRefresh<List<{{feature_name.pascalCase()}}>>(
         event: event,
         emit: emit,
-        action: () => get{{feature_name.pascalCase()}}sUseCase(params: event.params),
+        action: () => _get{{feature_name.pascalCase()}}sUseCase(params: event.params),
         onSuccess: (data) {
           Logger.info('✅ Loaded {{feature_name.lowerCase()}}s: ${data.length} items');
         },
@@ -135,7 +135,7 @@ class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
       await execute<List<{{feature_name.pascalCase()}}>>(
         event: event,
         emit: emit,
-        action: () => get{{feature_name.pascalCase()}}sUseCase(params: event.params),
+        action: () => _get{{feature_name.pascalCase()}}sUseCase(params: event.params),
         onSuccess: (data) {
           Logger.info('✅ Loaded {{feature_name.lowerCase()}}s: ${data.length} items');
         },
@@ -149,14 +149,14 @@ class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
 
   {{#has_detail}}
   /// ✅ Fetch {{feature_name.lowerCase()}} detail
-  Future<void> onFetch{{feature_name.pascalCase()}}Future<void> Detail(
+  Future<void> _onFetch{{feature_name.pascalCase()}}Detail(
     Fetch{{feature_name.pascalCase()}}DetailEvent event,
     Emitter<BaseState> emit,
   ) async {
     await execute<{{feature_name.pascalCase()}}>(
       event: event,
       emit: emit,
-      action: () => get{{feature_name.pascalCase()}}DetailUseCase(event.id),
+      action: () => _get{{feature_name.pascalCase()}}DetailUseCase(event.id),
       onSuccess: (data) {
         Logger.info('✅ Loaded {{feature_name.lowerCase()}} detail');
       },
@@ -169,14 +169,14 @@ class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
 
   {{#has_create}}
   /// ✅ Create {{feature_name.lowerCase()}} - dùng executeMutation()
-  Future<void> onCreate{{feature_name.pascalCase()}}(
+  Future<void> _onCreate{{feature_name.pascalCase()}}(
     Create{{feature_name.pascalCase()}}Event event,
     Emitter<BaseState> emit,
   ) async {
     await executeMutation<{{feature_name.pascalCase()}}>(
       event: event,
       emit: emit,
-      action: () => create{{feature_name.pascalCase()}}UseCase(event.data),
+      action: () => _create{{feature_name.pascalCase()}}UseCase(event.data),
       successMessage: '{{feature_name.titleCase()}} created successfully',
       onSuccess: (data) {
         Logger.success('✅ {{feature_name.titleCase()}} created');
@@ -190,14 +190,14 @@ class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
 
   {{#has_update}}
   /// ✅ Update {{feature_name.lowerCase()}} - dùng executeMutation()
-  Future<void> onUpdate{{feature_name.pascalCase()}}(
+  Future<void> _onUpdate{{feature_name.pascalCase()}}(
     Update{{feature_name.pascalCase()}}Event event,
     Emitter<BaseState> emit,
   ) async {
     await executeMutation<{{feature_name.pascalCase()}}>(
       event: event,
       emit: emit,
-      action: () => update{{feature_name.pascalCase()}}UseCase(event.id, event.data),
+      action: () => _update{{feature_name.pascalCase()}}UseCase(event.id, event.data),
       successMessage: '{{feature_name.titleCase()}} updated successfully',
       onSuccess: (data) {
         Logger.success('✅ {{feature_name.titleCase()}} updated');
@@ -211,14 +211,14 @@ class {{feature_name.pascalCase()}}Bloc extends void BaseBloc {
 
   {{#has_delete}}
   /// ✅ Delete {{feature_name.lowerCase()}} - dùng executeMutation()
-  Future<void> onDelete{{feature_name.pascalCase()}}(
+  Future<void> _onDelete{{feature_name.pascalCase()}}(
     Delete{{feature_name.pascalCase()}}Event event,
     Emitter<BaseState> emit,
   ) async {
     await executeMutation<bool>(
       event: event,
       emit: emit,
-      action: () => delete{{feature_name.pascalCase()}}UseCase(event.id),
+      action: () => _delete{{feature_name.pascalCase()}}UseCase(event.id),
       successMessage: '{{feature_name.titleCase()}} deleted successfully',
       onSuccess: (_) {
         Logger.success('✅ {{feature_name.titleCase()}} deleted');

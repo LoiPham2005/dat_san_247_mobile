@@ -1,38 +1,39 @@
-// import 'package:flutter/material.dart';
-// import 'package:dat_san_247_mobile/core/state_management/providers/base_provider.dart';
-// import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
-// import 'package:dat_san_247_mobile/features/auth/domain/usecases/login_usecase.dart';
-// import 'package:injectable/injectable.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
+import 'package:dat_san_247_mobile/core/state_management/providers/base_provider.dart';
 
-// @injectable
-// class AuthProvider extends BaseProvider {
-//   AuthProvider(this._loginUseCase);
+/// 📘 EXAMPLE: CÁCH SỬ DỤNG BASE PROVIDER
+class UserProvider extends BaseProvider<List<String>> {
+  // 1️⃣ TRUY VẤN (QUERY)
+  Future<void> fetchUsers() async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return const ResultSuccess(['User 1', 'User 2']);
+      },
+    );
+  }
 
-//   final LoginUseCase _loginUseCase;
-//   // final RegisterUseCase _registerUseCase;
+  // 2️⃣ THAY ĐỔI DỮ LIỆU (MUTATION)
+  Future<void> saveUser(String name) async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return ResultSuccess(['Saved $name']);
+      },
+      successMessage: 'Lưu thành công',
+    );
+  }
 
-//   AuthResponse? _authData;
-//   AuthResponse? get authData => _authData;
-
-//   /// ✅ Login tái sử dụng từ BaseProvider
-//   Future<void> login(String email, String password) async {
-//     await execute<AuthResponse>(
-//       action: () => _loginUseCase(email: email, password: password),
-//       onSuccess: (data) {
-//         _authData = data;
-//         notifyListeners();
-//       },
-//     );
-//   }
-
-//   /// ✅ Register tái sử dụng chung logic
-//   // Future<void> register(String email, String password) async {
-//   //   await execute<AuthResponse>(
-//   //     action: () => _registerUseCase(email: email, password: password),
-//   //     onSuccess: (data) {
-//   //       _authData = data;
-//   //       notifyListeners();
-//   //     },
-//   //   );
-//   // }
-// }
+  // 3️⃣ TRẠNG THÁI TÙY CHỈNH (CUSTOM STATUS)
+  Future<void> customExecute() async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return const ResultSuccess(['Custom']);
+      },
+      // Ưu tiên sử dụng status truyền vào thay vì tự động detect
+      customStatus: BaseStatus.submitting,
+    );
+  }
+}

@@ -1,31 +1,40 @@
-// import 'package:dat_san_247_mobile/core/state_management/getx/base_controller.dart';
-// import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
-// import 'package:dat_san_247_mobile/features/auth/domain/usecases/login_usecase.dart';
-// import 'package:get/get.dart';
-// import 'package:injectable/injectable.dart';
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
+import 'package:dat_san_247_mobile/core/state_management/getx/base_controller.dart';
 
-// @injectable
-// class AuthController extends BaseController {
-//   final LoginUseCase _loginUseCase;
-//   // final RegisterUseCase _registerUseCase;
+/// 📘 EXAMPLE: CÁCH SỬ DỤNG BASE CONTROLLER (GETX)
+class UserXController extends BaseController<List<String>> {
+  // 1️⃣ TRUY VẤN (QUERY)
+  Future<void> fetchUsers() async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return ResultSuccess(['User 1', 'User 2']);
+      },
+      // Tự động emit loading/refreshing
+    );
+  }
 
-//   AuthController(this._loginUseCase,);
+  // 2️⃣ THAY ĐỔI DỮ LIỆU (MUTATION)
+  Future<void> addUser(String name) async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return ResultSuccess(['User 1', 'User 2', name]);
+      },
+      successMessage: 'Thêm người dùng thành công', // Nhận diện tự động
+    );
+  }
 
-//   final Rx<AuthResponse?> user = Rx<AuthResponse?>(null);
-
-//   /// ✅ Login dùng hàm tái sử dụng
-//   Future<void> login(String email, String password) async {
-//     await execute<AuthResponse>(
-//       action: () => _loginUseCase(email: email, password: password),
-//       onSuccess: (data) => user.value = data,
-//     );
-//   }
-
-//   /// ✅ Register cũng dùng lại y chang
-//   // Future<void> register(String email, String password) async {
-//   //   await execute<AuthResponse>(
-//   //     action: () => _registerUseCase(email: email, password: password),
-//   //     onSuccess: (data) => user.value = data,
-//   //   );
-//   // }
-// }
+  // 3️⃣ TRẠNG THÁI TÙY CHỈNH (CUSTOM STATUS)
+  Future<void> fetchWithCustomStatus() async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return ResultSuccess(['Data']);
+      },
+      // Có thể ép buộc status bất kỳ lúc bắt đầu
+      customStatus: BaseStatus.submitting,
+    );
+  }
+}

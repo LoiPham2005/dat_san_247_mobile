@@ -1,11 +1,12 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/network/api_client.dart (ULTIMATE)
 // ════════════════════════════════════════════════════════════════
+import 'package:dio/dio.dart';
 import 'package:dat_san_247_mobile/core/cache/cache_strategy.dart';
 import 'package:dat_san_247_mobile/core/network/interceptors/smart_cache_interceptor.dart';
-import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
+import '../errors/error_handler.dart';
 import '../errors/exceptions.dart';
 import '../errors/failures.dart';
 import '../errors/result.dart';
@@ -132,134 +133,7 @@ class ApiClient {
 
   /// Handle errors and convert to Result
   Result<T> _handleError<T>(dynamic error) {
-    if (error is DioException) {
-      return ResultFailure(_mapDioError(error));
-    }
-    if (error is ServerException) {
-      return ResultFailure(ServerFailure(message: error.message, code: error.code));
-    }
-    return ResultFailure(UnknownFailure(message: error.toString()));
-  }
-
-  /// Map Dio errors to Failures
-  Failure _mapDioError(DioException error) {
-    return switch (error.type) {
-      DioExceptionType.connectionTimeout ||
-      DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout => const TimeoutFailure(),
-      DioExceptionType.connectionError => const NetworkFailure(),
-      DioExceptionType.cancel => CancelledFailure(message: error.message ?? 'Cancelled'),
-      DioExceptionType.badResponse => _mapStatusCodeError(error.response),
-      _ => UnknownFailure(message: error.message ?? 'Unknown error'),
-    };
-  }
-
-  /// Map HTTP status codes to Failures
-  Failure _mapStatusCodeError(Response? response) {
-    final data = response?.data;
-    final message = _extractErrorMessage(data);
-
-    return switch (response?.statusCode) {
-      null => const UnknownFailure(message: 'No response from server'),
-
-      // Validation errors (400, 422)
-      400 || 422 => DataFailure(
-        message: message ?? 'Dữ liệu không hợp lệ',
-        type: DataFailureType.validation,
-        fieldErrors: _extractFieldErrors(data),
-        globalErrors: _extractGlobalErrors(data),
-        statusCode: response?.statusCode,
-      ),
-
-      // Auth errors (401)
-      401 => AuthFailure(
-        message: message ?? 'Phiên đăng nhập hết hạn',
-        type: AuthFailureType.unauthenticated,
-        statusCode: 401,
-      ),
-
-      // Unauthorized (403)
-      403 => AuthFailure(
-        message: message ?? 'Không có quyền truy cập',
-        type: AuthFailureType.unauthorized,
-        statusCode: 403,
-      ),
-
-      // Not found (404)
-      404 => DataFailure(
-        message: message ?? 'Không tìm thấy',
-        type: DataFailureType.notFound,
-        statusCode: 404,
-      ),
-
-      // Timeout (408)
-      408 => const TimeoutFailure(),
-
-      // Conflict (409)
-      409 => DataFailure(
-        message: message ?? 'Dữ liệu đã tồn tại',
-        type: DataFailureType.conflict,
-        statusCode: 409,
-      ),
-
-      // Rate limit (429)
-      429 => ServerFailure(
-        message: message ?? 'Quá nhiều yêu cầu',
-        retryAfter: _extractRetryAfter(response),
-        statusCode: 429,
-      ),
-
-      // Server errors (5xx)
-      >= 500 => ServerFailure(
-        message: message ?? 'Lỗi máy chủ',
-        code: response?.statusCode?.toString(),
-        statusCode: response?.statusCode,
-      ),
-
-      // Unknown
-      _ => UnknownFailure(message: message ?? 'Yêu cầu thất bại'),
-    };
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // Error Extraction Helpers
-  // ═══════════════════════════════════════════════════════════════
-
-  String? _extractErrorMessage(dynamic data) {
-    if (data is Map<String, dynamic>) {
-      return data['message']?.toString() ?? data['error']?.toString() ?? data['msg']?.toString();
-    }
-    if (data is String) return data;
-    return null;
-  }
-
-  Map<String, String>? _extractFieldErrors(dynamic data) {
-    if (data is! Map<String, dynamic>) return null;
-    final errors = data['errors'] ?? data['fieldErrors'] ?? data['fields'];
-    if (errors is! Map<String, dynamic>) return null;
-    return errors.map((key, value) {
-      if (value is List && value.isNotEmpty) {
-        return MapEntry(key, value.first.toString());
-      }
-      return MapEntry(key, value.toString());
-    });
-  }
-
-  List<String>? _extractGlobalErrors(dynamic data) {
-    if (data is! Map<String, dynamic>) return null;
-    final errors = data['globalErrors'] ?? data['nonFieldErrors'];
-    if (errors is List) {
-      return errors.map((e) => e.toString()).toList();
-    }
-    return null;
-  }
-
-  Duration? _extractRetryAfter(Response? response) {
-    final retryAfter = response?.headers.value('retry-after');
-    if (retryAfter == null) return null;
-    final seconds = int.tryParse(retryAfter);
-    if (seconds != null) return Duration(seconds: seconds);
-    return null;
+    return ResultFailure(ErrorHandler.toFailure(error));
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -602,5 +476,11 @@ class ApiClient {
       maxRetries: maxRetries,
       unwrap: unwrap,
     );
+  }
+
+  /// ✅ NEW: Clear authorization and cancel all requests
+  void clearAuthorization() {
+    _dioClient.clearAuthorization();
+    cancelAllRequests('Logout cleanup');
   }
 }

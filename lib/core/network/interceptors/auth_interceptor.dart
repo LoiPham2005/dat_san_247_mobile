@@ -3,12 +3,12 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:dat_san_247_mobile/core/constants/api_constants.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/services/auth_service.dart';
-import 'package:dat_san_247_mobile/core/storage/secure_storage.dart';
+import 'package:dat_san_247_mobile/core/storage/secure/secure_storage_service.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
-import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton()

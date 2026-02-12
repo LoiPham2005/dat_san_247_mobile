@@ -1,63 +1,81 @@
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/ads/ad_placement.dart
+// 📁 lib/core/ads/domain/ad_placement.dart
 // ════════════════════════════════════════════════════════════════
 
-/// Ad placement constants
-class AdPlacement {
-  AdPlacement._();
-
+/// Ad placement enum - Type-safe, autocomplete-friendly
+enum AdPlacement {
   // Splash & App Open
-  static const String interSplash = 'interSplash';
-  static const String openSplash = 'openSplash';
-  static const String openOnResume = 'openOnResume';
-  static const String nativeFullSplash = 'nativeFullSplash';
-  static const String interSplashUninstall = 'interSplashUninstall';
+  interSplash('interSplash', AdType.interstitial),
+  openSplash('openSplash', AdType.appOpen),
+  openOnResume('openOnResume', AdType.appOpen),
+  nativeFullSplash('nativeFullSplash', AdType.native),
+  interSplashUninstall('interSplashUninstall', AdType.interstitial),
 
   // Language
-  static const String nativeLanguage = 'nativeLanguage';
-  static const String nativeLanguageSelect = 'nativeLanguageSelect';
+  nativeLanguage('nativeLanguage', AdType.native),
+  nativeLanguageSelect('nativeLanguageSelect', AdType.native),
 
   // Intro/Onboarding
-  static const String nativeIntro1 = 'nativeIntro1';
-  static const String nativeIntro2 = 'nativeIntro2';
-  static const String nativeIntro3 = 'nativeIntro3';
-  static const String nativeIntro4 = 'nativeIntro4';
-  static const String nativeFullIntro2 = 'nativeFullIntro2';
-  static const String nativeFullIntro3 = 'nativeFullIntro3';
-  static const String nativeIntroFull2 = 'nativeIntroFull2';
-  static const String nativeIntroFull3 = 'nativeIntroFull3';
-  static const String interIntro = 'interIntro';
+  nativeIntro1('nativeIntro1', AdType.native),
+  nativeIntro2('nativeIntro2', AdType.native),
+  nativeIntro3('nativeIntro3', AdType.native),
+  nativeIntro4('nativeIntro4', AdType.native),
+  nativeFullIntro2('nativeFullIntro2', AdType.native),
+  nativeFullIntro3('nativeFullIntro3', AdType.native),
+  nativeIntroFull2('nativeIntroFull2', AdType.native),
+  nativeIntroFull3('nativeIntroFull3', AdType.native),
+  interIntro('interIntro', AdType.interstitial),
 
   // Permission
-  static const String nativePermission = 'nativePermission';
+  nativePermission('nativePermission', AdType.native),
 
   // Home
-  static const String bannerHome = 'bannerHome';
-  static const String interHome = 'interHome';
-  static const String nativeHome = 'nativeHome';
+  bannerHome('bannerHome', AdType.banner),
+  interHome('interHome', AdType.interstitial),
+  nativeHome('nativeHome', AdType.native),
 
   // General
-  static const String nativeAll = 'nativeAll';
-  static const String nativeFull = 'nativeFull';
+  nativeAll('nativeAll', AdType.native),
+  nativeFull('nativeFull', AdType.native),
 
   // Password
-  static const String interPasswordShow = 'interPasswordShow';
-  static const String rewardPasswordShow = 'rewardPasswordShow';
+  interPasswordShow('interPasswordShow', AdType.interstitial),
+  rewardPasswordShow('rewardPasswordShow', AdType.rewarded),
 
   // Disconnect
-  static const String rewardDisconnect = 'rewardDisconnect';
+  rewardDisconnect('rewardDisconnect', AdType.rewarded),
 
   // Uninstall
-  static const String nativeUninstall = 'nativeUninstall';
-  static const String interUninstall = 'interUninstall';
+  nativeUninstall('nativeUninstall', AdType.native),
+  interUninstall('interUninstall', AdType.interstitial),
 
   // Navigation
-  static const String interBack = 'interBack';
+  interBack('interBack', AdType.interstitial);
 
-  // Helpers
-  static bool isInterstitial(String placement) => placement.startsWith('inter');
-  static bool isNative(String placement) => placement.startsWith('native');
-  static bool isRewarded(String placement) => placement.startsWith('reward');
-  static bool isBanner(String placement) => placement.startsWith('banner');
-  static bool isAppOpen(String placement) => placement.startsWith('open');
+  const AdPlacement(this.key, this.type);
+
+  /// Key used in RemoteConfig and analytics
+  final String key;
+
+  /// Type of ad for this placement
+  final AdType type;
+
+  /// Check if this placement is of a specific type
+  bool get isInterstitial => type == AdType.interstitial;
+  bool get isNative => type == AdType.native;
+  bool get isRewarded => type == AdType.rewarded;
+  bool get isBanner => type == AdType.banner;
+  bool get isAppOpen => type == AdType.appOpen;
+
+  /// Get placement from key string (for backwards compatibility)
+  static AdPlacement? fromKey(String key) {
+    try {
+      return AdPlacement.values.firstWhere((p) => p.key == key);
+    } catch (_) {
+      return null;
+    }
+  }
 }
+
+/// Ad types supported
+enum AdType { banner, interstitial, rewarded, native, appOpen }

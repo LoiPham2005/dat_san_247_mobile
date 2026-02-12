@@ -93,11 +93,11 @@
 //   }
 // }
 
-import 'package:dat_san_247_mobile/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../gen/assets.gen.dart';
 
 class CustomImage extends StatelessWidget {
   final String imageUrl;

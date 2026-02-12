@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -69,9 +70,7 @@ extension DoubleExtensions on double {
 
   // Currency with decimals
   String toCurrency({String symbol = '₫', int decimals = 0}) {
-    final formatter = NumberFormat(
-      '#,###${decimals > 0 ? '.${"#" * decimals}' : ''}',
-    );
+    final formatter = NumberFormat('#,###${decimals > 0 ? '.${"#" * decimals}' : ''}');
     return '${formatter.format(this)}$symbol';
   }
 
@@ -95,17 +94,14 @@ extension NumExtensions on num {
   Radius get circularRadius => Radius.circular(toDouble());
 
   // Universal currency formatter
-  String formatCurrency({String symbol = '₫', int decimals = 0}) {
-    return this is int
-        ? (this as int).toCurrency(symbol: symbol)
-        : (this as double).toCurrency(symbol: symbol, decimals: decimals);
-  }
+  static final _currencyFormat = NumberFormat.currency(
+    locale: 'vi_VN',
+    symbol: '₫',
+    decimalDigits: 0,
+  );
+
+  String formatCurrency() => _currencyFormat.format(this);
 
   // Universal number formatter
-  String formatNumber({int decimals = 0}) {
-    final formatter = NumberFormat(
-      '#,###${decimals > 0 ? '.${"#" * decimals}' : ''}',
-    );
-    return formatter.format(this);
-  }
+  String formatNumber() => NumberFormat('#,###', 'vi_VN').format(this);
 }

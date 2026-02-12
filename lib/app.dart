@@ -1,0 +1,71 @@
+import 'package:flutter/material.dart';
+import 'package:dat_san_247_mobile/core/constants/app_constants.dart';
+import 'package:dat_san_247_mobile/core/di/injection.dart';
+import 'package:dat_san_247_mobile/core/l10n/localization_service.dart';
+import 'package:dat_san_247_mobile/core/state_management/auth/auth_cubit.dart';
+import 'package:dat_san_247_mobile/core/theme/app_theme.dart';
+import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:dat_san_247_mobile/gen/l10n/app_localizations.dart';
+import 'package:dat_san_247_mobile/routes/app_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+/// 🏠 Root Widget của ứng dụng
+///
+/// File này đặt ở `lib/app.dart` vì:
+/// - App là root, không phải feature
+/// - Dễ tìm, dễ maintain
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (_, __) => _AppContent(),
+    );
+  }
+}
+
+/// 🎨 Nội dung chính của App (tách ra để code gọn hơn)
+class _AppContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<LocaleCubit>()),
+        BlocProvider(create: (_) => getIt<ThemeCubit>()),
+        BlocProvider(create: (_) => getIt<AuthCubit>()),
+        BlocProvider(create: (_) => getIt<AuthBloc>()),
+      ],
+      child: Builder(
+        builder: (context) {
+          final locale = context.select((LocaleCubit c) => c.state);
+          final themeState = context.select((ThemeCubit c) => c.state);
+
+          return MaterialApp.router(
+            // App Info
+            title: AppConstants.appName,
+            debugShowCheckedModeBanner: false,
+
+            // Theme
+            theme: AppTheme.getLightTheme(themeState.colorType),
+            darkTheme: AppTheme.getDarkTheme(themeState.colorType),
+            themeMode: themeState.materialThemeMode,
+
+            // Localization
+            locale: locale,
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+
+            // Navigation
+            routerConfig: getIt<AppRouter>().router,
+          );
+        },
+      ),
+    );
+  }
+}

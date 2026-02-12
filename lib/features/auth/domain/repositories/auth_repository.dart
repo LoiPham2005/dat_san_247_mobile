@@ -31,7 +31,7 @@ abstract class AuthRepository {
   Future<Result<bool>> checkLoginStatus();
 
   /// Get current user profile
-  Future<Result<User>> getProfile();
+  Future<Result<AuthUser>> getProfile();
 
   Future<Result<bool>> deleteAccount();
 }

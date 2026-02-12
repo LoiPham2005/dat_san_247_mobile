@@ -3,7 +3,7 @@ description: Generate complete feature with Clean Architecture (Domain + Data + 
 version: 1.0.0
 
 # Repository info (optional)
-repository: https://github.com/your-repo/dat_san_247_mobile
+repository: https://github.com/your-repo/flutter_base_template
 
 # Variables
 vars:

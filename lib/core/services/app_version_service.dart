@@ -1,16 +1,19 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/services/app_version_service.dart (TỐI ƯU)
 // ════════════════════════════════════════════════════════════════
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:dat_san_247_mobile/core/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AppVersionService {
-  static const String androidPackageName = 'com.example.yourapp';
-  static const String iosAppId = '123456789';
+  // Use constants from AppConstants
+  static const String androidPackageName = AppConstants.androidPackageName;
+  static const String iosAppId = AppConstants.appStoreId;
 
   // Cache
   static PackageInfo? _cachedPackageInfo;
@@ -45,14 +48,11 @@ class AppVersionService {
 
   Future<String?> _getLatestAndroidVersion() async {
     try {
-      const url =
-          'https://play.google.com/store/apps/details?id=$androidPackageName&hl=vi';
+      const url = 'https://play.google.com/store/apps/details?id=$androidPackageName&hl=vi';
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        final match = RegExp(
-          r'\[\[\["([0-9.]+)"\]\]',
-        ).firstMatch(response.body);
+        final match = RegExp(r'\[\[\["([0-9.]+)"\]\]').firstMatch(response.body);
         return match?.group(1);
       }
     } catch (e) {
@@ -99,10 +99,7 @@ class AppVersionService {
   }
 
   /// Check for update and show dialog
-  Future<void> checkForUpdate(
-    BuildContext context, {
-    bool showNoUpdateDialog = false,
-  }) async {
+  Future<void> checkForUpdate(BuildContext context, {bool showNoUpdateDialog = false}) async {
     try {
       final current = await getCurrentVersion();
       final latest = await getLatestVersion();
@@ -132,10 +129,7 @@ class AppVersionService {
           'Cập nhật để có trải nghiệm tốt nhất.',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Để sau'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Để sau')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -154,12 +148,7 @@ class AppVersionService {
       builder: (ctx) => AlertDialog(
         title: const Text('Thông báo'),
         content: const Text('Bạn đang dùng phiên bản mới nhất!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
       ),
     );
   }

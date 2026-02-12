@@ -1,8 +1,8 @@
 // auth_user_model.dart
 import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
 
-class UserModel extends User {
-  const UserModel({
+class AuthUserModel extends AuthUser {
+  const AuthUserModel({
     required super.id,
     required super.fullname,
     required super.username,
@@ -27,17 +27,16 @@ class UserModel extends User {
     super.deletedAt,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
+  /// ✅ From JSON
+  factory AuthUserModel.fromJson(Map<String, dynamic> json) {
+    return AuthUserModel(
       id: json['id'],
       fullname: json['fullname'],
       username: json['username'],
       email: json['email'],
       phone: json['phone'],
       gender: json['gender'],
-      birthDate: json['birthDate'] != null
-          ? DateTime.parse(json['birthDate'])
-          : null,
+      birthDate: json['birthDate'] != null ? DateTime.parse(json['birthDate']) : null,
       avatar: json['avatar'],
       roleId: json['roleId'],
       isVerified: json['isVerified'],
@@ -52,15 +51,41 @@ class UserModel extends User {
       providerId: json['providerId'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      deletedAt: json['deletedAt'] != null
-          ? DateTime.parse(json['deletedAt'])
-          : null,
+      deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
     );
   }
 
-  /// Chuyển AuthUserModel -> AuthUser (Entity)
-  User toEntity() {
-    return User(
+  /// ✅ NEW: From Entity (Domain layer to Data layer)
+  factory AuthUserModel.fromEntity(AuthUser entity) {
+    return AuthUserModel(
+      id: entity.id,
+      fullname: entity.fullname,
+      username: entity.username,
+      email: entity.email,
+      phone: entity.phone,
+      gender: entity.gender,
+      birthDate: entity.birthDate,
+      avatar: entity.avatar,
+      roleId: entity.roleId,
+      isVerified: entity.isVerified,
+      address: entity.address,
+      latitude: entity.latitude,
+      longitude: entity.longitude,
+      isActive: entity.isActive,
+      specialStatus: entity.specialStatus,
+      emailVerified: entity.emailVerified,
+      phoneVerified: entity.phoneVerified,
+      provider: entity.provider,
+      providerId: entity.providerId,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      deletedAt: entity.deletedAt,
+    );
+  }
+
+  /// To Entity (Data layer to Domain layer)
+  AuthUser toEntity() {
+    return AuthUser(
       id: id,
       fullname: fullname,
       username: username,
@@ -86,6 +111,7 @@ class UserModel extends User {
     );
   }
 
+  /// To JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -119,30 +145,46 @@ class AuthResponseModel extends AuthResponse {
     required super.user,
     required super.accessToken,
     required super.refreshToken,
+    super.expiresAt,
   });
 
+  /// ✅ From JSON
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
     return AuthResponseModel(
-      user: UserModel.fromJson(json['user']),
+      user: AuthUserModel.fromJson(json['user']),
       accessToken: json['accessToken'],
       refreshToken: json['refreshToken'],
+      expiresAt: json['expiresAt'] != null ? DateTime.parse(json['expiresAt']) : null,
     );
   }
 
-  /// Chuyển AuthResponseModel -> AuthResponse (Entity)
+  /// ✅ NEW: From Entity
+  factory AuthResponseModel.fromEntity(AuthResponse entity) {
+    return AuthResponseModel(
+      user: AuthUserModel.fromEntity(entity.user),
+      accessToken: entity.accessToken,
+      refreshToken: entity.refreshToken,
+      expiresAt: entity.expiresAt,
+    );
+  }
+
+  /// To Entity
   AuthResponse toEntity() {
     return AuthResponse(
-      user: (user as UserModel).toEntity(),
+      user: (user as AuthUserModel).toEntity(),
       accessToken: accessToken,
       refreshToken: refreshToken,
+      expiresAt: expiresAt,
     );
   }
 
+  /// To JSON
   Map<String, dynamic> toJson() {
     return {
-      'user': (user as UserModel).toJson(),
+      'user': (user as AuthUserModel).toJson(),
       'accessToken': accessToken,
       'refreshToken': refreshToken,
+      'expiresAt': expiresAt?.toIso8601String(),
     };
   }
 }

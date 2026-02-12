@@ -3,14 +3,14 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:io';
 
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:dio_cache_interceptor_db_store/dio_cache_interceptor_db_store.dart';
 import 'package:dat_san_247_mobile/core/cache/cache_config.dart';
 import 'package:dat_san_247_mobile/core/cache/models/cache_stats.dart';
-import 'package:dat_san_247_mobile/core/utils/logger.dart'; // Thêm import Logger
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:injectable/injectable.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 /// 🎯 Unified Cache Manager
@@ -68,24 +68,22 @@ class AppCacheManager {
     }
   }
 
-  /// Initialize API cache with Hive backend
+  /// Initialize API cache with SQL backend (SQLite)
   Future<void> _initApiCache() async {
     try {
-      // Init Hive if needed
-      if (!Hive.isAdapterRegistered(0)) {
-        await Hive.initFlutter();
-      }
+      // Get database directory
+      final docDir = await getApplicationDocumentsDirectory();
+      final dbPath = p.join(docDir.path, 'app_cache.db');
 
-      // Create Hive store
-      final cacheDir = await getTemporaryDirectory();
-      _apiCacheStore = HiveCacheStore(cacheDir.path);
+      // Create SQL cache store (SQLite) - ACID compliant
+      _apiCacheStore = DbCacheStore(databasePath: dbPath);
 
       // Register with CacheConfig
       CacheConfig.initialize(_apiCacheStore);
 
-      Logger.success('✅ API cache (Hive) ready');
+      Logger.success('✅ API cache (SQLite) ready');
     } catch (e) {
-      Logger.warning('⚠️ Hive failed, using MemCache: $e');
+      Logger.warning('⚠️ SQLite failed, using MemCache: $e');
       _apiCacheStore = MemCacheStore();
       CacheConfig.initialize(_apiCacheStore);
     }
@@ -162,6 +160,39 @@ class AppCacheManager {
     await clearFileCaches();
     resetStats();
     Logger.success('✅ All caches cleared');
+  }
+
+  /// Clear by pattern (with priority filter)
+  Future<void> clearByPattern({CachePriority? priorityOrBelow}) async {
+    try {
+      await _apiCacheStore.clean(
+        staleOnly: false,
+        priorityOrBelow: priorityOrBelow ?? CachePriority.high,
+      );
+      Logger.success('✅ Cache cleared by pattern');
+    } catch (e) {
+      Logger.error('❌ Clear by pattern failed: $e');
+    }
+  }
+
+  /// Clear expired cache entries only
+  Future<void> clearExpired() async {
+    try {
+      await _apiCacheStore.clean(staleOnly: true);
+      Logger.success('✅ Expired cache cleared');
+    } catch (e) {
+      Logger.error('❌ Clear expired failed: $e');
+    }
+  }
+
+  /// Delete cache by specific key
+  Future<void> deleteByKey(String key) async {
+    try {
+      await _apiCacheStore.delete(key);
+      Logger.success('✅ Cache deleted: $key');
+    } catch (e) {
+      Logger.error('❌ Delete by key failed: $e');
+    }
   }
 
   /// Smart clear - Remove old entries only

@@ -1,333 +1,17 @@
-// // ════════════════════════════════════════════════════════════════
-// // 📁 lib/core/state_management/riverpod/base_async_notifier.dart
-// // ════════════════════════════════════════════════════════════════
-// import 'dart:async';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:dat_san_247_mobile/core/errors/failures.dart';
-// import 'package:dat_san_247_mobile/core/errors/result.dart';
-
-// /// BaseAsyncNotifier cho Riverpod
-// abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
-//   /// Thực thi UseCase với full Failure object
-//   ///
-//   /// Example:
-//   /// ```dart
-//   /// await execute(
-//   ///   action: () => getUserUseCase(userId),
-//   ///   onSuccess: (user) => ref.read(routerProvider).go('/home'),
-//   ///   onFailure: (failure) {
-//   ///     if (failure is AuthenticationFailure) {
-//   ///       ref.read(authProvider.notifier).logout();
-//   ///     }
-//   ///   },
-//   /// );
-//   /// ```
-//   Future<void> execute({
-//     required Future<Result<T>> Function() action,
-//     void Function(T data)? onSuccess,
-//     void Function(Failure failure)? onFailure, // ✅ Full Failure object
-//     bool showLoading = true,
-//   }) async {
-//     if (showLoading) {
-//       state = const AsyncLoading();
-//     }
-
-//     try {
-//       final result = await action();
-
-//       result.fold(
-//         onSuccess: (data) {
-//           state = AsyncData(data);
-//           onSuccess?.call(data);
-//         },
-//         onFailure: (failure) {
-//           // ✅ Store failure as error in AsyncValue
-//           state = AsyncError(failure, StackTrace.current);
-//           onFailure?.call(failure); // ✅ Pass Failure object
-//         },
-//       );
-//     } catch (exception, stackTrace) {
-//       state = AsyncError(exception, stackTrace);
-//       onFailure?.call(
-//         const UnknownFailure(message: 'Đã xảy ra lỗi không xác định'),
-//       );
-//     }
-//   }
-
-//   /// Version đơn giản với String message
-//   Future<void> executeWithMessage({
-//     required Future<Result<T>> Function() action,
-//     void Function(T data)? onSuccess,
-//     void Function(String message)? onFailure, // ✅ Rõ ràng là message
-//     bool showLoading = true,
-//   }) async {
-//     if (showLoading) {
-//       state = const AsyncLoading();
-//     }
-
-//     try {
-//       final result = await action();
-
-//       result.fold(
-//         onSuccess: (data) {
-//           state = AsyncData(data);
-//           onSuccess?.call(data);
-//         },
-//         onFailure: (failure) {
-//           final message = failure.message;
-//           state = AsyncError(message, StackTrace.current);
-//           onFailure?.call(message);
-//         },
-//       );
-//     } catch (exception, stackTrace) {
-//       state = AsyncError(exception, stackTrace);
-//       onFailure?.call('Đã xảy ra lỗi không xác định');
-//     }
-//   }
-
-//   /// Helpers
-//   bool get isLoading => state is AsyncLoading;
-//   bool get hasError => state is AsyncError;
-//   bool get hasData => state is AsyncData;
-
-//   /// Get error as Failure if possible
-//   Failure? get failure {
-//     final error = state.error;
-//     if (error is Failure) return error;
-//     return null;
-//   }
-// }
-
-// // ════════════════════════════════════════════════════════════════
-// // 📁 lib/core/state_management/riverpod/base_async_notifier.dart (CLEAN)
-// // ════════════════════════════════════════════════════════════════
-// import 'dart:async';
-// import 'package:dat_san_247_mobile/core/errors/failures.dart';
-// import 'package:dat_san_247_mobile/core/errors/result.dart';
-// import 'package:dat_san_247_mobile/core/utils/logger.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// /// Base AsyncNotifier cho Riverpod
-// abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
-//   // ════════════════════════════════════════════════════════════
-//   // Additional State
-//   // ════════════════════════════════════════════════════════════
-
-//   String? _message;
-//   bool _isRefreshing = false;
-//   bool _isSubmitting = false;
-//   Map<String, dynamic> _metadata = {};
-
-//   String? get message => _message;
-//   bool get isRefreshing => _isRefreshing;
-//   bool get isSubmitting => _isSubmitting;
-//   Map<String, dynamic> get metadata => _metadata;
-
-//   // ════════════════════════════════════════════════════════════
-//   // Status Helpers
-//   // ════════════════════════════════════════════════════════════
-
-//   bool get isLoading => state is AsyncLoading;
-//   bool get hasError => state is AsyncError;
-//   bool get hasData => state is AsyncData;
-//   bool get isProcessing => isLoading || isSubmitting || isRefreshing;
-//   bool get isInteractable => !isLoading && !isSubmitting;
-
-//   T? get data => state.when(
-//         loading: () => null,
-//         error: (_, __) => null,
-//         data: (data) => data,
-//       );
-
-//   Failure? get failure {
-//     final error = state.error;
-//     if (error is Failure) return error;
-//     return null;
-//   }
-
-//   String? get errorMessage {
-//     final error = state.error;
-//     if (error is Failure) return error.message;
-//     if (error != null) return error.toString();
-//     return null;
-//   }
-
-//   // ════════════════════════════════════════════════════════════
-//   // Execute Methods
-//   // ════════════════════════════════════════════════════════════
-
-//   Future<T?> execute({
-//     required Future<Result<T>> Function() action,
-//     void Function(T data)? onSuccess,
-//     void Function(Failure failure)? onFailure,
-//     bool showLoading = true,
-//   }) async {
-//     if (showLoading) {
-//       state = const AsyncLoading();
-//     }
-//     _message = null;
-
-//     try {
-//       final result = await action();
-
-//       return result.fold(
-//         onSuccess: (data) {
-//           state = AsyncData(data);
-//           onSuccess?.call(data);
-//           return data;
-//         },
-//         onFailure: (failure) {
-//           state = AsyncError(failure, StackTrace.current);
-//           onFailure?.call(failure);
-//           return null;
-//         },
-//       );
-//     } catch (e, stackTrace) {
-//       Logger.error('Execute failed', error: e, stackTrace: stackTrace);
-
-//       final unknownFailure = UnknownFailure(message: e.toString());
-//       state = AsyncError(unknownFailure, stackTrace);
-//       onFailure?.call(unknownFailure);
-//       return null;
-//     }
-//   }
-
-//   Future<T?> executeMutation({
-//     required Future<Result<T>> Function() action,
-//     void Function(T data)? onSuccess,
-//     void Function(Failure failure)? onFailure,
-//     String? successMessage,
-//   }) async {
-//     _isSubmitting = true;
-//     _message = null;
-
-//     final currentData = state.when(
-//       loading: () => null,
-//       error: (_, __) => null,
-//       data: (data) => data,
-//     );
-
-//     try {
-//       final result = await action();
-
-//       return result.fold(
-//         onSuccess: (data) {
-//           _isSubmitting = false;
-//           _message = successMessage ?? 'Thành công';
-//           state = AsyncData(data);
-//           onSuccess?.call(data);
-//           return data;
-//         },
-//         onFailure: (failure) {
-//           _isSubmitting = false;
-//           if (currentData != null) {
-//             state = AsyncData(currentData);
-//           } else {
-//             state = AsyncError(failure, StackTrace.current);
-//           }
-//           onFailure?.call(failure);
-//           return null;
-//         },
-//       );
-//     } catch (e, stackTrace) {
-//       Logger.error('Mutation failed', error: e, stackTrace: stackTrace);
-
-//       _isSubmitting = false;
-//       final unknownFailure = UnknownFailure(message: e.toString());
-
-//       if (currentData != null) {
-//         state = AsyncData(currentData);
-//       } else {
-//         state = AsyncError(unknownFailure, stackTrace);
-//       }
-//       onFailure?.call(unknownFailure);
-//       return null;
-//     }
-//   }
-
-//   Future<T?> executeRefresh({
-//     required Future<Result<T>> Function() action,
-//     void Function(T data)? onSuccess,
-//     void Function(Failure failure)? onFailure,
-//   }) async {
-//     if (!hasData) {
-//       return execute(action: action, onSuccess: onSuccess, onFailure: onFailure);
-//     }
-
-//     _isRefreshing = true;
-//     _message = null;
-
-//     final currentData = state.when(
-//       loading: () => null,
-//       error: (_, __) => null,
-//       data: (data) => data,
-//     );
-
-//     try {
-//       final result = await action();
-
-//       return result.fold(
-//         onSuccess: (data) {
-//           _isRefreshing = false;
-//           state = AsyncData(data);
-//           onSuccess?.call(data);
-//           return data;
-//         },
-//         onFailure: (failure) {
-//           _isRefreshing = false;
-//           if (currentData != null) {
-//             state = AsyncData(currentData);
-//           }
-//           onFailure?.call(failure);
-//           return null;
-//         },
-//       );
-//     } catch (e, stackTrace) {
-//       Logger.error('Refresh failed', error: e, stackTrace: stackTrace);
-
-//       _isRefreshing = false;
-//       final unknownFailure = UnknownFailure(message: e.toString());
-
-//       if (currentData != null) {
-//         state = AsyncData(currentData);
-//       } else {
-//         state = AsyncError(unknownFailure, stackTrace);
-//       }
-//       onFailure?.call(unknownFailure);
-//       return null;
-//     }
-//   }
-
-//   // ════════════════════════════════════════════════════════════
-//   // Utility Methods
-//   // ════════════════════════════════════════════════════════════
-
-//   void setData(T data) => state = AsyncData(data);
-//   void setError(Failure failure) => state = AsyncError(failure, StackTrace.current);
-//   void clearMessage() => _message = null;
-//   void setMetadata(Map<String, dynamic> metadata) => _metadata = metadata;
-
-//   void reset() {
-//     _message = null;
-//     _isRefreshing = false;
-//     _isSubmitting = false;
-//     _metadata = {};
-//     ref.invalidateSelf();
-//   }
-// }
-
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/state_management/riverpod/base_async_notifier.dart (SMART AUTO)
+// 📁 lib/core/state_management/riverpod/base_async_notifier.dart
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
 import 'package:dat_san_247_mobile/core/errors/failures.dart';
 import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Smart + Flexible BaseAsyncNotifier
+/// SMART & FLEXIBLE BaseAsyncNotifier for Riverpod
 abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
+  // Additional states not covered by AsyncValue
   String? _message;
   bool _isRefreshing = false;
   bool _isSubmitting = false;
@@ -335,49 +19,113 @@ abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
   Completer<void>? _currentOperation;
   bool get isCancelled => _currentOperation?.isCompleted ?? false;
 
+  // ════════════════════════════════════════════════════════════
+  // Getters
+  // ════════════════════════════════════════════════════════════
+  String? get message => _message;
+  bool get isRefreshing => _isRefreshing;
+  bool get isSubmitting => _isSubmitting;
+  bool get isLoading => state is AsyncLoading;
+
+  T? get data => state.whenOrNull(data: (d) => d);
+  Failure? get failure => state.whenOrNull(error: (e, _) => e is Failure ? e : null);
+
+  /// 🎯 Mapping AsyncValue to unified BaseStatus
+  BaseStatus get status {
+    return state.when(
+      data: (d) {
+        if (_isSubmitting) return BaseStatus.submitting;
+        if (_isRefreshing) return BaseStatus.refreshing;
+        if (d is List && d.isEmpty) return BaseStatus.empty;
+        return BaseStatus.loaded;
+      },
+      error: (e, _) {
+        if (_isSubmitting || _isRefreshing) return BaseStatus.failure;
+        return BaseStatus.failure;
+      },
+      loading: () => BaseStatus.loading,
+    );
+  }
+
+  /// Hủy operation hiện tại (chỉ áp dụng cho Query)
   void cancelCurrentOperation() {
     if (_currentOperation != null && !_currentOperation!.isCompleted) {
       _currentOperation!.complete();
     }
   }
 
-  // Getters
-  String? get message => _message;
-  bool get isRefreshing => _isRefreshing;
-  bool get isSubmitting => _isSubmitting;
-  bool get isLoading => state is AsyncLoading;
-  bool get hasData => state is AsyncData;
-
-  T? get data => state.when(loading: () => null, error: (_, __) => null, data: (data) => data);
-
   // ════════════════════════════════════════════════════════════
-  // 🎯 SMART + FLEXIBLE EXECUTE
+  // 🎯 SMART EXECUTE
   // ════════════════════════════════════════════════════════════
+
+  /// [QUERY] Use for fetching data (GET)
+  Future<T?> onQuery({
+    required Future<Result<T>> Function() action,
+    void Function(T data)? onSuccess,
+    void Function(Failure failure)? onFailure,
+    bool cancelPrevious = true,
+    bool preserveData = false,
+  }) {
+    return execute(
+      action: action,
+      onSuccess: onSuccess,
+      onFailure: onFailure,
+      isMutation: false,
+      cancelPrevious: cancelPrevious,
+      preserveData: preserveData,
+    );
+  }
+
+  /// [MUTATION] Use for changing data (POST, PUT, DELETE)
+  Future<T?> onMutation({
+    required Future<Result<T>> Function() action,
+    void Function(T data)? onSuccess,
+    void Function(Failure failure)? onFailure,
+    String? successMessage,
+    bool showLoading = true,
+  }) {
+    return execute(
+      action: action,
+      onSuccess: onSuccess,
+      onFailure: onFailure,
+      successMessage: successMessage,
+      isMutation: true,
+      cancelPrevious: false,
+      showLoading: showLoading,
+    );
+  }
 
   Future<T?> execute({
     required Future<Result<T>> Function() action,
     void Function(T data)? onSuccess,
     void Function(Failure failure)? onFailure,
     String? successMessage,
-
-    // ✅ FLEXIBLE PARAMS
     bool? isMutation,
     bool? preserveData,
     bool? cancelPrevious,
+    AsyncValue<T>? customLoadingState,
+    bool showLoading = true, // Control loading state
   }) async {
-    final bool isRefreshingNow = hasData && !_isSubmitting && !isLoading;
     final currentData = data;
+    final bool isRefreshingNow = currentData != null && !_isSubmitting && !isLoading;
 
-    final bool _isMutation = isMutation ?? (_isSubmitting || successMessage != null);
-    final bool _preserveData = preserveData ?? (_isMutation || isRefreshingNow);
-    final bool _cancelPrevious = cancelPrevious ?? !_isMutation;
+    // 1. Resolve configuration (Auto detect)
+    final bool mutationMode = isMutation ?? (successMessage != null);
+    final bool shouldPreserve = preserveData ?? (mutationMode || isRefreshingNow);
+    final bool shouldCancel = cancelPrevious ?? !mutationMode;
 
-    if (_cancelPrevious) {
+    // 2. Handle cancellation
+    if (shouldCancel) {
       cancelCurrentOperation();
       _currentOperation = Completer<void>();
     }
 
-    if (_isMutation) {
+    // 3. Update internal loading flags & state
+    if (!showLoading) {
+      // Do nothing
+    } else if (customLoadingState != null) {
+      state = customLoadingState;
+    } else if (mutationMode) {
       _isSubmitting = true;
     } else if (isRefreshingNow) {
       _isRefreshing = true;
@@ -389,14 +137,16 @@ abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
     try {
       final result = await action();
 
-      if (isCancelled && !_isMutation) return null;
+      // Kiểm tra nếu đã bị cancel
+      if (isCancelled && !mutationMode) return null;
 
+      // 4. Handle success/failure
       return result.fold(
         onSuccess: (data) {
           _isSubmitting = false;
           _isRefreshing = false;
 
-          if (_isMutation) {
+          if (mutationMode) {
             _message = successMessage ?? 'Thành công';
           }
 
@@ -404,12 +154,11 @@ abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
           onSuccess?.call(data);
           return data;
         },
-
         onFailure: (failure) {
           _isSubmitting = false;
           _isRefreshing = false;
 
-          if (currentData != null && _preserveData) {
+          if (shouldPreserve && currentData != null) {
             state = AsyncData(currentData);
           } else {
             state = AsyncError(failure, StackTrace.current);
@@ -419,14 +168,14 @@ abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
         },
       );
     } catch (e, stackTrace) {
-      Logger.error('Execute failed', error: e, stackTrace: stackTrace);
+      Logger.error('BaseAsyncNotifier: Execute failed', error: e, stackTrace: stackTrace);
 
       _isSubmitting = false;
       _isRefreshing = false;
 
       final unknownFailure = UnknownFailure(message: e.toString());
 
-      if (currentData != null && _preserveData) {
+      if (shouldPreserve && currentData != null) {
         state = AsyncData(currentData);
       } else {
         state = AsyncError(unknownFailure, stackTrace);
@@ -434,9 +183,13 @@ abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
       onFailure?.call(unknownFailure);
       return null;
     } finally {
-      if (!_isMutation) _currentOperation = null;
+      if (!mutationMode) _currentOperation = null;
     }
   }
+
+  // ════════════════════════════════════════════════════════════
+  // Utility Methods
+  // ════════════════════════════════════════════════════════════
 
   void reset() {
     cancelCurrentOperation();
@@ -444,5 +197,29 @@ abstract class BaseAsyncNotifier<T> extends AsyncNotifier<T> {
     _isRefreshing = false;
     _isSubmitting = false;
     ref.invalidateSelf();
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // 🔓 FLEXIBLE EXECUTE (No Rules)
+  // ════════════════════════════════════════════════════════════
+
+  /// [RUN] Execute any logic freely.
+  Future<void> run({
+    required Future<void> Function() action,
+    AsyncValue<T>? loadingState,
+    void Function()? onSuccess,
+    void Function(Object error, StackTrace stackTrace)? onError,
+    bool showLog = true,
+  }) async {
+    if (loadingState != null) state = loadingState;
+    try {
+      await action();
+      onSuccess?.call();
+    } catch (e, stackTrace) {
+      if (showLog) {
+        Logger.error('BaseAsyncNotifier: execution failed', error: e, stackTrace: stackTrace);
+      }
+      onError?.call(e, stackTrace);
+    }
   }
 }

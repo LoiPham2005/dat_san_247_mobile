@@ -1,9 +1,9 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/cache/smart_cache_interceptor.dart
 // ════════════════════════════════════════════════════════════════
+import 'package:dio/dio.dart';
 import 'package:dat_san_247_mobile/core/cache/cache_config.dart';
 import 'package:dat_san_247_mobile/core/cache/cache_strategy.dart';
-import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 /// 🧠 Smart cache interceptor - Auto-apply cache strategies
@@ -45,7 +45,8 @@ class SmartCacheInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     // Skip cache for non-GET methods (unless forced)
-    if (options.method != 'GET' && !options.extra.containsKey('cache_strategy')) {
+    if (options.method != 'GET' &&
+        !options.extra.containsKey('cache_strategy')) {
       return handler.next(options);
     }
 
@@ -79,7 +80,9 @@ class SmartCacheInterceptor extends Interceptor {
     }
 
     // 4. Default: medium-term for GET, no-cache for others
-    return options.method == 'GET' ? CacheStrategy.mediumTerm : CacheStrategy.noCache;
+    return options.method == 'GET'
+        ? CacheStrategy.mediumTerm
+        : CacheStrategy.noCache;
   }
 
   // ═══════════════════════════════════════════════════════════════

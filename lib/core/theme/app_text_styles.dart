@@ -1,111 +1,124 @@
-// lib/core/theme/app_text_styles.dart
 import 'package:flutter/material.dart';
-import '../../gen/fonts.gen.dart';
+import 'package:dat_san_247_mobile/core/theme/app_colors.dart';
+import 'package:dat_san_247_mobile/gen/fonts.gen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppTextStyles {
   AppTextStyles._();
 
-  // Display
-  static const TextStyle displayLarge = TextStyle(
-    fontFamily: FontFamily.inter, // ✅ Set font family
-    fontSize: 57,
-    fontWeight: FontWeight.w400,
-    letterSpacing: -0.25,
-  );
+  static const String fontFamily = FontFamily.inter;
 
-  static const TextStyle displayMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 45,
-    fontWeight: FontWeight.w400,
-  );
+  // Base styles by size (using s[Size] convention)
+  static TextStyle get s10 =>
+      TextStyle(fontSize: 10.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s11 =>
+      TextStyle(fontSize: 11.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s12 =>
+      TextStyle(fontSize: 12.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s13 =>
+      TextStyle(fontSize: 13.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s14 =>
+      TextStyle(fontSize: 14.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s15 =>
+      TextStyle(fontSize: 15.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s16 =>
+      TextStyle(fontSize: 16.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s18 =>
+      TextStyle(fontSize: 18.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s20 =>
+      TextStyle(fontSize: 20.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s22 =>
+      TextStyle(fontSize: 22.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s24 =>
+      TextStyle(fontSize: 24.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s26 =>
+      TextStyle(fontSize: 26.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s28 =>
+      TextStyle(fontSize: 28.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s30 =>
+      TextStyle(fontSize: 30.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
+  static TextStyle get s32 =>
+      TextStyle(fontSize: 32.sp, fontFamily: fontFamily, height: 1.5, color: AppColors.textPrimary);
 
-  static const TextStyle displaySmall = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 36,
-    fontWeight: FontWeight.w400,
-  );
+  // Specific complex styles might go here if needed
+}
 
-  // Headline
-  static const TextStyle headlineLarge = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 32,
-    fontWeight: FontWeight.w400,
-  );
+// Fluent API Extension for TextStyle
+extension TextStyleExt on TextStyle {
+  // ═══════════════════════════════════════════════════════════════
+  // WEIGHTS
+  // ═══════════════════════════════════════════════════════════════
+  TextStyle get w100 => copyWith(fontWeight: FontWeight.w100);
+  TextStyle get w200 => copyWith(fontWeight: FontWeight.w200);
+  TextStyle get w300 => copyWith(fontWeight: FontWeight.w300); // Light
+  TextStyle get light => copyWith(fontWeight: FontWeight.w300);
 
-  static const TextStyle headlineMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 28,
-    fontWeight: FontWeight.w400,
-  );
+  TextStyle get w400 => copyWith(fontWeight: FontWeight.w400); // Regular
+  TextStyle get regular => copyWith(fontWeight: FontWeight.w400);
 
-  static const TextStyle headlineSmall = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 24,
-    fontWeight: FontWeight.w400,
-  );
+  TextStyle get w500 => copyWith(fontWeight: FontWeight.w500); // Medium
+  TextStyle get medium => copyWith(fontWeight: FontWeight.w500);
 
-  // Title
-  static const TextStyle titleLarge = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 22,
-    fontWeight: FontWeight.w500,
-  );
+  TextStyle get w600 => copyWith(fontWeight: FontWeight.w600); // SemiBold
+  TextStyle get semiBold => copyWith(fontWeight: FontWeight.w600);
 
-  static const TextStyle titleMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.15,
-  );
+  TextStyle get w700 => copyWith(fontWeight: FontWeight.w700); // Bold
+  TextStyle get bold => copyWith(fontWeight: FontWeight.bold);
 
-  static const TextStyle titleSmall = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.1,
-  );
+  TextStyle get w800 => copyWith(fontWeight: FontWeight.w800); // ExtraBold
+  TextStyle get extraBold => copyWith(fontWeight: FontWeight.w800);
 
-  // Body
-  static const TextStyle bodyLarge = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.5,
-  );
+  TextStyle get w900 => copyWith(fontWeight: FontWeight.w900); // Black
+  TextStyle get blackWeight => copyWith(fontWeight: FontWeight.w900);
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.25,
-  );
+  // ═══════════════════════════════════════════════════════════════
+  // STYLES
+  // ═══════════════════════════════════════════════════════════════
+  TextStyle get italic => copyWith(fontStyle: FontStyle.italic);
+  TextStyle get underline => copyWith(decoration: TextDecoration.underline);
+  TextStyle get lineThrough => copyWith(decoration: TextDecoration.lineThrough);
+  TextStyle get overline => copyWith(decoration: TextDecoration.overline);
 
-  static const TextStyle bodySmall = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.4,
-  );
+  // ═══════════════════════════════════════════════════════════════
+  // COLORS (Shortcuts)
+  // ═══════════════════════════════════════════════════════════════
+  TextStyle get white => copyWith(color: Colors.white);
+  TextStyle get black => copyWith(color: Colors.black);
 
-  // Label
-  static const TextStyle labelLarge = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.1,
-  );
+  // App Colors
+  TextStyle get primary => copyWith(color: AppColors.primary);
+  TextStyle get secondary => copyWith(color: AppColors.secondary);
+  TextStyle get error => copyWith(color: AppColors.error);
+  TextStyle get success => copyWith(color: AppColors.success);
+  TextStyle get warning => copyWith(color: AppColors.warning);
+  TextStyle get info => copyWith(color: AppColors.info);
 
-  static const TextStyle labelMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
-  );
+  // Neutral Colors
+  TextStyle get grey => copyWith(color: AppColors.grey);
+  TextStyle get greyLight => copyWith(color: AppColors.greyLight);
+  TextStyle get greyDark => copyWith(color: AppColors.greyDark);
 
-  static const TextStyle labelSmall = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 11,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
-  );
+  // Semantic Text Colors
+  TextStyle get textPrimary => copyWith(color: AppColors.textPrimary);
+  TextStyle get textSecondary => copyWith(color: AppColors.textSecondary);
+  TextStyle get textHint => copyWith(color: AppColors.textHint);
+  TextStyle get textDisabled => copyWith(color: AppColors.textDisabled);
+
+  // ═══════════════════════════════════════════════════════════════
+  // UTILITIES
+  // ═══════════════════════════════════════════════════════════════
+  /// Set custom color
+  TextStyle setColor(Color c) => copyWith(color: c);
+
+  /// Set custom font size (automatically adapted with .sp)
+  TextStyle size(double s) => copyWith(fontSize: s.sp);
+
+  /// Set custom height
+  TextStyle h(double v) => copyWith(height: v);
+
+  /// Set custom letter spacing
+  TextStyle letterSpace(double v) => copyWith(letterSpacing: v);
+
+  /// Set ellipsis overflow
+  TextStyle get ellipsis => copyWith(overflow: TextOverflow.ellipsis);
 }

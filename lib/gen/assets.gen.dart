@@ -11,14 +11,28 @@
 
 import 'package:flutter/widgets.dart';
 
+class $AssetsDataGen {
+  const $AssetsDataGen();
+
+  /// File path: assets/data/.gitkeep
+  String get aGitkeep => 'assets/data/.gitkeep';
+
+  /// List of all assets
+  List<String> get values => [aGitkeep];
+}
+
+class $AssetsGifsGen {
+  const $AssetsGifsGen();
+
+  /// File path: assets/gifs/.gitkeep
+  String get aGitkeep => 'assets/gifs/.gitkeep';
+
+  /// List of all assets
+  List<String> get values => [aGitkeep];
+}
+
 class $AssetsIconsGen {
   const $AssetsIconsGen();
-
-  /// File path: assets/icons/SprotHub_Logo.svg
-  String get sprotHubLogo => 'assets/icons/SprotHub_Logo.svg';
-
-  /// File path: assets/icons/copy.svg
-  String get copy => 'assets/icons/copy.svg';
 
   /// File path: assets/icons/dev.png
   AssetGenImage get dev => const AssetGenImage('assets/icons/dev.png');
@@ -34,36 +48,63 @@ class $AssetsIconsGen {
   AssetGenImage get stg => const AssetGenImage('assets/icons/stg.png');
 
   /// List of all assets
-  List<dynamic> get values => [
-    sprotHubLogo,
-    copy,
-    dev,
-    placeholder2,
-    prod,
-    stg,
-  ];
+  List<AssetGenImage> get values => [dev, placeholder2, prod, stg];
 }
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
-
-  /// File path: assets/images/SprotHub_Logo.png
-  AssetGenImage get sprotHubLogo =>
-      const AssetGenImage('assets/images/SprotHub_Logo.png');
 
   /// File path: assets/images/placeholder.jpg
   AssetGenImage get placeholder =>
       const AssetGenImage('assets/images/placeholder.jpg');
 
   /// List of all assets
-  List<AssetGenImage> get values => [sprotHubLogo, placeholder];
+  List<AssetGenImage> get values => [placeholder];
+}
+
+class $AssetsLottieGen {
+  const $AssetsLottieGen();
+
+  /// File path: assets/lottie/accept.json
+  String get accept => 'assets/lottie/accept.json';
+
+  /// List of all assets
+  List<String> get values => [accept];
+}
+
+class $AssetsSvgGen {
+  const $AssetsSvgGen();
+
+  /// File path: assets/svg/.gitkeep
+  String get aGitkeep => 'assets/svg/.gitkeep';
+
+  /// List of all assets
+  List<String> get values => [aGitkeep];
+}
+
+class $AssetsTranslationsGen {
+  const $AssetsTranslationsGen();
+
+  /// File path: assets/translations/en.json
+  String get en => 'assets/translations/en.json';
+
+  /// File path: assets/translations/vi.json
+  String get vi => 'assets/translations/vi.json';
+
+  /// List of all assets
+  List<String> get values => [en, vi];
 }
 
 class Assets {
   const Assets._();
 
+  static const $AssetsDataGen data = $AssetsDataGen();
+  static const $AssetsGifsGen gifs = $AssetsGifsGen();
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
+  static const $AssetsLottieGen lottie = $AssetsLottieGen();
+  static const $AssetsSvgGen svg = $AssetsSvgGen();
+  static const $AssetsTranslationsGen translations = $AssetsTranslationsGen();
 }
 
 class AssetGenImage {

@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 // Add these lines to read key.properties
@@ -15,8 +16,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.dat_san_247_mobile"
-    compileSdk = flutter.compileSdkVersion
+    namespace = "com.datsan247.mobile"
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -30,22 +31,22 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.dat_san_247_mobile"
-        minSdk = 23
+        applicationId = "com.datsan247.mobile"
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
     }
 
- //  signingConfigs {
- //      create("release") {
- //          keyAlias = keystoreProperties["keyAlias"] as String
- //          keyPassword = keystoreProperties["keyPassword"] as String
- //         storeFile = file(keystoreProperties["storeFile"] as String)
- //         storePassword = keystoreProperties["storePassword"] as String
- //      }
- //  }
+//    signingConfigs {
+//        release {
+//            keyAlias keystoreProperties['keyAlias']
+//            keyPassword keystoreProperties['keyPassword']
+//            storeFile file(keystoreProperties['storeFile'])
+//            storePassword keystoreProperties['storePassword']
+//        }
+//    }
 
     flavorDimensions += "environment"
     productFlavors {
@@ -53,17 +54,23 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            resValue("string", "app_name", "Base App Dev")
+            val appName = "dat san 247"  // ← Chỉ cần đổi ở đây
+            resValue("string", "app_name", appName)
+            extra["appName"] = appName
         }
         create("stg") {
             dimension = "environment"
             applicationIdSuffix = ".stg"
             versionNameSuffix = "-stg"
-            resValue("string", "app_name", "Base App Stg")
+            val appName = "dat san 247"  // ← Chỉ cần đổi ở đây
+            resValue("string", "app_name", appName)
+            extra["appName"] = appName
         }
         create("prod") {
             dimension = "environment"
-            resValue("string", "app_name", "Base App")
+            val appName = "dat san 247"  // ← Chỉ cần đổi ở đây
+            resValue("string", "app_name", appName)
+            extra["appName"] = appName
         }
     }
 
@@ -72,8 +79,8 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
-            isMinifyEnabled = true      // ✅ Minify enabled
-            isShrinkResources = true    // ✅ Shrink resources enabled
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
@@ -82,17 +89,15 @@ android {
         }
     }
 
-    // ✅ FIX: Correct Kotlin DSL syntax for splits
-    splits {
-        abi {
-            isEnable = true             // ✅ Changed from 'enable' to 'isEnable'
-            reset()
-            include("arm64-v8a", "armeabi-v7a")  // ✅ Changed from include to include()
-            isUniversalApk = true       // ✅ Changed from 'universalApk' to 'isUniversalApk'
-        }
-    }
+//    splits {
+//        abi {
+//            isEnable = true
+//            reset()
+//            include("arm64-v8a", "armeabi-v7a")
+//            isUniversalApk = true
+//        }
+//    }
 
-    // ✅ FIX: Correct Kotlin DSL syntax for bundle
     bundle {
         language {
             enableSplit = true
@@ -113,3 +118,9 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// =========================================================
+//  Tách các custom tasks ra file riêng cho dễ quản lý
+// =========================================================
+apply(from = "rename-outputs.gradle.kts")  // Rename APK + AAB
+apply(from = "open-folder.gradle.kts")     // Auto open folder after build

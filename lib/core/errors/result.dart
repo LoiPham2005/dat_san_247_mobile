@@ -1,24 +1,27 @@
-// ════════════════════════════════════════════════════════════════
-// 📁 lib/core/errors/result.dart (OPTIMIZED - Giảm 40% methods)
-// ════════════════════════════════════════════════════════════════
-
 import 'package:dat_san_247_mobile/core/errors/failures.dart';
 
-/// Result pattern - Thay thế Either
+/// Result pattern using sealed classes for exhaustive matching (Dart 3.x)
+/// 🎯 WORLD-CLASS IMPLEMENTATION
 sealed class Result<T> {
   const Result();
+
+  /// Create a success result
+  const factory Result.success(T data) = ResultSuccess<T>;
+
+  /// Create a failure result
+  const factory Result.failure(Failure failure) = ResultFailure<T>;
 
   bool get isSuccess => this is ResultSuccess<T>;
   bool get isFailure => this is ResultFailure<T>;
 
-  T? get dataOrNull => isSuccess ? (this as ResultSuccess<T>).data : null;
-  Failure? get failureOrNull => isFailure ? (this as ResultFailure<T>).failure : null;
+  T? get dataOrNull => fold(onSuccess: (data) => data, onFailure: (_) => null);
+  Failure? get failureOrNull => fold(onSuccess: (_) => null, onFailure: (f) => f);
 
   // ═══════════════════════════════════════════════════════════
-  // Core Methods (4 methods chính - đủ dùng cho 90% cases)
+  // Core Methods
   // ═══════════════════════════════════════════════════════════
 
-  /// 1. Fold - Transform to single type
+  /// Fold - Exhaustive matching using switch expression
   R fold<R>({
     required R Function(T data) onSuccess,
     required R Function(Failure failure) onFailure,
@@ -29,72 +32,49 @@ sealed class Result<T> {
     };
   }
 
-  /// 2. Map - Transform success data
+  /// Map - Transform success data
   Result<R> map<R>(R Function(T data) transform) {
     return fold(
-      onSuccess: (data) => ResultSuccess(transform(data)),
-      onFailure: (failure) => ResultFailure(failure),
+      onSuccess: (data) => Result.success(transform(data)),
+      onFailure: (failure) => Result.failure(failure),
     );
   }
 
-  /// 3. FlatMap - Chain operations
+  /// FlatMap - Chain operations
   Result<R> flatMap<R>(Result<R> Function(T data) transform) {
-    return fold(onSuccess: transform, onFailure: (failure) => ResultFailure(failure));
+    return fold(onSuccess: transform, onFailure: (failure) => Result.failure(failure));
   }
 
-  /// 4. GetOrElse - Get data or fallback
+  /// Get data or fallback
   T getOrElse(T Function() orElse) {
     return fold(onSuccess: (data) => data, onFailure: (_) => orElse());
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // Convenience Methods (4 methods bổ sung thường dùng)
-  // ═══════════════════════════════════════════════════════════
-
-  /// Async chain
-  Future<Result<R>> flatMapAsync<R>(Future<Result<R>> Function(T data) transform) async {
-    return fold(onSuccess: transform, onFailure: (failure) async => ResultFailure(failure));
-  }
-
-  /// Side effects
-  Result<T> tap(void Function(T data) onSuccess, [void Function(Failure failure)? onFailure]) {
-    fold(onSuccess: onSuccess, onFailure: onFailure ?? (_) {});
-    return this;
-  }
-
-  /// Recovery
-  Result<T> recover(T Function(Failure failure) recovery) {
-    return fold(
-      onSuccess: (data) => ResultSuccess(data),
-      onFailure: (failure) => ResultSuccess(recovery(failure)),
-    );
-  }
-
-  /// Quick getters
+  /// Get value or throw exception
   T getOrThrow() =>
       fold(onSuccess: (data) => data, onFailure: (failure) => throw Exception(failure.message));
 }
 
-/// Success with data
+/// Success state implementation
 final class ResultSuccess<T> extends Result<T> {
   final T data;
   const ResultSuccess(this.data);
 
   @override
-  String toString() => 'ResultSuccess($data)';
+  String toString() => 'Result.success($data)';
 }
 
-/// Failure with error
+/// Failure state implementation
 final class ResultFailure<T> extends Result<T> {
   final Failure failure;
   const ResultFailure(this.failure);
 
   @override
-  String toString() => 'ResultFailure($failure)';
+  String toString() => 'Result.failure($failure)';
 }
 
 // ═══════════════════════════════════════════════════════════
-// Extensions for common patterns
+// Convenience Extensions
 // ═══════════════════════════════════════════════════════════
 
 extension ResultListX<T> on Result<List<T>> {
@@ -110,7 +90,6 @@ extension ResultListX<T> on Result<List<T>> {
 }
 
 extension ResultFutureX<T> on Future<Result<T>> {
-  /// Chain future results
   Future<Result<R>> thenMap<R>(R Function(T data) transform) async {
     return (await this).map(transform);
   }

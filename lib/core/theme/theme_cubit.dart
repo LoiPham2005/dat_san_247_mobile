@@ -4,14 +4,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import '../storage/storage_service.dart';
+import '../storage/local/local_storage_service.dart';
 import 'app_theme.dart';
 import 'theme_state.dart';
 
-@injectable
 @lazySingleton
 class ThemeCubit extends Cubit<ThemeState> {
-  final StorageService _storageService;
+  final LocalStorageService _storageService;
 
   ThemeCubit(this._storageService) : super(const ThemeState());
 
@@ -25,15 +24,11 @@ class ThemeCubit extends Cubit<ThemeState> {
     try {
       // Load color type
       final savedColor = _storageService.getThemeColor();
-      final colorType = savedColor != null
-          ? _parseThemeColor(savedColor)
-          : ThemeColorType.green;
+      final colorType = savedColor != null ? _parseThemeColor(savedColor) : ThemeColorType.blue;
 
       // Load theme mode
       final savedMode = _storageService.getThemeMode();
-      final themeMode = savedMode != null
-          ? _parseThemeMode(savedMode)
-          : AppThemeMode.light;
+      final themeMode = savedMode != null ? _parseThemeMode(savedMode) : AppThemeMode.light;
 
       emit(state.copyWith(colorType: colorType, themeMode: themeMode));
     } catch (e) {

@@ -30,8 +30,8 @@ class AppTheme {
 
   // ✅ Theme names & icons
   static const Map<ThemeColorType, String> themeNames = {
-    ThemeColorType.green: '🟢 Nature Green',
     ThemeColorType.blue: '🔵 Ocean Blue',
+    ThemeColorType.green: '🟢 Nature Green',
     ThemeColorType.red: '🔴 Passion Red',
     ThemeColorType.purple: '🟣 Royal Purple',
     ThemeColorType.orange: '🟠 Sunset Orange',
@@ -45,8 +45,8 @@ class AppTheme {
   };
 
   static const Map<ThemeColorType, IconData> themeIcons = {
-    ThemeColorType.green: Icons.eco,
     ThemeColorType.blue: Icons.water_drop,
+    ThemeColorType.green: Icons.eco,
     ThemeColorType.red: Icons.favorite,
     ThemeColorType.purple: Icons.auto_awesome,
     ThemeColorType.orange: Icons.wb_sunny,

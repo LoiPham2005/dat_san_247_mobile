@@ -1,18 +1,19 @@
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/presentation/network_monitor.dart (FIXED - Support List)
+// 📁 lib/core/services/network_monitor.dart
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 
 /// Network monitor with UI feedback
 /// - Hiển thị SnackBar khi mất/có mạng
 /// - Dùng trong widgets cần UI feedback
 /// - Không inject, dùng trực tiếp
 class NetworkMonitor {
+  factory NetworkMonitor() => _instance;
   NetworkMonitor._();
   static final NetworkMonitor _instance = NetworkMonitor._();
-  factory NetworkMonitor() => _instance;
 
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _subscription;
@@ -72,10 +73,7 @@ class NetworkMonitor {
     }
   }
 
-  void _showConnectedSnackBar(
-    BuildContext context,
-    List<ConnectivityResult> results,
-  ) {
+  void _showConnectedSnackBar(BuildContext context, List<ConnectivityResult> results) {
     _isSnackBarShown = false;
     final connectionType = _getConnectionTypeName(results);
 
@@ -100,8 +98,8 @@ class NetworkMonitor {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: const [
+        content: const Row(
+          children: [
             Icon(Icons.wifi_off, color: Colors.white),
             SizedBox(width: 12),
             Text('Mất kết nối mạng'),
@@ -120,8 +118,7 @@ class NetworkMonitor {
   }
 
   bool _isConnected(List<ConnectivityResult> results) {
-    return results.isNotEmpty &&
-        !results.every((result) => result == ConnectivityResult.none);
+    return results.isNotEmpty && !results.every((result) => result == ConnectivityResult.none);
   }
 
   String _getConnectionTypeName(List<ConnectivityResult> results) {

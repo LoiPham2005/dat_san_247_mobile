@@ -69,7 +69,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<User>> getProfile() async {
+  Future<Result<AuthUser>> getProfile() async {
     final result = await _remoteDataSource.getProfile();
     return result.map((model) => model.toEntity());
   }

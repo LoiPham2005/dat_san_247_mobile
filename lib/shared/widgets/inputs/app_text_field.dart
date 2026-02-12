@@ -105,9 +105,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 onPressed: () => setState(() => _obscureText = !_obscureText),
               )
             : widget.suffixIcon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(widget.borderRadius)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius),
           borderSide: const BorderSide(color: AppColors.border),
@@ -124,48 +122,6 @@ class _AppTextFieldState extends State<AppTextField> {
         fillColor: widget.enabled ? AppColors.surface : AppColors.grey.withOpacity(0.1),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
-    );
-  }
-}
-
-/// Search TextField
-class AppSearchField extends StatelessWidget {
-  const AppSearchField({
-    super.key,
-    this.controller,
-    this.hint = 'Tìm kiếm...',
-    this.onChanged,
-    this.onSubmitted,
-    this.onClear,
-    this.autofocus = false,
-  });
-
-  final TextEditingController? controller;
-  final String hint;
-  final void Function(String)? onChanged;
-  final void Function(String)? onSubmitted;
-  final VoidCallback? onClear;
-  final bool autofocus;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppTextField(
-      controller: controller,
-      hint: hint,
-      autofocus: autofocus,
-      prefixIcon: const Icon(Icons.search),
-      suffixIcon: controller?.text.isNotEmpty == true
-          ? IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () {
-                controller?.clear();
-                onClear?.call();
-              },
-            )
-          : null,
-      onChanged: onChanged,
-      onSubmitted: onSubmitted,
-      textInputAction: TextInputAction.search,
     );
   }
 }

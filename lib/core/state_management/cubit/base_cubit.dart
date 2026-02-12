@@ -1,159 +1,6 @@
-// // ════════════════════════════════════════════════════════════════
-// // 📁 Example: base_cubit.dart (SIMPLIFIED - Không cần exception)
-// // ════════════════════════════════════════════════════════════════
-
-// import 'dart:async';
-// import 'package:dat_san_247_mobile/core/errors/failures.dart';
-// import 'package:dat_san_247_mobile/core/errors/result.dart';
-// import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
-// import 'package:dat_san_247_mobile/core/utils/logger.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-
-// abstract class BaseCubit<T> extends Cubit<BaseState<T>> {
-//   BaseCubit([BaseState<T>? initialState])
-//       : super(initialState ?? BaseState<T>.initial());
-
-//   Completer<void>? _currentOperation;
-
-//   bool get isCancelled => _currentOperation?.isCompleted ?? false;
-
-//   void cancelCurrentOperation() {
-//     if (_currentOperation != null && !_currentOperation!.isCompleted) {
-//       _currentOperation!.complete();
-//     }
-//   }
-
-//   void safeEmit(BaseState<T> newState) {
-//     if (!isClosed) emit(newState);
-//   }
-
-//   // ════════════════════════════════════════════════════════════
-//   // Execute Query (GET operations)
-//   // ════════════════════════════════════════════════════════════
-
-//   Future<T?> execute({
-//     required Future<Result<T>> Function() action,
-//     void Function(T data)? onSuccess,
-//     void Function(Failure failure)? onFailure,
-//     bool preserveDataOnError = false,
-//     bool cancelPrevious = false,
-//   }) async {
-//     if (cancelPrevious) cancelCurrentOperation();
-//     _currentOperation = Completer<void>();
-
-//     safeEmit(BaseState.loading(
-//       previousData: preserveDataOnError ? state.data : null,
-//     ));
-
-//     try {
-//       final result = await action();
-
-//       if (isCancelled) return null;
-
-//       return result.fold(
-//         onSuccess: (data) {
-//           if (data is List && (data as List).isEmpty) {
-//             safeEmit(BaseState.empty());
-//           } else {
-//             safeEmit(BaseState.loaded(data));
-//           }
-//           onSuccess?.call(data);
-//           return data;
-//         },
-//         onFailure: (failure) {
-//           // ✅ CHỈ LƯU MESSAGE - Không cần exception/stackTrace
-//           safeEmit(
-//             BaseState.failure(
-//               error: failure.message,  // ← Chỉ lưu message
-//               previousData: preserveDataOnError ? state.data : null,
-//             ),
-//           );
-//           onFailure?.call(failure);
-//           return null;
-//         },
-//       );
-//     } catch (e, stackTrace) {
-//       // ✅ LOG TẠI ĐÂY, nhưng State chỉ nhận message
-//       Logger.error('Execute failed', error: e, stackTrace: stackTrace);
-
-//       safeEmit(
-//         BaseState.failure(
-//           error: e.toString(),  // ← Chỉ message
-//           previousData: preserveDataOnError ? state.data : null,
-//         ),
-//       );
-//       onFailure?.call(UnknownFailure(message: e.toString()));
-//       return null;
-//     }
-//   }
-
-//   // ════════════════════════════════════════════════════════════
-//   // Execute Mutation (POST/PUT/DELETE)
-//   // ════════════════════════════════════════════════════════════
-
-//   Future<T?> executeMutation({
-//     required Future<Result<T>> Function() action,
-//     void Function(T data)? onSuccess,
-//     void Function(Failure failure)? onFailure,
-//     String? successMessage,
-//   }) async {
-//     safeEmit(BaseState.submitting(data: state.data));
-
-//     try {
-//       final result = await action();
-
-//       return result.fold(
-//         onSuccess: (data) {
-//           safeEmit(BaseState.success(data: data, message: successMessage));
-//           onSuccess?.call(data);
-//           return data;
-//         },
-//         onFailure: (failure) {
-//           // ✅ Chỉ lưu message
-//           safeEmit(
-//             BaseState.failure(
-//               error: failure.message,
-//               previousData: state.data,
-//             ),
-//           );
-//           onFailure?.call(failure);
-//           return null;
-//         },
-//       );
-//     } catch (e, stackTrace) {
-//       Logger.error('Mutation failed', error: e, stackTrace: stackTrace);
-
-//       safeEmit(
-//         BaseState.failure(
-//           error: e.toString(),
-//           previousData: state.data,
-//         ),
-//       );
-//       onFailure?.call(UnknownFailure(message: e.toString()));
-//       return null;
-//     }
-//   }
-
-//   // ════════════════════════════════════════════════════════════
-//   // Utility Methods
-//   // ════════════════════════════════════════════════════════════
-
-//   void reset() {
-//     cancelCurrentOperation();
-//     safeEmit(BaseState.initial());
-//   }
-
-//   void updateData(T data) => safeEmit(BaseState.loaded(data));
-
-//   void setEmpty({String? message}) => safeEmit(BaseState.empty(message: message));
-
-//   @override
-//   Future<void> close() {
-//     cancelCurrentOperation();
-//     return super.close();
-//   }
-// }
-
+// ════════════════════════════════════════════════════════════════
+// 📁 lib/core/state_management/cubit/base_cubit.dart
+// ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
 import 'package:dat_san_247_mobile/core/errors/failures.dart';
@@ -162,85 +9,130 @@ import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Smart + Flexible BaseCubit
+/// SMART & FLEXIBLE BaseCubit
+///
+/// Tăng cường khả năng xử lý state tự động:
+/// - Tự động phát hiện Mutation (POST/PUT/DELETE) nếu có successMessage.
+/// - Tự động phát hiện Refresh nếu đang có data.
+/// - Tự động hủy (cancel) các request Query cũ nếu có request mới.
+/// - Giữ lại data cũ (Preserve Data) khi có lỗi xảy ra trong quá trình Mutation/Refresh.
 abstract class BaseCubit<T> extends Cubit<BaseState<T>> {
   BaseCubit([BaseState<T>? initialState]) : super(initialState ?? BaseState<T>.initial());
 
   Completer<void>? _currentOperation;
   bool get isCancelled => _currentOperation?.isCompleted ?? false;
 
+  /// Hủy operation hiện tại (chỉ áp dụng cho Query)
   void cancelCurrentOperation() {
     if (_currentOperation != null && !_currentOperation!.isCompleted) {
       _currentOperation!.complete();
     }
   }
 
+  /// Emit state an toàn (check isClosed)
   void safeEmit(BaseState<T> newState) {
     if (!isClosed) emit(newState);
   }
 
   // ════════════════════════════════════════════════════════════
-  // 🎯 SMART + FLEXIBLE EXECUTE
+  // 🎯 SMART EXECUTE
   // ════════════════════════════════════════════════════════════
 
+  /// [QUERY] Use for fetching data (GET)
+  /// - Default: cancelPrevious = true (cancel old requests)
+  /// - Default: isMutation = false
+  Future<T?> onQuery({
+    required Future<Result<T>> Function() action,
+    void Function(T data)? onSuccess,
+    void Function(Failure failure)? onFailure,
+    bool cancelPrevious = true, // Cancel old queries by default
+    bool preserveData = false, // Show loading, hide old data (optional)
+  }) {
+    return execute(
+      action: action,
+      onSuccess: onSuccess,
+      onFailure: onFailure,
+      isMutation: false,
+      cancelPrevious: cancelPrevious,
+      preserveData: preserveData,
+    );
+  }
+
+  /// [MUTATION] Use for changing data (POST, PUT, DELETE)
+  /// - Default: cancelPrevious = false (allow parallel mutations)
+  /// - Default: isMutation = true
+  Future<T?> onMutation({
+    required Future<Result<T>> Function() action,
+    void Function(T data)? onSuccess,
+    void Function(Failure failure)? onFailure,
+    String? successMessage,
+    bool showLoading = true,
+  }) {
+    return execute(
+      action: action,
+      onSuccess: onSuccess,
+      onFailure: onFailure,
+      successMessage: successMessage,
+      isMutation: true,
+      cancelPrevious: false,
+      showLoading: showLoading,
+    );
+  }
+
+  /// Thực thi một action Async và quản lý toàn bộ vòng đời state.
+  ///
+  /// [action]: Hàm thực thi UseCase trả về Result.
+  /// [isMutation]: Ép buộc là mutation (Submitting) thay vì query (Loading).
+  /// [preserveData]: Ép buộc giữ data cũ khi lỗi.
+  /// [cancelPrevious]: Ép buộc hủy request trước đó (mặc định true cho Query, false cho Mutation).
   Future<T?> execute({
     required Future<Result<T>> Function() action,
     void Function(T data)? onSuccess,
     void Function(Failure failure)? onFailure,
     String? successMessage,
-
-    // ✅ FLEXIBLE PARAMS - Null = Auto detect
-    bool? isMutation, // null → auto detect, true/false → override
-    bool? preserveData, // null → auto detect, true/false → override
-    bool? cancelPrevious, // null → auto detect, true/false → override
+    bool? isMutation,
+    bool? preserveData,
+    bool? cancelPrevious,
+    BaseState<T>? customLoadingState,
+    bool showLoading = true, // Control loading state
   }) async {
-    // ─────────────────────────────────────────────────────────
-    // 🤖 AUTO DETECT hoặc OVERRIDE
-    // ─────────────────────────────────────────────────────────
-    final currentData = state.data; // ✅ Lưu lại data hiện tại
+    final currentData = state.data;
     final bool isRefreshing = currentData != null && !state.isSubmitting && !state.isLoading;
 
-    // 1. Detect mutation (có thể override)
-    final bool _isMutation = isMutation ?? (state.isSubmitting || successMessage != null);
+    // 1. Resolve configuration (Auto detect)
+    final bool mutationMode = isMutation ?? (successMessage != null);
+    final bool shouldPreserve = preserveData ?? (mutationMode || isRefreshing);
+    final bool shouldCancel = cancelPrevious ?? !mutationMode;
 
-    // 2. Detect preserve data (có thể override)
-    final bool _preserveData = preserveData ?? (_isMutation || isRefreshing);
-
-    // 3. Detect cancel previous (có thể override)
-    final bool _cancelPrevious = cancelPrevious ?? !_isMutation;
-
-    // Cancel nếu cần
-    if (_cancelPrevious) {
+    // 2. Handle cancellation
+    if (shouldCancel) {
       cancelCurrentOperation();
       _currentOperation = Completer<void>();
     }
 
-    // ════════════════════════════════════════════════════════════
-    // 1️⃣ EMIT LOADING STATE
-    // ════════════════════════════════════════════════════════════
-    if (_isMutation) {
+    // 3. Emit Loading/Submitting/Refreshing state
+    if (!showLoading) {
+      // Do nothing
+    } else if (customLoadingState != null) {
+      safeEmit(customLoadingState);
+    } else if (mutationMode) {
       safeEmit(BaseState.submitting(data: currentData));
     } else if (isRefreshing) {
-      // ✅ FIX: Chỉ gọi refreshing khi có data
-      safeEmit(BaseState.refreshing(currentData: currentData!)); // Safe vì đã check isRefreshing
+      safeEmit(BaseState.refreshing(currentData: currentData));
     } else {
       safeEmit(BaseState.loading(previousData: null));
     }
 
-    // ════════════════════════════════════════════════════════════
-    // 2️⃣ EXECUTE ACTION
-    // ════════════════════════════════════════════════════════════
     try {
       final result = await action();
 
-      if (isCancelled && !_isMutation) return null;
+      // Kiểm tra nếu đã bị cancel (chỉ reset flag cho query)
+      if (isCancelled && !mutationMode) return null;
 
-      // ════════════════════════════════════════════════════════════
-      // 3️⃣ HANDLE SUCCESS
-      // ════════════════════════════════════════════════════════════
+      // 4. Handle success/failure
       return result.fold(
         onSuccess: (data) {
-          if (_isMutation) {
+          if (mutationMode) {
             safeEmit(BaseState.success(data: data, message: successMessage ?? 'Thành công'));
           } else {
             if (data is List && (data as List).isEmpty) {
@@ -253,12 +145,11 @@ abstract class BaseCubit<T> extends Cubit<BaseState<T>> {
           onSuccess?.call(data);
           return data;
         },
-
         onFailure: (failure) {
           safeEmit(
             BaseState.failure(
               error: failure.message,
-              previousData: _preserveData ? currentData : null, // ✅ Dùng currentData
+              previousData: shouldPreserve ? currentData : null,
             ),
           );
           onFailure?.call(failure);
@@ -266,19 +157,53 @@ abstract class BaseCubit<T> extends Cubit<BaseState<T>> {
         },
       );
     } catch (e, stackTrace) {
-      Logger.error('Execute failed', error: e, stackTrace: stackTrace);
+      Logger.error('BaseCubit: Execute failed', error: e, stackTrace: stackTrace);
 
       safeEmit(
         BaseState.failure(
           error: e.toString(),
-          previousData: _preserveData ? currentData : null, // ✅ Dùng currentData
+          previousData: shouldPreserve ? currentData : null,
           stackTrace: stackTrace,
         ),
       );
       onFailure?.call(UnknownFailure(message: e.toString()));
       return null;
     } finally {
-      if (!_isMutation) _currentOperation = null;
+      if (!mutationMode) _currentOperation = null;
+    }
+  }
+
+  /// Thực thi pagination (load more)
+  ///
+  /// [action]: Phải trả về List đã được merge hoặc thông tin phân trang mới.
+  Future<T?> executePagination({
+    required Future<Result<T>> Function() action,
+    void Function(T data)? onSuccess,
+    void Function(Failure failure)? onFailure,
+  }) async {
+    final currentData = state.data;
+    if (currentData == null) return execute(action: action);
+
+    safeEmit(BaseState.loadingMore(currentData: currentData));
+
+    try {
+      final result = await action();
+      return result.fold(
+        onSuccess: (data) {
+          safeEmit(BaseState.loaded(data));
+          onSuccess?.call(data);
+          return data;
+        },
+        onFailure: (failure) {
+          safeEmit(BaseState.failure(error: failure.message, previousData: currentData));
+          onFailure?.call(failure);
+          return null;
+        },
+      );
+    } catch (e) {
+      safeEmit(BaseState.failure(error: e.toString(), previousData: currentData));
+      onFailure?.call(UnknownFailure(message: e.toString()));
+      return null;
     }
   }
 
@@ -298,5 +223,29 @@ abstract class BaseCubit<T> extends Cubit<BaseState<T>> {
   Future<void> close() {
     cancelCurrentOperation();
     return super.close();
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // 🔓 FLEXIBLE EXECUTE (No Rules)
+  // ════════════════════════════════════════════════════════════
+
+  /// [RUN] Execute any logic freely.
+  Future<void> run({
+    required Future<void> Function() action,
+    BaseState<T>? loadingState,
+    void Function()? onSuccess,
+    void Function(Object error, StackTrace stackTrace)? onError,
+    bool showLog = true,
+  }) async {
+    if (loadingState != null) safeEmit(loadingState);
+    try {
+      await action();
+      onSuccess?.call();
+    } catch (e, stackTrace) {
+      if (showLog) {
+        Logger.error('BaseCubit: execution failed', error: e, stackTrace: stackTrace);
+      }
+      onError?.call(e, stackTrace);
+    }
   }
 }

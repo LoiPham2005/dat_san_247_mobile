@@ -24,7 +24,7 @@ class NotificationService {
     );
 
     await _flutterLocalNotificationsPlugin.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         // Xử lý click notification
         final payload = response.payload;
@@ -59,6 +59,12 @@ class NotificationService {
       macOS: darwinDetails,
     );
 
-    await _flutterLocalNotificationsPlugin.show(id, title, body, platformDetails, payload: payload);
+    await _flutterLocalNotificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: platformDetails,
+      payload: payload,
+    );
   }
 }

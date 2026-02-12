@@ -1,55 +1,82 @@
-# 🚀 Flutter Base Template
+# 🚀 Dặt Sân 247 Mobile Application
 
 <div align="center">
 
-![Flutter](https://img.shields.io/badge/Flutter-3.22.0+-02569B?logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-3.4.0+-0175C2?logo=dart&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Platform](https://img.shields.io/badge/Platform-Android%20|%20iOS-blue.svg)
+![Flutter](https://img.shields.io/badge/Flutter-3.35.7+-02569B?logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-3.8.1+-0175C2?logo=dart&logoColor=white)
+![Architecture](https://img.shields.io/badge/Clean-Architecture-green)
+![State](https://img.shields.io/badge/State-BLoC%20%7C%20Riverpod-purple)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-**Production-ready Flutter template với Clean Architecture, DI, State Management, Flavors, và Environment Config**
+**A production-ready, feature-rich Flutter template optimized for scalability, performance, and developer experience.**
 
-[Tài liệu](#-documentation) • [Bắt đầu](#-quick-start) • [Tính năng](#-features) • [Cấu trúc](#-project-structure) • [Architecture](#-architecture-flow)
+[Getting Started](#-getting-started) • [Documentation](#-documentation) • [Features](#-features) • [Structure](#-project-structure)
 
 </div>
 
 ---
 
-## ✨ Features
+## 🌟 Features
 
-- 🏗️ **Clean Architecture** - Domain, Data, Presentation layers
-- 📁 **Feature-First** - Tổ chức theo tính năng, dễ scale
-- 💉 **DI tự động** - get_it + injectable
-- 🔄 **State Management** - BLoC, GetX, Riverpod, Provider
-- 🌐 **Networking** - Dio + Interceptors + Result wrapper
-- 🔒 **Storage** - SharedPreferences + SecureStorage
-- 🎨 **Theme** - Light/Dark mode
-- 🌍 **i18n** - Multi-language với .arb
-- 📱 **Responsive** - Screen utilities
-- 🧪 **Testing** - Unit, Widget, Integration tests
-- ⚙️ **Environment Config** - Flavors + Entrypoints (Dev, Staging, Prod)
-- 🔥 **CI/CD** - GitHub Actions
+This template provides a robust foundation for building large-scale Flutter applications.
+
+- **🏗️ Clean Architecture**: Strict separation of concerns (Domain, Data, Presentation) for testability and scalability.
+- **💉 Dependency Injection**: Powered by `get_it` and `injectable` for loose coupling.
+- **🌐 Environment Management**: Native Flavors (Dev, Stg, Prod) combined with `envied` for secure config.
+- **🧱 Mason Templates**: Pre-built bricks to generate features, blocs, and logic in seconds.
+- **📺 Advanced Ads Module**: Complete generic implementation for AdMob (Banner, Interstitial, Native, Reward, AppOpen).
+- **🔄 State Management**: Pre-configured support for BLoC (default), Riverpod, or GetX.
+- **🔌 Robust Networking**: Dio client with smart interceptors, logging, and error handling.
+- **🌍 Localization (i18n)**: Native `.arb` file support with type-safe generation.
+- **🎨 Modern UI/UX**: `ScreenUtil` for responsiveness, centralized Theme system, and Asset management.
+- **🤖 Developer Experience**: Integrated FVM, VS Code Tasks, and Launch Configurations.
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Tech Stack
 
-```bash
-# 1. Clone & install
-git clone <your-repo-url>
-cd dat_san_247_mobile
-flutter pub get
+| Category | Technology | Description |
+|----------|------------|-------------|
+| **Core** | Flutter, Dart | Latest stable versions |
+| **Architecture** | Clean Architecture | Domain-driven design |
+| **DI** | `get_it`, `injectable` | Service locator & generation |
+| **State** | `flutter_bloc` | Predictable state management |
+| **Navigation** | `go_router` | Declarative routing with deep links |
+| **Network** | `dio`, `retrofit` | Http client & API generation |
+| **Storage** | `hive`, `secure_storage` | Local DB & Encrypted storage |
+| **Ads** | `google_mobile_ads` | Monetization wrapper |
+| **Utils** | `logger`, `freezed` | Logging & Immutable classes |
 
-# 2. Generate code
-dart run build_runner build --delete-conflicting-outputs
+---
 
-# 3. Run (chọn environment & flavor)
-flutter run --flavor dev -t lib/main_dev.dart              # Development
-flutter run --flavor stg -t lib/main_stg.dart              # Staging
-flutter run --flavor prod -t lib/main_prod.dart            # Production
-```
+## 🚀 Getting Started
 
-**VS Code**: Nhấn `F5` → Chọn flavor (🧑‍💻 Dev / 🧪 Stg / 🚀 Prod) → Run
+### Prerequisites
+- [FVM](https://fvm.app/) (Flutter Version Manager)
+- [Mason](https://pub.dev/packages/mason_cli) (Template Generator)
+
+### Installation
+
+1. **Clone & Install Dependencies**
+   ```bash
+   git clone https://github.com/your-username/flutter_base_template.git
+   cd flutter_base_template
+   fvm install
+   fvm flutter pub get
+   ```
+
+2. **Generate Code**
+   ```bash
+   fvm dart run build_runner build -d
+   ```
+
+3. **Run the App**
+   ```bash
+   # Development
+   fvm flutter run --flavor dev -t lib/main_dev.dart
+   ```
+
+> **Tip**: If using VS Code, simply press `F5` to start debugging. We have pre-configured launch.json!
 
 ---
 
@@ -57,289 +84,67 @@ flutter run --flavor prod -t lib/main_prod.dart            # Production
 
 ```
 lib/
-├── core/                   # Core functionalities, shared across the app
-│   ├── config/             # App initialization & configuration (Observer, Initializer)
-│   ├── constants/          # Constants (API endpoints, App info)
-│   ├── di/                 # Dependency Injection (get_it, injectable)
-│   ├── errors/             # Error handling (Failures, Exceptions)
-│   ├── extensions/         # Utility extensions
-│   ├── l10n/               # Localization (multi-language support)
-│   ├── network/            # Network layer (Dio, Interceptors, API Client)
-│   ├── routes/             # App routes (GoRouter config)
-│   ├── services/           # Core services (Notifications, Auth, Navigation)
-│   ├── state_management/   # Base classes for BLoC, GetX, Riverpod, Provider
-│   ├── storage/            # Data storage (SharedPreferences, Secure Storage)
-│   ├── theme/              # UI management (Colors, Styles, Themes)
-│   └── utils/              # Utilities (Logger, Validators, Device Info)
-│
-├── features/               # App features (Clean Architecture)
-│   ├── auth/               # Example: Authentication feature
-│   │   ├── data/           # Models, DataSources, Repository Implementation
-│   │   ├── domain/         # Entities, Repository Abstract, UseCases
-│   │   └── presentation/   # BLoC/Cubit, Pages, Widgets
-│   ├── home/               # Home feature
-│   ├── splash/             # Splash screen
-│   ├── welcome/            # Welcome screen
-│   └── ...                 # Other features
-│
-├── shared/                 # Shared UI components & models
-│   ├── models/             # Shared models (non-entity)
-│   └── widgets/            # Reusable widgets (Toast, Dash, etc.)
-│
-├── env/                    # Environment config (auto-generated by envied)
-│   ├── env_dev.dart
-│   ├── env_stg.dart
-│   └── env_prod.dart
-│
-├── main_dev.dart           # Development entrypoint
-├── main_stg.dart           # Staging entrypoint
-├── main_prod.dart          # Production entrypoint
-└── main_common.dart        # Common initialization logic
+├── core/                  # Core modules (Network, Storage, Ads, Theme, Utils)
+│   ├── ads/               # 📺 Complete Ads module (Config, Service, Widgets)
+│   ├── config/            # App Config & Environments
+│   ├── di/                # Dependency Injection Setup
+│   └── ...
+├── features/              # Feature-based organization
+│   ├── auth/              # Example Feature
+│   │   ├── data/          # Repositories & DTOs
+│   │   ├── domain/        # Entities & UseCases
+│   │   └── presentation/  # BLoC, Pages, Widgets
+│   └── home/
+├── shared/                # Shared Widgets & Constants
+└── main_dev.dart          # Entry points
 ```
 
 ---
 
 ## 📚 Documentation
 
-### Bắt đầu
-- 📖 [Getting Started](docs/GETTING_STARTED.md) - Setup chi tiết
-- 🌍 [Environment Setup](docs/ENVIRONMENT_SETUP.md) - Cấu hình Flavors & Environment
-- 🎨 [Rename Project](docs/RENAME_PROJECT.md) - Đổi tên dự án
+Detailed documentation is available in the `docs/` directory:
 
-### Phát triển
-- 🏗️ [Architecture](docs/ARCHITECTURE.md) - Clean Architecture
-- 🚀 [Build & Code Generation](docs/build_flavor.md) - Build commands với Flavors
-- 🔌 [API Implementation](docs/CALL_API.md) - Thêm API feature mới
-- 🔄 [State Management](docs/STATE_MANAGEMENT.md) - BLoC, GetX, Riverpod
-- 📝 [Coding Standards](docs/CODING_STANDARDS.md) - Quy tắc code
-
-### Build & Deploy
-- 📱 [Setup Keystore](docs/SETUP_KEYSTORE.md) - Setup signing cho release
-- 🧪 [Testing](docs/TESTING.md) - Viết tests
-- ❓ [FAQ](docs/FAQ.md) - Giải đáp thắc mắc
-
-### Đóng góp
-- 🤝 [Contributing](docs/CONTRIBUTING.md) - Cách contribute
+- [**🛠️ Setup Guide**](docs/SETUP.md) - Environment setup, Keystores, and Tools.
+- [**🏗️ Architecture**](docs/ARCHITECTURE.md) - Deep dive into Clean Architecture & DI.
+- [**💻 Development Workflow**](docs/DEVELOPMENT.md) - Commands, Mason, L10n, Testing.
+- [**📺 Ads Integration**](docs/ads.md) - How to configure and use the Ads module.
+- [**🧩 Ecosystem**](docs/ECOSYSTEM.md) - API, Storage, Theme, Navigation details.
 
 ---
 
-## ⚡ Build & Run Commands (With Flavors + Entrypoints)
+## 🤖 Automation with Makefile
 
-### 1. Code Generation (Build Runner)
+Để đơn giản hóa việc chạy các lệnh dài, dự án đã cấu hình sẵn **Makefile**. Bạn có thể dùng `make <command>` để thực thi nhanh:
 
-```bash
-# One-time build
-dart run build_runner build --delete-conflicting-outputs
-
-# Watch mode (auto-rebuild on changes)
-dart run build_runner watch --delete-conflicting-outputs
-```
-
----
-
-### 2. Generate Localization (i18n)
-
-```bash
-flutter gen-l10n
-```
+| Lệnh | Mô tả |
+|------|-------|
+| `make get` | Cài đặt dependencies (pub get) |
+| `make gen` | Chạy build_runner (tạo code tự động) |
+| `make l10n` | Cập nhật đa ngôn ngữ (l10n) |
+| `make full-gen` | Reset sạch dự án và build lại toàn bộ |
+| `make run-dev` | Chạy app ở chế độ DEV (Debug) |
+| `make apk-prod` | Build APK môi trường Production |
+| `make icons` | Tạo lại App Icon từ cấu hình |
 
 ---
 
-### 3. Clean Project
+## 📂 Common Commands
 
-```bash
-flutter clean && flutter pub get
-```
-
----
-
-### 4. Run on Device/Emulator (With Flavors)
-
-```bash
-# Development
-flutter run --flavor dev -t lib/main_dev.dart
-
-# Staging
-flutter run --flavor stg -t lib/main_stg.dart
-
-# Production
-flutter run --flavor prod -t lib/main_prod.dart
-```
-
----
-
-### 5. Build APK (With Flavors)
-
-```bash
-# Development
-flutter build apk --flavor dev -t lib/main_dev.dart
-
-# Staging
-flutter build apk --flavor stg -t lib/main_stg.dart
-
-# Production (Optimized)
-flutter build apk --flavor prod -t lib/main_prod.dart --release \
-  --obfuscate --split-debug-info=build/debug-symbols
-```
-
----
-
-### 6. Build AAB (App Bundle - For Google Play)
-
-```bash
-# Production (Optimized)
-flutter build appbundle --flavor prod -t lib/main_prod.dart --release \
-  --obfuscate --split-debug-info=build/debug-symbols
-```
-
----
-
-### 7. Build iOS (With Flavors)
-
-```bash
-# Development
-flutter build ios --flavor dev -t lib/main_dev.dart
-
-# Staging
-flutter build ios --flavor stg -t lib/main_stg.dart
-
-# Production
-flutter build ios --flavor prod -t lib/main_prod.dart --release
-```
-
----
-
-### 8. Upgrade Dependencies
-
-```bash
-flutter pub upgrade
-flutter pub outdated
-```
-
----
-
-### 9. Code Analysis & Formatting
-
-```bash
-flutter analyze
-dart format .
-```
-
----
-
-### 10. Run Tests
-
-```bash
-flutter test
-flutter test test/features/auth/presentation/bloc/auth_bloc_test.dart
-flutter test --coverage
-```
-
----
-
-## 📋 Quick Command Reference
-
-| Task                | Command |
-|---------------------|---------|
-| **Build APK Dev**   | `flutter build apk --flavor dev -t lib/main_dev.dart` |
-| **Build APK Stg**   | `flutter build apk --flavor stg -t lib/main_stg.dart` |
-| **Build APK Prod**  | `flutter build apk --flavor prod -t lib/main_prod.dart --release --obfuscate --split-debug-info=build/debug-symbols` |
-| **Build AAB Prod**  | `flutter build appbundle --flavor prod -t lib/main_prod.dart --release --obfuscate --split-debug-info=build/debug-symbols` |
-| **Run Dev**         | `flutter run --flavor dev -t lib/main_dev.dart` |
-| **Run Stg**         | `flutter run --flavor stg -t lib/main_stg.dart` |
-| **Run Prod**        | `flutter run --flavor prod -t lib/main_prod.dart` |
-| **Code Gen**        | `dart run build_runner build --delete-conflicting-outputs` |
-| **i18n**            | `flutter gen-l10n` |
-| **Clean**           | `flutter clean && flutter pub get` |
-| **Analyze**         | `flutter analyze` |
-| **Format**          | `dart format .` |
-| **Test**            | `flutter test` |
-
----
-
-## 🎯 Typical Workflow
-
-```bash
-# 1. Setup
-flutter clean && flutter pub get
-
-# 2. Code generation
-dart run build_runner build --delete-conflicting-outputs
-
-# 3. Generate localization
-flutter gen-l10n
-
-# 4. Run development
-flutter run --flavor dev -t lib/main_dev.dart
-
-# 5. Build staging (for testing)
-flutter build apk --flavor stg -t lib/main_stg.dart
-
-# 6. Build production
-flutter build apk --flavor prod -t lib/main_prod.dart --release \
-  --obfuscate --split-debug-info=build/debug-symbols
-
-# 7. Build AAB (for Google Play)
-flutter build appbundle --flavor prod -t lib/main_prod.dart --release \
-  --obfuscate --split-debug-info=build/debug-symbols
-```
-
----
-
-## 📝 Notes
-
-- **Flavors**: Cấu hình trong [`android/app/build.gradle.kts`](android/app/build.gradle.kts) (dev, stg, prod).
-- **Entrypoints**: Mỗi flavor có file main riêng: `lib/main_dev.dart`, `lib/main_stg.dart`, `lib/main_prod.dart`.
-- **Environment Config**: Set tại khởi tạo app trong `main_common.dart` → `mainCommon(Environment env)`.
-- **No --dart-define needed**: Vì entrypoint đã xác định rõ environment, không cần `--dart-define=ENV=...`.
-- **Output**: APK/AAB nằm trong `build/app/outputs/`.
-- **Optimization**: Dùng `--obfuscate` + `--split-debug-info` cho production (giảm ~8-10MB).
-
----
-
-## 🛠️ Tech Stack
-
-**Core**: Flutter 3.22+, Dart 3.4+
-**Architecture**: get_it, injectable
-**State**: flutter_bloc, get, riverpod, provider
-**Network**: dio, connectivity_plus
-**Storage**: shared_preferences, flutter_secure_storage
-**UI**: flutter_screenutil, cached_network_image, toastification
-**Localization**: flutter_localizations, intl
-**Dev**: build_runner, freezed, json_serializable, envied
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! Xem [Contributing Guide](docs/CONTRIBUTING.md)
-
-```bash
-git checkout -b feature/amazing-feature
-git commit -m 'feat: Add amazing feature'
-git push origin feature/amazing-feature
-```
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE)
-
----
-
-## 📞 Support
-
-- 📧 Email: support@yourcompany.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourrepo/issues)
-- 📖 Docs: [Documentation](docs/)
+| Action | Command |
+|--------|---------|
+| **Run Dev** | `fvm flutter run --flavor dev -t lib/main_dev.dart` |
+| **Build APK** | `fvm flutter build apk --flavor prod -t lib/main_prod.dart` |
+| **Build Runner** | `fvm dart run build_runner build -d` |
+| **Localization** | `fvm flutter gen-l10n` |
+| **Analyze** | `fvm flutter analyze` |
 
 ---
 
 <div align="center">
 
-**Made with ❤️ using Flutter**
+**Made with ❤️ by [Your Name]**
 
-⭐ Star nếu hữu ích!
+⭐ Star this repo if you find it useful!
 
 </div>

@@ -4,7 +4,7 @@ import 'package:injectable/injectable.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../models/{{feature_name.snakeCase()}}_model.dart';
 
-abstract class {{feature_name.pascalCase()}}void RemoteDataSource {
+abstract class {{feature_name.pascalCase()}}RemoteDataSource {
   {{#has_list}}
   Future<Result<List<{{feature_name.pascalCase()}}Model>>> get{{feature_name.pascalCase()}}s({
     Map<String, dynamic>? params,
@@ -28,16 +28,16 @@ abstract class {{feature_name.pascalCase()}}void RemoteDataSource {
 }
 
 @LazySingleton(as: {{feature_name.pascalCase()}}RemoteDataSource)
-class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_name.pascalCase()}}void RemoteDataSource {
+class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_name.pascalCase()}}RemoteDataSource {
   {{feature_name.pascalCase()}}RemoteDataSourceImpl(this._apiClient);
-  final ApiClient apiClient;
+  final ApiClient _apiClient;
 
   {{#has_list}}
   @override
-  Future<Result<List<{{feature_name.pascalCase()}}Model>>> get{{feature_name.pascalCase()}}Future<Future<Result>> s({
+  Future<Result<List<{{feature_name.pascalCase()}}Model>>> get{{feature_name.pascalCase()}}s({
     Map<String, dynamic>? params,
   }) async {
-    return apiClient.get(
+    return _apiClient.get(
       ApiConstants.apiEndpoints,
       (json) => json.map((e) => {{feature_name.pascalCase()}}Model.fromJson(e)).toList(),
       queryParameters: params,
@@ -47,8 +47,8 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
 
   {{#has_detail}}
   @override
-  Future<Result<{{feature_name.pascalCase()}}Model>> get{{feature_name.pascalCase()}}Future<Result<Set<Set<dynamic>>>> Detail(String id) {
-    return apiClient.get(
+  Future<Result<{{feature_name.pascalCase()}}Model>> get{{feature_name.pascalCase()}}Detail(String id) {
+    return _apiClient.get(
       '${ApiConstants.apiEndpoints}/$id',
       (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
     );
@@ -58,7 +58,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
   {{#has_create}}
   @override
   Future<Result<{{feature_name.pascalCase()}}Model>> create{{feature_name.pascalCase()}}(Map<String, dynamic> data) {
-    return apiClient.post(
+    return _apiClient.post(
       ApiConstants.apiEndpoints,
       (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
       data: data,
@@ -72,7 +72,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
     String id,
     Map<String, dynamic> data,
   ) {
-    return apiClient.put(
+    return _apiClient.put(
       '${ApiConstants.apiEndpoints}/$id',
       (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
       data: data,
@@ -83,7 +83,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
   {{#has_delete}}
   @override
   Future<Result<bool>> delete{{feature_name.pascalCase()}}(String id) {
-    return apiClient.delete('${ApiConstants.apiEndpoints}/$id');
+    return _apiClient.delete('${ApiConstants.apiEndpoints}/$id');
   }
   {{/has_delete}}
 }

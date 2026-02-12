@@ -1,39 +1,48 @@
-// import 'dart:async';
-// import 'package:dat_san_247_mobile/core/state_management/riverpod/provider_helper/base_async_notifier.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:dat_san_247_mobile/core/di/injection.dart';
-// import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
-// import 'package:dat_san_247_mobile/features/auth/domain/usecases/login_usecase.dart';
+import 'dart:async';
 
-// /// ✅ Provider Riverpod 3.x
-// final authProvider =
-//     AsyncNotifierProvider<AuthNotifier, AuthResponse?>(AuthNotifier.new);
+import 'package:dat_san_247_mobile/core/errors/result.dart';
+import 'package:dat_san_247_mobile/core/state_management/riverpod/base_async_notifier.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// /// ✅ AuthNotifier kế thừa BaseAsyncNotifier để dùng hàm executeUseCase()
-// class AuthNotifier extends BaseAsyncNotifier<AuthResponse?> {
-//   late final LoginUseCase _loginUseCase;
-//   // late final RegisterUseCase _registerUseCase;
+/// 📘 EXAMPLE: CÁCH SỬ DỤNG BASE ASYNC NOTIFIER (RIVERPOD)
+class UserNotifier extends BaseAsyncNotifier<List<String>> {
+  @override
+  FutureOr<List<String>> build() {
+    return [];
+  }
 
-//   @override
-//   FutureOr<AuthResponse?> build() {
-//     _loginUseCase = getIt<LoginUseCase>();
-//     // _registerUseCase = getIt<RegisterUseCase>();
-//     return null;
-//   }
+  // 1️⃣ TRUY VẤN (QUERY)
+  Future<void> fetchUsers() async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return const ResultSuccess(['User 1', 'User 2']);
+      },
+    );
+  }
 
-//   /// ✅ Login
-//   Future<void> login(String email, String password) async {
-//     await execute(
-//       action: () => _loginUseCase(email: email, password: password),
-//       onSuccess: (data) => state = AsyncData(data),
-//     );
-//   }
+  // 2️⃣ THAY ĐỔI DỮ LIỆU (MUTATION)
+  Future<void> updateUser(String name) async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return ResultSuccess(['Updated $name']);
+      },
+      successMessage: 'Cập nhật thành công',
+    );
+  }
 
-//   /// ✅ Register
-//   // Future<void> register(String email, String password) async {
-//   //   await execute(
-//   //     action: () => _registerUseCase(email: email, password: password),
-//   //     onSuccess: (data) => state = AsyncData(data),
-//   //   );
-//   // }
-// }
+  // 3️⃣ TRẠNG THÁI TÙY CHỈNH (CUSTOM STATUS)
+  Future<void> customExecute() async {
+    await execute(
+      action: () async {
+        await Future.delayed(const Duration(seconds: 1));
+        return const ResultSuccess(['Custom']);
+      },
+      // Truyền trực tiếp AsyncValue khởi đầu
+      customLoadingState: const AsyncLoading<List<String>>().copyWithPrevious(
+        AsyncData(state.value ?? []),
+      ),
+    );
+  }
+}

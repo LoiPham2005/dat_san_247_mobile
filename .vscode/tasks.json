@@ -11,25 +11,22 @@
         "prod"
       ],
       "default": "dev"
+    },
+    {
+      "id": "flutterVersion",
+      "type": "promptString",
+      "description": "Nhập phiên bản Flutter (VD: 3.27.3, stable, beta)",
+      "default": "stable"
     }
   ],
   "tasks": [
     // ═══════════════════════════════════════════════════════════
-    // 🎯 UNIVERSAL BUILD - ANDROID
+    // 🚀 CORE BUILD TASKS (Most Used)
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "🚀 Build APK (Universal)",
+      "label": "🚀 Build APK",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "apk",
-        "--flavor",
-        "${input:buildEnv}",
-        "-t",
-        "lib/main_${input:buildEnv}.dart",
-        "--release"
-      ],
+      "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -42,44 +39,9 @@
       }
     },
     {
-      "label": "🏬 Build AAB (Universal)",
+      "label": "🏬 Build AAB",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "appbundle",
-        "--flavor",
-        "${input:buildEnv}",
-        "-t",
-        "lib/main_${input:buildEnv}.dart",
-        "--release",
-        "--obfuscate",
-        "--split-debug-info=build/debug-symbols"
-      ],
-      "group": "build",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": true
-      }
-    },
-    // ═══════════════════════════════════════════════════════════
-    // 🎯 UNIVERSAL BUILD - iOS
-    // ═══════════════════════════════════════════════════════════
-    {
-      "label": "🍎 Build iOS (Universal)",
-      "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "ios",
-        "--flavor",
-        "${input:buildEnv}",
-        "-t",
-        "lib/main_${input:buildEnv}.dart",
-        "--release"
-      ],
+      "command": "fvm flutter build appbundle --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=build/debug-symbols",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -89,146 +51,26 @@
       }
     },
     {
-      "label": "📦 Build IPA (Universal)",
+      "label": "🍎 Build iOS",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "ipa",
-        "--flavor",
-        "${input:buildEnv}",
-        "-t",
-        "lib/main_${input:buildEnv}.dart",
-        "--release"
-      ],
-      "group": "build",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": true
-      }
-    },
-    // ═══════════════════════════════════════════════════════════
-    // 🏗️ QUICK BUILDS - DEV
-    // ═══════════════════════════════════════════════════════════
-    {
-      "label": "📦 Build APK (Dev)",
-      "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "apk",
-        "--flavor",
-        "dev",
-        "-t",
-        "lib/main_dev.dart"
-      ],
+      "command": "fvm flutter build ios --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
       "group": "build",
       "problemMatcher": []
     },
     {
-      "label": "🏬 Build AAB (Dev)",
+      "label": "📦 Build IPA",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "appbundle",
-        "--flavor",
-        "dev",
-        "-t",
-        "lib/main_dev.dart"
-      ],
+      "command": "fvm flutter build ipa --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=build/debug-symbols",
       "group": "build",
       "problemMatcher": []
     },
     // ═══════════════════════════════════════════════════════════
-    // 🏗️ QUICK BUILDS - STAGING
+    // ⚡ CODE GENERATION
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "📦 Build APK (Stg)",
+      "label": "⚡ Build Runner",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "apk",
-        "--flavor",
-        "stg",
-        "-t",
-        "lib/main_stg.dart",
-        "--release"
-      ],
-      "group": "build",
-      "problemMatcher": []
-    },
-    {
-      "label": "🏬 Build AAB (Stg)",
-      "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "appbundle",
-        "--flavor",
-        "stg",
-        "-t",
-        "lib/main_stg.dart",
-        "--release"
-      ],
-      "group": "build",
-      "problemMatcher": []
-    },
-    // ═══════════════════════════════════════════════════════════
-    // 🏗️ QUICK BUILDS - PRODUCTION
-    // ═══════════════════════════════════════════════════════════
-    {
-      "label": "📦 Build APK (Prod)",
-      "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "apk",
-        "--flavor",
-        "prod",
-        "-t",
-        "lib/main_prod.dart",
-        "--release",
-        "--obfuscate",
-        "--split-debug-info=build/debug-symbols"
-      ],
-      "group": "build",
-      "problemMatcher": []
-    },
-    {
-      "label": "🏬 Build AAB (Prod)",
-      "type": "shell",
-      "command": "flutter",
-      "args": [
-        "build",
-        "appbundle",
-        "--flavor",
-        "prod",
-        "-t",
-        "lib/main_prod.dart",
-        "--release",
-        "--obfuscate",
-        "--split-debug-info=build/debug-symbols"
-      ],
-      "group": "build",
-      "problemMatcher": []
-    },
-    // ═══════════════════════════════════════════════════════════
-    // 🧩 CODE GENERATION
-    // ═══════════════════════════════════════════════════════════
-    {
-      "label": "⚡ Build Runner (One-time)",
-      "type": "shell",
-      "command": "dart",
-      "args": [
-        "run",
-        "build_runner",
-        "build",
-        "--delete-conflicting-outputs"
-      ],
+      "command": "fvm dart run build_runner build --delete-conflicting-outputs",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -237,52 +79,24 @@
       }
     },
     {
-      "label": "👁️ Build Runner (Watch)",
+      "label": "👁️ Build Runner Watch",
       "type": "shell",
-      "command": "dart",
-      "args": [
-        "run",
-        "build_runner",
-        "watch",
-        "--delete-conflicting-outputs"
-      ],
+      "command": "fvm dart run build_runner watch --delete-conflicting-outputs",
       "group": "build",
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "🎯 Build Runner (Current File)",
-      "type": "shell",
-      "command": "dart",
-      "args": [
-        "run",
-        "build_runner",
-        "build",
-        "--build-filter",
-        "${relativeFile}",
-        "--delete-conflicting-outputs"
-      ],
-      "problemMatcher": [],
-      "group": "build"
-    },
-    {
       "label": "🌐 Generate l10n",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "gen-l10n"
-      ],
+      "command": "fvm flutter gen-l10n",
       "group": "build",
       "problemMatcher": []
     },
     {
       "label": "🌐 Sync l10n (arb)",
       "type": "shell",
-      "command": "dart",
-      "args": [
-        "run",
-        "lib/core/l10n/tool/l10n_sync.dart"
-      ],
+      "command": "fvm dart run lib/core/l10n/tool/l10n_sync.dart",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -296,7 +110,18 @@
     {
       "label": "🧹 Clean & Get",
       "type": "shell",
-      "command": "flutter clean && flutter pub get",
+      "command": "fvm flutter clean && fvm flutter pub get",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "🔄 Full Regenerate",
+      "type": "shell",
+      "command": "fvm flutter clean && fvm flutter pub get && fvm flutter gen-l10n && fvm dart run build_runner build --delete-conflicting-outputs",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -307,131 +132,157 @@
     {
       "label": "📦 Pub Get",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "pub",
-        "get"
-      ],
+      "command": "fvm flutter pub get",
       "group": "build",
       "problemMatcher": []
     },
     {
       "label": "⬆️ Pub Upgrade",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "pub",
-        "upgrade"
-      ],
-      "group": "build",
-      "problemMatcher": []
-    },
-    {
-      "label": "🔍 Pub Outdated",
-      "type": "shell",
-      "command": "flutter",
-      "args": [
-        "pub",
-        "outdated"
-      ],
+      "command": "fvm flutter pub upgrade --major-versions",
       "group": "build",
       "problemMatcher": []
     },
     // ═══════════════════════════════════════════════════════════
-    // 🔧 FLUTTER COMMANDS
+    // 🔧 QUALITY & ANALYSIS
     // ═══════════════════════════════════════════════════════════
     {
       "label": "🔧 Flutter Doctor",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "doctor",
-        "-v"
-      ],
+      "command": "fvm flutter doctor -v",
       "group": "build",
       "problemMatcher": []
     },
     {
-      "label": "📊 Flutter Analyze",
+      "label": "📊 Analyze & Fix",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "analyze"
-      ],
+      "command": "fvm flutter analyze && fvm dart fix --apply",
       "group": "build",
       "problemMatcher": []
     },
     {
-      "label": "✨ Dart Format",
+      "label": "✨ Format",
       "type": "shell",
-      "command": "dart",
-      "args": [
-        "format",
-        "."
-      ],
+      "command": "fvm dart format .",
       "group": "build",
       "problemMatcher": []
     },
     // ═══════════════════════════════════════════════════════════
-    // 🎯 DEBUG RUNS (with hot reload)
+    // 🧪 TESTING
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "🐛 Run Debug (Dev)",
+      "label": "🧪 Test",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "run",
-        "--flavor",
-        "dev",
-        "-t",
-        "lib/main_dev.dart"
-      ],
-      "group": "build",
-      "problemMatcher": [],
-      "isBackground": true
+      "command": "fvm flutter test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
     },
     {
-      "label": "🐛 Run Debug (Stg)",
+      "label": "📈 Test Coverage",
       "type": "shell",
-      "command": "flutter",
-      "args": [
-        "run",
-        "--flavor",
-        "stg",
-        "-t",
-        "lib/main_stg.dart"
-      ],
-      "group": "build",
-      "problemMatcher": [],
-      "isBackground": true
+      "command": "fvm flutter test --coverage && genhtml coverage/lcov.info -o coverage/html",
+      "group": "test",
+      "problemMatcher": []
     },
-    {
-      "label": "🐛 Run Debug (Prod)",
-      "type": "shell",
-      "command": "flutter",
-      "args": [
-        "run",
-        "--flavor",
-        "prod",
-        "-t",
-        "lib/main_prod.dart"
-      ],
-      "group": "build",
-      "problemMatcher": [],
-      "isBackground": true
-    },
+    // ═══════════════════════════════════════════════════════════
+    // 🧱 MASON & FLAVORIZR
+    // ═══════════════════════════════════════════════════════════
     {
       "label": "🧱 Mason: Generate Feature",
       "type": "shell",
-      "command": "mason",
-      "args": [
-        "make",
-        "feature",
-        "--on-conflict",
-        "overwrite"
-      ],
+      "command": "mason make feature --on-conflict overwrite",
       "problemMatcher": [],
       "group": "build"
-    }
+    },
+    {
+      "label": "� Flutter Flavorizr",
+      "type": "shell",
+      "command": "fvm flutter pub run flutter_flavorizr",
+      "group": "build",
+      "problemMatcher": []
+    },
+    // ═══════════════════════════════════════════════════════════
+    // 🎨 ICONS & SPLASH
+    // ═══════════════════════════════════════════════════════════
+    {
+      "label": "🎨 Generate App Icons",
+      "type": "shell",
+      "command": "fvm flutter pub run flutter_launcher_icons",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🌊 Generate Native Splash",
+      "type": "shell",
+      "command": "fvm flutter pub run flutter_native_splash:create",
+      "group": "build",
+      "problemMatcher": []
+    },
+    // ═══════════════════════════════════════════════════════════
+    // 🔧 FVM MANAGEMENT
+    // ═══════════════════════════════════════════════════════════
+    {
+      "label": "📋 FVM List",
+      "type": "shell",
+      "command": "fvm list",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🌐 FVM Releases",
+      "type": "shell",
+      "command": "fvm releases",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🔍 FVM Global",
+      "type": "shell",
+      "command": "fvm global",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📥 FVM Install",
+      "type": "shell",
+      "command": "fvm install ${input:flutterVersion}",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "🔧 FVM Use",
+      "type": "shell",
+      "command": "fvm use ${input:flutterVersion}",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "🗑️ FVM Remove",
+      "type": "shell",
+      "command": "fvm remove ${input:flutterVersion}",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
   ]
 }

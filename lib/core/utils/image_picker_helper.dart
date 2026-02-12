@@ -2,12 +2,11 @@
 // 📁 lib/core/utils/image_picker_helper.dart (CHỈ IMAGE PICKING)
 // ════════════════════════════════════════════════════════════════
 import 'dart:io';
-
-import 'package:dat_san_247_mobile/core/services/permission_service.dart';
-import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dat_san_247_mobile/core/services/permission_service.dart';
+import 'package:dat_san_247_mobile/core/utils/logger.dart';
 
 /// Image picker helper
 ///
@@ -62,7 +61,10 @@ class ImagePickerHelper {
   }
 
   /// Pick multiple images
-  static Future<List<File>> pickMultiple(BuildContext? context, {int maxCount = 10}) async {
+  static Future<List<File>> pickMultiple(
+    BuildContext? context, {
+    int maxCount = 10,
+  }) async {
     try {
       // ✅ Check permission first
       final hasPermission = await _permissionService.requestPhotos(context);
@@ -91,7 +93,8 @@ class ImagePickerHelper {
     int? maxHeight,
   }) async {
     try {
-      final targetPath = '${file.parent.path}/compressed_${file.path.split('/').last}';
+      final targetPath =
+          '${file.parent.path}/compressed_${file.path.split('/').last}';
 
       final result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path,
@@ -159,6 +162,11 @@ class ImagePickerHelper {
   /// Generate placeholder color based on text
   static Color getPlaceholderColor(String text) {
     final hash = text.hashCode;
-    return Color.fromARGB(255, (hash & 0xFF0000) >> 16, (hash & 0x00FF00) >> 8, hash & 0x0000FF);
+    return Color.fromARGB(
+      255,
+      (hash & 0xFF0000) >> 16,
+      (hash & 0x00FF00) >> 8,
+      hash & 0x0000FF,
+    );
   }
 }

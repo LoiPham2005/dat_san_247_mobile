@@ -6,15 +6,15 @@ import '../repositories/{{feature_name.snakeCase()}}_repository.dart';
 {{#has_list}}
 /// Get {{feature_name.lowerCase()}}s use case
 @injectable
-class Get{{feature_name.pascalCase()}}void sUseCase {
-  final {{feature_name.pascalCase()}}Repository repository;
+class Get{{feature_name.pascalCase()}}sUseCase {
+  final {{feature_name.pascalCase()}}Repository _repository;
 
   Get{{feature_name.pascalCase()}}sUseCase(this._repository);
 
   Future<Result<List<{{feature_name.pascalCase()}}>>> call({
     Map<String, dynamic>? params,
   }) {
-    return repository.get{{feature_name.pascalCase()}}s(params: params);
+    return _repository.get{{feature_name.pascalCase()}}s(params: params);
   }
 }
 {{/has_list}}
@@ -22,13 +22,13 @@ class Get{{feature_name.pascalCase()}}void sUseCase {
 {{#has_detail}}
 /// Get {{feature_name.lowerCase()}} detail use case
 @injectable
-class Get{{feature_name.pascalCase()}}void DetailUseCase {
-  final {{feature_name.pascalCase()}}Repository repository;
+class Get{{feature_name.pascalCase()}}DetailUseCase {
+  final {{feature_name.pascalCase()}}Repository _repository;
 
   Get{{feature_name.pascalCase()}}DetailUseCase(this._repository);
 
   Future<Result<{{feature_name.pascalCase()}}>> call(String id) {
-    return repository.get{{feature_name.pascalCase()}}Detail(id);
+    return _repository.get{{feature_name.pascalCase()}}Detail(id);
   }
 }
 {{/has_detail}}
@@ -36,13 +36,13 @@ class Get{{feature_name.pascalCase()}}void DetailUseCase {
 {{#has_create}}
 /// Create {{feature_name.lowerCase()}} use case
 @injectable
-class Create{{feature_name.pascalCase()}}void UseCase {
-  final {{feature_name.pascalCase()}}Repository repository;
+class Create{{feature_name.pascalCase()}}UseCase {
+  final {{feature_name.pascalCase()}}Repository _repository;
 
   Create{{feature_name.pascalCase()}}UseCase(this._repository);
 
   Future<Result<{{feature_name.pascalCase()}}>> call(Map<String, dynamic> data) {
-    return repository.create{{feature_name.pascalCase()}}(data);
+    return _repository.create{{feature_name.pascalCase()}}(data);
   }
 }
 {{/has_create}}
@@ -50,8 +50,8 @@ class Create{{feature_name.pascalCase()}}void UseCase {
 {{#has_update}}
 /// Update {{feature_name.lowerCase()}} use case
 @injectable
-class Update{{feature_name.pascalCase()}}void UseCase {
-  final {{feature_name.pascalCase()}}Repository repository;
+class Update{{feature_name.pascalCase()}}UseCase {
+  final {{feature_name.pascalCase()}}Repository _repository;
 
   Update{{feature_name.pascalCase()}}UseCase(this._repository);
 
@@ -59,7 +59,7 @@ class Update{{feature_name.pascalCase()}}void UseCase {
     String id,
     Map<String, dynamic> data,
   ) {
-    return repository.update{{feature_name.pascalCase()}}(id, data);
+    return _repository.update{{feature_name.pascalCase()}}(id, data);
   }
 }
 {{/has_update}}
@@ -67,13 +67,13 @@ class Update{{feature_name.pascalCase()}}void UseCase {
 {{#has_delete}}
 /// Delete {{feature_name.lowerCase()}} use case
 @injectable
-class Delete{{feature_name.pascalCase()}}void UseCase {
-  final {{feature_name.pascalCase()}}Repository repository;
+class Delete{{feature_name.pascalCase()}}UseCase {
+  final {{feature_name.pascalCase()}}Repository _repository;
 
   Delete{{feature_name.pascalCase()}}UseCase(this._repository);
 
   Future<Result<bool>> call(String id) {
-    return repository.delete{{feature_name.pascalCase()}}(id);
+    return _repository.delete{{feature_name.pascalCase()}}(id);
   }
 }
 {{/has_delete}}

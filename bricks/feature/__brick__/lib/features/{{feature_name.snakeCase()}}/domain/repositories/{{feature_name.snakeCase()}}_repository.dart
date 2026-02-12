@@ -2,7 +2,7 @@ import 'package:dat_san_247_mobile/core/errors/result.dart';
 import '../entities/{{feature_name.snakeCase()}}.dart';
 
 /// {{feature_name.pascalCase()}} repository abstract
-abstract class {{feature_name.pascalCase()}}void Repository {
+abstract class {{feature_name.pascalCase()}}Repository {
 {{#has_list}}
   /// Get all {{feature_name.lowerCase()}}s
   Future<Result<List<{{feature_name.pascalCase()}}>>> get{{feature_name.pascalCase()}}s({

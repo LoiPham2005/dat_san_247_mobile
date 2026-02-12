@@ -1,11 +1,26 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/extensions/context_extensions.dart (SỬ DỤNG CHÍNH)
 // ════════════════════════════════════════════════════════════════
+import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/services/toast_service.dart';
-import 'package:flutter/material.dart';
+import 'package:dat_san_247_mobile/core/state_management/auth/auth_cubit.dart';
+import 'package:dat_san_247_mobile/core/state_management/auth/auth_state.dart';
+import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
+import 'package:dat_san_247_mobile/routes/app_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
+
+/// 🌍 Global BuildContext - CHỈ DÙNG KHI KHÔNG CÓ CONTEXT
+BuildContext get appContext {
+  final ctx = getIt<AppRouter>().router.routerDelegate.navigatorKey.currentContext;
+  assert(ctx != null, '⛔ appContext is null!');
+  return ctx!;
+}
+
+BuildContext? get appContextOrNull =>
+    getIt<AppRouter>().router.routerDelegate.navigatorKey.currentContext;
 
 extension ContextExtensions on BuildContext {
   // ═══════════════════════════════════════════════════════════════
@@ -266,6 +281,22 @@ extension ContextExtensions on BuildContext {
   void unfocus() => FocusScope.of(this).unfocus();
   void requestFocus(FocusNode node) => FocusScope.of(this).requestFocus(node);
   void hideKeyboard() => FocusScope.of(this).unfocus();
+
+  // ═══════════════════════════════════════════════════════════════
+  // AUTH (⭐ NEW)
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Access global AuthCubit
+  AuthCubit get authCubit => read<AuthCubit>();
+
+  /// Watch global AuthState
+  AuthState get authState => watch<AuthCubit>().state;
+
+  /// Get current authenticated user
+  AuthUser? get currentUser => authState.user;
+
+  /// Check if user is authenticated
+  bool get isAuthenticated => authState.isAuthenticated;
 }
 
 // Thêm extension này vào cuối file ContextExtensions

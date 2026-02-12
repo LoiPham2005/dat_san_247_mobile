@@ -74,7 +74,7 @@
 -keep class io.flutter.plugins.**  { *; }
 
 # Keep your model classes
--keep class com.example.dat_san_247_mobile.data.models.** { *; }
+-keep class com.datsan247.mobile.data.models.** { *; }
 
 # Retrofit
 -keepattributes Signature
@@ -100,7 +100,7 @@
 -keep class com.google.flutter.** { *; }
 
 # Keep your app's main classes
--keep class com.example.dat_san_247_mobile.** { *; }
+-keep class com.datsan247.mobile.** { *; }
 
 # Keep model classes (Serializable)
 -keepclassmembers class * implements java.io.Serializable {
