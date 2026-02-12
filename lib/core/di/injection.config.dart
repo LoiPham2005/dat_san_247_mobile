@@ -68,6 +68,32 @@ import 'package:dat_san_247_mobile/features/auth/domain/usecases/reset_password_
     as _i565;
 import 'package:dat_san_247_mobile/features/auth/presentation/bloc/auth_bloc.dart'
     as _i801;
+import 'package:dat_san_247_mobile/features/customer/auth/data/datasources/auth_remote_datasourse.dart'
+    as _i1033;
+import 'package:dat_san_247_mobile/features/customer/auth/domain/repositories/auth_repository.dart'
+    as _i800;
+import 'package:dat_san_247_mobile/features/customer/auth/domain/usecases/delete_account_use_case.dart'
+    as _i339;
+import 'package:dat_san_247_mobile/features/customer/auth/domain/usecases/forgot_password_use_case.dart'
+    as _i731;
+import 'package:dat_san_247_mobile/features/customer/auth/domain/usecases/login_usecase.dart'
+    as _i826;
+import 'package:dat_san_247_mobile/features/customer/auth/domain/usecases/logout_usecase.dart'
+    as _i221;
+import 'package:dat_san_247_mobile/features/customer/auth/domain/usecases/register_use_case.dart'
+    as _i1070;
+import 'package:dat_san_247_mobile/features/customer/auth/domain/usecases/reset_password_use_case.dart'
+    as _i702;
+import 'package:dat_san_247_mobile/features/customer/auth/presentation/cubit/auth_cubit.dart'
+    as _i310;
+import 'package:dat_san_247_mobile/features/customer/category/data/datasourse/sport_category_remote_datasourse.dart'
+    as _i976;
+import 'package:dat_san_247_mobile/features/customer/category/data/repositories/sport_category_repository_impl.dart'
+    as _i183;
+import 'package:dat_san_247_mobile/features/customer/category/domain/repositories/sport_category_repository.dart'
+    as _i220;
+import 'package:dat_san_247_mobile/features/customer/category/domain/usecases/get_sport_category.dart'
+    as _i813;
 import 'package:dat_san_247_mobile/features/example/category_ket_hop/data/datasources/category_remote_datasource.dart'
     as _i934;
 import 'package:dat_san_247_mobile/features/example/category_ket_hop/data/datasources/category_service.dart'
@@ -96,6 +122,10 @@ import 'package:dat_san_247_mobile/features/example/category_thu_cong/domain/use
     as _i602;
 import 'package:dat_san_247_mobile/features/example/category_thu_cong/presentation/bloc/category_bloc.dart'
     as _i877;
+import 'package:dat_san_247_mobile/features/example/category_toi_uu/data/repositories/category_repository.dart'
+    as _i879;
+import 'package:dat_san_247_mobile/features/example/category_toi_uu/data/services/category_service.dart'
+    as _i856;
 import 'package:dat_san_247_mobile/routes/app_router.dart' as _i850;
 import 'package:dat_san_247_mobile/routes/app_routes_observer.dart' as _i1062;
 import 'package:dat_san_247_mobile/routes/route_guards.dart' as _i899;
@@ -145,6 +175,24 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i643.AdAnalyticsTracker>(
       () => _i643.AdAnalyticsTracker(gh<_i616.AnalyticsService>()),
     );
+    gh.factory<_i339.DeleteAccountUseCase>(
+      () => _i339.DeleteAccountUseCase(gh<_i800.AuthRepository>()),
+    );
+    gh.factory<_i731.ForgotPasswordUseCase>(
+      () => _i731.ForgotPasswordUseCase(gh<_i800.AuthRepository>()),
+    );
+    gh.factory<_i826.LoginUseCase>(
+      () => _i826.LoginUseCase(gh<_i800.AuthRepository>()),
+    );
+    gh.factory<_i221.LogoutUseCase>(
+      () => _i221.LogoutUseCase(gh<_i800.AuthRepository>()),
+    );
+    gh.factory<_i1070.RegisterUseCase>(
+      () => _i1070.RegisterUseCase(gh<_i800.AuthRepository>()),
+    );
+    gh.factory<_i702.ResetPasswordUseCase>(
+      () => _i702.ResetPasswordUseCase(gh<_i800.AuthRepository>()),
+    );
     gh.lazySingletonAsync<_i37.AdConfig>(
       () => adModule.provideAdConfig(gh<_i352.AdRemoteConfig>()),
     );
@@ -153,6 +201,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i141.CategoryRutGonService>(
       () => _i141.CategoryRutGonService.new(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i856.CategoryService>(
+      () => _i856.CategoryService.new(gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i616.NetworkInfo>(
       () => _i616.NetworkInfoImpl(gh<_i161.InternetConnection>()),
@@ -174,6 +225,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i934.CategoryRemoteDataSource>(
       () => _i934.CategoryRemoteDataSourceImpl(gh<_i296.CategoryService>()),
+    );
+    gh.lazySingleton<_i879.CategoryRepository>(
+      () => _i879.CategoryRepository(gh<_i856.CategoryService>()),
     );
     gh.lazySingleton<_i1005.CategoryRutGonRepository>(
       () => _i1005.CategoryRutGonRepository(gh<_i141.CategoryRutGonService>()),
@@ -235,6 +289,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i649.ApiClient>(),
       ),
     );
+    gh.lazySingleton<_i1033.AuthRemoteDataSource>(
+      () => _i1033.AuthRemoteDataSourceImpl(gh<_i649.ApiClient>()),
+    );
     gh.factory<_i627.DeleteAccountUseCase>(
       () => _i627.DeleteAccountUseCase(gh<_i376.AuthRepository>()),
     );
@@ -259,6 +316,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i232.CategoryRemoteDataSource>(
       () => _i232.CategoryRemoteDataSourceImpl(gh<_i649.ApiClient>()),
     );
+    gh.lazySingleton<_i976.SportCategoryRemoteDataSource>(
+      () => _i976.SportCategoryRemoteDataSourceImpl(gh<_i649.ApiClient>()),
+    );
     gh.factory<_i801.AuthBloc>(
       () => _i801.AuthBloc(
         loginUseCase: gh<_i655.LoginUseCase>(),
@@ -274,8 +334,19 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1068.AuthCubit>(
       () => _i1068.AuthCubit(gh<_i455.AuthService>()),
     );
+    gh.factory<_i310.AuthCubit>(
+      () => _i310.AuthCubit(gh<_i655.LoginUseCase>()),
+    );
     gh.lazySingleton<_i211.CategoryRepository>(
       () => _i155.CategoryRepositoryImpl(gh<_i232.CategoryRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i220.SportCategoryRepository>(
+      () => _i183.SportCategoryRepositoryImpl(
+        gh<_i976.SportCategoryRemoteDataSource>(),
+      ),
+    );
+    gh.factory<_i813.GetSportCategories>(
+      () => _i813.GetSportCategories(gh<_i220.SportCategoryRepository>()),
     );
     gh.factory<_i899.RouteGuards>(
       () => _i899.RouteGuards(gh<_i801.AuthBloc>()),

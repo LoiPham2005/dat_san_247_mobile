@@ -44,4 +44,5 @@ class CategoryRutGonModel extends Equatable {
     displayOrder,
     createdAt,
   ];
+  
 }
