@@ -134,6 +134,7 @@ dev_dependencies:
   injectable_generator: ^2.6.1
   # retrofit_generator: 10.0.6
   retrofit_generator: 10.0.0
+  go_router_builder: 4.0.0
 
   # ─────────────────────── LINT & TEST ──────────────────────────
   flutter_lints: ^6.0.0

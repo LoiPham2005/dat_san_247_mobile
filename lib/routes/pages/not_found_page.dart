@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/routes/route_names.dart';
 import 'package:go_router/go_router.dart';
+
+import '../route_names.dart';
 
 class NotFoundPage extends StatelessWidget {
   const NotFoundPage({super.key, this.error});

@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:dat_san_247_mobile/routes/route_names.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+
+import '../features/auth/presentation/bloc/auth_bloc.dart';
 
 @injectable
 class RouteGuards {

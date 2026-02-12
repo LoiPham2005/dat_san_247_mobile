@@ -202,11 +202,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i296.CategoryService>(
       () => _i296.CategoryService.new(gh<_i361.Dio>()),
     );
-    gh.lazySingleton<_i856.CategoryService>(
-      () => _i856.CategoryService.new(gh<_i361.Dio>()),
-    );
     gh.lazySingleton<_i594.CategoryRutGonService>(
       () => _i594.CategoryRutGonService.new(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i856.CategoryService>(
+      () => _i856.CategoryService.new(gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i879.CategoryRutGonRepository>(
       () => _i879.CategoryRutGonRepository(gh<_i594.CategoryRutGonService>()),

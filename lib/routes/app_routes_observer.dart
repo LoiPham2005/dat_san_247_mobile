@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:injectable/injectable.dart';
+
+import '../core/utils/logger.dart';
 
 @singleton
 class AppRoutesObserver extends NavigatorObserver {
