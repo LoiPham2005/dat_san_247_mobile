@@ -1,12 +1,12 @@
 # ════════════════════════════════════════════════════════════════
-# 📁 Makefile - Dat San 247 Mobile Automation
+# 📁 Makefile - Flutter Base Template Automation
 # ════════════════════════════════════════════════════════════════
 
 .PHONY: help get clean gen watch l10n full-gen analyze format fix test cov run-dev run-stg run-prod build-apk-dev build-apk-stg build-apk-prod build-aab-prod icons splash
 
 # Default target
 help:
-	@echo "🚀 Dat San 247 Mobile - Makefile Commands"
+	@echo "🚀 Flutter Base Template - Makefile Commands"
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "📦 DEPENDENCIES"
 	@echo "  make get             - Cài đặt dependencies (pub get)"
@@ -42,6 +42,10 @@ help:
 	@echo "🎨 ASSETS"
 	@echo "  make icons           - Tạo App Icons"
 	@echo "  make splash          - Tạo Native Splash"
+	@echo ""
+	@echo "🛠️ REFACTORING"
+	@echo "  make rename-package name=\"new_name\" - Đổi tên package (pubspec & dart files)"
+	@echo "  make rename-app name=\"New App\"      - Đổi tên hiển thị ứng dụng"
 	@echo "════════════════════════════════════════════════════════════════"
 
 # 📦 DEPENDENCIES
@@ -118,8 +122,10 @@ icons:
 splash:
 	fvm flutter pub run flutter_native_splash:create
 
+
+# 🛠️ REFACTORING
 rename-package:
-	powershell -Command "(Get-Content pubspec.yaml) -replace 'name: flutter_base_template', 'name: dat_san_247_mobile' | Set-Content pubspec.yaml"
-	powershell -Command "Get-ChildItem -Recurse -Include *.dart | ForEach-Object { (Get-Content $$_.FullName) -replace 'package:flutter_base_template', 'package:dat_san_247_mobile' | Set-Content $$_.FullName }"
-	fvm flutter clean
-	fvm flutter pub get
+	@powershell -Command "$$oldName = (Get-Content pubspec.yaml | Select-String -Pattern '^name: ' | ForEach-Object { $$_.Line.Split(':')[1].Trim() }); Write-Host 'Renaming package from' $$oldName 'to $(name)...'; (Get-Content pubspec.yaml) -replace ('name: ' + $$oldName), ('name: ' + '$(name)') | Set-Content pubspec.yaml; Get-ChildItem -Recurse -Include *.dart | ForEach-Object { (Get-Content $$_.FullName) -replace ('package:' + $$oldName), ('package:' + '$(name)') | Set-Content $$_.FullName }; fvm flutter clean; fvm flutter pub get"
+
+rename-app:
+	fvm flutter pub run rename setAppName --value "$(name)"

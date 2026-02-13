@@ -17,6 +17,18 @@
       "type": "promptString",
       "description": "Nhập phiên bản Flutter (VD: 3.27.3, stable, beta)",
       "default": "stable"
+    },
+    {
+      "id": "newPackageName",
+      "type": "promptString",
+      "description": "Nhập tên package mới (VD: dat_san_247_mobile)",
+      "default": "flutter_base"
+    },
+    {
+      "id": "newAppLabel",
+      "type": "promptString",
+      "description": "Nhập tên hiển thị ứng dụng (VD: Đặt Sân 247)",
+      "default": "Đặt Sân 247"
     }
   ],
   "tasks": [
@@ -284,5 +296,30 @@
         "panel": "dedicated"
       }
     },
+    // ═══════════════════════════════════════════════════════════
+    // 🛠️ REFACTORING
+    // ═══════════════════════════════════════════════════════════
+    {
+      "label": "🔧 Rename Package",
+      "type": "shell",
+      "command": "powershell -Command \"$oldName = (Get-Content pubspec.yaml | Select-String -Pattern '^name: ' | ForEach-Object { $_.Line.Split(':')[1].Trim() }); Write-Host 'Renaming package from' $oldName 'to ${input:newPackageName}...'; (Get-Content pubspec.yaml) -replace ('name: ' + $oldName), ('name: ' + '${input:newPackageName}') | Set-Content pubspec.yaml; Get-ChildItem -Recurse -Include *.dart | ForEach-Object { (Get-Content $_.FullName) -replace ('package:' + $oldName), ('package:' + '${input:newPackageName}') | Set-Content $_.FullName }; fvm flutter clean; fvm flutter pub get\"",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🏷️ Rename App Label (Display Name)",
+      "type": "shell",
+      "command": "fvm flutter pub run rename setAppName --value \"${input:newAppLabel}\"",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    }
   ]
 }
