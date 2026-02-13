@@ -9,6 +9,7 @@ import 'package:dat_san_247_mobile/features/auth/presentation/bloc/auth_bloc.dar
 import 'package:dat_san_247_mobile/gen/l10n/app_localizations.dart';
 import 'package:dat_san_247_mobile/routes/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// 🏠 Root Widget của ứng dụng
@@ -25,7 +26,7 @@ class App extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, __) => _AppContent(),
+      builder: (_, __) => ProviderScope(child: _AppContent()),
     );
   }
 }
