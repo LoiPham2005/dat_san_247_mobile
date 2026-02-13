@@ -35,24 +35,24 @@ class CategoryRutGonNotifier extends BaseAsyncNotifier<List<CategoryRutGonModel>
 
   /// ✅ Get List of Categories
   Future<void> loadCategories({Map<String, dynamic>? params}) async {
-    await onQuery(action: () => _repository.getCategories(params: params));
+    await execute(action: () => _repository.getCategories(params: params));
   }
 
   /// ✅ Create Category
   Future<void> createCategory(CategoryRutGonModel category) async {
-    await onMutation(
+    await execute(
       action: () async {
         final result = await _repository.createCategory(category);
         return result.map((_) => state.value ?? []);
       },
       successMessage: 'Tạo danh mục thành công',
-      onSuccess: (_) => loadCategories(), // Refresh list after success
+      onSuccess: (_) => loadCategories(),
     );
   }
 
   /// ✅ Update Category
   Future<void> updateCategory(String id, CategoryRutGonModel category) async {
-    await onMutation(
+    await execute(
       action: () async {
         final result = await _repository.updateCategory(id, category);
         return result.map((_) => state.value ?? []);
@@ -64,7 +64,7 @@ class CategoryRutGonNotifier extends BaseAsyncNotifier<List<CategoryRutGonModel>
 
   /// ✅ Delete Category
   Future<void> deleteCategory(String id) async {
-    await onMutation(
+    await execute(
       action: () async {
         final result = await _repository.deleteCategory(id);
         return result.map((_) => state.value ?? []);

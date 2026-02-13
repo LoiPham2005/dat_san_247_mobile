@@ -1,6 +1,3 @@
-// ════════════════════════════════════════════════════════════════
-// 📁 lib/core/state_management/bloc/base_bloc.dart
-// ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
 import 'package:dat_san_247_mobile/core/errors/failures.dart';
@@ -10,233 +7,83 @@ import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// SMART & FLEXIBLE BaseBloc
+/// 🎯 MINIMAL & POWERFUL BaseBloc
 abstract class BaseBloc extends Bloc<BaseEvent, BaseState> {
   BaseBloc([BaseState? initialState]) : super(initialState ?? BaseState.initial());
 
   Completer<void>? _currentOperation;
-  bool get isCancelled => _currentOperation?.isCompleted ?? false;
 
-  /// Hủy operation hiện tại (chỉ áp dụng cho Query)
-  void cancelCurrentOperation() {
+  /// Hủy operation hiện tại
+  void cancel() {
     if (_currentOperation != null && !_currentOperation!.isCompleted) {
       _currentOperation!.complete();
     }
   }
 
-  // ════════════════════════════════════════════════════════════
-  // 🎯 SMART EXECUTE
-  // ════════════════════════════════════════════════════════════
-
-  /// [QUERY] Use for fetching data (GET)
-  /// - Default: cancelPrevious = true (cancel old requests)
-  /// - Default: isMutation = false
-  Future<T?> onQuery<T>({
-    required Emitter<BaseState> emit,
-    required Future<Result<T>> Function() action,
-    void Function(T data)? onSuccess,
-    void Function(Failure failure)? onFailure,
-    bool cancelPrevious = true, // Cancel old queries by default
-    bool preserveData = false, // Show loading, hide old data (optional)
-  }) {
-    return execute<T>(
-      emit: emit,
-      action: action,
-      onSuccess: onSuccess,
-      onFailure: onFailure,
-      isMutation: false,
-      cancelPrevious: cancelPrevious,
-      preserveData: preserveData,
-    );
-  }
-
-  /// [MUTATION] Use for changing data (POST, PUT, DELETE)
-  /// - Default: cancelPrevious = false (allow parallel mutations)
-  /// - Default: isMutation = true
-  Future<T?> onMutation<T>({
-    required Emitter<BaseState> emit,
-    required Future<Result<T>> Function() action,
-    void Function(T data)? onSuccess,
-    void Function(Failure failure)? onFailure,
-    String? successMessage,
-    bool showLoading = true,
-  }) {
-    return execute<T>(
-      emit: emit,
-      action: action,
-      onSuccess: onSuccess,
-      onFailure: onFailure,
-      successMessage: successMessage,
-      isMutation: true,
-      cancelPrevious: false,
-      showLoading: showLoading,
-    );
-  }
-
-  /// [CORE] Execute async action with full lifecycle management
+  /// 🚀 Core Execute
   Future<T?> execute<T>({
     required Emitter<BaseState> emit,
     required Future<Result<T>> Function() action,
     void Function(T data)? onSuccess,
     void Function(Failure failure)? onFailure,
+    BaseState? loadingState,
     String? successMessage,
-    bool? isMutation,
-    bool? preserveData,
-    bool? cancelPrevious,
-    BaseState? customLoadingState,
-    bool showLoading = true, // Control loading state
   }) async {
-    final currentData = state.data;
-    final bool isRefreshing = currentData != null && !state.isSubmitting && !state.isLoading;
+    // Tự động cancel nếu là Query (không có successMessage)
+    if (successMessage == null) cancel();
+    _currentOperation = Completer<void>();
 
-    // 1. Resolve configuration (Auto detect)
-    final bool mutationMode = isMutation ?? (successMessage != null);
-    final bool shouldPreserve = preserveData ?? (mutationMode || isRefreshing);
-    final bool shouldCancel = cancelPrevious ?? !mutationMode;
-
-    // 2. Handle cancellation
-    if (shouldCancel) {
-      cancelCurrentOperation();
-      _currentOperation = Completer<void>();
-    }
-
-    // 3. Emit Loading/Submitting/Refreshing state
-    if (!showLoading) {
-      // Do nothing
-    } else if (customLoadingState != null) {
-      emit(customLoadingState);
-    } else if (mutationMode) {
-      emit(BaseState.submitting(data: currentData));
-    } else if (isRefreshing) {
-      emit(BaseState.refreshing(currentData: currentData));
-    } else {
-      emit(BaseState.loading(previousData: null));
-    }
+    // Emit Loading
+    emit(loadingState ?? BaseState.loading(previousData: state.data));
 
     try {
       final result = await action();
+      if (_currentOperation?.isCompleted ?? false) return null;
 
-      // Kiểm tra nếu đã bị cancel
-      if (isCancelled && !mutationMode) return null;
-
-      // 4. Handle success/failure
       return result.fold(
         onSuccess: (data) {
           if (emit.isDone) return data;
 
-          if (mutationMode) {
-            emit(BaseState.success(data: data, message: successMessage ?? 'Thành công'));
+          if (data is List && data.isEmpty) {
+            emit(BaseState.empty());
           } else {
-            if (data is List && (data as List).isEmpty) {
-              emit(BaseState.empty());
-            } else {
-              final newState = BaseState.loaded(data);
-              emit(isRefreshing ? newState.resetRetry() : newState);
-            }
+            emit(BaseState.success(data: data, message: successMessage));
           }
+
           onSuccess?.call(data);
           return data;
         },
         onFailure: (failure) {
           if (!emit.isDone) {
-            emit(
-              BaseState.failure(
-                error: failure.message,
-                previousData: shouldPreserve ? currentData : null,
-              ),
-            );
+            emit(BaseState.failure(error: failure.message, previousData: state.data));
           }
           onFailure?.call(failure);
           return null;
         },
       );
     } catch (e, stackTrace) {
-      Logger.error('BaseBloc: Execute failed', error: e, stackTrace: stackTrace);
-
+      Logger.error('BaseBloc: Execution error', error: e, stackTrace: stackTrace);
       if (!emit.isDone) {
-        emit(
-          BaseState.failure(
-            error: e.toString(),
-            previousData: shouldPreserve ? currentData : null,
-            stackTrace: stackTrace,
-          ),
-        );
+        emit(BaseState.failure(error: e.toString(), previousData: state.data));
       }
       onFailure?.call(UnknownFailure(message: e.toString()));
       return null;
     } finally {
-      if (!mutationMode) _currentOperation = null;
+      _currentOperation = null;
     }
   }
 
-  /// Thực thi pagination (load more)
+  /// 📥 Pagination Helper
   Future<T?> executePagination<T>({
     required Emitter<BaseState> emit,
     required Future<Result<T>> Function() action,
-    void Function(T data)? onSuccess,
-    void Function(Failure failure)? onFailure,
-  }) async {
-    final currentData = state.data;
-    if (currentData == null) {
-      return execute(emit: emit, action: action);
-    }
-
-    emit(BaseState.loadingMore(currentData: currentData));
-
-    try {
-      final result = await action();
-      return result.fold(
-        onSuccess: (data) {
-          if (!emit.isDone) emit(BaseState.loaded(data));
-          onSuccess?.call(data);
-          return data;
-        },
-        onFailure: (failure) {
-          if (!emit.isDone) {
-            emit(BaseState.failure(error: failure.message, previousData: currentData));
-          }
-          onFailure?.call(failure);
-          return null;
-        },
-      );
-    } catch (e) {
-      if (!emit.isDone) {
-        emit(BaseState.failure(error: e.toString(), previousData: currentData));
-      }
-      onFailure?.call(UnknownFailure(message: e.toString()));
-      return null;
-    }
+  }) {
+    return execute(emit: emit, action: action);
   }
 
   @override
   Future<void> close() {
-    cancelCurrentOperation();
+    cancel();
     return super.close();
-  }
-
-  // ════════════════════════════════════════════════════════════
-  // 🔓 FLEXIBLE EXECUTE (No Rules)
-  // ════════════════════════════════════════════════════════════
-
-  /// [RUN] Execute any logic freely without [Result] pattern.
-  /// Useful for complex scenarios where you want manual control.
-  Future<void> run({
-    required Emitter<BaseState> emit,
-    required Future<void> Function() action,
-    BaseState? loadingState,
-    void Function()? onSuccess,
-    void Function(Object error, StackTrace stackTrace)? onError,
-    bool showLog = true,
-  }) async {
-    if (loadingState != null) emit(loadingState);
-    try {
-      await action();
-      onSuccess?.call();
-    } catch (e, stackTrace) {
-      if (showLog) {
-        Logger.error('BaseBloc: execution failed', error: e, stackTrace: stackTrace);
-      }
-      onError?.call(e, stackTrace);
-    }
   }
 }

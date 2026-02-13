@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/state_management/riverpod/riverpod_listeners.dart';
 import '../riverpod/category_riverpod.dart';
 import '../widgets/category_card.dart';
 
@@ -28,18 +29,7 @@ class _CategoryRiverpodPageState extends ConsumerState<CategoryRiverpodPage> {
     final notifier = ref.read(categoryRutGonProvider.notifier);
 
     // Lắng nghe sự thay đổi message (thành công/thất bại) từ BaseAsyncNotifier
-    ref.listen(categoryRutGonProvider, (previous, next) {
-      if (next.hasError) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.error.toString()), backgroundColor: Colors.red));
-      }
-      if (notifier.message != null && !next.isLoading) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(notifier.message!), backgroundColor: Colors.green));
-      }
-    });
+    RiverpodListeners.common(ref: ref, context: context, provider: categoryRutGonProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +71,7 @@ class _CategoryRiverpodPageState extends ConsumerState<CategoryRiverpodPage> {
                     return CategoryCard(category: category, onTap: () {});
                   },
                 ),
-                if (notifier.isRefreshing)
+                if (notifier.isLoading)
                   const Positioned(top: 0, left: 0, right: 0, child: LinearProgressIndicator()),
               ],
             ),

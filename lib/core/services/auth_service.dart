@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:dat_san_247_mobile/core/constants/api_constants.dart';
 import 'package:dat_san_247_mobile/core/network/api_client.dart';
 import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
-import 'package:dat_san_247_mobile/core/storage/secure/secure_storage_service.dart';
 import 'package:dat_san_247_mobile/core/storage/local/local_storage_service.dart';
+import 'package:dat_san_247_mobile/core/storage/secure/secure_storage_service.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
 import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
@@ -157,8 +157,6 @@ class AuthService {
       await _storageService.clearAuthData();
       _apiClient.clearAuthorization();
 
-      _updateStatus(AuthStatus.loggedOut);
-      // Quickly reset to unauthenticated to allow re-login
       _updateStatus(AuthStatus.unauthenticated);
     } catch (e) {
       Logger.error('AuthService: Logout failed', error: e);

@@ -23,19 +23,16 @@ class AuthState extends Equatable {
   factory AuthState.unauthenticated({String? error}) =>
       AuthState(status: AuthStatus.unauthenticated, error: error);
 
-  factory AuthState.authenticating() => const AuthState(status: AuthStatus.authenticating);
+  factory AuthState.loading() => const AuthState(status: AuthStatus.loading);
 
   factory AuthState.authenticated(AuthUser user, {String? message}) =>
       AuthState(status: AuthStatus.authenticated, user: user, message: message);
 
-  factory AuthState.tokenExpired({String? message}) =>
-      AuthState(status: AuthStatus.tokenExpired, message: message ?? 'Phiên đăng nhập hết hạn');
+  factory AuthState.expired({String? message}) =>
+      AuthState(status: AuthStatus.expired, message: message ?? 'Phiên đăng nhập hết hạn');
 
   factory AuthState.unauthorized({String? error}) =>
       AuthState(status: AuthStatus.unauthorized, error: error ?? 'Bạn không có quyền truy cập');
-
-  factory AuthState.loggedOut() =>
-      const AuthState(status: AuthStatus.loggedOut, message: 'Đã đăng xuất');
 
   // ════════════════════════════════════════════════════════════
   // Getters
@@ -43,8 +40,8 @@ class AuthState extends Equatable {
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
   bool get isUnauthenticated => status == AuthStatus.unauthenticated;
-  bool get isAuthenticating => status == AuthStatus.authenticating;
-  bool get isTokenExpired => status == AuthStatus.tokenExpired;
+  bool get isLoading => status == AuthStatus.loading;
+  bool get isExpired => status == AuthStatus.expired;
   bool get isInitial => status == AuthStatus.initial;
 
   bool get hasUser => user != null;

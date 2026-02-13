@@ -4,8 +4,8 @@
 import 'dart:async';
 
 import 'package:dat_san_247_mobile/core/services/auth_service.dart';
-import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
 import 'package:dat_san_247_mobile/core/state_management/auth/auth_state.dart';
+import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
 import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -33,7 +33,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Khởi tạo trạng thái ban đầu của App (gọi lúc Splash/Init)
   Future<void> init() async {
-    emit(AuthState.authenticating());
+    emit(AuthState.loading());
 
     final status = await _authService.checkInitialStatus();
     _handleStatusChange(status);
@@ -78,17 +78,14 @@ class AuthCubit extends Cubit<AuthState> {
       case AuthStatus.unauthenticated:
         emit(AuthState.unauthenticated());
         break;
-      case AuthStatus.tokenExpired:
-        emit(AuthState.tokenExpired());
+      case AuthStatus.expired:
+        emit(AuthState.expired());
         break;
       case AuthStatus.unauthorized:
         emit(AuthState.unauthorized());
         break;
-      case AuthStatus.loggedOut:
-        emit(AuthState.loggedOut());
-        break;
-      case AuthStatus.authenticating:
-        emit(AuthState.authenticating());
+      case AuthStatus.loading:
+        emit(AuthState.loading());
         break;
       case AuthStatus.initial:
         emit(AuthState.initial());
