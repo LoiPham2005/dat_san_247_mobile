@@ -38,7 +38,8 @@
     {
       "label": "🚀 Build APK",
       "type": "shell",
-      "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
+      // "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
+      "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=build/debug-symbols --target-platform android-arm64",
       "group": {
         "kind": "build",
         "isDefault": true

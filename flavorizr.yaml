@@ -1,3 +1,13 @@
+instructions:
+  - android:androidManifest
+  - android:flavorizrGradle
+  - android:dummyAssets
+  - android:icons
+  - ios:xcconfig
+  - ios:plist
+  - ios:runnerProject
+  - ios:icons
+
 app:
   android:
     flavorDimensions: "environment"

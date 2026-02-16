@@ -50,32 +50,6 @@ android {
 //        }
 //    }
 
-    flavorDimensions += "environment"
-    productFlavors {
-        create("dev") {
-            dimension = "environment"
-            applicationIdSuffix = ".dev"
-            versionNameSuffix = "-dev"
-            val appName = "dat san 247"  // ← Chỉ cần đổi ở đây
-            resValue("string", "app_name", appName)
-            extra["appName"] = appName
-        }
-        create("stg") {
-            dimension = "environment"
-            applicationIdSuffix = ".stg"
-            versionNameSuffix = "-stg"
-            val appName = "dat san 247"  // ← Chỉ cần đổi ở đây
-            resValue("string", "app_name", appName)
-            extra["appName"] = appName
-        }
-        create("prod") {
-            dimension = "environment"
-            val appName = "dat san 247"  // ← Chỉ cần đổi ở đây
-            resValue("string", "app_name", appName)
-            extra["appName"] = appName
-        }
-    }
-
     buildTypes {
         debug {
             signingConfig = signingConfigs.getByName("debug")
@@ -126,3 +100,4 @@ flutter {
 // =========================================================
 apply(from = "rename-outputs.gradle.kts")  // Rename APK + AAB
 apply(from = "open-folder.gradle.kts")     // Auto open folder after build
+apply(from = "flavorizr.gradle.kts")     // Flavorizr
