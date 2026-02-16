@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../bloc/auth_bloc.dart';
+import '../cubit/auth_cubit.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocConsumer<AuthBloc, BaseState>(
+      body: BlocConsumer<AuthCubit, BaseState>(
         listener: (context, state) {
           if (state.isSuccess) {
             context.showSuccessSnackBar('Đăng nhập thành công!');
@@ -143,16 +143,23 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: isLoading
-                              ? null
-                              : () {
-                                  context.read<AuthBloc>().add(
-                                    LoginEvent(
-                                      email: _emailController.text,
-                                      password: _passwordController.text,
-                                    ),
-                                  );
-                                },
+                          onPressed: () {
+                            context.read<AuthCubit>().login(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                            );
+                          },
+
+                          // isLoading
+                          //     ? null
+                          //     : () {
+                          //         context.read<AuthBloc>().add(
+                          //           LoginEvent(
+                          //             email: _emailController.text,
+                          //             password: _passwordController.text,
+                          //           ),
+                          //         );
+                          //       },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

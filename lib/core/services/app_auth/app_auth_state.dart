@@ -1,48 +1,50 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/state_management/bloc/auth_state.dart
 // ════════════════════════════════════════════════════════════════
-import 'package:equatable/equatable.dart';
 import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
-import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
+import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
+import 'package:equatable/equatable.dart';
 
 /// 🔐 Global Authentication State
-class AuthState extends Equatable {
-  final AuthStatus status;
-  final AuthUser? user;
+class AppAuthState extends Equatable {
+  final AppAuthStatus status;
+  final UserModel? user;
   final String? error;
   final String? message;
 
-  const AuthState({required this.status, this.user, this.error, this.message});
+  const AppAuthState({required this.status, this.user, this.error, this.message});
 
   // ════════════════════════════════════════════════════════════
   // Factories
   // ════════════════════════════════════════════════════════════
 
-  factory AuthState.initial() => const AuthState(status: AuthStatus.initial);
+  factory AppAuthState.initial() => const AppAuthState(status: AppAuthStatus.initial);
 
-  factory AuthState.unauthenticated({String? error}) =>
-      AuthState(status: AuthStatus.unauthenticated, error: error);
+  factory AppAuthState.unauthenticated({String? error}) =>
+      AppAuthState(status: AppAuthStatus.unauthenticated, error: error);
 
-  factory AuthState.loading() => const AuthState(status: AuthStatus.loading);
+  factory AppAuthState.loading() => const AppAuthState(status: AppAuthStatus.loading);
 
-  factory AuthState.authenticated(AuthUser user, {String? message}) =>
-      AuthState(status: AuthStatus.authenticated, user: user, message: message);
+  factory AppAuthState.authenticated(UserModel user, {String? message}) =>
+      AppAuthState(status: AppAuthStatus.authenticated, user: user, message: message);
 
-  factory AuthState.expired({String? message}) =>
-      AuthState(status: AuthStatus.expired, message: message ?? 'Phiên đăng nhập hết hạn');
+  factory AppAuthState.expired({String? message}) =>
+      AppAuthState(status: AppAuthStatus.expired, message: message ?? 'Phiên đăng nhập hết hạn');
 
-  factory AuthState.unauthorized({String? error}) =>
-      AuthState(status: AuthStatus.unauthorized, error: error ?? 'Bạn không có quyền truy cập');
+  factory AppAuthState.unauthorized({String? error}) => AppAuthState(
+    status: AppAuthStatus.unauthorized,
+    error: error ?? 'Bạn không có quyền truy cập',
+  );
 
   // ════════════════════════════════════════════════════════════
   // Getters
   // ════════════════════════════════════════════════════════════
 
-  bool get isAuthenticated => status == AuthStatus.authenticated;
-  bool get isUnauthenticated => status == AuthStatus.unauthenticated;
-  bool get isLoading => status == AuthStatus.loading;
-  bool get isExpired => status == AuthStatus.expired;
-  bool get isInitial => status == AuthStatus.initial;
+  bool get isAuthenticated => status == AppAuthStatus.authenticated;
+  bool get isUnauthenticated => status == AppAuthStatus.unauthenticated;
+  bool get isLoading => status == AppAuthStatus.loading;
+  bool get isExpired => status == AppAuthStatus.expired;
+  bool get isInitial => status == AppAuthStatus.initial;
 
   bool get hasUser => user != null;
 
@@ -50,8 +52,8 @@ class AuthState extends Equatable {
   // Utility
   // ════════════════════════════════════════════════════════════
 
-  AuthState copyWith({AuthStatus? status, AuthUser? user, String? error, String? message}) {
-    return AuthState(
+  AppAuthState copyWith({AppAuthStatus? status, UserModel? user, String? error, String? message}) {
+    return AppAuthState(
       status: status ?? this.status,
       user: user ?? this.user,
       error: error ?? this.error,
@@ -63,5 +65,5 @@ class AuthState extends Equatable {
   List<Object?> get props => [status, user, error, message];
 
   @override
-  String toString() => 'AuthState(status: $status, user: ${user?.email})';
+  String toString() => 'AppAuthState(status: $status, user: ${user?.email})';
 }

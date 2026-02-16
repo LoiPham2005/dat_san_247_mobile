@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../auth/data/models/auth_model.dart';
-import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart' hide UserModel;
 
 class VenueOwnerCard extends StatelessWidget {
   final UserModel owner;

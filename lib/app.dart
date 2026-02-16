@@ -1,16 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/constants/app_constants.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/l10n/localization_service.dart';
-import 'package:dat_san_247_mobile/core/state_management/auth/auth_cubit.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
 import 'package:dat_san_247_mobile/core/theme/app_theme.dart';
 import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:dat_san_247_mobile/gen/l10n/app_localizations.dart';
 import 'package:dat_san_247_mobile/routes/app_router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'features/auth/presentation/cubit/auth_cubit.dart';
 
 /// 🏠 Root Widget của ứng dụng
 ///
@@ -26,7 +27,7 @@ class App extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, __) => ProviderScope(child: _AppContent()),
+      builder: (_, __) => _AppContent(),
     );
   }
 }
@@ -39,9 +40,10 @@ class _AppContent extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => getIt<LocaleCubit>()),
         BlocProvider(create: (_) => getIt<ThemeCubit>()),
+        BlocProvider(create: (_) => getIt<AppAuthCubit>()),
         BlocProvider(create: (_) => getIt<AuthCubit>()),
-        BlocProvider(create: (_) => getIt<AuthBloc>()),
       ],
+
       child: Builder(
         builder: (context) {
           final locale = context.select((LocaleCubit c) => c.state);

@@ -324,7 +324,7 @@ class _DetailsPageState extends State<DetailsPage>
 
     return Column(
       children: [
-        if (venue?.owner != null) VenueOwnerCard(owner: venue!.owner!),
+        // if (venue?.owner != null) VenueOwnerCard(owner: venue!.!),
         if (venue?.amenities != null && venue!.amenities!.isNotEmpty)
           VenueAmenitiesCard(amenities: venue!.amenities!),
         if (venue?.venueRules != null && venue!.venueRules!.isNotEmpty)

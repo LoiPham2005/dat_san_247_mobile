@@ -1,7 +1,6 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/config/app_initializer.dart (OPTIMIZED)
 // ════════════════════════════════════════════════════════════════
-import 'package:firebase_core/firebase_core.dart';
 import 'package:dat_san_247_mobile/config/app_bloc_observer.dart';
 import 'package:dat_san_247_mobile/config/app_observer.dart';
 import 'package:dat_san_247_mobile/config/environment_config.dart';
@@ -11,10 +10,11 @@ import 'package:dat_san_247_mobile/core/ads/services/ad_manager.dart';
 import 'package:dat_san_247_mobile/core/cache/app_cache_manager.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/l10n/localization_service.dart';
-import 'package:dat_san_247_mobile/core/state_management/auth/auth_cubit.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
 import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:dat_san_247_mobile/core/utils/logger_config.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// 🎯 Quản lý toàn bộ quá trình khởi tạo app
@@ -102,8 +102,9 @@ class AppInitializer {
       await Future.wait([
         getIt<ThemeCubit>().initTheme(),
         getIt<LocaleCubit>().initLocale(),
-        getIt<AuthCubit>().init(),
+        getIt<AppAuthCubit>().init(),
       ]);
+
       Logger.success('Services initialized', tag: 'INIT');
     } catch (e, stackTrace) {
       Logger.error('Failed to init services', error: e, stackTrace: stackTrace, tag: 'INIT');

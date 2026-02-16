@@ -2,7 +2,6 @@ import 'package:dat_san_247_mobile/config/app_startup.dart';
 import 'package:dat_san_247_mobile/core/ads/services/ad_manager.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/theme/app_colors.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
@@ -18,28 +17,31 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // 🚀 Start Auth Check early
-    getIt<AuthBloc>().add(const CheckAuthStatusEvent());
-    _showSplashAd();
+    // 🚀 Start Sequence
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startAppSequence());
   }
 
-  Future<void> _boot(BuildContext context) async {
-    await AppStartup.launch(context); // 🚀 Logic khởi chạy + điều hướng
-  }
+  Future<void> _startAppSequence() async {
+    // 1. Trigger Auth Check (background)
+    // getIt<AuthBloc>().add(const CheckAuthStatusEvent());
 
-  Future<void> _showSplashAd() async {
+    // 2. Minimum Branding Time (2s)
     await Future.delayed(const Duration(seconds: 2));
 
-    await _adManager.showSplashAppOpen();
+    if (!mounted) return;
+
+    // 3. Show Ad Sequence (Open -> Inter -> Full Splash)
+    // This MUST finish before we proceed to boot/navigate
+    // await _adManager.showSplashSequence(context);
+
+    if (!mounted) return;
+
+    // 4. Finally, Boot & Navigate
+    await AppStartup.launch(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Khởi tạo app sau khi build hoàn tất
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _boot(context);
-    });
-
     return Scaffold(
       body: Container(
         width: double.infinity,

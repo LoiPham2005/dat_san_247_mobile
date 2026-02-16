@@ -56,8 +56,6 @@
 //   loggedOut,
 // }
 
-
-
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/state_management/base_status.dart
 // ════════════════════════════════════════════════════════════════
@@ -83,7 +81,7 @@ enum BaseStatus {
 }
 
 /// 🔐 Authentication-specific status
-enum AuthStatus {
+enum AppAuthStatus {
   /// Not determined yet (app startup, checking cached session)
   initial,
 

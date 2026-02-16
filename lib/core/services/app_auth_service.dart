@@ -10,40 +10,39 @@ import 'package:dat_san_247_mobile/core/storage/local/local_storage_service.dart
 import 'package:dat_san_247_mobile/core/storage/secure/secure_storage_service.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
-import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
 import 'package:injectable/injectable.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-/// 🎯 AuthService - Centralized Authentication Service
+/// 🎯 AppAuthService - Centralized Authentication Service
 @LazySingleton()
-class AuthService {
+class AppAuthService {
   final SecureStorage _secureStorage;
   final LocalStorageService _storageService;
   final ApiClient _apiClient;
 
-  AuthService(this._secureStorage, this._storageService, this._apiClient);
+  AppAuthService(this._secureStorage, this._storageService, this._apiClient);
 
   // ═══════════════════════════════════════════════════════════════
   // State Broadcasting
   // ═══════════════════════════════════════════════════════════════
 
-  final _authStateController = StreamController<AuthStatus>.broadcast();
-  Stream<AuthStatus> get authStateStream => _authStateController.stream;
+  final _authStateController = StreamController<AppAuthStatus>.broadcast();
+  Stream<AppAuthStatus> get authStateStream => _authStateController.stream;
 
-  AuthStatus _currentStatus = AuthStatus.initial;
-  AuthStatus get currentStatus => _currentStatus;
+  AppAuthStatus _currentStatus = AppAuthStatus.initial;
+  AppAuthStatus get currentStatus => _currentStatus;
 
   // ═══════════════════════════════════════════════════════════════
   // Check Status
   // ═══════════════════════════════════════════════════════════════
 
   /// Initialize and check current auth state
-  Future<AuthStatus> checkInitialStatus() async {
+  Future<AppAuthStatus> checkInitialStatus() async {
     final token = await _secureStorage.getAccessToken();
 
     if (token == null || token.isEmpty) {
-      _updateStatus(AuthStatus.unauthenticated);
-      return AuthStatus.unauthenticated;
+      _updateStatus(AppAuthStatus.unauthenticated);
+      return AppAuthStatus.unauthenticated;
     }
 
     // Check if token is expired
@@ -51,19 +50,19 @@ class AuthService {
       final success = await refreshToken();
       if (!success) {
         await logout();
-        return AuthStatus.unauthenticated;
+        return AppAuthStatus.unauthenticated;
       }
     }
 
     // Get user from local storage
     final userData = _storageService.getUser();
     if (userData == null) {
-      _updateStatus(AuthStatus.unauthenticated);
-      return AuthStatus.unauthenticated;
+      _updateStatus(AppAuthStatus.unauthenticated);
+      return AppAuthStatus.unauthenticated;
     }
 
-    _updateStatus(AuthStatus.authenticated);
-    return AuthStatus.authenticated;
+    _updateStatus(AppAuthStatus.authenticated);
+    return AppAuthStatus.authenticated;
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -138,16 +137,15 @@ class AuthService {
   // ═══════════════════════════════════════════════════════════════
 
   /// Save login data
-  Future<void> saveLoginData(AuthResponse response) async {
+  Future<void> saveLoginData(AuthResponseModel response) async {
     await _secureStorage.saveAccessToken(response.accessToken);
     await _secureStorage.saveRefreshToken(response.refreshToken);
 
-    // Use AuthUserModel for JSON conversion
-    final model = AuthUserModel.fromEntity(response.user);
-    await _storageService.saveUser(model.toJson());
+    await _storageService.saveUser(response.user.toJson());
+
     await _storageService.setLoggedIn(true);
 
-    _updateStatus(AuthStatus.authenticated);
+    _updateStatus(AppAuthStatus.authenticated);
   }
 
   /// Logout cleanup
@@ -157,18 +155,18 @@ class AuthService {
       await _storageService.clearAuthData();
       _apiClient.clearAuthorization();
 
-      _updateStatus(AuthStatus.unauthenticated);
+      _updateStatus(AppAuthStatus.unauthenticated);
     } catch (e) {
-      Logger.error('AuthService: Logout failed', error: e);
+      Logger.error('AppAuthService: Logout failed', error: e);
     }
   }
 
   /// Get current user from storage
-  AuthUser? get currentUser {
+  UserModel? get currentUser {
     final data = _storageService.getUser();
     if (data == null) return null;
     try {
-      return AuthUserModel.fromJson(data).toEntity();
+      return UserModel.fromJson(data);
     } catch (e) {
       return null;
     }
@@ -178,11 +176,11 @@ class AuthService {
   // Updates
   // ═══════════════════════════════════════════════════════════════
 
-  void _updateStatus(AuthStatus status) {
+  void _updateStatus(AppAuthStatus status) {
     if (_currentStatus != status) {
       _currentStatus = status;
       _authStateController.add(status);
-      Logger.info('AuthService: Status -> $status');
+      Logger.info('AppAuthService: Status -> $status');
     }
   }
 

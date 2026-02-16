@@ -9,27 +9,28 @@ import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import 'config/app_initializer.dart';
 
 void mainCommon(Environment env) {
-  // ✅ Đảm bảo Binding được khởi tạo đầu tiên
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Bắt lỗi UI (Flutter Framework)
-  FlutterError.onError = (details) {
-    Logger.error('Flutter framework error', error: details.exception, stackTrace: details.stack);
-  };
-
-  // Bắt lỗi Global Isolate (Platform)
-  PlatformDispatcher.instance.onError = (error, stack) {
-    Logger.error('Platform error', error: error, stackTrace: stack);
-    return true;
-  };
-
   // Bắt lỗi Async (Dart Zone)
   runZonedGuarded(
     () async {
-      EnvironmentConfig.setEnvironment(env);
+      // ✅ Đảm bảo Binding được khởi tạo TRONG Zone này để tránh lỗi "Zone mismatch"
+      WidgetsFlutterBinding.ensureInitialized();
 
-      // Print debug info
-      EnvironmentConfig.printInfo();
+      // Bắt lỗi UI (Flutter Framework)
+      FlutterError.onError = (details) {
+        Logger.error(
+          'Flutter framework error',
+          error: details.exception,
+          stackTrace: details.stack,
+        );
+      };
+
+      // Bắt lỗi Global Isolate (Platform)
+      PlatformDispatcher.instance.onError = (error, stack) {
+        Logger.error('Platform error', error: error, stackTrace: stack);
+        return true;
+      };
+
+      EnvironmentConfig.setEnvironment(env);
 
       await AppInitializer.initialize();
 

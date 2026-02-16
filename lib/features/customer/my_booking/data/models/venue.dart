@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
+import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart' hide UserModel;
 import 'package:dat_san_247_mobile/features/customer/my_booking/data/models/amenities.dart';
 import 'package:dat_san_247_mobile/features/customer/my_booking/data/models/venue_images.dart';
 import 'package:dat_san_247_mobile/features/customer/my_booking/data/models/venue_rules.dart';

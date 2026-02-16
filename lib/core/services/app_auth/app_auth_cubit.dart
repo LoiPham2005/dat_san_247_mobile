@@ -3,20 +3,20 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
-import 'package:dat_san_247_mobile/core/services/auth_service.dart';
-import 'package:dat_san_247_mobile/core/state_management/auth/auth_state.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth_service.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:dat_san_247_mobile/core/state_management/base_status.dart';
-import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
+import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 /// 🌍 Global Auth Cubit - Manages the authenticated state of the entire app
 @LazySingleton()
-class AuthCubit extends Cubit<AuthState> {
-  final AuthService _authService;
+class AppAuthCubit extends Cubit<AppAuthState> {
+  final AppAuthService _authService;
   StreamSubscription? _authStreamSubscription;
 
-  AuthCubit(this._authService) : super(AuthState.initial()) {
+  AppAuthCubit(this._authService) : super(AppAuthState.initial()) {
     _listenToAuthChanges();
   }
 
@@ -24,7 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
   // Initialization
   // ═══════════════════════════════════════════════════════════════
 
-  /// Lắng nghe thay đổi trạng thái từ AuthService
+  /// Lắng nghe thay đổi trạng thái từ AppAuthService
   void _listenToAuthChanges() {
     _authStreamSubscription = _authService.authStateStream.listen((status) {
       _handleStatusChange(status);
@@ -33,7 +33,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Khởi tạo trạng thái ban đầu của App (gọi lúc Splash/Init)
   Future<void> init() async {
-    emit(AuthState.loading());
+    emit(AppAuthState.loading());
 
     final status = await _authService.checkInitialStatus();
     _handleStatusChange(status);
@@ -44,9 +44,9 @@ class AuthCubit extends Cubit<AuthState> {
   // ═══════════════════════════════════════════════════════════════
 
   /// Cập nhật trạng thái sau khi Login thành công
-  Future<void> loginSuccess(AuthResponse response) async {
+  Future<void> loginSuccess(AuthResponseModel response) async {
     await _authService.saveLoginData(response);
-    // AuthService sẽ tự emit AuthStatus.authenticated, _listenToAuthChanges sẽ bắt được
+    // AppAuthService sẽ tự emit AppAuthStatus.authenticated, _listenToAuthChanges sẽ bắt được
   }
 
   /// Thực hiện Logout
@@ -55,7 +55,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   /// Cập nhật thông tin user (ví dụ sau khi sửa profile)
-  void updateUser(AuthUser user) {
+  void updateUser(UserModel user) {
     if (state.isAuthenticated) {
       emit(state.copyWith(user: user));
     }
@@ -65,30 +65,30 @@ class AuthCubit extends Cubit<AuthState> {
   // Private Logic
   // ═══════════════════════════════════════════════════════════════
 
-  void _handleStatusChange(AuthStatus status) {
+  void _handleStatusChange(AppAuthStatus status) {
     switch (status) {
-      case AuthStatus.authenticated:
+      case AppAuthStatus.authenticated:
         final user = _authService.currentUser;
         if (user != null) {
-          emit(AuthState.authenticated(user));
+          emit(AppAuthState.authenticated(user));
         } else {
-          emit(AuthState.unauthenticated());
+          emit(AppAuthState.unauthenticated());
         }
         break;
-      case AuthStatus.unauthenticated:
-        emit(AuthState.unauthenticated());
+      case AppAuthStatus.unauthenticated:
+        emit(AppAuthState.unauthenticated());
         break;
-      case AuthStatus.expired:
-        emit(AuthState.expired());
+      case AppAuthStatus.expired:
+        emit(AppAuthState.expired());
         break;
-      case AuthStatus.unauthorized:
-        emit(AuthState.unauthorized());
+      case AppAuthStatus.unauthorized:
+        emit(AppAuthState.unauthorized());
         break;
-      case AuthStatus.loading:
-        emit(AuthState.loading());
+      case AppAuthStatus.loading:
+        emit(AppAuthState.loading());
         break;
-      case AuthStatus.initial:
-        emit(AuthState.initial());
+      case AppAuthStatus.initial:
+        emit(AppAuthState.initial());
         break;
     }
   }

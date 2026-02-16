@@ -5,17 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 
-import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../core/services/app_auth/app_auth_cubit.dart';
 
 @injectable
 class RouteGuards {
-  final AuthBloc _authBloc;
+  final AppAuthCubit _authCubit;
 
-  RouteGuards(this._authBloc);
+  RouteGuards(this._authCubit);
 
   FutureOr<String?> authGuard(BuildContext context, GoRouterState state) {
-    final bool isLoggedIn = _authBloc.isLoggedIn;
+    final bool isLoggedIn = _authCubit.state.isAuthenticated;
     final bool isLoggingIn = state.matchedLocation == RouteNames.login;
+
     final bool isSplash = state.matchedLocation == RouteNames.splash;
     final bool isWelcome = state.matchedLocation == RouteNames.welcome;
     final bool isRegister = state.matchedLocation == RouteNames.register;

@@ -1,13 +1,13 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/extensions/context_extensions.dart (SỬ DỤNG CHÍNH)
 // ════════════════════════════════════════════════════════════════
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
 import 'package:dat_san_247_mobile/core/services/toast_service.dart';
-import 'package:dat_san_247_mobile/core/state_management/auth/auth_cubit.dart';
-import 'package:dat_san_247_mobile/core/state_management/auth/auth_state.dart';
-import 'package:dat_san_247_mobile/features/auth/domain/entities/auth_entity.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
+import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
 import 'package:dat_san_247_mobile/routes/app_router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
@@ -286,14 +286,14 @@ extension ContextExtensions on BuildContext {
   // AUTH (⭐ NEW)
   // ═══════════════════════════════════════════════════════════════
 
-  /// Access global AuthCubit
-  AuthCubit get authCubit => read<AuthCubit>();
+  /// Access global AppAuthCubit
+  AppAuthCubit get authCubit => read<AppAuthCubit>();
 
-  /// Watch global AuthState
-  AuthState get authState => watch<AuthCubit>().state;
+  /// Watch global AppAuthState
+  AppAuthState get authState => watch<AppAuthCubit>().state;
 
   /// Get current authenticated user
-  AuthUser? get currentUser => authState.user;
+  UserModel? get currentUser => authState.user;
 
   /// Check if user is authenticated
   bool get isAuthenticated => authState.isAuthenticated;

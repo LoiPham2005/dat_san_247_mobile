@@ -1,7 +1,7 @@
-import 'package:dat_san_247_mobile/routes/route_names.dart';
+import 'package:dat_san_247_mobile/core/extensions/context_extensions.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../data/models/intro_model.dart';
 import '../widgets/intro_content.dart';
@@ -98,7 +98,8 @@ class _WelcomePageState extends State<WelcomePage> with TickerProviderStateMixin
   }
 
   void _navigateToLogin() {
-    context.go(RouteNames.login);
+    // context.go(RouteNames.login);
+    context.navPush(LoginPage());
   }
 
   @override

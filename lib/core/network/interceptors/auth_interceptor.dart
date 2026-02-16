@@ -3,12 +3,12 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:dat_san_247_mobile/core/constants/api_constants.dart';
 import 'package:dat_san_247_mobile/core/di/injection.dart';
-import 'package:dat_san_247_mobile/core/services/auth_service.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth_service.dart';
 import 'package:dat_san_247_mobile/core/storage/secure/secure_storage_service.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
+import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton()
@@ -68,7 +68,7 @@ class AuthInterceptor extends Interceptor {
     _isRefreshing = true;
 
     try {
-      final authService = getIt<AuthService>();
+      final authService = getIt<AppAuthService>();
       final success = await authService.refreshToken();
 
       if (!success) {
@@ -90,7 +90,7 @@ class AuthInterceptor extends Interceptor {
     } catch (e) {
       Logger.error('Token refresh error', error: e, tag: 'AUTH');
       _rejectPendingRequests(err);
-      await getIt<AuthService>().logout();
+      await getIt<AppAuthService>().logout();
       return handler.reject(err);
     } finally {
       _isRefreshing = false;

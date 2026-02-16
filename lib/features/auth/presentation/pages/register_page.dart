@@ -2,11 +2,11 @@
 import 'package:dat_san_247_mobile/core/extensions/context_extensions.dart';
 import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/theme/app_colors.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../bloc/auth_bloc.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -33,7 +33,7 @@ class _RegisterPageState extends State<RegisterPage> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: BlocConsumer<AuthBloc, BaseState>(
+      body: BlocConsumer<AuthCubit, BaseState>(
         listener: (context, state) {
           if (state.isSuccess) {
             context.showSuccessSnackBar('Đăng ký thành công!');

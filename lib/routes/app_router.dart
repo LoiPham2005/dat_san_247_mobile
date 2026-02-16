@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════════
 // lib/core/routes/app_router.dart
 
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
 import 'package:dat_san_247_mobile/routes/app_routes_observer.dart';
 import 'package:dat_san_247_mobile/routes/go_router_refresh_stream.dart';
 import 'package:dat_san_247_mobile/routes/route_guards.dart';
@@ -13,7 +14,6 @@ import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 
 import '../core/services/navigation_service.dart';
-import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/customer/home/presentation/pages/home_page.dart';
 import '../features/customer/intro/presentation/pages/welcome_page.dart';
@@ -24,12 +24,12 @@ part 'app_router.g.dart';
 
 @LazySingleton()
 class AppRouter {
-  final AuthBloc authBloc;
+  final AppAuthCubit authCubit;
   final RouteGuards routeGuards;
   final NavigationService navigationService;
   final AppRoutesObserver appRoutesObserver;
 
-  AppRouter(this.authBloc, this.routeGuards, this.navigationService, this.appRoutesObserver);
+  AppRouter(this.authCubit, this.routeGuards, this.navigationService, this.appRoutesObserver);
 
   late final GoRouter router = GoRouter(
     initialLocation: RouteNames.splash,
@@ -38,7 +38,7 @@ class AppRouter {
     restorationScopeId: 'app_router',
 
     // Auto-refresh when auth state changes
-    refreshListenable: GoRouterRefreshStream(authBloc.stream),
+    refreshListenable: GoRouterRefreshStream(authCubit.stream),
 
     // Global redirect (auth guard)
     redirect: routeGuards.authGuard,
