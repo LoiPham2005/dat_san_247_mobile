@@ -4,7 +4,7 @@ import 'package:dat_san_247_mobile/core/di/injection.dart';
 import '../../domain/entities/{{feature_name.snakeCase()}}.dart';
 import '../bloc/{{feature_name.snakeCase()}}_bloc.dart';
 import '../widgets/{{feature_name.snakeCase()}}_item.dart';
-import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/core/state/bloc/base_state.dart';
 
 /// {{feature_name.pascalCase()}} page
 class {{feature_name.pascalCase()}}Page extends StatelessWidget {

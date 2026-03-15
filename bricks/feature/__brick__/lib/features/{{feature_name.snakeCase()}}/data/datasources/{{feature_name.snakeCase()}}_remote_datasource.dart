@@ -1,7 +1,7 @@
 import 'package:dat_san_247_mobile/core/errors/result.dart';
 import 'package:dat_san_247_mobile/core/network/api_client.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/constants/api_constants.dart';
+import '../../../../core/common/constants/api_endpoints.dart';
 import '../models/{{feature_name.snakeCase()}}_model.dart';
 
 abstract class {{feature_name.pascalCase()}}RemoteDataSource {
@@ -38,7 +38,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
     Map<String, dynamic>? params,
   }) async {
     return _apiClient.get(
-      ApiConstants.apiEndpoints,
+      ApiEndpoints.apiEndpoints,
       (json) => json.map((e) => {{feature_name.pascalCase()}}Model.fromJson(e)).toList(),
       queryParameters: params,
     );
@@ -49,7 +49,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
   @override
   Future<Result<{{feature_name.pascalCase()}}Model>> get{{feature_name.pascalCase()}}Detail(String id) {
     return _apiClient.get(
-      '${ApiConstants.apiEndpoints}/$id',
+      '${ApiEndpoints.apiEndpoints}/$id',
       (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
     );
   }
@@ -59,7 +59,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
   @override
   Future<Result<{{feature_name.pascalCase()}}Model>> create{{feature_name.pascalCase()}}(Map<String, dynamic> data) {
     return _apiClient.post(
-      ApiConstants.apiEndpoints,
+      ApiEndpoints.apiEndpoints,
       (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
       data: data,
     );
@@ -73,7 +73,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
     Map<String, dynamic> data,
   ) {
     return _apiClient.put(
-      '${ApiConstants.apiEndpoints}/$id',
+      '${ApiEndpoints.apiEndpoints}/$id',
       (json) => {{feature_name.pascalCase()}}Model.fromJson(json),
       data: data,
     );
@@ -83,7 +83,7 @@ class {{feature_name.pascalCase()}}RemoteDataSourceImpl implements {{feature_nam
   {{#has_delete}}
   @override
   Future<Result<bool>> delete{{feature_name.pascalCase()}}(String id) {
-    return _apiClient.delete('${ApiConstants.apiEndpoints}/$id');
+    return _apiClient.delete('${ApiEndpoints.apiEndpoints}/$id');
   }
   {{/has_delete}}
 }

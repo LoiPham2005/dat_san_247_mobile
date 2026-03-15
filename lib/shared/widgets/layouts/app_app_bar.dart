@@ -51,8 +51,8 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(
-        (toolbarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0),
-      );
+    (toolbarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,7 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: centerTitle ?? _getCenterTitle(),
       backgroundColor: backgroundColor ?? _getBackgroundColor(theme),
       foregroundColor: foregroundColor ?? _getForegroundColor(theme),
-      elevation: elevation ?? _getElevation(),
+      elevation: elevation ?? 0,
       scrolledUnderElevation: scrolledUnderElevation,
       shadowColor: shadowColor,
       surfaceTintColor: surfaceTintColor,
@@ -86,8 +86,9 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (subtitle != null) {
       return Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment:
-            centerTitle == true ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        crossAxisAlignment: centerTitle == true
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
         children: [
           Text(
             title!,
@@ -141,26 +142,9 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
         return Colors.white;
     }
   }
-
-  double _getElevation() {
-    switch (style) {
-      case AppAppBarStyle.standard:
-      case AppAppBarStyle.centered:
-        return 0;
-      case AppAppBarStyle.large:
-        return 0;
-      case AppAppBarStyle.transparent:
-        return 0;
-    }
-  }
 }
 
-enum AppAppBarStyle {
-  standard,
-  centered,
-  large,
-  transparent,
-}
+enum AppAppBarStyle { standard, centered, large, transparent }
 
 // ════════════════════════════════════════════════════════════════
 // SLIVER APP BAR
@@ -235,24 +219,16 @@ class AppSliverAppBar extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (backgroundImage != null)
-            Image.asset(
-              backgroundImage!,
-              fit: BoxFit.cover,
-            ),
+            Image.asset(backgroundImage!, fit: BoxFit.cover),
           if (gradient != null)
-            Container(
-              decoration: BoxDecoration(gradient: gradient),
-            ),
+            Container(decoration: BoxDecoration(gradient: gradient)),
           if (backgroundImage != null)
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
-                  ],
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
                 ),
               ),
             ),
@@ -377,14 +353,9 @@ class _SearchAppBarState extends State<SearchAppBar> {
       decoration: InputDecoration(
         hintText: widget.hintText ?? 'Tìm kiếm...',
         border: InputBorder.none,
-        hintStyle: TextStyle(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+        hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
       ),
-      style: TextStyle(
-        color: theme.colorScheme.onSurface,
-        fontSize: 16.sp,
-      ),
+      style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 16.sp),
       textInputAction: TextInputAction.search,
       onChanged: widget.onSearchChanged,
       onSubmitted: widget.onSearch,
@@ -398,19 +369,14 @@ class _SearchAppBarState extends State<SearchAppBar> {
 
 extension AppAppBarX on AppAppBar {
   /// Thêm search action
-  AppAppBar withSearch({
-    required VoidCallback onSearchTap,
-  }) {
+  AppAppBar withSearch({required VoidCallback onSearchTap}) {
     return AppAppBar(
       title: title,
       titleWidget: titleWidget,
       subtitle: subtitle,
       leading: leading,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: onSearchTap,
-        ),
+        IconButton(icon: const Icon(Icons.search), onPressed: onSearchTap),
         ...?actions,
       ],
       bottom: bottom,

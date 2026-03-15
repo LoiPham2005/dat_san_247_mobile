@@ -2,7 +2,7 @@
 # 📁 Makefile - Flutter Base Template Automation
 # ════════════════════════════════════════════════════════════════
 
-.PHONY: help get clean gen watch l10n full-gen analyze format fix test cov run-dev run-stg run-prod build-apk-dev build-apk-stg build-apk-prod build-aab-prod icons splash
+.PHONY: help get clean gen watch l10n full-gen analyze format fix test cov run-dev run-stg run-prod build-apk-dev build-apk-stg build-apk-prod build-aab-prod icons splash feature feature-rut-gon feature-ket-hop feature-pick
 
 # Default target
 help:
@@ -43,9 +43,21 @@ help:
 	@echo "  make icons           - Tạo App Icons"
 	@echo "  make splash          - Tạo Native Splash"
 	@echo ""
+	@echo "🎨 THEME GEN"
+	@echo "  make theme-expand      - Thêm theme mới (có trong meta) vào tất cả tokens + gen"
+	@echo "  make theme-sync        - Sync key từ 'light' sang các themes khác + gen code"
+	@echo "  make theme-gen         - Gen code (tất cả themes phải đồng đều key)"
+	@echo "  make theme-preview     - Xem trước output, không ghi file"
+	@echo ""
 	@echo "🛠️ REFACTORING"
 	@echo "  make rename-package name=\"new_name\" - Đổi tên package (pubspec & dart files)"
 	@echo "  make rename-app name=\"New App\"      - Đổi tên hiển thị ứng dụng"
+	@echo ""
+	@echo "🧱 MASON CODE GEN"
+	@echo "  make feature          - Tạo feature (Full: Data + Domain + Presentation)"
+	@echo "  make feature-rut-gon  - Tạo feature (Rút gọn: không có Domain layer)"
+	@echo "  make feature-ket-hop  - Tạo feature (Kết hợp: List + Card + Detail)"
+	@echo "  make feature-pick     - Hỏi chọn loại brick rồi mới tạo"
 	@echo "════════════════════════════════════════════════════════════════"
 
 # 📦 DEPENDENCIES
@@ -68,10 +80,47 @@ watch:
 l10n:
 	fvm flutter gen-l10n
 
+flutter_gen:
+	fvm dart pub global activate flutter_gen
+
+gen-assets:
+	fluttergen -c pubspec.yaml
+
+bloc_gen:
+	dart tools/generate_bloc_helper.dart
+
+theme-expand:
+	fvm dart run tools/theme_gen.dart --expand
+
+theme-sync:
+	fvm dart run tools/theme_gen.dart --sync
+
+theme-gen:
+	fvm dart run tools/theme_gen.dart
+
+theme-preview:
+	fvm dart run tools/theme_gen.dart --dry-run
+
+route-list:
+	dart tools/generate_route.dart --list
+
+route-scan:
+	dart tools/generate_route.dart --scan
+
+route-gen:
+	dart tools/generate_route.dart --name ${input:routeName} --path ${input:routePath} --page ${input:routePage} --import ${input:routeImport} --group ${input:routeGroup}
+
+l10n_sync:
+	fvm dart run tools/l10n_sync.dart --translate
+
+l10n_sync_translate:
+	fvm dart run tools/l10n_sync.dart --translate && fvm flutter gen-l10n
+
 full-gen:
 	fvm flutter clean
 	fvm flutter pub get
 	fvm flutter gen-l10n
+	dart scripts/generate_bloc_helper.dart
 	fvm dart run build_runner build --delete-conflicting-outputs
 
 # 🔧 QUALITY & ANALYSIS
@@ -113,7 +162,7 @@ apk-prod:
 	fvm flutter build apk --flavor prod -t lib/main_prod.dart --release
 
 aab-prod:
-	fvm flutter build appbundle --flavor prod -t lib/main_prod.dart --release --obfuscate --split-debug-info=build/debug-symbols
+	fvm flutter build appbundle --flavor prod -t lib/main_prod.dart --release
 
 # 🎨 ASSETS
 icons:
@@ -122,6 +171,28 @@ icons:
 splash:
 	fvm flutter pub run flutter_native_splash:create
 
+
+# 🧱 MASON CODE GEN
+feature:
+	mason make feature --on-conflict overwrite
+
+feature-rut-gon:
+	mason make feature_rut_gon --on-conflict overwrite
+
+feature-ket-hop:
+	mason make feature_ket_hop --on-conflict overwrite
+
+feature-pick:
+	@powershell -Command "\
+	$$choice = (Write-Host '`nChon loai Feature brick:' -ForegroundColor Cyan; \
+	Write-Host '  [1] Feature Full         (Data + Domain + Presentation)' -ForegroundColor White; \
+	Write-Host '  [2] Feature Rut Gon      (Khong co Domain layer)' -ForegroundColor White; \
+	Write-Host '  [3] Feature Ket Hop      (List + Card + Detail)' -ForegroundColor White; \
+	Read-Host '`nNhap so lua chon (1/2/3)'); \
+	if ($$choice -eq '1') { mason make feature --on-conflict overwrite } \
+	elseif ($$choice -eq '2') { mason make feature_rut_gon --on-conflict overwrite } \
+	elseif ($$choice -eq '3') { mason make feature_ket_hop --on-conflict overwrite } \
+	else { Write-Host 'Lua chon khong hop le. Vui long nhap 1, 2 hoac 3.' -ForegroundColor Red }"
 
 # 🛠️ REFACTORING
 rename-package:

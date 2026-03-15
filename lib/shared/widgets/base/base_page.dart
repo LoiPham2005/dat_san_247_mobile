@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/extensions/context_extensions.dart';
+import 'package:dat_san_247_mobile/core/common/extensions/context_extensions.dart';
 
 /// Base Page với các tính năng chung
 abstract class BasePage extends StatefulWidget {

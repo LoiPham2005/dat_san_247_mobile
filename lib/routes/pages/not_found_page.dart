@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:go_router/go_router.dart';
-
-import '../route_names.dart';
 
 class NotFoundPage extends StatelessWidget {
   const NotFoundPage({super.key, this.error});
@@ -22,7 +21,7 @@ class NotFoundPage extends StatelessWidget {
             ],
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => context.go(RouteNames.home),
+              onPressed: () => context.go(RouteNames.main),
               child: const Text('Về trang chủ'),
             ),
           ],

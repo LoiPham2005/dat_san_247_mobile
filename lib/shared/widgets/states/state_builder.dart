@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'loading_widget.dart';
 import 'error_widget.dart' as app;
 import 'empty_widget.dart';
@@ -79,12 +79,14 @@ class PaginatedStateBuilder<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initial loading
-    if (state.isLoading && (state.data == null || (state.data as List).isEmpty)) {
+    if (state.isLoading &&
+        (state.data == null || (state.data as List).isEmpty)) {
       return onLoading?.call() ?? const LoadingWidget();
     }
 
     // Error (không có data cũ)
-    if (state.isFailure && (state.data == null || (state.data as List).isEmpty)) {
+    if (state.isFailure &&
+        (state.data == null || (state.data as List).isEmpty)) {
       return onError?.call(state.error ?? 'Đã xảy ra lỗi', null) ??
           app.AppErrorWidget(message: state.error ?? 'Đã xảy ra lỗi');
     }
@@ -111,8 +113,8 @@ class PaginatedStateBuilder<T> extends StatelessWidget {
         padding: padding,
         physics: physics,
         itemCount: items.length + (state.isRefreshing ? 1 : 0),
-        separatorBuilder: separatorBuilder ??
-            (context, index) => const SizedBox(height: 8),
+        separatorBuilder:
+            separatorBuilder ?? (context, index) => const SizedBox(height: 8),
         itemBuilder: (context, index) {
           if (index == items.length) {
             return const Padding(

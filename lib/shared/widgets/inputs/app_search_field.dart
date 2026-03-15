@@ -100,11 +100,9 @@ class _AppSearchFieldState extends State<AppSearchField> {
       onSubmitted: widget.onSubmitted,
       decoration: InputDecoration(
         hintText: widget.hint ?? 'Tìm kiếm...',
-        prefixIcon: widget.prefixIcon ??
-            Icon(
-              Icons.search,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        prefixIcon:
+            widget.prefixIcon ??
+            Icon(Icons.search, color: theme.colorScheme.onSurfaceVariant),
         suffixIcon: _hasText
             ? IconButton(
                 icon: Icon(
@@ -116,8 +114,10 @@ class _AppSearchFieldState extends State<AppSearchField> {
               )
             : widget.suffixIcon,
         filled: widget.filled,
-        fillColor: widget.fillColor ?? theme.colorScheme.surfaceContainerHighest,
-        contentPadding: widget.contentPadding ??
+        fillColor:
+            widget.fillColor ?? theme.colorScheme.surfaceContainerHighest,
+        contentPadding:
+            widget.contentPadding ??
             EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(effectiveBorderRadius),
@@ -149,11 +149,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
   }
 }
 
-enum AppSearchFieldStyle {
-  rounded,
-  outlined,
-  flat,
-}
+enum AppSearchFieldStyle { rounded, outlined, flat }
 
 /// Search Bar với actions
 class AppSearchBar extends StatelessWidget implements PreferredSizeWidget {
@@ -199,10 +195,7 @@ class AppSearchBar extends StatelessWidget implements PreferredSizeWidget {
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           child: Row(
             children: [
-              if (leading != null) ...[
-                leading!,
-                SizedBox(width: 8.w),
-              ],
+              if (leading != null) ...[leading!, SizedBox(width: 8.w)],
               Expanded(
                 child: AppSearchField(
                   controller: controller,
@@ -214,10 +207,7 @@ class AppSearchBar extends StatelessWidget implements PreferredSizeWidget {
                   autofocus: autofocus,
                 ),
               ),
-              if (actions != null) ...[
-                SizedBox(width: 8.w),
-                ...actions!,
-              ],
+              if (actions != null) ...[SizedBox(width: 8.w), ...actions!],
             ],
           ),
         ),

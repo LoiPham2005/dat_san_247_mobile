@@ -6,8 +6,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_fr.dart';
 import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
 import 'app_localizations_vi.dart';
+import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,8 +99,11 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('fr'),
     Locale('ja'),
+    Locale('ko'),
     Locale('vi'),
+    Locale('zh'),
   ];
 
   /// No description provided for @appTitle.
@@ -106,23 +112,11 @@ abstract class AppLocalizations {
   /// **'My App'**
   String get appTitle;
 
-  /// No description provided for @ddd.
-  ///
-  /// In en, this message translates to:
-  /// **'gggg'**
-  String get ddd;
-
   /// No description provided for @hello.
   ///
   /// In en, this message translates to:
   /// **'Hello'**
   String get hello;
-
-  /// No description provided for @ccccc.
-  ///
-  /// In en, this message translates to:
-  /// **'cccc'**
-  String get ccccc;
 
   /// No description provided for @welcome.
   ///
@@ -130,17 +124,71 @@ abstract class AppLocalizations {
   /// **'Welcome {name}'**
   String welcome(String name);
 
-  /// No description provided for @her.
+  /// No description provided for @name.
   ///
   /// In en, this message translates to:
-  /// **'her'**
-  String get her;
+  /// **'Name'**
+  String get name;
 
-  /// No description provided for @map.
+  /// No description provided for @full_name.
   ///
   /// In en, this message translates to:
-  /// **'map'**
-  String get map;
+  /// **'Full name'**
+  String get full_name;
+
+  /// No description provided for @ads.
+  ///
+  /// In en, this message translates to:
+  /// **'Ads'**
+  String get ads;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get systemDefault;
+
+  /// No description provided for @on.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get on;
+
+  /// No description provided for @off.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get off;
+
+  /// No description provided for @primaryColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Color'**
+  String get primaryColor;
 }
 
 class _AppLocalizationsDelegate
@@ -153,8 +201,14 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'ja', 'vi'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'en',
+    'fr',
+    'ja',
+    'ko',
+    'vi',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -165,10 +219,16 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'fr':
+      return AppLocalizationsFr();
     case 'ja':
       return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
     case 'vi':
       return AppLocalizationsVi();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(

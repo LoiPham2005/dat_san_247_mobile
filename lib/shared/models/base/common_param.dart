@@ -56,15 +56,18 @@ class CommonParam extends Equatable {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{'page': page, 'limit': limit};
 
-    if (search != null && search!.trim().isNotEmpty) map['search'] = search!.trim();
+    if (search != null && search!.trim().isNotEmpty)
+      map['search'] = search!.trim();
     if (sortBy != null) {
       map['sort_by'] = sortBy;
       map['sort_order'] = sortOrder.name;
     }
 
     // Convert Date sang epoch seconds (Phổ biến trong Backend)
-    if (startDate != null) map['start_date'] = startDate!.millisecondsSinceEpoch ~/ 1000;
-    if (endDate != null) map['end_date'] = endDate!.millisecondsSinceEpoch ~/ 1000;
+    if (startDate != null)
+      map['start_date'] = startDate!.millisecondsSinceEpoch ~/ 1000;
+    if (endDate != null)
+      map['end_date'] = endDate!.millisecondsSinceEpoch ~/ 1000;
 
     // Thêm các custom filters khác
     if (filters.isNotEmpty) {
@@ -75,7 +78,16 @@ class CommonParam extends Equatable {
   }
 
   @override
-  List<Object?> get props => [page, limit, search, sortBy, sortOrder, filters, startDate, endDate];
+  List<Object?> get props => [
+    page,
+    limit,
+    search,
+    sortBy,
+    sortOrder,
+    filters,
+    startDate,
+    endDate,
+  ];
 }
 
 enum SortOrder { asc, desc }

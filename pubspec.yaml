@@ -1,5 +1,5 @@
 name: dat_san_247_mobile
-description: "Dặt Sân 247 Mobile Application"
+description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -68,12 +68,12 @@ dependencies:
   google_fonts: ^8.0.0
   easy_localization: ^3.0.8
   intl: ^0.20.2
-  toastification: ^3.0.3
+  flutter_smart_dialog: ^4.9.8+9
   lottie: ^3.1.2
   flutter_svg: ^2.0.10+1
 
   # ─────────────────────── OPTIONAL / COMMENTED ──────────────────────────
-  # nb_utils: 7.0.9
+  # nb_utils: ^7.2.0
   flutter_local_notifications: ^20.0.0
   cached_network_image: ^3.4.1
   image_picker: ^1.0.4
@@ -89,35 +89,15 @@ dependencies:
   flutter_launcher_icons: ^0.14.4  # ← Dùng khi build icon app
   flutter_native_splash: ^2.4.7
   pin_code_fields: ^8.0.1
-  # device_preview: ^1.3.1           # ← Bật khi muốn test UI đa thiết bị
-  # standard_searchbar: ^2.1.1       # ← Dành cho search UI nâng cao
-  # share_plus: ^12.0.0
-  # flutter_osm_plugin: ^1.4.2
-  # open_street_map_search_and_pick: ^0.1.1
-  # flutter_staggered_grid_view: ^0.7.0
-  # curved_navigation_bar: ^1.0.6
-  # smooth_page_indicator: ^1.2.1
-  # table_calendar: ^3.2.0
   path_provider: ^2.1.5
   envied: ^1.3.1
-  dio_cache_interceptor: ^3.5.0
-  dio_cache_interceptor_db_store: ^6.0.0
-  drift: ^2.23.0
-  sqlite3: ^2.9.4
-  sqlite3_flutter_libs: ^0.5.24
   path: ^1.9.1
   flutter_screenutil: ^5.9.3
   flutter_cache_manager: ^3.4.1
   retrofit: 4.7.3
-
-
-  table_calendar: ^3.2.0
-  flutter_osm_plugin: ^1.4.3
-  curved_navigation_bar: ^1.0.6
-  share_plus: ^12.0.0
-  smooth_page_indicator: ^1.2.1
-  flutter_map: ^6.1.0
-
+  purchases_flutter: ^9.12.0
+  google_maps_flutter: 2.10.0
+  # device_preview: ^1.3.1           # ← Bật khi muốn test UI đa thiết bị
 
 
 dev_dependencies:
@@ -132,7 +112,6 @@ dev_dependencies:
   json_serializable: ^6.8.0
   freezed: ^3.2.3
   injectable_generator: ^2.6.1
-  # retrofit_generator: 10.0.6
   retrofit_generator: 10.0.0
   go_router_builder: 4.0.0
 
@@ -144,7 +123,6 @@ dev_dependencies:
   # Flavor
   flutter_flavorizr: ^2.4.1
   envied_generator: ^1.3.1
-  drift_dev: ^2.23.0
   rename: ^3.1.0
 
 
@@ -169,34 +147,18 @@ flutter:
     # Icons (PNG icons - small UI elements)
     - assets/icons/
 
-    # SVG files (vector graphics - scalable)
-    - assets/svg/
-
     # Lottie animations (JSON)
     - assets/lottie/
 
-    # GIF animations
-    - assets/gifs/
-
-    # Data files (JSON, mock data, configs)
-    - assets/data/
-
-    # Translations / Localization (i18n)
-    - assets/translations/
+    # Fonts
+    - assets/fonts/
 
   # ═══════════════════════════════════════════════════════════════
   # FONTS
   # ═══════════════════════════════════════════════════════════════
-  # Inter font family - Google's recommended font for UI
-  # Using 18pt variant for optimal legibility
   fonts:
     - family: Inter
       fonts:
-        # ─────────── Regular variants (normal style) ───────────
-        - asset: assets/fonts/inter/Inter_18pt-Thin.ttf
-          weight: 100
-        - asset: assets/fonts/inter/Inter_18pt-ExtraLight.ttf
-          weight: 200
         - asset: assets/fonts/inter/Inter_18pt-Light.ttf
           weight: 300
         - asset: assets/fonts/inter/Inter_18pt-Regular.ttf
@@ -207,36 +169,3 @@ flutter:
           weight: 600
         - asset: assets/fonts/inter/Inter_18pt-Bold.ttf
           weight: 700
-        - asset: assets/fonts/inter/Inter_18pt-ExtraBold.ttf
-          weight: 800
-        - asset: assets/fonts/inter/Inter_18pt-Black.ttf
-          weight: 900
-
-        # ─────────── Italic variants ───────────
-        - asset: assets/fonts/inter/Inter_18pt-ThinItalic.ttf
-          weight: 100
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-ExtraLightItalic.ttf
-          weight: 200
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-LightItalic.ttf
-          weight: 300
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-Italic.ttf
-          weight: 400
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-MediumItalic.ttf
-          weight: 500
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-SemiBoldItalic.ttf
-          weight: 600
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-BoldItalic.ttf
-          weight: 700
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-ExtraBoldItalic.ttf
-          weight: 800
-          style: italic
-        - asset: assets/fonts/inter/Inter_18pt-BlackItalic.ttf
-          weight: 900
-          style: italic

@@ -76,7 +76,9 @@ class AppDialog extends StatelessWidget {
         title: title,
         icon: Icons.check_circle_outline,
         iconColor: Colors.green,
-        content: message != null ? Text(message, textAlign: TextAlign.center) : null,
+        content: message != null
+            ? Text(message, textAlign: TextAlign.center)
+            : null,
         actions: [
           AppButton(
             onPressed: () {

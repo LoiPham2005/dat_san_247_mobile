@@ -4,9 +4,9 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:dat_san_247_mobile/core/state_management/bloc/base_event.dart';
-import 'package:dat_san_247_mobile/core/state_management/bloc/base_state.dart';
-import 'package:dat_san_247_mobile/core/state_management/bloc/base_bloc.dart';
+import 'package:dat_san_247_mobile/core/state/bloc/base_event.dart';
+import 'package:dat_san_247_mobile/core/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/core/state/bloc/base_bloc.dart';
 import 'package:dat_san_247_mobile/core/utils/logger.dart';
 import '../../domain/entities/{{feature_name.snakeCase()}}.dart';
 import '../../domain/usecases/{{feature_name.snakeCase()}}_usecases.dart';
@@ -112,14 +112,14 @@ class {{feature_name.pascalCase()}}Bloc extends BaseBloc {
   }
 
   {{#has_list}}
-  /// ✅ Fetch {{feature_name.lowerCase()}}s - dùng execute() hoặc executeRefresh()
+  /// ✅ Fetch {{feature_name.lowerCase()}}s - dùng run() hoặc runRefresh()
   Future<void> _onFetch{{feature_name.pascalCase()}}s(
     Fetch{{feature_name.pascalCase()}}sEvent event,
     Emitter<BaseState> emit,
   ) async {
     if (event.refresh) {
       // Pull-to-refresh
-      await executeRefresh<List<{{feature_name.pascalCase()}}>>(
+      await runRefresh<List<{{feature_name.pascalCase()}}>>(
         event: event,
         emit: emit,
         action: () => _get{{feature_name.pascalCase()}}sUseCase(params: event.params),
@@ -132,7 +132,7 @@ class {{feature_name.pascalCase()}}Bloc extends BaseBloc {
       );
     } else {
       // Initial load
-      await execute<List<{{feature_name.pascalCase()}}>>(
+      await run<List<{{feature_name.pascalCase()}}>>(
         event: event,
         emit: emit,
         action: () => _get{{feature_name.pascalCase()}}sUseCase(params: event.params),
@@ -153,7 +153,7 @@ class {{feature_name.pascalCase()}}Bloc extends BaseBloc {
     Fetch{{feature_name.pascalCase()}}DetailEvent event,
     Emitter<BaseState> emit,
   ) async {
-    await execute<{{feature_name.pascalCase()}}>(
+    await run<{{feature_name.pascalCase()}}>(
       event: event,
       emit: emit,
       action: () => _get{{feature_name.pascalCase()}}DetailUseCase(event.id),
@@ -168,12 +168,12 @@ class {{feature_name.pascalCase()}}Bloc extends BaseBloc {
   {{/has_detail}}
 
   {{#has_create}}
-  /// ✅ Create {{feature_name.lowerCase()}} - dùng executeMutation()
+  /// ✅ Create {{feature_name.lowerCase()}} - dùng runMutation()
   Future<void> _onCreate{{feature_name.pascalCase()}}(
     Create{{feature_name.pascalCase()}}Event event,
     Emitter<BaseState> emit,
   ) async {
-    await executeMutation<{{feature_name.pascalCase()}}>(
+    await runMutation<{{feature_name.pascalCase()}}>(
       event: event,
       emit: emit,
       action: () => _create{{feature_name.pascalCase()}}UseCase(event.data),
@@ -189,12 +189,12 @@ class {{feature_name.pascalCase()}}Bloc extends BaseBloc {
   {{/has_create}}
 
   {{#has_update}}
-  /// ✅ Update {{feature_name.lowerCase()}} - dùng executeMutation()
+  /// ✅ Update {{feature_name.lowerCase()}} - dùng runMutation()
   Future<void> _onUpdate{{feature_name.pascalCase()}}(
     Update{{feature_name.pascalCase()}}Event event,
     Emitter<BaseState> emit,
   ) async {
-    await executeMutation<{{feature_name.pascalCase()}}>(
+    await runMutation<{{feature_name.pascalCase()}}>(
       event: event,
       emit: emit,
       action: () => _update{{feature_name.pascalCase()}}UseCase(event.id, event.data),
@@ -210,12 +210,12 @@ class {{feature_name.pascalCase()}}Bloc extends BaseBloc {
   {{/has_update}}
 
   {{#has_delete}}
-  /// ✅ Delete {{feature_name.lowerCase()}} - dùng executeMutation()
+  /// ✅ Delete {{feature_name.lowerCase()}} - dùng runMutation()
   Future<void> _onDelete{{feature_name.pascalCase()}}(
     Delete{{feature_name.pascalCase()}}Event event,
     Emitter<BaseState> emit,
   ) async {
-    await executeMutation<bool>(
+    await runMutation<bool>(
       event: event,
       emit: emit,
       action: () => _delete{{feature_name.pascalCase()}}UseCase(event.id),

@@ -12,7 +12,7 @@ vars:
     description: Feature name (e.g., product, category, user)
     prompt: What is the feature name?
 
-  # state_management:
+  # state:
   #   type: enum
   #   description: State management type
   #   prompt: Which state management?

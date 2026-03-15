@@ -27,45 +27,55 @@ val androidComponentsExt = project.extensions.getByType<ApplicationAndroidCompon
 
 // =========================================================
 //  HELPER - Lấy app name theo thứ tự ưu tiên:
-//  1. resValue (nếu AGP hỗ trợ)
-//  2. extra["appName"]
+//  1. resValue trực tiếp (hoạt động ở execution phase - AAB)
+//  2. flavorizr.gradle.kts (parse từ file - hoạt động ở mọi phase)
 //  3. flavorizr.yaml
 //  4. Tên flavor (dev, stg, prod)
+//
+//  ⚠️ resValue chỉ available ở execution phase (renameAab doLast),
+//  còn APK rename chạy ở configuration phase → resValue null → tự
+//  fallback sang bước 2 parse file.
 // =========================================================
-fun getAppNameForFlavor(flavor: String): String {
+fun getAppNameForFlavor(flavor: String, isExecutionPhase: Boolean = false): String {
     val flavorConfig = androidExt.productFlavors.findByName(flavor)
 
-    // 1. Thử lấy từ resValue
-    var rawAppName = flavorConfig?.resValues?.get("app_name")?.value
+    // 1. Thử lấy từ resValue (chỉ hoạt động ở execution phase)
+    val rawAppName = flavorConfig?.resValues?.get("string/app_name")?.value
+        ?: flavorConfig?.resValues?.get("app_name")?.value
     if (rawAppName != null) {
-        println("🟢 [$flavor] App name source: resValue → $rawAppName")
+        if (isExecutionPhase) println("🟢 [$flavor] App name source: resValue → $rawAppName")
         return rawAppName.toSafeFileName()
     }
 
-    // 2. Thử lấy từ extra["appName"]
-    if (flavorConfig?.extra?.has("appName") == true) {
-        rawAppName = flavorConfig.extra["appName"] as? String
-        if (rawAppName != null) {
-            println("🟢 [$flavor] App name source: extra → $rawAppName")
-            return rawAppName.toSafeFileName()
+    // 2. Parse trực tiếp từ flavorizr.gradle.kts (nguồn truth chính)
+    val flavorizrGradleFile = project.file("flavorizr.gradle.kts")
+    if (flavorizrGradleFile.exists()) {
+        val content = flavorizrGradleFile.readText()
+        val blockRegex = Regex(
+            "create\\(\"$flavor\"\\)\\s*\\{[^}]*resValue[^)]*value\\s*=\\s*\"([^\"]+)\"[^}]*\\}",
+            RegexOption.DOT_MATCHES_ALL
+        )
+        val match = blockRegex.find(content)
+        if (match != null) {
+            val name = match.groupValues[1]
+            if (isExecutionPhase) println("🟢 [$flavor] App name source: flavorizr.gradle.kts → $name")
+            return name.toSafeFileName()
         }
     }
 
     // 3. Đọc từ flavorizr.yaml
-    val flavorizrFile = rootProject.file("../flavorizr.yaml")
-    if (flavorizrFile.exists()) {
-        val content = flavorizrFile.readText()
-        val regex = Regex("$flavor:\\s*[\\s\\S]*?app:\\s*[\\s\\S]*?name:\\s*\"([^\"]+)\"")
+    val flavorizrYamlFile = rootProject.file("flavorizr.yaml")
+    if (flavorizrYamlFile.exists()) {
+        val content = flavorizrYamlFile.readText()
+        val regex = Regex("^\\s{2}$flavor:\\s*\\n(?:.*\\n)*?\\s{4}app:\\s*\\n\\s{6}name:\\s*\"([^\"]+)\"", RegexOption.MULTILINE)
         val match = regex.find(content)
-        if (match != null && match.groupValues.size > 1) {
+        if (match != null) {
             val yamlName = match.groupValues[1]
-            println("🟢 [$flavor] App name source: flavorizr.yaml → $yamlName")
+            if (isExecutionPhase) println("🟢 [$flavor] App name source: flavorizr.yaml → $yamlName")
             return yamlName.toSafeFileName()
         }
     }
 
-    // 4. Fallback: tên flavor
-    println("🟡 [$flavor] App name source: flavor name (fallback)")
     return flavor
 }
 
@@ -106,38 +116,40 @@ androidComponentsExt.onVariants { variant ->
 tasks.register("renameAab") {
     doLast {
         val bundleDir = file("${layout.buildDirectory.get()}/outputs/bundle")
+        if (!bundleDir.exists()) return@doLast
 
-        if (bundleDir.exists()) {
-            bundleDir.walk().filter { it.extension == "aab" }.forEach { aabFile ->
-                val parentName = aabFile.parentFile.name
+        bundleDir.walkBottomUp().filter { it.extension == "aab" }.forEach { aabFile ->
+            // Chỉ xử lý file gốc của Flutter (thường là *-release.aab)
+            // Bỏ qua nếu file đã được đổi tên theo format mới (có chứa vX.X.X)
+            if (!aabFile.name.contains("release", ignoreCase = true) || aabFile.name.contains("-v")) {
+                return@forEach
+            }
 
-                // Determine flavor from parent directory name
-                val flavor = when {
-                    parentName.contains("DevRelease", ignoreCase = true) -> "dev"
-                    parentName.contains("StgRelease", ignoreCase = true) -> "stg"
-                    parentName.contains("ProdRelease", ignoreCase = true) -> "prod"
-                    else -> "unknown"
-                }
+            val parentName = aabFile.parentFile.name
+            val flavor = when {
+                parentName.contains("DevRelease", ignoreCase = true) -> "dev"
+                parentName.contains("StgRelease", ignoreCase = true) -> "stg"
+                parentName.contains("ProdRelease", ignoreCase = true) -> "prod"
+                else -> return@forEach // Không phải bản Release thì bỏ qua
+            }
 
-                // Lấy app name (resValue → extra → yaml → flavor)
-                val appName = getAppNameForFlavor(flavor)
-                val flavorConfig = androidExt.productFlavors.findByName(flavor)
+            val appName = getAppNameForFlavor(flavor, isExecutionPhase = true)
+            val flavorConfig = androidExt.productFlavors.findByName(flavor)
+            val versionName = androidExt.defaultConfig.versionName ?: "1.0.0"
+            val versionCode = androidExt.defaultConfig.versionCode ?: 1
+            val versionSuffix = flavorConfig?.versionNameSuffix ?: ""
 
-                // Get version info
-                val versionName = androidExt.defaultConfig.versionName ?: "1.0.0"
-                val versionCode = androidExt.defaultConfig.versionCode ?: 1
+            val newName = "${appName}-release-v${versionName}${versionSuffix}(${versionCode}).aab"
+            val newFile = File(aabFile.parentFile, newName)
 
-                // Tự động lấy versionNameSuffix từ flavor config
-                val versionSuffix = flavorConfig?.versionNameSuffix ?: ""
+            // Tránh đổi tên nếu file nguồn và đích giống hệt nhau
+            if (aabFile.absolutePath == newFile.absolutePath) return@forEach
 
-                val newName = "${appName}-release-v${versionName}${versionSuffix}(${versionCode}).aab"
-                val newFile = File(aabFile.parentFile, newName)
-
-                if (aabFile.renameTo(newFile)) {
-                    println("✅ AAB renamed → $newName")
-                } else {
-                    println("❌ Failed to rename AAB: ${aabFile.name}")
-                }
+            if (aabFile.renameTo(newFile)) {
+                println("✅ AAB renamed → $newName")
+            } else {
+                // Nếu thất bại, có thể file đang bị khóa, ta không in lỗi to để tránh hoang mang
+                // vì Gradle có thể chạy finalizedBy nhiều lần.
             }
         }
     }
@@ -145,7 +157,7 @@ tasks.register("renameAab") {
 
 // Auto-run renameAab after bundle tasks
 tasks.whenTaskAdded {
-    if (name.contains("bundle") && name.contains("Release")) {
+    if (name.startsWith("bundle") && name.endsWith("Release")) {
         finalizedBy("renameAab")
     }
 }

@@ -1,25 +1,33 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/constants/app_constants.dart';
-import 'package:dat_san_247_mobile/core/storage/local/local_storage_keys.dart';
-import 'package:dat_san_247_mobile/core/storage/secure/secure_storage_keys.dart';
+import 'package:dat_san_247_mobile/core/common/constants/app_constants.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
+import 'package:dat_san_247_mobile/core/data/storage/local/local_storage_keys.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../buttons/app_button.dart';
 
 class AppRatingDialog extends StatefulWidget {
-  const AppRatingDialog({super.key, required this.packageName, this.appStoreId});
+  const AppRatingDialog({
+    super.key,
+    required this.packageName,
+    this.appStoreId,
+  });
 
   final String packageName;
   final String? appStoreId;
 
   /// Static method to check history and show dialog if not rated yet
-  static Future<void> show(BuildContext context, {String? packageName, String? appStoreId}) async {
+  static Future<void> show(
+    BuildContext context, {
+    String? packageName,
+    String? appStoreId,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final hasRated = prefs.getBool(LocalStorageKeys.hasRatedApp) ?? false;
 
@@ -43,8 +51,10 @@ class AppRatingDialog extends StatefulWidget {
       // ignore: use_build_context_synchronously
       showDialog(
         context: context,
-        builder: (_) =>
-            AppRatingDialog(packageName: resolvedPackageName, appStoreId: resolvedAppStoreId),
+        builder: (_) => AppRatingDialog(
+          packageName: resolvedPackageName,
+          appStoreId: resolvedAppStoreId,
+        ),
       );
     }
   }
@@ -68,7 +78,10 @@ class _AppRatingDialogState extends State<AppRatingDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Bạn cảm thấy trải nghiệm với ứng dụng thế nào?', textAlign: TextAlign.center),
+          const Text(
+            'Bạn cảm thấy trải nghiệm với ứng dụng thế nào?',
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 24),
           RatingBar.builder(
             initialRating: 0,
@@ -77,7 +90,8 @@ class _AppRatingDialogState extends State<AppRatingDialog> {
             allowHalfRating: true,
             itemCount: 5,
             itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-            itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
+            itemBuilder: (context, _) =>
+                const Icon(Icons.star, color: Colors.amber),
             onRatingUpdate: (rating) {
               setState(() {
                 _rating = rating;
@@ -168,16 +182,9 @@ class _AppRatingDialogState extends State<AppRatingDialog> {
   }
 
   void _showThankYou() {
-    toastification.show(
-      context: context,
-      type: ToastificationType.success,
-      style: ToastificationStyle.flat,
-      title: const Text('Cảm ơn bạn!'),
-      description: const Text('Cảm ơn bạn đã dành thời gian đánh giá.'),
-      alignment: Alignment.bottomCenter,
-      autoCloseDuration: const Duration(seconds: 3),
-      borderRadius: BorderRadius.circular(12),
-      showProgressBar: false,
+    getIt<ToastService>().success(
+      'Cảm ơn bạn đã dành thời gian đánh giá.',
+      title: 'Cảm ơn bạn!',
     );
   }
 }

@@ -86,7 +86,8 @@ class InfoCard extends StatelessWidget {
                     if (!isLast && showDivider)
                       Divider(
                         height: 16.h,
-                        color: dividerColor ?? theme.dividerColor.withOpacity(0.5),
+                        color:
+                            dividerColor ?? theme.dividerColor.withOpacity(0.5),
                       ),
                   ],
                 );
@@ -144,7 +145,8 @@ class _InfoRow extends StatelessWidget {
           // Value
           Expanded(
             flex: item.valueFlex,
-            child: item.valueWidget ??
+            child:
+                item.valueWidget ??
                 Text(
                   item.value ?? '-',
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -196,36 +198,32 @@ class InfoItem {
   final Widget? customWidget;
 
   /// Factory for custom row
-  factory InfoItem.custom(Widget widget) => InfoItem(
-        label: '',
-        isCustom: true,
-        customWidget: widget,
-      );
+  factory InfoItem.custom(Widget widget) =>
+      InfoItem(label: '', isCustom: true, customWidget: widget);
 
   /// Factory for status badge
   factory InfoItem.status({
     required String label,
     required String status,
     required Color color,
-  }) =>
-      InfoItem(
-        label: label,
-        valueWidget: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          child: Text(
-            status,
-            style: TextStyle(
-              color: color,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+  }) => InfoItem(
+    label: label,
+    valueWidget: Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          color: color,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w600,
         ),
-      );
+      ),
+    ),
+  );
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -265,9 +263,7 @@ class StatCard extends StatelessWidget {
     return Card(
       elevation: 2,
       color: backgroundColor ?? theme.cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16.r),
@@ -287,11 +283,7 @@ class StatCard extends StatelessWidget {
                         color: effectiveIconColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Icon(
-                        icon,
-                        color: effectiveIconColor,
-                        size: 24.r,
-                      ),
+                      child: Icon(icon, color: effectiveIconColor, size: 24.r),
                     ),
                   if (trend != null && trendValue != null)
                     _TrendBadge(trend: trend!, value: trendValue!),
@@ -347,14 +339,14 @@ class _TrendBadge extends StatelessWidget {
     final color = trend == StatTrend.up
         ? Colors.green
         : trend == StatTrend.down
-            ? Colors.red
-            : Colors.grey;
+        ? Colors.red
+        : Colors.grey;
 
     final icon = trend == StatTrend.up
         ? Icons.trending_up
         : trend == StatTrend.down
-            ? Icons.trending_down
-            : Icons.trending_flat;
+        ? Icons.trending_down
+        : Icons.trending_flat;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),

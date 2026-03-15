@@ -248,12 +248,7 @@ class _OutlinedIconButton extends StatelessWidget {
   }
 }
 
-enum AppIconButtonStyle {
-  standard,
-  filled,
-  outlined,
-  tonal,
-}
+enum AppIconButtonStyle { standard, filled, outlined, tonal }
 
 // ════════════════════════════════════════════════════════════════
 // EXTENSIONS
@@ -261,11 +256,7 @@ enum AppIconButtonStyle {
 
 extension AppIconButtonX on AppIconButton {
   /// Icon button với badge
-  Widget withBadge({
-    required int count,
-    Color? badgeColor,
-    Color? textColor,
-  }) {
+  Widget withBadge({required int count, Color? badgeColor, Color? textColor}) {
     if (count <= 0) return this;
 
     return Stack(

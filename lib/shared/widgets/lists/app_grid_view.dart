@@ -119,7 +119,8 @@ class AppGridView<T> extends StatelessWidget {
         mainAxisSpacing: mainAxisSpacing ?? 12.r,
       ),
       itemCount: items.length,
-      itemBuilder: (context, index) => itemBuilder(context, items[index], index),
+      itemBuilder: (context, index) =>
+          itemBuilder(context, items[index], index),
     );
 
     // Wrap with header/footer if needed
@@ -128,8 +129,7 @@ class AppGridView<T> extends StatelessWidget {
         controller: controller,
         physics: physics ?? const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (headerWidget != null)
-            SliverToBoxAdapter(child: headerWidget),
+          if (headerWidget != null) SliverToBoxAdapter(child: headerWidget),
           SliverPadding(
             padding: padding ?? EdgeInsets.all(16.r),
             sliver: SliverGrid(
@@ -145,18 +145,14 @@ class AppGridView<T> extends StatelessWidget {
               ),
             ),
           ),
-          if (footerWidget != null)
-            SliverToBoxAdapter(child: footerWidget),
+          if (footerWidget != null) SliverToBoxAdapter(child: footerWidget),
         ],
       );
     }
 
     // Wrap with RefreshIndicator if onRefresh provided
     if (onRefresh != null) {
-      return RefreshIndicator(
-        onRefresh: onRefresh!,
-        child: gridView,
-      );
+      return RefreshIndicator(onRefresh: onRefresh!, child: gridView);
     }
 
     return gridView;

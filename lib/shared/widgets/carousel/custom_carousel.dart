@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
 
 /// Generic reusable carousel widget
 /// - items: danh sách các widget hiển thị trong carousel
@@ -7,18 +7,24 @@ import 'package:carousel_slider/carousel_slider.dart';
 /// - aspectRatio: tỉ lệ chiều ngang / chiều cao
 /// - viewportFraction: độ rộng item so với slider
 class CustomCarousel extends StatefulWidget {
-  final List<Widget> items;
-  final bool autoPlay;
-  final double aspectRatio;
-  final double viewportFraction;
-
   const CustomCarousel({
-    Key? key,
+    super.key,
     required this.items,
     this.autoPlay = true,
     this.aspectRatio = 16 / 9,
     this.viewportFraction = 0.9,
-  }) : super(key: key);
+    this.onPageChanged,
+    this.activeColor,
+    this.inactiveColor,
+  });
+
+  final List<Widget> items;
+  final bool autoPlay;
+  final double aspectRatio;
+  final double viewportFraction;
+  final void Function(int index)? onPageChanged;
+  final Color? activeColor;
+  final Color? inactiveColor;
 
   @override
   State<CustomCarousel> createState() => _CustomCarouselState();
@@ -29,9 +35,7 @@ class _CustomCarouselState extends State<CustomCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.items.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    if (widget.items.isEmpty) return const SizedBox.shrink();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -44,6 +48,7 @@ class _CustomCarouselState extends State<CustomCarousel> {
             viewportFraction: widget.viewportFraction,
             onPageChanged: (index, reason) {
               setState(() => _currentIndex = index);
+              widget.onPageChanged?.call(index);
             },
           ),
         ),
@@ -51,7 +56,7 @@ class _CustomCarouselState extends State<CustomCarousel> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(widget.items.length, (index) {
-            bool isSelected = index == _currentIndex;
+            final isSelected = index == _currentIndex;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: isSelected ? 18 : 5,
@@ -59,7 +64,10 @@ class _CustomCarouselState extends State<CustomCarousel> {
               margin: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                color: isSelected ? Colors.amber : Colors.grey,
+                color: isSelected
+                    ? (widget.activeColor ??
+                          Theme.of(context).colorScheme.primary)
+                    : (widget.inactiveColor ?? Colors.grey.shade300),
               ),
             );
           }),

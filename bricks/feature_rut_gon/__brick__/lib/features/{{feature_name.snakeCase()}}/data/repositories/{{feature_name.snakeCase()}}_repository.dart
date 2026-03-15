@@ -1,5 +1,5 @@
-import 'package:dat_san_247_mobile/core/errors/result.dart';
-import 'package:dat_san_247_mobile/core/mixins/api_handler_mixin.dart';
+import 'package:dat_san_247_mobile/core/base/errors/result.dart';
+import 'package:dat_san_247_mobile/core/common/mixins/api_handler_mixin.dart';
 import 'package:injectable/injectable.dart';
 
 import '../models/{{feature_name.snakeCase()}}_model.dart';

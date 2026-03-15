@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../states/loading_widget.dart';
 
 /// Smart Scaffold với nhiều tính năng
 class AppScaffold extends StatelessWidget {
@@ -137,40 +138,17 @@ class LoadingScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        AppScaffold(
-          appBar: appBar,
-          body: body,
-          floatingActionButton: floatingActionButton,
-          bottomNavigationBar: bottomNavigationBar,
-          backgroundColor: backgroundColor,
-          padding: padding,
-        ),
-        if (isLoading)
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.5),
-              child: Center(
-                child: Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(24.r),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircularProgressIndicator(),
-                        if (loadingMessage != null) ...[
-                          SizedBox(height: 16.h),
-                          Text(loadingMessage!),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-      ],
+    return LoadingOverlay(
+      isLoading: isLoading,
+      message: loadingMessage,
+      child: AppScaffold(
+        appBar: appBar,
+        body: body,
+        floatingActionButton: floatingActionButton,
+        bottomNavigationBar: bottomNavigationBar,
+        backgroundColor: backgroundColor,
+        padding: padding,
+      ),
     );
   }
 }

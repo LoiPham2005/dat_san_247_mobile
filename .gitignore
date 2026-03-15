@@ -11,6 +11,9 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+.mason/
+.tmp/
+# .run/
 
 # IntelliJ related
 *.iml
@@ -48,16 +51,22 @@ app.*.map.json
 **/android/*.jks
 **/android/*.keystore
 
-# Environment files (BẮT BUỘC)
+# Environment files
 # .env*
 # !.env.example
 
 # Generated files
 *.g.dart
 *.freezed.dart
+*.gr.dart
+**/*.config.dart
+*.gen.dart
+*.mocks.dart
+*.mapper.dart
 
 # Build
 build/
+gen/
 
 # Firebase
 # **/google-services.json

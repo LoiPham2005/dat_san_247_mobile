@@ -3,23 +3,24 @@ import com.android.build.gradle.AppExtension
 val android = project.extensions.getByType(AppExtension::class.java)
 
 android.apply {
-    flavorDimensions("environment")
+    flavorDimensions("flavor")
 
     productFlavors {
         create("dev") {
-            dimension = "environment"
-            applicationId = "com.datsan247.mobile.dev"
-            resValue(type = "string", name = "app_name", value = "Dặt Sân 247 Dev")
+            dimension = "flavor"
+            applicationId = "com.example.flutter_base_template.dev"
+            // applicationId = "com.wifi.manage.speed.network.tool"
+            resValue(type = "string", name = "app_name", value = "MyApp Dev 1111")
         }
         create("stg") {
-            dimension = "environment"
-            applicationId = "com.datsan247.mobile.stg"
-            resValue(type = "string", name = "app_name", value = "Dặt Sân 247 Stg")
+            dimension = "flavor"
+            applicationId = "com.example.flutter_base_template.stg"
+            resValue(type = "string", name = "app_name", value = "MyApp Stg 1111")
         }
         create("prod") {
-            dimension = "environment"
-            applicationId = "com.datsan247.mobile"
-            resValue(type = "string", name = "app_name", value = "Dặt Sân 247")
+            dimension = "flavor"
+            applicationId = "com.example.flutter_base_template"
+            resValue(type = "string", name = "app_name", value = "MyApp")
         }
     }
 }

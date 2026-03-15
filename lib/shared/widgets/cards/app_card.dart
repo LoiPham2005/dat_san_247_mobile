@@ -94,8 +94,8 @@ class AppCardWithHeader extends StatelessWidget {
                   child: Text(
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 if (action != null) action!,
@@ -103,10 +103,7 @@ class AppCardWithHeader extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
-          Padding(
-            padding: padding ?? const EdgeInsets.all(16),
-            child: body,
-          ),
+          Padding(padding: padding ?? const EdgeInsets.all(16), child: body),
         ],
       ),
     );

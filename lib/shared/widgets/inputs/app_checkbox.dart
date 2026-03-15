@@ -50,7 +50,9 @@ class AppCheckbox extends StatelessWidget {
       activeColor: activeColor ?? theme.colorScheme.primary,
       checkColor: checkColor ?? theme.colorScheme.onPrimary,
       tristate: tristate,
-      shape: shape ?? RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
+      shape:
+          shape ??
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
       side: isError
           ? BorderSide(color: theme.colorScheme.error, width: 2)
           : side,
@@ -66,7 +68,8 @@ class AppCheckbox extends StatelessWidget {
         CheckboxListTile(
           value: value,
           onChanged: enabled ? onChanged : null,
-          title: labelWidget ??
+          title:
+              labelWidget ??
               Text(
                 label!,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -87,7 +90,9 @@ class AppCheckbox extends StatelessWidget {
           dense: dense,
           contentPadding: contentPadding ?? EdgeInsets.zero,
           controlAffinity: controlAffinity,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+          ),
         ),
         if (isError && errorText != null)
           Padding(
@@ -139,7 +144,8 @@ class AppCheckboxGroup<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final children = items.map((item) {
       final isSelected = values.contains(item);
-      final canSelect = maxSelected == null || values.length < maxSelected! || isSelected;
+      final canSelect =
+          maxSelected == null || values.length < maxSelected! || isSelected;
       final canDeselect = minSelected == null || values.length > minSelected!;
 
       return AppCheckbox(
@@ -163,11 +169,7 @@ class AppCheckboxGroup<T> extends StatelessWidget {
     }).toList();
 
     if (direction == Axis.horizontal) {
-      return Wrap(
-        spacing: spacing,
-        runSpacing: runSpacing,
-        children: children,
-      );
+      return Wrap(spacing: spacing, runSpacing: runSpacing, children: children);
     }
 
     return Column(
@@ -226,7 +228,8 @@ class AppSwitch extends StatelessWidget {
     return SwitchListTile(
       value: value,
       onChanged: enabled ? onChanged : null,
-      title: labelWidget ??
+      title:
+          labelWidget ??
           Text(
             label!,
             style: theme.textTheme.bodyMedium?.copyWith(

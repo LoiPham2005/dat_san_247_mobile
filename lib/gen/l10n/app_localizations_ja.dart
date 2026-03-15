@@ -9,25 +9,46 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get appTitle => 'My App';
+  String get appTitle => 'マイアプリ';
 
   @override
-  String get ddd => 'gggg';
-
-  @override
-  String get hello => 'Hello';
-
-  @override
-  String get ccccc => 'cccc';
+  String get hello => 'こんにちは';
 
   @override
   String welcome(String name) {
-    return 'Welcome $name';
+    return 'ようこそ $name';
   }
 
   @override
-  String get her => 'her';
+  String get name => '名前';
 
   @override
-  String get map => 'map';
+  String get full_name => 'フルネーム';
+
+  @override
+  String get ads => '広告';
+
+  @override
+  String get settings => '設定';
+
+  @override
+  String get language => '言語';
+
+  @override
+  String get appearance => '外観';
+
+  @override
+  String get darkMode => 'ダークモード';
+
+  @override
+  String get systemDefault => 'システムのデフォルト';
+
+  @override
+  String get on => 'の上';
+
+  @override
+  String get off => 'オフ';
+
+  @override
+  String get primaryColor => '原色';
 }

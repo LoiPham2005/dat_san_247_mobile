@@ -11,26 +11,6 @@
 
 import 'package:flutter/widgets.dart';
 
-class $AssetsDataGen {
-  const $AssetsDataGen();
-
-  /// File path: assets/data/.gitkeep
-  String get aGitkeep => 'assets/data/.gitkeep';
-
-  /// List of all assets
-  List<String> get values => [aGitkeep];
-}
-
-class $AssetsGifsGen {
-  const $AssetsGifsGen();
-
-  /// File path: assets/gifs/.gitkeep
-  String get aGitkeep => 'assets/gifs/.gitkeep';
-
-  /// List of all assets
-  List<String> get values => [aGitkeep];
-}
-
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
@@ -72,39 +52,12 @@ class $AssetsLottieGen {
   List<String> get values => [accept];
 }
 
-class $AssetsSvgGen {
-  const $AssetsSvgGen();
-
-  /// File path: assets/svg/.gitkeep
-  String get aGitkeep => 'assets/svg/.gitkeep';
-
-  /// List of all assets
-  List<String> get values => [aGitkeep];
-}
-
-class $AssetsTranslationsGen {
-  const $AssetsTranslationsGen();
-
-  /// File path: assets/translations/en.json
-  String get en => 'assets/translations/en.json';
-
-  /// File path: assets/translations/vi.json
-  String get vi => 'assets/translations/vi.json';
-
-  /// List of all assets
-  List<String> get values => [en, vi];
-}
-
 class Assets {
   const Assets._();
 
-  static const $AssetsDataGen data = $AssetsDataGen();
-  static const $AssetsGifsGen gifs = $AssetsGifsGen();
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
   static const $AssetsLottieGen lottie = $AssetsLottieGen();
-  static const $AssetsSvgGen svg = $AssetsSvgGen();
-  static const $AssetsTranslationsGen translations = $AssetsTranslationsGen();
 }
 
 class AssetGenImage {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/theme/app_dimensions.dart';
 
 /// Breakpoints cho responsive design
 class Breakpoints {
@@ -61,7 +60,9 @@ class ScreenInfo {
       orientation: orientation,
       isMobile: deviceType == DeviceType.mobile,
       isTablet: deviceType == DeviceType.tablet,
-      isDesktop: deviceType == DeviceType.desktop || deviceType == DeviceType.largeDesktop,
+      isDesktop:
+          deviceType == DeviceType.desktop ||
+          deviceType == DeviceType.largeDesktop,
     );
   }
 }
@@ -129,11 +130,7 @@ class ResponsiveValue<T> {
   final T? tablet;
   final T? desktop;
 
-  const ResponsiveValue({
-    required this.mobile,
-    this.tablet,
-    this.desktop,
-  });
+  const ResponsiveValue({required this.mobile, this.tablet, this.desktop});
 
   T resolve(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -281,11 +278,7 @@ extension ResponsiveContextX on BuildContext {
   bool get isDesktop => ResponsiveBuilder.isDesktop(this);
 
   /// Get responsive value
-  T responsive<T>({
-    required T mobile,
-    T? tablet,
-    T? desktop,
-  }) {
+  T responsive<T>({required T mobile, T? tablet, T? desktop}) {
     return ResponsiveValue<T>(
       mobile: mobile,
       tablet: tablet,

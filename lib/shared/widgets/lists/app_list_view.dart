@@ -106,7 +106,8 @@ class AppListView<T> extends StatelessWidget {
     }
 
     // Calculate item count
-    final itemCount = items.length +
+    final itemCount =
+        items.length +
         (headerWidget != null ? 1 : 0) +
         (footerWidget != null || isLoadingMore || hasMore ? 1 : 0);
 
@@ -137,11 +138,13 @@ class AppListView<T> extends StatelessWidget {
         itemCount: itemCount,
         separatorBuilder: (context, index) {
           // Skip separator for header/footer
-          if (headerWidget != null && index == 0) return const SizedBox.shrink();
+          if (headerWidget != null && index == 0)
+            return const SizedBox.shrink();
           if (index >= items.length + (headerWidget != null ? 1 : 0)) {
             return const SizedBox.shrink();
           }
-          return separatorBuilder?.call(context, index) ?? SizedBox(height: 8.h);
+          return separatorBuilder?.call(context, index) ??
+              SizedBox(height: 8.h);
         },
         itemBuilder: (context, index) {
           // Header
@@ -171,10 +174,7 @@ class AppListView<T> extends StatelessWidget {
 
     // Wrap with RefreshIndicator if onRefresh provided
     if (onRefresh != null) {
-      return RefreshIndicator(
-        onRefresh: onRefresh!,
-        child: listView,
-      );
+      return RefreshIndicator(onRefresh: onRefresh!, child: listView);
     }
 
     return listView;
@@ -281,10 +281,7 @@ class GroupedListView<T, G> extends StatelessWidget {
     );
 
     if (onRefresh != null) {
-      return RefreshIndicator(
-        onRefresh: onRefresh!,
-        child: listView,
-      );
+      return RefreshIndicator(onRefresh: onRefresh!, child: listView);
     }
 
     return listView;
@@ -310,13 +307,15 @@ class SliverAppListView<T> extends StatelessWidget {
       return SliverList.separated(
         itemCount: items.length,
         separatorBuilder: separatorBuilder!,
-        itemBuilder: (context, index) => itemBuilder(context, items[index], index),
+        itemBuilder: (context, index) =>
+            itemBuilder(context, items[index], index),
       );
     }
 
     return SliverList.builder(
       itemCount: items.length,
-      itemBuilder: (context, index) => itemBuilder(context, items[index], index),
+      itemBuilder: (context, index) =>
+          itemBuilder(context, items[index], index),
     );
   }
 }

@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoadingWidget extends StatelessWidget {
-  const LoadingWidget({
-    super.key,
-    this.message,
-    this.size = 40,
-    this.color,
-  });
+  const LoadingWidget({super.key, this.message, this.size = 40, this.color});
 
   final String? message;
   final double size;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dat_san_247_mobile/core/theme/app_colors.dart';
 
 class AppTextField extends StatefulWidget {
   const AppTextField({
@@ -100,27 +99,32 @@ class _AppTextFieldState extends State<AppTextField> {
             ? IconButton(
                 icon: Icon(
                   _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.grey,
+                  // color: context.colors.textSub,
                 ),
                 onPressed: () => setState(() => _obscureText = !_obscureText),
               )
             : widget.suffixIcon,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(widget.borderRadius)),
-        enabledBorder: OutlineInputBorder(
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: const BorderSide(color: AppColors.border),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        // enabledBorder: OutlineInputBorder(
+        //   borderRadius: BorderRadius.circular(widget.borderRadius),
+        //   borderSide: BorderSide(color: context.colors.borderDefault),
+        // ),
+        // focusedBorder: OutlineInputBorder(
+        //   borderRadius: BorderRadius.circular(widget.borderRadius),
+        //   borderSide: BorderSide(color: context.colors.borderFocus, width: 2),
+        // ),
+        // errorBorder: OutlineInputBorder(
+        //   borderRadius: BorderRadius.circular(widget.borderRadius),
+        //   borderSide: BorderSide(color: context.colors.error),
+        // ),
+        // filled: true,
+        // fillColor: widget.enabled ? context.colors.bgInput : context.colors.bgPage,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        filled: true,
-        fillColor: widget.enabled ? AppColors.surface : AppColors.grey.withOpacity(0.1),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }

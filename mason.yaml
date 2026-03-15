@@ -6,3 +6,5 @@ bricks:
     path: bricks/feature
   feature_rut_gon:
     path: bricks/feature_rut_gon
+  feature_ket_hop:
+    path: bricks/feature_ket_hop

@@ -1,17 +1,15 @@
-import 'package:dat_san_247_mobile/core/constants/app_constants.dart';
-import 'package:dat_san_247_mobile/core/di/injection.dart';
-import 'package:dat_san_247_mobile/core/l10n/localization_service.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
-import 'package:dat_san_247_mobile/core/theme/app_theme.dart';
-import 'package:dat_san_247_mobile/core/theme/theme_cubit.dart';
-import 'package:dat_san_247_mobile/gen/l10n/app_localizations.dart';
-import 'package:dat_san_247_mobile/routes/app_router.dart';
 import 'package:flutter/material.dart';
+import 'package:dat_san_247_mobile/core/common/constants/app_constants.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/design/l10n/cubit/locale_cubit.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
+import 'package:dat_san_247_mobile/design/theme/app_theme.dart';
+import 'package:dat_san_247_mobile/design/theme/cubit/theme_cubit.dart';
+import 'package:dat_san_247_mobile/gen/l10n/app_localizations.dart';
+import 'package:dat_san_247_mobile/routes/config/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 /// 🏠 Root Widget của ứng dụng
 ///
@@ -41,9 +39,7 @@ class _AppContent extends StatelessWidget {
         BlocProvider(create: (_) => getIt<LocaleCubit>()),
         BlocProvider(create: (_) => getIt<ThemeCubit>()),
         BlocProvider(create: (_) => getIt<AppAuthCubit>()),
-        BlocProvider(create: (_) => getIt<AuthCubit>()),
       ],
-
       child: Builder(
         builder: (context) {
           final locale = context.select((LocaleCubit c) => c.state);
@@ -55,8 +51,8 @@ class _AppContent extends StatelessWidget {
             debugShowCheckedModeBanner: false,
 
             // Theme
-            theme: AppTheme.getLightTheme(themeState.colorType),
-            darkTheme: AppTheme.getDarkTheme(themeState.colorType),
+            theme: AppTheme.light(themeState),
+            darkTheme: AppTheme.dark(themeState),
             themeMode: themeState.materialThemeMode,
 
             // Localization
@@ -66,6 +62,7 @@ class _AppContent extends StatelessWidget {
 
             // Navigation
             routerConfig: getIt<AppRouter>().router,
+            builder: FlutterSmartDialog.init(),
           );
         },
       ),

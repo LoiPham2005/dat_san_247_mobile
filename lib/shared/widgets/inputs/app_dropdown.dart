@@ -66,7 +66,8 @@ class AppDropdown<T> extends StatelessWidget {
         if (label != null || labelWidget != null)
           Padding(
             padding: EdgeInsets.only(bottom: 8.h),
-            child: labelWidget ??
+            child:
+                labelWidget ??
                 Text(
                   label!,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -94,7 +95,8 @@ class AppDropdown<T> extends StatelessWidget {
           autofocus: autofocus,
           menuMaxHeight: menuMaxHeight,
           selectedItemBuilder: selectedItemBuilder != null
-              ? (context) => items.map((item) => selectedItemBuilder!(item)).toList()
+              ? (context) =>
+                    items.map((item) => selectedItemBuilder!(item)).toList()
               : null,
           decoration: InputDecoration(
             prefixIcon: prefixIcon,
@@ -102,7 +104,8 @@ class AppDropdown<T> extends StatelessWidget {
             fillColor: fillColor,
             errorText: errorText,
             helperText: helperText,
-            contentPadding: contentPadding ??
+            contentPadding:
+                contentPadding ??
                 EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
@@ -113,7 +116,10 @@ class AppDropdown<T> extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
-              borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
@@ -121,7 +127,9 @@ class AppDropdown<T> extends StatelessWidget {
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
-              borderSide: BorderSide(color: theme.disabledColor.withOpacity(0.5)),
+              borderSide: BorderSide(
+                color: theme.disabledColor.withOpacity(0.5),
+              ),
             ),
           ),
         ),
@@ -160,7 +168,8 @@ class AppSearchableDropdown<T> extends StatefulWidget {
   final Widget Function()? emptyBuilder;
 
   @override
-  State<AppSearchableDropdown<T>> createState() => _AppSearchableDropdownState<T>();
+  State<AppSearchableDropdown<T>> createState() =>
+      _AppSearchableDropdownState<T>();
 }
 
 class _AppSearchableDropdownState<T> extends State<AppSearchableDropdown<T>> {
@@ -244,12 +253,14 @@ class _AppSearchableDropdownState<T> extends State<AppSearchableDropdown<T>> {
                     Expanded(
                       child: _filteredItems.isEmpty
                           ? (widget.emptyBuilder?.call() ??
-                              Center(
-                                child: Text(
-                                  'Không tìm thấy kết quả',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ))
+                                Center(
+                                  child: Text(
+                                    'Không tìm thấy kết quả',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium,
+                                  ),
+                                ))
                           : ListView.builder(
                               controller: scrollController,
                               itemCount: _filteredItems.length,
@@ -258,12 +269,18 @@ class _AppSearchableDropdownState<T> extends State<AppSearchableDropdown<T>> {
                                 final isSelected = item == widget.value;
 
                                 return ListTile(
-                                  title: widget.itemBuilder?.call(item, isSelected) ??
+                                  title:
+                                      widget.itemBuilder?.call(
+                                        item,
+                                        isSelected,
+                                      ) ??
                                       Text(item.toString()),
                                   trailing: isSelected
                                       ? Icon(
                                           Icons.check,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
                                         )
                                       : null,
                                   selected: isSelected,
@@ -310,7 +327,10 @@ class _AppSearchableDropdownState<T> extends State<AppSearchableDropdown<T>> {
           borderRadius: BorderRadius.circular(12.r),
           child: InputDecorator(
             decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 12.h,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
               ),

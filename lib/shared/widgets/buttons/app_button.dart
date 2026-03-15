@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/theme/app_colors.dart';
 
 enum AppButtonType { primary, secondary, outline, text, danger }
+
 enum AppButtonSize { small, medium, large }
 
 class AppButton extends StatelessWidget {
@@ -48,7 +48,7 @@ class AppButton extends StatelessWidget {
             height: 20,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(_getLoadingColor()),
+              valueColor: AlwaysStoppedAnimation(_getLoadingColor(theme)),
             ),
           )
         : Row(
@@ -101,39 +101,40 @@ class AppButton extends StatelessWidget {
 
   ButtonStyle _getButtonStyle(ThemeData theme) {
     final radius = BorderRadius.circular(borderRadius ?? 12);
+    final colorScheme = theme.colorScheme;
 
     switch (type) {
       case AppButtonType.primary:
         return ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: _getPadding(),
         );
       case AppButtonType.secondary:
         return ElevatedButton.styleFrom(
-          backgroundColor: AppColors.secondary,
-          foregroundColor: Colors.white,
+          backgroundColor: colorScheme.secondary,
+          foregroundColor: colorScheme.onSecondary,
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: _getPadding(),
         );
       case AppButtonType.outline:
         return OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary),
+          foregroundColor: colorScheme.primary,
+          side: BorderSide(color: colorScheme.primary),
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: _getPadding(),
         );
       case AppButtonType.text:
         return TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: colorScheme.primary,
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: _getPadding(),
         );
       case AppButtonType.danger:
         return ElevatedButton.styleFrom(
-          backgroundColor: AppColors.error,
-          foregroundColor: Colors.white,
+          backgroundColor: colorScheme.error,
+          foregroundColor: colorScheme.onError,
           shape: RoundedRectangleBorder(borderRadius: radius),
           padding: _getPadding(),
         );
@@ -184,15 +185,17 @@ class AppButton extends StatelessWidget {
     }
   }
 
-  Color _getLoadingColor() {
+  Color _getLoadingColor(ThemeData theme) {
     switch (type) {
       case AppButtonType.primary:
+        return theme.colorScheme.onPrimary;
       case AppButtonType.secondary:
+        return theme.colorScheme.onSecondary;
       case AppButtonType.danger:
-        return Colors.white;
+        return theme.colorScheme.onError;
       case AppButtonType.outline:
       case AppButtonType.text:
-        return AppColors.primary;
+        return theme.colorScheme.primary;
     }
   }
 }

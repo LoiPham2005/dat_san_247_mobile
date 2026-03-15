@@ -3,11 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Loading Dialog - Hiển thị trong quá trình xử lý
 class LoadingDialog extends StatelessWidget {
-  const LoadingDialog({
-    super.key,
-    this.message,
-    this.dismissible = false,
-  });
+  const LoadingDialog({super.key, this.message, this.dismissible = false});
 
   final String? message;
   final bool dismissible;
@@ -21,10 +17,7 @@ class LoadingDialog extends StatelessWidget {
     return showDialog(
       context: context,
       barrierDismissible: dismissible,
-      builder: (_) => LoadingDialog(
-        message: message,
-        dismissible: dismissible,
-      ),
+      builder: (_) => LoadingDialog(message: message, dismissible: dismissible),
     );
   }
 
@@ -135,7 +128,8 @@ class ProgressDialog extends StatelessWidget {
                     child: CircularProgressIndicator(
                       value: progress,
                       strokeWidth: 6,
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
                       color: theme.colorScheme.primary,
                     ),
                   ),
@@ -204,9 +198,7 @@ class SuccessDialog extends StatelessWidget {
 
     return Dialog(
       backgroundColor: theme.cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
         padding: EdgeInsets.all(24.r),
         child: Column(
@@ -219,11 +211,7 @@ class SuccessDialog extends StatelessWidget {
                 color: Colors.green.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 48.r,
-              ),
+              child: Icon(Icons.check_circle, color: Colors.green, size: 48.r),
             ),
 
             SizedBox(height: 16.h),
@@ -307,9 +295,7 @@ class ErrorDialog extends StatelessWidget {
 
     return Dialog(
       backgroundColor: theme.cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
         padding: EdgeInsets.all(24.r),
         child: Column(
@@ -322,11 +308,7 @@ class ErrorDialog extends StatelessWidget {
                 color: Colors.red.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 48.r,
-              ),
+              child: Icon(Icons.error_outline, color: Colors.red, size: 48.r),
             ),
 
             SizedBox(height: 16.h),

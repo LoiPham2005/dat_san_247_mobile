@@ -48,8 +48,8 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
   /// Clear error
   void clearError() => setError(null);
 
-  /// Execute async action với loading state
-  Future<R?> executeAsync<R>(
+  /// run async action với loading state
+  Future<R?> runAsync<R>(
     Future<R> Function() action, {
     bool showLoading = true,
     void Function(R result)? onSuccess,

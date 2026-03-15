@@ -12,13 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'My App';
 
   @override
-  String get ddd => 'gggg';
-
-  @override
   String get hello => 'Hello';
-
-  @override
-  String get ccccc => 'cccc';
 
   @override
   String welcome(String name) {
@@ -26,8 +20,35 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get her => 'her';
+  String get name => 'Name';
 
   @override
-  String get map => 'map';
+  String get full_name => 'Full name';
+
+  @override
+  String get ads => 'Ads';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get systemDefault => 'System Default';
+
+  @override
+  String get on => 'On';
+
+  @override
+  String get off => 'Off';
+
+  @override
+  String get primaryColor => 'Primary Color';
 }

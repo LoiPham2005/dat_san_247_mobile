@@ -2,12 +2,16 @@
 // SHARED WIDGETS EXPORTS
 // ════════════════════════════════════════════════════════════════
 
+// Avatar
+export 'avatar/user_avatar.dart';
 // Badges
 export 'badges/icon_badges.dart';
 // Base
 export 'base/base_page.dart';
 export 'base/base_stateful_widget.dart';
 export 'base/base_stateless_widget.dart';
+// Bottom Sheets
+export 'bottom_sheets/custom_bottom_sheet.dart';
 // Buttons
 export 'buttons/app_button.dart';
 export 'buttons/icon_button.dart';
@@ -43,10 +47,12 @@ export 'lists/app_list_view.dart';
 export 'lists/empty_list_widget.dart';
 // Location
 export 'location/location_widget.dart';
+// Page Transition
+export 'page_transition/page_transition.dart';
+// Rating
+export 'rating/rating_bar.dart';
 // States
 export 'states/empty_widget.dart';
 export 'states/error_widget.dart';
 export 'states/loading_widget.dart';
 export 'states/state_builder.dart';
-// Toast
-export 'toast/show_toast.dart';

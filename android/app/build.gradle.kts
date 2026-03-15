@@ -6,6 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 // Add these lines to read key.properties
@@ -16,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.datsan247.mobile"
+    namespace = "com.example.flutter_base_template"
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 
@@ -31,24 +32,33 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.datsan247.mobile"
+        applicationId = "com.example.flutter_base_template"
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-     //   versionCode = 101
-     //   versionName = "1.0.1"
+        //  versionCode = 101
+        //  versionName = "1.0.1"
         multiDexEnabled = true
     }
 
-//    signingConfigs {
-//        release {
-//            keyAlias keystoreProperties['keyAlias']
-//            keyPassword keystoreProperties['keyPassword']
-//            storeFile file(keystoreProperties['storeFile'])
-//            storePassword keystoreProperties['storePassword']
-//        }
-//    }
+    signingConfigs {
+        create("release") {
+            // Chỉ load config nếu file keystore thực sự tồn tại
+            val storeFileVal = keystoreProperties["storeFile"] as String?
+            if (storeFileVal != null) {
+                val keyFile = rootProject.file(storeFileVal)
+                if (keyFile.exists()) {
+                    storeFile = keyFile
+                    keyAlias = keystoreProperties["keyAlias"] as String?
+                    keyPassword = keystoreProperties["keyPassword"] as String?
+                    storePassword = keystoreProperties["storePassword"] as String?
+                } else {
+                    println("⚠️ [Build] Release keystore file '$storeFileVal' not found. Will use DEBUG signing config.")
+                }
+            }
+        }
+    }
 
     buildTypes {
         debug {
@@ -61,18 +71,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
-            signingConfig = signingConfigs.getByName("debug")
+
+            // Logic thông minh: Kiểm tra xem release config có valid không
+            val releaseConfig = signingConfigs.getByName("release")
+            if (releaseConfig.storeFile != null && releaseConfig.storeFile?.exists() == true) {
+                signingConfig = releaseConfig
+            } else {
+                println("⚠️ [Build] Using DEBUG signing config for RELEASE build (Keystore not found).")
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
-
-//    splits {
-//        abi {
-//            isEnable = true
-//            reset()
-//            include("arm64-v8a", "armeabi-v7a")
-//            isUniversalApk = true
-//        }
-//    }
 
     bundle {
         language {
@@ -98,6 +107,6 @@ flutter {
 // =========================================================
 //  Tách các custom tasks ra file riêng cho dễ quản lý
 // =========================================================
+apply { from("flavorizr.gradle.kts") }     // flavor
 apply(from = "rename-outputs.gradle.kts")  // Rename APK + AAB
 apply(from = "open-folder.gradle.kts")     // Auto open folder after build
-apply(from = "flavorizr.gradle.kts")     // Flavorizr

@@ -4,7 +4,7 @@
     {
       "id": "buildEnv",
       "type": "pickString",
-      "description": "Chọn environment",
+      "description": "Flavor selection",
       "options": [
         "dev",
         "stg",
@@ -13,50 +13,164 @@
       "default": "dev"
     },
     {
+      "id": "routeName",
+      "type": "promptString",
+      "description": "Route class name (ví dụ: ProfileRoute)",
+      "default": "ProfileRoute"
+    },
+    {
+      "id": "routePath",
+      "type": "promptString",
+      "description": "URL path (ví dụ: /profile)",
+      "default": "/profile"
+    },
+    {
+      "id": "routePage",
+      "type": "promptString",
+      "description": "Page widget class name (ví dụ: ProfilePage)",
+      "default": "ProfilePage"
+    },
+    {
+      "id": "routeImport",
+      "type": "promptString",
+      "description": "Import path từ lib/ (ví dụ: features/profile/presentation/pages/profile_page.dart)",
+      "default": "features/profile/presentation/pages/profile_page.dart"
+    },
+    {
+      "id": "routeGroup",
+      "type": "pickString",
+      "description": "Nhóm route trong app_routes.dart",
+      "options": [
+        "Auth",
+        "Main",
+        "Product",
+        "Cart & Orders"
+      ],
+      "default": "Main"
+    },
+    {
+      "id": "themeAction",
+      "type": "pickString",
+      "description": "Select Theme Gen action",
+      "options": [
+        {
+          "label": "Gen: Generate theme code",
+          "value": ""
+        },
+        {
+          "label": "Expand: Add new tokens from meta to all themes",
+          "value": "--expand"
+        },
+        {
+          "label": "Sync: Synchronize keys from light theme",
+          "value": "--sync"
+        },
+        {
+          "label": "Preview: Dry run (no file changes)",
+          "value": "--dry-run"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "id": "l10nAction",
+      "type": "pickString",
+      "description": "Select Localization action",
+      "options": [
+        {
+          "label": "Generate: flutter gen-l10n",
+          "value": "fvm flutter gen-l10n"
+        },
+        {
+          "label": "Sync: Translate and sync ARB files",
+          "value": "fvm dart run tools/l10n_sync.dart --translate"
+        },
+        {
+          "label": "Sync & Gen: Full translation sync and generation",
+          "value": "fvm dart run tools/l10n_sync.dart --translate && fvm flutter gen-l10n"
+        }
+      ],
+      "default": "fvm flutter gen-l10n"
+    },
+    {
+      "id": "fvmAction",
+      "type": "pickString",
+      "description": "Select FVM action",
+      "options": [
+        {
+          "label": "List: Show installed versions",
+          "value": "list"
+        },
+        {
+          "label": "Releases: Show available flutter releases",
+          "value": "releases"
+        },
+        {
+          "label": "Global: Show global configuration",
+          "value": "global"
+        }
+      ],
+      "default": "list"
+    },
+    {
+      "id": "fvmVersionAction",
+      "type": "pickString",
+      "description": "Select FVM version action",
+      "options": [
+        "use",
+        "install",
+        "remove"
+      ],
+      "default": "use"
+    },
+    {
       "id": "flutterVersion",
       "type": "promptString",
-      "description": "Nhập phiên bản Flutter (VD: 3.27.3, stable, beta)",
+      "description": "Enter Flutter version (e.g., 3.27.3, stable)",
       "default": "stable"
     },
     {
       "id": "newPackageName",
       "type": "promptString",
-      "description": "Nhập tên package mới (VD: dat_san_247_mobile)",
+      "description": "Enter new package name",
       "default": "flutter_base"
     },
     {
       "id": "newAppLabel",
       "type": "promptString",
-      "description": "Nhập tên hiển thị ứng dụng (VD: Đặt Sân 247)",
-      "default": "Đặt Sân 247"
+      "description": "Enter new app display name",
+      "default": "Flutter App"
+    },
+    {
+      "id": "masonBrick",
+      "type": "pickString",
+      "description": "Chọn loại Feature brick muốn tạo",
+      "options": [
+        {
+          "label": "🏗️  Feature Full  (Data + Domain + Presentation đầy đủ)",
+          "value": "feature"
+        },
+        {
+          "label": "⚡ Feature Rút Gọn  (Không có Domain layer)",
+          "value": "feature_rut_gon"
+        },
+        {
+          "label": "🔗 Feature Kết Hợp (List + Card + Detail)",
+          "value": "feature_ket_hop"
+        }
+      ],
+      "default": "feature"
     }
   ],
   "tasks": [
     // ═══════════════════════════════════════════════════════════
-    // 🚀 CORE BUILD TASKS (Most Used)
+    // 🚀 BUILD & RUN (Flavor Based)
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "🚀 Build APK",
+      "label": "🚀 Run App: Debug (Current OS)",
       "type": "shell",
-      // "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
-      "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=build/debug-symbols --target-platform android-arm64",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": true
-      }
-    },
-    {
-      "label": "🏬 Build AAB",
-      "type": "shell",
-      "command": "fvm flutter build appbundle --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=build/debug-symbols",
+      "command": "fvm flutter run --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart",
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -64,234 +178,203 @@
       }
     },
     {
-      "label": "🍎 Build iOS",
+      "label": "🚀 Build APK (Android)",
+      "type": "shell",
+      "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
+      // "command": "fvm flutter build apk --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=debug-symbols/${input:buildEnv} --tree-shake-icons --target-platform android-arm64,android-x64",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🚀 Build AAB (Android)",
+      "type": "shell",
+      "command": "fvm flutter build appbundle --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
+      // "command": "fvm flutter build appbundle --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=debug-symbols/${input:buildEnv} --tree-shake-icons",
+      "group": "build"
+    },
+    {
+      // ⚠️ CHỈ CHẠY ĐƯỢC TRÊN macOS + Xcode — KHÔNG hỗ trợ Windows/Linux
+      "label": "🍎 Build iOS (macOS only)",
       "type": "shell",
       "command": "fvm flutter build ios --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release",
-      "group": "build",
-      "problemMatcher": []
-    },
-    {
-      "label": "📦 Build IPA",
-      "type": "shell",
-      "command": "fvm flutter build ipa --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=build/debug-symbols",
-      "group": "build",
-      "problemMatcher": []
+      // "command": "fvm flutter build ios --flavor ${input:buildEnv} -t lib/main_${input:buildEnv}.dart --release --obfuscate --split-debug-info=debug-symbols/${input:buildEnv} --tree-shake-icons",
+      "group": "build"
     },
     // ═══════════════════════════════════════════════════════════
-    // ⚡ CODE GENERATION
+    // ⚡ CODE GENERATION (Grouped)
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "⚡ Build Runner",
+      "label": "⚡ Build Runner: Build",
       "type": "shell",
       "command": "fvm dart run build_runner build --delete-conflicting-outputs",
-      "group": "build",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
+      "group": "build"
     },
     {
-      "label": "👁️ Build Runner Watch",
+      "label": "👁️ Build Runner: Watch",
       "type": "shell",
       "command": "fvm dart run build_runner watch --delete-conflicting-outputs",
       "group": "build",
-      "isBackground": true,
-      "problemMatcher": []
+      "isBackground": true
     },
     {
-      "label": "🌐 Generate l10n",
+      "label": "� Theme Generator",
       "type": "shell",
-      "command": "fvm flutter gen-l10n",
-      "group": "build",
-      "problemMatcher": []
+      "command": "fvm dart run tools/theme_gen.dart ${input:themeAction}",
+      "group": "build"
     },
     {
-      "label": "🌐 Sync l10n (arb)",
+      "label": "🌐 Localization (l10n)",
       "type": "shell",
-      "command": "fvm dart run lib/core/l10n/tool/l10n_sync.dart",
+      "command": "${input:l10nAction}",
+      "group": "build"
+    },
+    {
+      "label": "🖼️ Generate Assets",
+      "type": "shell",
+      "command": "fluttergen -c pubspec.yaml",
+      "group": "build"
+    },
+    {
+      "label": "🧱 Generate Bloc Helpers",
+      "type": "shell",
+      "command": "fvm dart run tools/generate_bloc_helper.dart",
+      "group": "build"
+    },
+    {
+      "label": "🛣️ Route: List All Routes",
+      "type": "shell",
+      "command": "fvm dart run tools/generate_route.dart --list",
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "shared"
+      }
+    },
+    {
+      "label": "🛣️ Route: Scan Routes",
+      "type": "shell",
+      "command": "fvm dart run tools/generate_route.dart --scan",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🛣️ Route: Generate New Route",
+      "type": "shell",
+      // Sửa các tham số bên dưới trước khi chạy
+      // Sau khi gen xong nhớ chạy: ⚡ Build Runner: Build
+      "command": "fvm dart run tools/generate_route.dart --name ${input:routeName} --path ${input:routePath} --page ${input:routePage} --import ${input:routeImport} --group ${input:routeGroup}",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
       }
     },
     // ═══════════════════════════════════════════════════════════
     // 🧹 MAINTENANCE
     // ═══════════════════════════════════════════════════════════
     {
+      "label": "🧹 Pub Get",
+      "type": "shell",
+      "command": "fvm flutter pub get",
+      "group": "build"
+    },
+    {
       "label": "🧹 Clean & Get",
       "type": "shell",
       "command": "fvm flutter clean && fvm flutter pub get",
-      "group": "build",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+      "group": "build"
     },
     {
       "label": "🔄 Full Regenerate",
       "type": "shell",
-      "command": "fvm flutter clean && fvm flutter pub get && fvm flutter gen-l10n && fvm dart run build_runner build --delete-conflicting-outputs",
+      "command": "fvm flutter clean && fvm flutter pub get && fvm flutter gen-l10n && fvm dart run tools/theme_gen.dart && fvm dart run tools/generate_bloc_helper.dart && fvm dart run build_runner build --delete-conflicting-outputs",
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
       }
     },
     {
-      "label": "📦 Pub Get",
-      "type": "shell",
-      "command": "fvm flutter pub get",
-      "group": "build",
-      "problemMatcher": []
-    },
-    {
-      "label": "⬆️ Pub Upgrade",
+      "label": "⬆️ Pub Upgrade (Major)",
       "type": "shell",
       "command": "fvm flutter pub upgrade --major-versions",
-      "group": "build",
-      "problemMatcher": []
+      "group": "build"
     },
     // ═══════════════════════════════════════════════════════════
     // 🔧 QUALITY & ANALYSIS
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "🔧 Flutter Doctor",
-      "type": "shell",
-      "command": "fvm flutter doctor -v",
-      "group": "build",
-      "problemMatcher": []
-    },
-    {
-      "label": "📊 Analyze & Fix",
+      "label": "� Analyze & Fix",
       "type": "shell",
       "command": "fvm flutter analyze && fvm dart fix --apply",
-      "group": "build",
-      "problemMatcher": []
+      "group": "build"
     },
     {
-      "label": "✨ Format",
+      "label": "✨ Format Code",
       "type": "shell",
       "command": "fvm dart format .",
-      "group": "build",
-      "problemMatcher": []
+      "group": "build"
+    },
+    {
+      "label": "🩺 Flutter Doctor",
+      "type": "shell",
+      "command": "fvm flutter doctor -v",
+      "group": "build"
     },
     // ═══════════════════════════════════════════════════════════
     // 🧪 TESTING
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "🧪 Test",
+      "label": "🧪 Run Tests",
       "type": "shell",
       "command": "fvm flutter test",
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
-      "problemMatcher": []
+      "group": "test"
     },
     {
       "label": "📈 Test Coverage",
       "type": "shell",
       "command": "fvm flutter test --coverage && genhtml coverage/lcov.info -o coverage/html",
-      "group": "test",
-      "problemMatcher": []
+      "group": "test"
     },
     // ═══════════════════════════════════════════════════════════
-    // 🧱 MASON & FLAVORIZR
-    // ═══════════════════════════════════════════════════════════
-    {
-      "label": "🧱 Mason: Generate Feature",
-      "type": "shell",
-      "command": "mason make feature --on-conflict overwrite",
-      "problemMatcher": [],
-      "group": "build"
-    },
-    {
-      "label": "� Flutter Flavorizr",
-      "type": "shell",
-      "command": "fvm flutter pub run flutter_flavorizr",
-      "group": "build",
-      "problemMatcher": []
-    },
-    // ═══════════════════════════════════════════════════════════
-    // 🎨 ICONS & SPLASH
+    // 🎨 ASSETS & RESOURCES
     // ═══════════════════════════════════════════════════════════
     {
       "label": "🎨 Generate App Icons",
       "type": "shell",
       "command": "fvm flutter pub run flutter_launcher_icons",
-      "group": "build",
-      "problemMatcher": []
+      "group": "build"
     },
     {
       "label": "🌊 Generate Native Splash",
       "type": "shell",
       "command": "fvm flutter pub run flutter_native_splash:create",
-      "group": "build",
-      "problemMatcher": []
+      "group": "build"
     },
     // ═══════════════════════════════════════════════════════════
-    // 🔧 FVM MANAGEMENT
+    // ⚙️ FVM MANAGEMENT
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "📋 FVM List",
+      "label": "⚙️ FVM: Status & Info",
       "type": "shell",
-      "command": "fvm list",
-      "problemMatcher": [],
+      "command": "fvm ${input:fvmAction}",
       "presentation": {
         "reveal": "always",
         "panel": "shared"
       }
     },
     {
-      "label": "🌐 FVM Releases",
+      "label": "⚙️ FVM: Version Management",
       "type": "shell",
-      "command": "fvm releases",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🔍 FVM Global",
-      "type": "shell",
-      "command": "fvm global",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "📥 FVM Install",
-      "type": "shell",
-      "command": "fvm install ${input:flutterVersion}",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "🔧 FVM Use",
-      "type": "shell",
-      "command": "fvm use ${input:flutterVersion}",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "🗑️ FVM Remove",
-      "type": "shell",
-      "command": "fvm remove ${input:flutterVersion}",
-      "problemMatcher": [],
+      "command": "fvm ${input:fvmVersionAction} ${input:flutterVersion}",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
@@ -301,10 +384,9 @@
     // 🛠️ REFACTORING
     // ═══════════════════════════════════════════════════════════
     {
-      "label": "🔧 Rename Package",
+      "label": "🔧 Rename: Package Name",
       "type": "shell",
       "command": "powershell -Command \"$oldName = (Get-Content pubspec.yaml | Select-String -Pattern '^name: ' | ForEach-Object { $_.Line.Split(':')[1].Trim() }); Write-Host 'Renaming package from' $oldName 'to ${input:newPackageName}...'; (Get-Content pubspec.yaml) -replace ('name: ' + $oldName), ('name: ' + '${input:newPackageName}') | Set-Content pubspec.yaml; Get-ChildItem -Recurse -Include *.dart | ForEach-Object { (Get-Content $_.FullName) -replace ('package:' + $oldName), ('package:' + '${input:newPackageName}') | Set-Content $_.FullName }; fvm flutter clean; fvm flutter pub get\"",
-      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -312,10 +394,60 @@
       }
     },
     {
-      "label": "🏷️ Rename App Label (Display Name)",
+      "label": "🏷️ Rename: App Label (Display Name)",
       "type": "shell",
       "command": "fvm flutter pub run rename setAppName --value \"${input:newAppLabel}\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    // ═══════════════════════════════════════════════════════════
+    // 🧱 MASON
+    // ═══════════════════════════════════════════════════════════
+    {
+      "label": "🧱 Mason: Generate Feature (Chọn loại brick)",
+      "type": "shell",
+      "command": "mason make ${input:masonBrick} --on-conflict overwrite",
       "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🏗️  Mason: Feature Full",
+      "type": "shell",
+      "command": "mason make feature --on-conflict overwrite",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "⚡ Mason: Feature Rút Gọn",
+      "type": "shell",
+      "command": "mason make feature_rut_gon --on-conflict overwrite",
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🔗 Mason: Feature Kết Hợp",
+      "type": "shell",
+      "command": "mason make feature_ket_hop --on-conflict overwrite",
+      "problemMatcher": [],
+      "group": "build",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",

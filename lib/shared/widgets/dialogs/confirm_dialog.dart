@@ -26,11 +26,7 @@ class ConfirmDialog extends StatelessWidget {
       title: Column(
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: 48,
-              color: isDanger ? Colors.red : Colors.orange,
-            ),
+            Icon(icon, size: 48, color: isDanger ? Colors.red : Colors.orange),
             const SizedBox(height: 16),
           ],
           Text(title, textAlign: TextAlign.center),

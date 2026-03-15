@@ -2,10 +2,7 @@ import 'package:equatable/equatable.dart';
 
 /// Response phân trang chuẩn
 class PaginatedResponse<T> extends Equatable {
-  const PaginatedResponse({
-    required this.data,
-    required this.pagination,
-  });
+  const PaginatedResponse({required this.data, required this.pagination});
 
   final List<T> data;
   final PaginationMeta pagination;
@@ -16,7 +13,8 @@ class PaginatedResponse<T> extends Equatable {
     T Function(Map<String, dynamic>) fromJsonT,
   ) {
     return PaginatedResponse(
-      data: (json['data'] as List<dynamic>?)
+      data:
+          (json['data'] as List<dynamic>?)
               ?.map((e) => fromJsonT(e as Map<String, dynamic>))
               .toList() ??
           [],

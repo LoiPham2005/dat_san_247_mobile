@@ -40,10 +40,7 @@ class EmptyListWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildIcon(theme),
-            if (title != null) ...[
-              SizedBox(height: 16.h),
-              _buildTitle(theme),
-            ],
+            if (title != null) ...[SizedBox(height: 16.h), _buildTitle(theme)],
             if (message != null) ...[
               SizedBox(height: 8.h),
               _buildMessage(theme),
@@ -67,11 +64,7 @@ class EmptyListWidget extends StatelessWidget {
 
     switch (style) {
       case EmptyListStyle.standard:
-        return Icon(
-          effectiveIcon,
-          size: effectiveSize,
-          color: effectiveColor,
-        );
+        return Icon(effectiveIcon, size: effectiveSize, color: effectiveColor);
 
       case EmptyListStyle.circled:
         return Container(
@@ -140,22 +133,13 @@ class EmptyListWidget extends StatelessWidget {
     switch (style) {
       case EmptyListStyle.standard:
       case EmptyListStyle.circled:
-        return FilledButton(
-          onPressed: onAction,
-          child: Text(actionLabel!),
-        );
+        return FilledButton(onPressed: onAction, child: Text(actionLabel!));
 
       case EmptyListStyle.outlined:
-        return OutlinedButton(
-          onPressed: onAction,
-          child: Text(actionLabel!),
-        );
+        return OutlinedButton(onPressed: onAction, child: Text(actionLabel!));
 
       case EmptyListStyle.minimal:
-        return TextButton(
-          onPressed: onAction,
-          child: Text(actionLabel!),
-        );
+        return TextButton(onPressed: onAction, child: Text(actionLabel!));
     }
   }
 
@@ -190,12 +174,7 @@ class EmptyListWidget extends StatelessWidget {
   }
 }
 
-enum EmptyListStyle {
-  standard,
-  circled,
-  outlined,
-  minimal,
-}
+enum EmptyListStyle { standard, circled, outlined, minimal }
 
 // ════════════════════════════════════════════════════════════════
 // PRESET EMPTY WIDGETS
@@ -203,11 +182,7 @@ enum EmptyListStyle {
 
 /// Empty search results
 class EmptySearchWidget extends StatelessWidget {
-  const EmptySearchWidget({
-    super.key,
-    this.searchQuery,
-    this.onClearSearch,
-  });
+  const EmptySearchWidget({super.key, this.searchQuery, this.onClearSearch});
 
   final String? searchQuery;
   final VoidCallback? onClearSearch;
@@ -229,10 +204,7 @@ class EmptySearchWidget extends StatelessWidget {
 
 /// Empty favorites
 class EmptyFavoritesWidget extends StatelessWidget {
-  const EmptyFavoritesWidget({
-    super.key,
-    this.onExplore,
-  });
+  const EmptyFavoritesWidget({super.key, this.onExplore});
 
   final VoidCallback? onExplore;
 
@@ -251,10 +223,7 @@ class EmptyFavoritesWidget extends StatelessWidget {
 
 /// Empty cart
 class EmptyCartWidget extends StatelessWidget {
-  const EmptyCartWidget({
-    super.key,
-    this.onShopNow,
-  });
+  const EmptyCartWidget({super.key, this.onShopNow});
 
   final VoidCallback? onShopNow;
 
@@ -288,10 +257,7 @@ class EmptyNotificationsWidget extends StatelessWidget {
 
 /// Empty messages
 class EmptyMessagesWidget extends StatelessWidget {
-  const EmptyMessagesWidget({
-    super.key,
-    this.onStartChat,
-  });
+  const EmptyMessagesWidget({super.key, this.onStartChat});
 
   final VoidCallback? onStartChat;
 

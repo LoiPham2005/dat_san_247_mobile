@@ -9,25 +9,46 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appTitle => 'My App';
+  String get appTitle => 'Ứng dụng của tôi';
 
   @override
-  String get ddd => 'gggg';
-
-  @override
-  String get hello => 'Hello';
-
-  @override
-  String get ccccc => 'cccc';
+  String get hello => 'Xin chào';
 
   @override
   String welcome(String name) {
-    return 'Welcome $name';
+    return 'Chào mừng $name';
   }
 
   @override
-  String get her => 'her';
+  String get name => 'Tên';
 
   @override
-  String get map => 'map';
+  String get full_name => 'Họ và tên';
+
+  @override
+  String get ads => 'Quảng cáo';
+
+  @override
+  String get settings => 'Cài đặt';
+
+  @override
+  String get language => 'Ngôn ngữ';
+
+  @override
+  String get appearance => 'Giao diện';
+
+  @override
+  String get darkMode => 'Chế độ tối';
+
+  @override
+  String get systemDefault => 'Theo hệ thống';
+
+  @override
+  String get on => 'Đang bật';
+
+  @override
+  String get off => 'Đang tắt';
+
+  @override
+  String get primaryColor => 'Màu chủ đạo';
 }
