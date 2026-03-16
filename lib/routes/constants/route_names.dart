@@ -9,14 +9,16 @@ class RouteNames {
   // ═══════════════════════════════════════════════════════════════
   // Auth
   static const String splash = '/';
-  static const String welcome = '/welcome';
+  static const String onboarding = '/onboarding';
   static const String login = '/login';
-  static const String intro = '/intro';
+  static const String register = '/register';
+  static const String otp = '/otp';
+  static const String forgotPassword = '/forgot-password';
   // ═══════════════════════════════════════════════════════════════
   // Main App
   static const String main = '/main';
-  static const String home = '/home';
-  static const String premium = '/premium';
-  static const String settings = '/settings';
+  static const String home = '/home'; // Customer Home
+  static const String venueSearch = '/venue-search';
+  static const String venues = '/venues';
   static const String googleMap = '/google-map-example';
 }

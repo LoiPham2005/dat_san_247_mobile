@@ -9,10 +9,11 @@ import 'package:dat_san_247_mobile/core/common/utils/logger.dart';
 import 'package:dat_san_247_mobile/core/data/network/api_client.dart';
 import 'package:dat_san_247_mobile/core/data/storage/local/local_storage_service.dart';
 import 'package:dat_san_247_mobile/core/data/storage/secure/secure_storage_service.dart';
-import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+import '../../../features/auth/data/models/auth_token_model.dart';
+import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
 
 /// 🎯 AppAuthService - Centralized Authentication Service for the entire App
@@ -118,10 +119,30 @@ class AppAuthService {
     }
   }
 
+  Future<UserModel?> fetchUserProfile() async {
+    final result = await _apiClient.get(
+      ApiEndpoints.profile,
+      (json) => UserModel.fromJson(json as Map<String, dynamic>),
+    );
+    return result.fold(
+      onSuccess: (user) => user,
+      onFailure: (failure) {
+        Logger.error('AppAuthService: Fetch profile failed: ${failure.message}');
+        return null;
+      },
+    );
+  }
+
   Future<void> saveLoginData(AuthResponseModel response) async {
     await _secureStorage.saveAccessToken(response.accessToken);
     await _secureStorage.saveRefreshToken(response.refreshToken);
-    await _storageService.saveUser(response.user.toJson());
+
+    // Fetch user profile from API since it's not in the token response
+    final user = await fetchUserProfile();
+    if (user != null) {
+      await _storageService.saveUser(user.toJson());
+    }
+
     await _storageService.setLoggedIn(true);
     _updateStatus(AuthStatus.authenticated);
   }

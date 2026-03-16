@@ -8,19 +8,18 @@ android.apply {
     productFlavors {
         create("dev") {
             dimension = "flavor"
-            applicationId = "com.example.flutter_base_template.dev"
-            // applicationId = "com.wifi.manage.speed.network.tool"
-            resValue(type = "string", name = "app_name", value = "MyApp Dev 1111")
+            applicationId = "com.datsan247.dev"
+            resValue(type = "string", name = "app_name", value = "Dat San 247 Dev")
         }
         create("stg") {
             dimension = "flavor"
-            applicationId = "com.example.flutter_base_template.stg"
-            resValue(type = "string", name = "app_name", value = "MyApp Stg 1111")
+            applicationId = "com.datsan247.stg"
+            resValue(type = "string", name = "app_name", value = "Dat San 247 Stg")
         }
         create("prod") {
             dimension = "flavor"
-            applicationId = "com.example.flutter_base_template"
-            resValue(type = "string", name = "app_name", value = "MyApp")
+            applicationId = "com.datsan247"
+            resValue(type = "string", name = "app_name", value = "Dat San 247")
         }
     }
 }

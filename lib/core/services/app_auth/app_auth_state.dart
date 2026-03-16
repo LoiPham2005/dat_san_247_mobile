@@ -2,8 +2,8 @@
 // 📁 lib/core/services/app_auth/app_auth_state.dart
 // ════════════════════════════════════════════════════════════════
 import 'package:equatable/equatable.dart';
-import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
 
+import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
 
 /// 🔐 Global Authentication State

@@ -8,7 +8,8 @@ import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../features/auth/data/models/auth_model.dart';
+import '../../../features/auth/data/models/auth_token_model.dart';
+import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
 
 /// 🌍 Global App Auth Cubit - Manages the authenticated state of the entire app

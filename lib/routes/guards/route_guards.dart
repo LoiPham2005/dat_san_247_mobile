@@ -20,18 +20,22 @@ class RouteGuards {
   // Routes that don't require authentication
   static const _publicRoutes = {
     RouteNames.splash,
-    RouteNames.welcome,
+    RouteNames.onboarding,
     RouteNames.login,
-    RouteNames.intro,
-    RouteNames.premium,
-    RouteNames.main,
-    RouteNames.settings,
-    RouteNames.home,
+    RouteNames.register,
+    RouteNames.otp,
+    RouteNames.forgotPassword,
     RouteNames.googleMap,
   };
 
   // Routes that authenticated users should not access (auth pages)
-  static const _authOnlyRoutes = {RouteNames.login, RouteNames.welcome};
+  static const _authOnlyRoutes = {
+    RouteNames.onboarding,
+    RouteNames.login,
+    RouteNames.register,
+    RouteNames.otp,
+    RouteNames.forgotPassword,
+  };
 
   FutureOr<String?> authGuard(BuildContext context, GoRouterState state) {
     final bool isLoggedIn = _appAuthCubit.state.isAuthenticated;

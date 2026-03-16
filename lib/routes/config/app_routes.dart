@@ -3,12 +3,16 @@
 // ════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
-import 'package:dat_san_247_mobile/features/customer/welcome/presentation/pages/welcom_page.dart';
 import 'package:dat_san_247_mobile/features/example/presentation/pages/google_map_example_page.dart';
-import 'package:dat_san_247_mobile/features/main/presentation/pages/main_page.dart';
-import 'package:dat_san_247_mobile/features/splash/presentation/pages/intro.dart';
 import 'package:dat_san_247_mobile/features/splash/presentation/pages/splash_page.dart';
+import 'package:dat_san_247_mobile/features/splash/presentation/pages/onboarding_page.dart';
+import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/home_page.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_search_page.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/register_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/otp_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,11 +26,37 @@ class SplashRoute extends GoRouteData with $SplashRoute {
   Widget build(BuildContext context, GoRouterState state) => const SplashPage();
 }
 
-@TypedGoRoute<WelcomeRoute>(path: RouteNames.welcome)
-class WelcomeRoute extends GoRouteData with $WelcomeRoute {
-  const WelcomeRoute();
+@TypedGoRoute<OnboardingRoute>(path: RouteNames.onboarding)
+class OnboardingRoute extends GoRouteData with $OnboardingRoute {
+  const OnboardingRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) => const WelcomePage();
+  Widget build(BuildContext context, GoRouterState state) => const OnboardingPage();
+}
+
+@TypedGoRoute<HomeRoute>(path: RouteNames.home)
+class HomeRoute extends GoRouteData with $HomeRoute {
+  const HomeRoute();
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const HomePage();
+}
+
+@TypedGoRoute<VenueSearchRoute>(path: RouteNames.venueSearch)
+class VenueSearchRoute extends GoRouteData with $VenueSearchRoute {
+  const VenueSearchRoute({this.initialQuery});
+  final String? initialQuery;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => VenueSearchPage(initialQuery: initialQuery);
+}
+
+@TypedGoRoute<VenueListRoute>(path: RouteNames.venues)
+class VenueListRoute extends GoRouteData with $VenueListRoute {
+  const VenueListRoute({this.query, this.district});
+  final String? query;
+  final String? district;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => VenueListPage(initialQuery: query, initialDistrict: district);
 }
 
 @TypedGoRoute<LoginRoute>(path: RouteNames.login)
@@ -36,48 +66,25 @@ class LoginRoute extends GoRouteData with $LoginRoute {
   Widget build(BuildContext context, GoRouterState state) => const LoginPage();
 }
 
-@TypedGoRoute<IntroRoute>(path: RouteNames.intro)
-class IntroRoute extends GoRouteData with $IntroRoute {
-  final bool isFirstTime;
-  const IntroRoute({this.isFirstTime = false});
-
+@TypedGoRoute<RegisterRoute>(path: RouteNames.register)
+class RegisterRoute extends GoRouteData with $RegisterRoute {
+  const RegisterRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) => IntroPage(isFirstTime: isFirstTime);
+  Widget build(BuildContext context, GoRouterState state) => const RegisterPage();
 }
 
-@TypedGoRoute<MainRoute>(path: RouteNames.main)
-class MainRoute extends GoRouteData with $MainRoute {
-  const MainRoute();
+@TypedGoRoute<OtpRoute>(path: RouteNames.otp)
+class OtpRoute extends GoRouteData with $OtpRoute {
+  const OtpRoute({required this.contactInfo});
+  final String contactInfo;
+
   @override
-  Widget build(BuildContext context, GoRouterState state) => const MainPage();
+  Widget build(BuildContext context, GoRouterState state) => OtpPage(contactInfo: contactInfo);
 }
 
-@TypedGoRoute<PremiumRoute>(path: RouteNames.premium)
-class PremiumRoute extends GoRouteData with $PremiumRoute {
-  const PremiumRoute();
+@TypedGoRoute<ForgotPasswordRoute>(path: RouteNames.forgotPassword)
+class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
+  const ForgotPasswordRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) => const MainPage();
-}
-
-@TypedGoRoute<SettingsRoute>(path: RouteNames.settings)
-class SettingsRoute extends GoRouteData with $SettingsRoute {
-  const SettingsRoute();
-  @override
-  Widget build(BuildContext context, GoRouterState state) => const MainPage();
-}
-
-@TypedGoRoute<HomeRoute>(path: RouteNames.home)
-class HomeRoute extends GoRouteData with $HomeRoute {
-  const HomeRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) => const MainPage();
-}
-
-@TypedGoRoute<GoogleMapRoute>(path: RouteNames.googleMap)
-class GoogleMapRoute extends GoRouteData with $GoogleMapRoute {
-  const GoogleMapRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) => const GoogleMapExamplePage();
+  Widget build(BuildContext context, GoRouterState state) => const ForgotPasswordPage();
 }

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
 import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
-import 'package:dat_san_247_mobile/features/auth/data/models/auth_model.dart';
 import 'package:dat_san_247_mobile/routes/config/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../features/auth/data/models/user_model.dart';
 import '../../base/di/injection.dart';
 
 /// 🌍 Global BuildContext - CHỈ DÙNG KHI KHÔNG CÓ CONTEXT
