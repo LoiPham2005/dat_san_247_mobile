@@ -34,7 +34,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       if (!mounted) return;
       // TODO: Check token to decide between /main (logged in) and /onboarding (new user)
       // For now, navigate to main shell to test bottom nav
-      context.go('/main');
+      context.go('/login');
     });
   }
 

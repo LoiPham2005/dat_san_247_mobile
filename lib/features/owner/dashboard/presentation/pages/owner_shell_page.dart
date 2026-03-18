@@ -2,6 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_venue_list_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_revenue_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_reviews_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_calendar_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_settings_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_venue_manage_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_venue_services_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_staff_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_verification_page.dart';
+import 'package:dat_san_247_mobile/features/owner/presentation/pages/owner_refund_policy_page.dart';
+
 
 // ──────────────────────────────────────────────────────────────────────────
 // Owner Main Shell — Bottom navigation cho Owner
@@ -28,10 +39,10 @@ class _OwnerShellPageState extends State<OwnerShellPage> {
 
   late final List<Widget> _pages = [
     const OwnerDashboardPage(),
-    const _OwnerComingSoon(icon: Icons.calendar_month_rounded, title: 'Quản lý Booking', subtitle: 'Xem và xác nhận booking từ khách hàng'),
-    const _OwnerComingSoon(icon: Icons.stadium_rounded, title: 'Quản lý Sân', subtitle: 'Sân, bảng giá, dịch vụ, lịch bảo trì'),
-    const _OwnerComingSoon(icon: Icons.monetization_on_rounded, title: 'Doanh Thu', subtitle: 'Thống kê doanh thu và hoa hồng'),
-    const _OwnerComingSoon(icon: Icons.settings_rounded, title: 'Cài đặt', subtitle: 'Thông tin venue, nhân viên, chính sách'),
+    const OwnerCalendarPage(venueId: 'v1', venueName: 'Venue Của Bạn'),
+    const OwnerVenueListPage(),  // O-02 → O-03 → O-04 → O-05
+    const OwnerRevenuePage(),
+    const OwnerSettingsPage(),
   ];
 
   void _onTabTap(int index) {
@@ -157,47 +168,6 @@ class _NavItem {
   const _NavItem({required this.label, required this.icon, required this.activeIcon, this.isCenter = false});
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Coming Soon placeholder for unbuilt tabs
-// ──────────────────────────────────────────────────────────────────────────
-class _OwnerComingSoon extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  const _OwnerComingSoon({required this.icon, required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF4F6FA),
-    appBar: AppBar(
-      backgroundColor: const Color(0xFF1565C0),
-      elevation: 0,
-      title: Text(title, style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold)),
-    ),
-    body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 100, height: 100,
-            decoration: BoxDecoration(color: const Color(0xFF1565C0).withOpacity(0.1), shape: BoxShape.circle),
-            child: Icon(icon, size: 50, color: const Color(0xFF1565C0)),
-          ),
-          const SizedBox(height: 24),
-          Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(color: const Color(0xFF1565C0).withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-            child: const Text('Đang phát triển 🚀', style: TextStyle(color: Color(0xFF1565C0), fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    ),
-  );
-}
 
 // ──────────────────────────────────────────────────────────────────────────
 // O-01: Owner Dashboard
@@ -311,7 +281,28 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
                   // ── Chart hint (7-day trend) ──
                   _MiniChart(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
+
+                  // ── Quick Actions / Phím Trực Tiếp (For easy access) ──
+                  Row(children: [
+                    const Icon(Icons.flash_on_rounded, size: 18, color: Color(0xFF1565C0)),
+                    const SizedBox(width: 8),
+                    const Text('Phím Tắt Quản Lý', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                  ]),
+                  const SizedBox(height: 12),
+                  GridView.count(
+                    crossAxisCount: 3, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.1,
+                    children: [
+                      _QuickActionBtn(icon: Icons.stadium_rounded, label: 'Quản Lý\nVenue', color: const Color(0xFF0891B2), onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerVenueManagePage(venueId: 'v1')))),
+                      _QuickActionBtn(icon: Icons.room_service_rounded, label: 'Dịch Vụ\nBán Kèm', color: const Color(0xFFE1306C), onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerVenueServicesPage(venueId: 'v1', venueName: 'Venue Của Bạn')))),
+                      _QuickActionBtn(icon: Icons.people_rounded, label: 'Nhân\nViên', color: const Color(0xFF4267B2), onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerStaffPage(venueId: 'v1', venueName: 'Venue Của Bạn')))),
+                      _QuickActionBtn(icon: Icons.verified_rounded, label: 'Xác Minh\nVenue', color: AppColors.success, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerVerificationPage(venueId: 'v1', venueName: 'Venue Của Bạn')))),
+                      _QuickActionBtn(icon: Icons.policy_rounded, label: 'Hoàn Tiền\n(Policy)', color: AppColors.warning, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerRefundPolicyPage(venueId: 'v1', venueName: 'Venue Của Bạn')))),
+                      _QuickActionBtn(icon: Icons.rate_review_rounded, label: 'Đánh Giá\n(Reviews)', color: const Color(0xFF9C27B0), onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerReviewsPage(venueId: 'v1', venueName: 'Venue Của Bạn')))),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
 
                   // ── Pending bookings ──
                   _SectionHeader(
@@ -359,7 +350,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   }
 
   void _replyReview(String id) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('→ Phản hồi đánh giá')));
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => OwnerReviewsPage(venueId: 'v1', venueName: _venueName)));
   }
 }
 
@@ -403,7 +394,10 @@ class _RevenueCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(_fmt(revenue['thisMonth']), style: const TextStyle(color: AppColors.white, fontSize: 30, fontWeight: FontWeight.w900)),
+          Column(children: [
+            Text(_fmt(revenue['thisMonth']), style: const TextStyle(color: AppColors.white, fontSize: 30, fontWeight: FontWeight.w900)),
+            const Text('doanh thu tháng này', style: TextStyle(color: AppColors.white70, fontSize: 11)),
+          ]),
           const SizedBox(height: 14),
           Row(children: [
             Expanded(child: _RevenueInfo(label: 'Hôm nay', value: _fmt(revenue['today']), icon: Icons.today_rounded)),
@@ -799,6 +793,45 @@ class _ReviewCard extends StatelessWidget {
             Text(review['comment'], style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _QuickActionBtn extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionBtn({required this.icon, required this.label, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.2)),
+          boxShadow: [BoxShadow(color: color.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 8),
+            Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+          ],
+        ),
       ),
     );
   }
