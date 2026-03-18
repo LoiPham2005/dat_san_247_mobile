@@ -4,7 +4,7 @@ part 'sport_category_model.freezed.dart';
 part 'sport_category_model.g.dart';
 
 @freezed
-class SportCategoryModel with _$SportCategoryModel {
+abstract class SportCategoryModel with _$SportCategoryModel {
   const factory SportCategoryModel({
     required String id,
     required String name,

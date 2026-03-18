@@ -1,4 +1,4 @@
-import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 
@@ -31,9 +31,10 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     // Simulate initial loading (e.g. check token, version)
     Future.delayed(const Duration(seconds: 3), () {
-      // Navigate to generic next page if needed
-      // context.go('/login');
-      OnboardingRoute().pushReplacement(context);
+      if (!mounted) return;
+      // TODO: Check token to decide between /main (logged in) and /onboarding (new user)
+      // For now, navigate to main shell to test bottom nav
+      context.go('/main');
     });
   }
 

@@ -232,7 +232,7 @@ class _VenueListPageState extends State<VenueListPage> {
         return VenueListItem(
           venue: venue,
           onTap: () {
-            // Navigate to detail
+            GoRouter.of(context).push('/venue-detail/${venue.id}');
           },
           onFavoriteTap: () {
             // Toggle favorite API

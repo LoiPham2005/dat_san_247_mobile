@@ -2,18 +2,20 @@
 // 📁 Typed Routes Definition
 // ════════════════════════════════════════════════════════════════
 
-import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/features/example/presentation/pages/google_map_example_page.dart';
-import 'package:dat_san_247_mobile/features/splash/presentation/pages/splash_page.dart';
-import 'package:dat_san_247_mobile/features/splash/presentation/pages/onboarding_page.dart';
-import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/home_page.dart';
-import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_search_page.dart';
-import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/pages/register_page.dart';
-import 'package:dat_san_247_mobile/features/auth/presentation/pages/otp_page.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/forgot_password_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/otp_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/register_page.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/time_slot_picker_page.dart';
+import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/home_page.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/pages/venue_detail_page.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_search_page.dart';
+import 'package:dat_san_247_mobile/features/example/presentation/pages/google_map_example_page.dart';
+import 'package:dat_san_247_mobile/features/splash/presentation/pages/onboarding_page.dart';
+import 'package:dat_san_247_mobile/features/splash/presentation/pages/splash_page.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 part 'app_routes.g.dart';
@@ -46,7 +48,8 @@ class VenueSearchRoute extends GoRouteData with $VenueSearchRoute {
   final String? initialQuery;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => VenueSearchPage(initialQuery: initialQuery);
+  Widget build(BuildContext context, GoRouterState state) =>
+      VenueSearchPage(initialQuery: initialQuery);
 }
 
 @TypedGoRoute<VenueListRoute>(path: RouteNames.venues)
@@ -56,7 +59,28 @@ class VenueListRoute extends GoRouteData with $VenueListRoute {
   final String? district;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => VenueListPage(initialQuery: query, initialDistrict: district);
+  Widget build(BuildContext context, GoRouterState state) =>
+      VenueListPage(initialQuery: query, initialDistrict: district);
+}
+
+@TypedGoRoute<VenueDetailRoute>(path: RouteNames.venueDetail)
+class VenueDetailRoute extends GoRouteData with $VenueDetailRoute {
+  const VenueDetailRoute({required this.slugOrId});
+  final String slugOrId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => VenueDetailPage(slugOrId: slugOrId);
+}
+
+@TypedGoRoute<TimeSlotPickerRoute>(path: RouteNames.timeSlotPicker)
+class TimeSlotPickerRoute extends GoRouteData with $TimeSlotPickerRoute {
+  const TimeSlotPickerRoute({required this.courtId, required this.venueName});
+  final String courtId;
+  final String venueName;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      TimeSlotPickerPage(courtId: courtId, venueName: venueName);
 }
 
 @TypedGoRoute<LoginRoute>(path: RouteNames.login)

@@ -54,7 +54,7 @@ class AdAnalyticsTracker {
     required Ad ad,
     required String format,
   }) {
-    final usd = micros / 1_000_000;
+    final usd = micros / 1000000;
     _dbg('💰 Rev: ${p.name} \$$usd $currency');
 
     // 1️⃣ Firebase Analytics

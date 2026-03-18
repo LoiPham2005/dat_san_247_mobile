@@ -7,7 +7,7 @@ enum PromotionDiscountType { PERCENTAGE, FIXED_AMOUNT }
 enum PromotionStatus { ACTIVE, INACTIVE, EXPIRED }
 
 @freezed
-class PromotionModel with _$PromotionModel {
+abstract class PromotionModel with _$PromotionModel {
   const factory PromotionModel({
     required String id,
     required String code,

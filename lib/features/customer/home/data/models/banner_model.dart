@@ -8,7 +8,7 @@ enum BannerType { IMAGE, VIDEO }
 enum BannerActionType { NONE, URL, VENUE, PROMOTION }
 
 @freezed
-class BannerModel with _$BannerModel {
+abstract class BannerModel with _$BannerModel {
   const factory BannerModel({
     required String id,
     required String title,

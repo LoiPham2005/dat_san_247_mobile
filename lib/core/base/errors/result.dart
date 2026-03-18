@@ -114,7 +114,7 @@ extension ResultFutureX<T> on Future<Result<T>> {
   Future<Result<R>> thenAsyncFlatMap<R>(Future<Result<R>> Function(T data) transform) async {
     final result = await this;
     return switch (result) {
-      ResultSuccess(:final data) => transform(data),
+      ResultSuccess(:final data) => await transform(data),
       ResultFailure(:final failure) => Result.failure(failure),
     };
   }

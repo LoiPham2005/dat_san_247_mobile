@@ -1,12 +1,12 @@
-import 'package:equatable/equatable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'venue_model.freezed.dart';
 part 'venue_model.g.dart';
 
 enum VenueStatus { PENDING, APPROVED, REJECTED, SUSPENDED }
 
-@JsonSerializable()
-class VenueModel extends Equatable {
+@freezed
+abstract class VenueModel with _$VenueModel {
   const factory VenueModel({
     required String id,
     @JsonKey(name: 'owner_id') required String ownerId,
@@ -29,10 +29,5 @@ class VenueModel extends Equatable {
     @JsonKey(name: 'min_booking_hours') @Default(1) int minBookingHours,
   }) = _VenueModel;
 
-    factory VenueModel.fromJson(Map<String, dynamic> json) => _$VenueModelFromJson(json);
-  Map<String, dynamic> toJson() => _$VenueModelToJson(this);
-  
-  @override
-  // TODO: implement props
-  List<Object?> get props => [id, ownerId, name, slug, description, address, city, district, ward, phone, email, thumbnailUrl, status, isActive, isFeatured, featuredUntil, rating, totalReviews, minBookingHours];
+  factory VenueModel.fromJson(Map<String, dynamic> json) => _$VenueModelFromJson(json);
 }

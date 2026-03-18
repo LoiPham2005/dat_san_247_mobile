@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
               HomeFeaturedVenues(
                 venues: _mockVenues,
                 onVenueTap: (venue) {
-                  // Navigate to Venue Detail
+                   GoRouter.of(context).push('/venue-detail/${venue.id}');
                 },
                 onViewAllTap: () {
                   GoRouter.of(context).push('/venues?query=featured');
