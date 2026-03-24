@@ -33,6 +33,12 @@ class VenueSearchResultModel extends Equatable {
   @JsonKey(name: 'is_favorite')
   final bool isFavorite;
 
+  final double? latitude;
+  final double? longitude;
+
+  @JsonKey(name: 'is_open')
+  final bool? isOpen;
+
   const VenueSearchResultModel({
     required this.id,
     required this.name,
@@ -49,6 +55,9 @@ class VenueSearchResultModel extends Equatable {
     this.amenities = const [],
     this.isFeatured = false,
     this.isFavorite = false,
+    this.latitude,
+    this.longitude,
+    this.isOpen,
   });
 
   factory VenueSearchResultModel.fromJson(Map<String, dynamic> json) => _$VenueSearchResultModelFromJson(json);
@@ -71,5 +80,8 @@ class VenueSearchResultModel extends Equatable {
         amenities,
         isFeatured,
         isFavorite,
+        latitude,
+        longitude,
+        isOpen,
       ];
 }

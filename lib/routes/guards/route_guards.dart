@@ -32,7 +32,7 @@ class RouteGuards {
     RouteNames.venues,
     RouteNames.venueDetail,
     RouteNames.timeSlotPicker,
-    
+
 
   };
 
@@ -69,6 +69,7 @@ class RouteGuards {
     '/profile-settings',
     '/owner',
     '/venue-staff',
+    '/venue-map',
   ];
 
   FutureOr<String?> authGuard(BuildContext context, GoRouterState state) {

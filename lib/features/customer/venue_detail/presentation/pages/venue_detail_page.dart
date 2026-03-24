@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
+import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 
 import '../../data/models/venue_detail_model.dart';
 import '../../data/models/court_model.dart';
@@ -117,6 +119,42 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                     children: [
                       // Basic Info Card
                       VenueInfoCard(venue: venue!),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            if (venue!.latitude != null && venue!.longitude != null) {
+                              final resultModel = VenueSearchResultModel(
+                                id: venue!.id,
+                                name: venue!.name,
+                                slug: venue!.slug,
+                                address: venue!.address,
+                                city: venue!.city,
+                                district: venue!.district,
+                                thumbnailUrl: venue!.thumbnailUrl,
+                                rating: venue!.rating,
+                                totalReviews: venue!.totalReviews,
+                                latitude: venue!.latitude,
+                                longitude: venue!.longitude,
+                                sportTypes: const [],
+                                amenities: const [],
+                                isFeatured: venue!.isFeatured,
+                                isFavorite: false,
+                              );
+                              context.push(RouteNames.venueMap, extra: [resultModel]);
+                            }
+                          },
+                          icon: const Icon(Icons.map_outlined),
+                          label: const Text('Xem trên bản đồ'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primaryLightBrand,
+                            side: const BorderSide(color: AppColors.primaryLightBrand),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 24),
 
                       // Amenities Grid
@@ -261,6 +299,8 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
           thumbnailUrl: null,
         ),
       ],
+      latitude: 21.0367,
+      longitude: 105.7822,
     );
   }
 }

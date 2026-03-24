@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_filter_params.dart';
+import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:go_router/go_router.dart';
 
 import '../widgets/venue_list_item.dart';
@@ -37,6 +38,8 @@ class _VenueListPageState extends State<VenueListPage> {
       amenities: ['WIFI', 'Bãi xe Ô tô', 'Tủ đồ'],
       isFeatured: true,
       isFavorite: false,
+      latitude: 10.762622,
+      longitude: 106.660172,
     ),
     const VenueSearchResultModel(
       id: '2',
@@ -53,6 +56,8 @@ class _VenueListPageState extends State<VenueListPage> {
       amenities: ['WIFI', 'Căng tin'],
       isFeatured: false,
       isFavorite: true,
+      latitude: 10.7769,
+      longitude: 106.7009,
     ),
   ];
 
@@ -116,6 +121,14 @@ class _VenueListPageState extends State<VenueListPage> {
             child: _buildVenueList(),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          context.push(RouteNames.venueMap, extra: _mockVenues);
+        },
+        backgroundColor: AppColors.primaryLightBrand,
+        icon: const Icon(Icons.map_rounded, color: AppColors.white),
+        label: const Text('Bản đồ', style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }

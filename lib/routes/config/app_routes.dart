@@ -11,7 +11,7 @@ import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/hom
 import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/pages/venue_detail_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_search_page.dart';
-import 'package:dat_san_247_mobile/features/example/presentation/pages/google_map_example_page.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_map_page.dart';
 import 'package:dat_san_247_mobile/features/splash/presentation/pages/onboarding_page.dart';
 import 'package:dat_san_247_mobile/features/splash/presentation/pages/splash_page.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
@@ -111,4 +111,12 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
   const ForgotPasswordRoute();
   @override
   Widget build(BuildContext context, GoRouterState state) => const ForgotPasswordPage();
+}
+
+@TypedGoRoute<VenueMapRoute>(path: RouteNames.venueMap)
+class VenueMapRoute extends GoRouteData with $VenueMapRoute {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const VenueMapPage();
+  }
 }

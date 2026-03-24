@@ -54,6 +54,9 @@ class VenueDetailModel {
   final List<VenueScheduleExceptionModel>? scheduleExceptions;
   final List<AmenityModel>? amenities;
 
+  final double? latitude;
+  final double? longitude;
+
   VenueDetailModel({
     required this.id,
     required this.ownerId,
@@ -84,6 +87,8 @@ class VenueDetailModel {
     this.operatingHours,
     this.scheduleExceptions,
     this.amenities,
+    this.latitude,
+    this.longitude,
   });
 
   factory VenueDetailModel.fromJson(Map<String, dynamic> json) =>

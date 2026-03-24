@@ -24,5 +24,6 @@ class RouteNames {
   static const String bookingConfirm = '/booking-confirm';
   static const String payment = '/payment';
   static const String bookingSuccess = '/booking-success';
+  static const String venueMap = '/venue-map';
   static const String googleMap = '/google-map-example';
 }

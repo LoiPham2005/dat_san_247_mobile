@@ -74,6 +74,7 @@ class ProfilePage extends StatelessWidget {
                       _ProfileTile(icon: Icons.favorite_border_rounded, label: 'Sân yêu thích', onTap: () => context.push('/favorite-venues')),
                       _ProfileTile(icon: Icons.repeat_rounded, label: 'Lịch đặt định kỳ', onTap: () => context.push('/recurring-bookings')),
                       _ProfileTile(icon: Icons.queue_rounded, label: 'Danh sách chờ', onTap: () => context.push('/my-waitlist')),
+                      _ProfileTile(icon: Icons.queue_rounded, label: 'map', onTap: () => context.push('/venue-map')),
                     ],
                   ),
                   const SizedBox(height: 16),
