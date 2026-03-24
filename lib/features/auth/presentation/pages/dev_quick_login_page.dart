@@ -15,7 +15,7 @@ class DevQuickLoginPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +72,7 @@ class DevQuickLoginPage extends StatelessWidget {
                 onTap: () => context.go('/venue-staff'),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 48),
 
               // ── Real Login link ──
               Center(

@@ -70,7 +70,7 @@ class AppStartup {
       context.go(RouteNames.splash);
     } else {
       // RouteGuard tự handle redirect về login nếu chưa đăng nhập
-      context.go(RouteNames.main);
+      context.go(RouteNames.login);
     }
   }
 }

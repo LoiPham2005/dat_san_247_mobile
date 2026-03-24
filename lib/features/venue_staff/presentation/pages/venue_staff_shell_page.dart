@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/pages/staff_dashboard_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/pages/staff_notifications_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/today_schedule_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentation/pages/staff_profile_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Venue Staff Main Shell
@@ -40,8 +40,14 @@ class _VenueStaffShellPageState extends State<VenueStaffShellPage>
   // ── Nav items ──
   static const _navItems = [
     _NavItem(icon: Icons.dashboard_rounded, activeIcon: Icons.dashboard, label: 'Dashboard'),
-    _NavItem(icon: Icons.calendar_month_outlined, activeIcon: Icons.calendar_month_rounded, label: 'Lịch'),
-    _NavItem(icon: Icons.notifications_outlined, activeIcon: Icons.notifications_rounded, label: 'Thông Báo'),
+    _NavItem(
+        icon: Icons.calendar_month_outlined,
+        activeIcon: Icons.calendar_month_rounded,
+        label: 'Lịch'),
+    _NavItem(
+        icon: Icons.notifications_outlined,
+        activeIcon: Icons.notifications_rounded,
+        label: 'Thông Báo'),
     _NavItem(icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded, label: 'Hồ Sơ'),
   ];
 
@@ -58,7 +64,7 @@ class _VenueStaffShellPageState extends State<VenueStaffShellPage>
         bucket: _bucket,
         child: Padding(
           // Reserve space for bottom nav + safe area
-          padding: EdgeInsets.only(bottom: 64 + bottomPadding),
+          padding: EdgeInsets.only(bottom: 72 + bottomPadding),
           child: _pages[_currentIndex],
         ),
       ),
@@ -72,13 +78,14 @@ class _VenueStaffShellPageState extends State<VenueStaffShellPage>
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 20, offset: const Offset(0, -4)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.10), blurRadius: 20, offset: const Offset(0, -4)),
         ],
       ),
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 64,
+          height: 72,
           child: Row(
             children: List.generate(_navItems.length, (i) {
               final item = _navItems[i];
@@ -119,12 +126,19 @@ class _VenueStaffShellPageState extends State<VenueStaffShellPage>
                           ),
                           if (badge > 0)
                             Positioned(
-                              right: -2, top: -2,
+                              right: -2,
+                              top: -2,
                               child: Container(
-                                width: 16, height: 16,
-                                decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
+                                width: 16,
+                                height: 16,
+                                decoration: const BoxDecoration(
+                                    color: AppColors.error, shape: BoxShape.circle),
                                 child: Center(
-                                  child: Text('$badge', style: const TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold)),
+                                  child: Text('$badge',
+                                      style: const TextStyle(
+                                          fontSize: 9,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold)),
                                 ),
                               ),
                             ),
@@ -169,5 +183,3 @@ class _NavItem {
   final String label;
   const _NavItem({required this.icon, required this.activeIcon, required this.label});
 }
-
-

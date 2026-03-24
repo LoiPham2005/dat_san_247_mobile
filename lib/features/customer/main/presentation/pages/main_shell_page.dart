@@ -1,4 +1,5 @@
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/customer/deals/presentation/pages/deals_page.dart';
 import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/home_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
 import 'package:flutter/material.dart';

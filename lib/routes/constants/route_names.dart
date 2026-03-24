@@ -24,5 +24,20 @@ class RouteNames {
   static const String bookingConfirm = '/booking-confirm';
   static const String payment = '/payment';
   static const String bookingSuccess = '/booking-success';
+  static const String bookingDetail = '/booking-detail';
+  static const String cancelBooking = '/cancel-booking';
+  static const String writeReview = '/write-review';
+  static const String recurringBookings = '/recurring-bookings';
+  static const String myWaitlist = '/my-waitlist';
+  static const String wallet = '/wallet';
+  static const String invoices = '/invoices';
+  static const String promotions = '/promotions';
+  static const String favoriteVenues = '/favorite-venues';
+  static const String notifications = '/notifications';
+  static const String supportTickets = '/support-tickets';
+  static const String profileSettings = '/profile-settings';
+  static const String owner = '/owner';
+  static const String venueStaff = '/venue-staff';
   static const String googleMap = '/google-map-example';
+  static const String deals = '/deals';
 }

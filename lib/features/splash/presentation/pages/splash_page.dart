@@ -1,6 +1,6 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/config/app/app_startup.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -29,13 +29,13 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     _controller.forward();
 
-    // Simulate initial loading (e.g. check token, version)
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      // TODO: Check token to decide between /main (logged in) and /onboarding (new user)
-      // For now, navigate to main shell to test bottom nav
-      context.go('/login');
-    });
+    // 🚀 Start Sequence
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startAppSequence());
+  }
+
+  Future<void> _startAppSequence() async {
+    // 4. Finally, Boot & Navigate
+    await AppStartup.launch(context);
   }
 
   @override
