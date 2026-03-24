@@ -19,7 +19,7 @@ class VenueDetailModel {
   final String? email;
   @JsonKey(name: 'thumbnail_url')
   final String? thumbnailUrl;
-  
+
   @JsonKey(name: 'fb_url')
   final String? fbUrl;
   @JsonKey(name: 'zalo_url')
@@ -54,6 +54,9 @@ class VenueDetailModel {
   final List<VenueScheduleExceptionModel>? scheduleExceptions;
   final List<AmenityModel>? amenities;
 
+  final double? latitude;
+  final double? longitude;
+
   VenueDetailModel({
     required this.id,
     required this.ownerId,
@@ -84,9 +87,10 @@ class VenueDetailModel {
     this.operatingHours,
     this.scheduleExceptions,
     this.amenities,
+    this.latitude,
+    this.longitude,
   });
 
-  factory VenueDetailModel.fromJson(Map<String, dynamic> json) =>
-      _$VenueDetailModelFromJson(json);
+  factory VenueDetailModel.fromJson(Map<String, dynamic> json) => _$VenueDetailModelFromJson(json);
   Map<String, dynamic> toJson() => _$VenueDetailModelToJson(this);
 }

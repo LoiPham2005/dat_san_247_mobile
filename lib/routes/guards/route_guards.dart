@@ -69,6 +69,7 @@ class RouteGuards {
     '/profile-settings',
     '/owner',
     '/venue-staff',
+    '/venue-map',
   ];
 
   FutureOr<String?> authGuard(BuildContext context, GoRouterState state) {

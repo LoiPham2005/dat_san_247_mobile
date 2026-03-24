@@ -1,11 +1,18 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 
 export 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/my_bookings_page.dart' show MyBookingsPage;
 
-
+class DealsPage extends StatelessWidget {
+  const DealsPage({super.key});
+  @override
+  Widget build(BuildContext context) => _ComingStuab(
+    icon: Icons.local_offer_rounded,
+    title: 'Ưu đãi & Khuyến mãi',
+    subtitle: 'Khám phá mã giảm giá và ưu đãi độc quyền',
+  );
+}
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -67,6 +74,7 @@ class ProfilePage extends StatelessWidget {
                       _ProfileTile(icon: Icons.favorite_border_rounded, label: 'Sân yêu thích', onTap: () => context.push('/favorite-venues')),
                       _ProfileTile(icon: Icons.repeat_rounded, label: 'Lịch đặt định kỳ', onTap: () => context.push('/recurring-bookings')),
                       _ProfileTile(icon: Icons.queue_rounded, label: 'Danh sách chờ', onTap: () => context.push('/my-waitlist')),
+                      _ProfileTile(icon: Icons.queue_rounded, label: 'map', onTap: () => context.push('/venue-map')),
                     ],
                   ),
                   const SizedBox(height: 16),

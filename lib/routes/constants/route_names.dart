@@ -40,4 +40,5 @@ class RouteNames {
   static const String venueStaff = '/venue-staff';
   static const String googleMap = '/google-map-example';
   static const String deals = '/deals';
+  static const String venueMap = '/venue-map';
 }

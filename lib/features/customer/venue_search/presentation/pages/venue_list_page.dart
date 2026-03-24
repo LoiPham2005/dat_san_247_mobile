@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_filter_params.dart';
+import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:go_router/go_router.dart';
 
 import '../widgets/venue_list_item.dart';
@@ -37,6 +38,8 @@ class _VenueListPageState extends State<VenueListPage> {
       amenities: ['WIFI', 'Bãi xe Ô tô', 'Tủ đồ'],
       isFeatured: true,
       isFavorite: false,
+      latitude: 10.762622,
+      longitude: 106.660172,
     ),
     const VenueSearchResultModel(
       id: '2',
@@ -45,7 +48,8 @@ class _VenueListPageState extends State<VenueListPage> {
       address: '16A Lê Hồng Phong',
       city: 'TP.HCM',
       district: 'Quận 10',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1549721067-15efba51ebce?q=80&w=400&auto=format&fit=crop',
+      thumbnailUrl:
+          'https://images.unsplash.com/photo-1549721067-15efba51ebce?q=80&w=400&auto=format&fit=crop',
       rating: 4.5,
       totalReviews: 85,
       minPricePerHour: 80000,
@@ -53,6 +57,8 @@ class _VenueListPageState extends State<VenueListPage> {
       amenities: ['WIFI', 'Căng tin'],
       isFeatured: false,
       isFavorite: true,
+      latitude: 10.7769,
+      longitude: 106.7009,
     ),
   ];
 
@@ -96,8 +102,8 @@ class _VenueListPageState extends State<VenueListPage> {
         backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-           onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+          onPressed: () => context.pop(),
         ),
         title: _buildSearchInput(),
         titleSpacing: 0,
@@ -112,10 +118,19 @@ class _VenueListPageState extends State<VenueListPage> {
       body: Column(
         children: [
           _buildFilterChipsBar(),
-          Expanded(
-            child: _buildVenueList(),
-          ),
+          Expanded(child: _buildVenueList()),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          context.push(RouteNames.venueMap, extra: _mockVenues);
+        },
+        backgroundColor: AppColors.primaryLightBrand,
+        icon: const Icon(Icons.map_rounded, color: AppColors.white),
+        label: const Text(
+          'Bản đồ',
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -132,7 +147,7 @@ class _VenueListPageState extends State<VenueListPage> {
         controller: _searchController,
         textInputAction: TextInputAction.search,
         onSubmitted: (val) {
-           // REFETCH DATA
+          // REFETCH DATA
         },
         decoration: InputDecoration(
           hintText: 'Tìm kiếm sân...',
@@ -156,28 +171,36 @@ class _VenueListPageState extends State<VenueListPage> {
 
   Widget _buildFilterChipsBar() {
     final List<Widget> chips = [];
-    
+
     // Convert filter object to chips
     if (_currentFilter.sportType != null) {
-      chips.add(_buildRemovableChip(_currentFilter.sportType!, () {
-        setState(() => _currentFilter = _currentFilter.copyWith(sportType: null));
-      }));
+      chips.add(
+        _buildRemovableChip(_currentFilter.sportType!, () {
+          setState(() => _currentFilter = _currentFilter.copyWith(sportType: null));
+        }),
+      );
     }
     if (_currentFilter.district != null) {
-      chips.add(_buildRemovableChip(_currentFilter.district!, () {
-        setState(() => _currentFilter = _currentFilter.copyWith(district: null));
-      }));
+      chips.add(
+        _buildRemovableChip(_currentFilter.district!, () {
+          setState(() => _currentFilter = _currentFilter.copyWith(district: null));
+        }),
+      );
     }
     if (_currentFilter.minPrice != null || _currentFilter.maxPrice != null) {
-      chips.add(_buildRemovableChip('Theo giá', () {
-        setState(() => _currentFilter = _currentFilter.copyWith(minPrice: null, maxPrice: null));
-      }));
+      chips.add(
+        _buildRemovableChip('Theo giá', () {
+          setState(() => _currentFilter = _currentFilter.copyWith(minPrice: null, maxPrice: null));
+        }),
+      );
     }
     for (var am in _currentFilter.amenities) {
-      chips.add(_buildRemovableChip(am, () {
-        final newAm = List<String>.from(_currentFilter.amenities)..remove(am);
-        setState(() => _currentFilter = _currentFilter.copyWith(amenities: newAm));
-      }));
+      chips.add(
+        _buildRemovableChip(am, () {
+          final newAm = List<String>.from(_currentFilter.amenities)..remove(am);
+          setState(() => _currentFilter = _currentFilter.copyWith(amenities: newAm));
+        }),
+      );
     }
 
     if (chips.isEmpty) {
@@ -208,7 +231,14 @@ class _VenueListPageState extends State<VenueListPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.primaryLightBrand, fontSize: 13, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.primaryLightBrand,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(width: 4),
           InkWell(
             onTap: onRemove,
@@ -221,7 +251,9 @@ class _VenueListPageState extends State<VenueListPage> {
 
   Widget _buildVenueList() {
     if (_mockVenues.isEmpty) {
-      return const Center(child: Text('Không tìm thấy sân phù hợp', style: TextStyle(color: AppColors.textHint)));
+      return const Center(
+        child: Text('Không tìm thấy sân phù hợp', style: TextStyle(color: AppColors.textHint)),
+      );
     }
 
     return ListView.builder(

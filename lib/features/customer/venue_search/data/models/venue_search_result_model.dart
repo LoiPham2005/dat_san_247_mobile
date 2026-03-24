@@ -13,25 +13,31 @@ class VenueSearchResultModel extends Equatable {
   final String district;
   @JsonKey(name: 'thumbnail_url')
   final String? thumbnailUrl;
-  
+
   final double rating;
   @JsonKey(name: 'total_reviews')
   final int totalReviews;
-  
+
   @JsonKey(name: 'min_price_per_hour')
   final double? minPricePerHour;
   @JsonKey(name: 'max_price_per_hour')
   final double? maxPricePerHour;
-  
+
   @JsonKey(name: 'sport_types')
   final List<String> sportTypes;
   final List<String> amenities;
 
   @JsonKey(name: 'is_featured')
   final bool isFeatured;
-  
+
   @JsonKey(name: 'is_favorite')
   final bool isFavorite;
+
+  final double? latitude;
+  final double? longitude;
+
+  @JsonKey(name: 'is_open')
+  final bool? isOpen;
 
   const VenueSearchResultModel({
     required this.id,
@@ -49,27 +55,34 @@ class VenueSearchResultModel extends Equatable {
     this.amenities = const [],
     this.isFeatured = false,
     this.isFavorite = false,
+    this.latitude,
+    this.longitude,
+    this.isOpen,
   });
 
-  factory VenueSearchResultModel.fromJson(Map<String, dynamic> json) => _$VenueSearchResultModelFromJson(json);
+  factory VenueSearchResultModel.fromJson(Map<String, dynamic> json) =>
+      _$VenueSearchResultModelFromJson(json);
   Map<String, dynamic> toJson() => _$VenueSearchResultModelToJson(this);
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        slug,
-        address,
-        city,
-        district,
-        thumbnailUrl,
-        rating,
-        totalReviews,
-        minPricePerHour,
-        maxPricePerHour,
-        sportTypes,
-        amenities,
-        isFeatured,
-        isFavorite,
-      ];
+    id,
+    name,
+    slug,
+    address,
+    city,
+    district,
+    thumbnailUrl,
+    rating,
+    totalReviews,
+    minPricePerHour,
+    maxPricePerHour,
+    sportTypes,
+    amenities,
+    isFeatured,
+    isFavorite,
+    latitude,
+    longitude,
+    isOpen,
+  ];
 }

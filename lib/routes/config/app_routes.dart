@@ -353,3 +353,10 @@ class GoogleMapExampleRoute extends GoRouteData with $GoogleMapExampleRoute {
   Widget build(BuildContext context, GoRouterState state) => const GoogleMapExamplePage();
 }
 
+@TypedGoRoute<VenueMapRoute>(path: RouteNames.venueMap)
+class VenueMapRoute extends GoRouteData with $VenueMapRoute {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const VenueMapPage();
+  }
+}

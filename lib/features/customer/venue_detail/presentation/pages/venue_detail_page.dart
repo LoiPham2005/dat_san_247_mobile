@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
+import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 
 import '../../data/models/venue_detail_model.dart';
 import '../../data/models/court_model.dart';
@@ -68,11 +70,12 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: AppColors.white70,
-                  shape: BoxShape.circle,
+                decoration: const BoxDecoration(color: AppColors.white70, shape: BoxShape.circle),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: AppColors.black,
+                  size: 20,
                 ),
-                child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.black, size: 20),
               ),
               onPressed: () => context.pop(),
             ),
@@ -80,11 +83,12 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
               IconButton(
                 icon: Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.white70,
-                    shape: BoxShape.circle,
+                  decoration: const BoxDecoration(color: AppColors.white70, shape: BoxShape.circle),
+                  child: const Icon(
+                    Icons.favorite_border_rounded,
+                    color: AppColors.destructiveLight,
+                    size: 22,
                   ),
-                  child: const Icon(Icons.favorite_border_rounded, color: AppColors.destructiveLight, size: 22),
                 ),
                 onPressed: () {
                   // Toggle favorite
@@ -117,6 +121,42 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                     children: [
                       // Basic Info Card
                       VenueInfoCard(venue: venue!),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            if (venue!.latitude != null && venue!.longitude != null) {
+                              final resultModel = VenueSearchResultModel(
+                                id: venue!.id,
+                                name: venue!.name,
+                                slug: venue!.slug,
+                                address: venue!.address,
+                                city: venue!.city,
+                                district: venue!.district,
+                                thumbnailUrl: venue!.thumbnailUrl,
+                                rating: venue!.rating,
+                                totalReviews: venue!.totalReviews,
+                                latitude: venue!.latitude,
+                                longitude: venue!.longitude,
+                                sportTypes: const [],
+                                amenities: const [],
+                                isFeatured: venue!.isFeatured,
+                                isFavorite: false,
+                              );
+                              context.push(RouteNames.venueMap, extra: [resultModel]);
+                            }
+                          },
+                          icon: const Icon(Icons.map_outlined),
+                          label: const Text('Xem trên bản đồ'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primaryLightBrand,
+                            side: const BorderSide(color: AppColors.primaryLightBrand),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 24),
 
                       // Amenities Grid
@@ -134,10 +174,10 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                       // Reviews Summary
                       if (venue!.totalReviews > 0) ...[
                         ReviewSummaryWidget(
-                          venue: venue!, 
+                          venue: venue!,
                           onViewAll: () {
                             // Navigate to full reviews
-                          }
+                          },
                         ),
                         const SizedBox(height: 24),
                       ],
@@ -146,7 +186,11 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                       const Divider(color: AppColors.borderLight, height: 32),
                       const Row(
                         children: [
-                          Icon(Icons.sports_tennis_rounded, color: AppColors.primaryLightBrand, size: 24),
+                          Icon(
+                            Icons.sports_tennis_rounded,
+                            color: AppColors.primaryLightBrand,
+                            size: 24,
+                          ),
                           SizedBox(width: 8),
                           Text(
                             'Danh sách sân',
@@ -160,23 +204,28 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                       ),
                       const SizedBox(height: 16),
                       if (venue!.courts != null && venue!.courts!.isNotEmpty)
-                        ...venue!.courts!.map((court) => CourtListTile(
-                          court: court,
-                          onTapBooking: () {
-                            TimeSlotPickerRoute(
-                              courtId: court.id,
-                              venueName: venue!.name,
-                            ).push(context);
-                          },
-                        ))
+                        ...venue!.courts!.map(
+                          (court) => CourtListTile(
+                            court: court,
+                            onTapBooking: () {
+                              TimeSlotPickerRoute(
+                                courtId: court.id,
+                                venueName: venue!.name,
+                              ).push(context);
+                            },
+                          ),
+                        )
                       else
                         const Center(
                           child: Padding(
                             padding: EdgeInsets.all(24.0),
-                            child: Text('Chưa có sân nào được thêm', style: TextStyle(color: AppColors.textSecondary)),
+                            child: Text(
+                              'Chưa có sân nào được thêm',
+                              style: TextStyle(color: AppColors.textSecondary),
+                            ),
                           ),
                         ),
-                        
+
                       const SizedBox(height: 40), // Bottom padding
                     ],
                   ),
@@ -196,7 +245,8 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
       ownerId: 'owner-1',
       name: 'Sân Bóng Đá Cỏ Nhân Tạo K34',
       slug: 'san-bong-da-k34',
-      description: 'Sân bóng K34 cung cấp cụm 4 sân cỏ nhân tạo đạt chuẩn FIFA, hệ thống chiếu sáng LED hiện đại, mặt cỏ êm ái chống trơn trượt. Có canteen giải khát tiện lợi.',
+      description:
+          'Sân bóng K34 cung cấp cụm 4 sân cỏ nhân tạo đạt chuẩn FIFA, hệ thống chiếu sáng LED hiện đại, mặt cỏ êm ái chống trơn trượt. Có canteen giải khát tiện lợi.',
       address: 'Số 10 Phạm Văn Đồng',
       city: 'Hà Nội',
       district: 'Cầu Giấy',
@@ -211,7 +261,8 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
       ratingFacilities: 4.7,
       ratingStaff: 4.8,
       totalReviews: 125,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbc09e99c?auto=format&fit=crop&q=80',
+      thumbnailUrl:
+          'https://images.unsplash.com/photo-1574629810360-7efbbc09e99c?auto=format&fit=crop&q=80',
       amenities: [
         AmenityModel(id: 'a1', venueId: 'mock-123', name: 'WiFi miễn phí', isFree: true),
         AmenityModel(id: 'a2', venueId: 'mock-123', name: 'Bãi xe ô tô', isFree: true),
@@ -232,7 +283,8 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
           isIndoor: false,
           isActive: true,
           displayOrder: 1,
-          thumbnailUrl: 'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?q=80&w=400&auto=format&fit=crop',
+          thumbnailUrl:
+              'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?q=80&w=400&auto=format&fit=crop',
         ),
         CourtModel(
           id: 'court-2',
@@ -261,6 +313,8 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
           thumbnailUrl: null,
         ),
       ],
+      latitude: 21.0367,
+      longitude: 105.7822,
     );
   }
 }
