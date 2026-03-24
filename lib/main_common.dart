@@ -26,10 +26,12 @@ void mainCommon(AppFlavor flavor) {
       // Đặt SAU initialize() để Crashlytics đã được khởi tạo
       // ─────────────────────────────────────────────────────────────
       FlutterError.onError = (details) {
+        final location = _extractErrorLocation(details);
         Logger.error(
           'Flutter framework error',
           error: details.exception,
           stackTrace: details.stack,
+          location: location,
         );
         // recordFlutterFatalError = đánh dấu là Fatal crash
         CrashlyticsService.instance.recordFlutterError(details);
@@ -56,4 +58,25 @@ void mainCommon(AppFlavor flavor) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     },
   );
+}
+
+String? _extractErrorLocation(FlutterErrorDetails details) {
+  try {
+    final msg = details.toString();
+    // 1. Try to extract from summary/context (can be package or file path)
+    final match = RegExp(r'(?:package:[a-z0-9_]+/|lib/)([^)\s]+\.dart:\d+:\d+)').firstMatch(msg);
+    if (match != null) return 'lib/${match.group(1)}';
+
+    // 2. Fallback to stack trace
+    if (details.stack != null) {
+      final stack = details.stack.toString();
+      for (final line in stack.split('\n')) {
+        if (line.contains('package:dat_san_247_mobile') || line.contains('lib/')) {
+          final m = RegExp(r'(?:package:[a-z0-9_]+/|lib/)([^)\s]+\.dart:\d+:\d+)').firstMatch(line);
+          if (m != null) return 'lib/${m.group(1)}';
+        }
+      }
+    }
+  } catch (_) {}
+  return null;
 }

@@ -103,7 +103,7 @@ class Logger {
   // ❌ ERROR LOG (WITH BORDER)
   // ═══════════════════════════════════════════════════════════════
 
-  static void error(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
+  static void error(String message, {String? tag, Object? error, StackTrace? stackTrace, String? location}) {
     if (!LogConfig.enabled) return;
 
     final buffer = StringBuffer();
@@ -119,9 +119,14 @@ class Logger {
       buffer.writeln('$_vertical Details: ${error.toString()}');
     }
 
+    if (location != null) {
+      buffer.writeln(_section);
+      buffer.writeln('$_vertical Location: $location');
+    }
+
     if (kDebugMode && stackTrace != null) {
       buffer.writeln(_section);
-      buffer.writeln('$_vertical Stack Trace:');
+      buffer.writeln('$_vertical Stack Trace (Top 3):');
       final lines = stackTrace.toString().split('\n').take(3);
       for (final line in lines) {
         buffer.writeln('$_vertical   $line');
