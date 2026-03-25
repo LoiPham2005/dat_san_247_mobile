@@ -10,10 +10,12 @@ import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/data/models/check_in_models.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pages/check_in_confirm_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/data/models/staff_schedule_models.dart';
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // VS-05: Staff Booking Detail + Add Addon
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class StaffBookingDetailPage extends StatefulWidget {
   final StaffBookingDetailModel booking;
   final bool canAddAddon; // MANAGER || STAFF role

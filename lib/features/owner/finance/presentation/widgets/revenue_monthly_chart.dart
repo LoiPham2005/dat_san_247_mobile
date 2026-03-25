@@ -22,7 +22,7 @@ class RevenueMonthlyChart extends StatelessWidget {
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
         const SizedBox(height: 16),
         SizedBox(
-            height: 120,
+            height: 140,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: summaries.reversed.toList().map((s) {
@@ -39,7 +39,7 @@ class RevenueMonthlyChart extends StatelessWidget {
                               duration: const Duration(milliseconds: 500),
                               height: 100 * ratio,
                               decoration: BoxDecoration(
-                                  color: const Color(0xFF0891B2).withOpacity(0.85),
+                                  color: const Color(0xFF1565C0).withOpacity(0.85),
                                   borderRadius: BorderRadius.circular(6))),
                           const SizedBox(height: 4),
                           Text('Th$label',

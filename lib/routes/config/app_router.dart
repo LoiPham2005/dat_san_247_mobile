@@ -14,6 +14,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+import '../../features/venue_staff/dashboard/presentation/pages/staff_dashboard_page.dart';
+import '../../features/venue_staff/dashboard/presentation/pages/staff_notifications_page.dart';
+import '../../features/venue_staff/dashboard/presentation/pages/staff_system_notifications_page.dart';
+import '../../features/venue_staff/pricing/presentation/pages/pricing_rules_page.dart';
+import '../../features/venue_staff/pricing/presentation/pages/venue_services_page.dart';
+import '../../features/venue_staff/schedule/presentation/pages/staff_booking_detail_page.dart';
+import '../../features/venue_staff/schedule/presentation/pages/today_schedule_page.dart';
+import '../../features/venue_staff/schedule/presentation/pages/weekly_schedule_page.dart';
+import '../../features/venue_staff/staff_profile/presentation/pages/staff_management_page.dart';
+import '../../features/venue_staff/staff_profile/presentation/pages/staff_profile_page.dart';
+import '../../features/venue_staff/check_in/presentation/pages/check_in_confirm_page.dart';
+import '../../features/venue_staff/check_in/presentation/pages/qr_checkin_page.dart';
+import '../../features/venue_staff/court_status/presentation/pages/court_status_page.dart';
 
 @LazySingleton()
 class AppRouter {

@@ -25,17 +25,32 @@ import 'package:dat_san_247_mobile/features/customer/recurring_booking/presentat
 import 'package:dat_san_247_mobile/features/customer/support/presentation/pages/support_ticket_list_page.dart';
 import 'package:dat_san_247_mobile/features/customer/profile/presentation/pages/profile_settings_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_map_page.dart';
-import 'package:dat_san_247_mobile/features/owner/dashboard/presentation/pages/owner_shell_page.dart';
-import 'package:dat_san_247_mobile/features/venue_staff/presentation/pages/venue_staff_shell_page.dart';
 import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/home_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/pages/venue_detail_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_search_page.dart';
 import 'package:dat_san_247_mobile/features/customer/waitlist/presentation/pages/my_waitlist_page.dart';
 import 'package:dat_san_247_mobile/features/customer/wallet/presentation/pages/wallet_page.dart';
+import 'package:dat_san_247_mobile/features/owner/main/presentation/pages/owner_shell_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/check_in/data/models/check_in_models.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pages/check_in_confirm_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pages/qr_checkin_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/court_status/presentation/pages/court_status_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/main/presentation/pages/venue_staff_shell_page.dart';
 import 'package:dat_san_247_mobile/features/example/presentation/pages/google_map_example_page.dart';
 import 'package:dat_san_247_mobile/features/splash/presentation/pages/onboarding_page.dart';
 import 'package:dat_san_247_mobile/features/splash/presentation/pages/splash_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/pages/staff_dashboard_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/pages/staff_notifications_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/pages/staff_system_notifications_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/pricing/presentation/pages/pricing_rules_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/pricing/presentation/pages/venue_services_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/schedule/data/models/staff_schedule_models.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/staff_booking_detail_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/today_schedule_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/weekly_schedule_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentation/pages/staff_management_page.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentation/pages/staff_profile_page.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -368,4 +383,113 @@ class VenueMapRoute extends GoRouteData with $VenueMapRoute {
   Widget build(BuildContext context, GoRouterState state) {
     return const VenueMapPage();
   }
+}
+
+@TypedGoRoute<StaffDashboardRoute>(path: RouteNames.staffDashboard)
+class StaffDashboardRoute extends GoRouteData with $StaffDashboardRoute {
+  const StaffDashboardRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const StaffDashboardPage();
+}
+
+@TypedGoRoute<StaffNotificationsRoute>(path: RouteNames.staffNotifications)
+class StaffNotificationsRoute extends GoRouteData with $StaffNotificationsRoute {
+  const StaffNotificationsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const StaffNotificationsPage();
+}
+
+@TypedGoRoute<StaffSystemNotificationsRoute>(path: RouteNames.staffSystemNotifications)
+class StaffSystemNotificationsRoute extends GoRouteData with $StaffSystemNotificationsRoute {
+  const StaffSystemNotificationsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const StaffSystemNotificationsPage();
+}
+
+@TypedGoRoute<PricingRulesRoute>(path: RouteNames.pricingRules)
+class PricingRulesRoute extends GoRouteData with $PricingRulesRoute {
+  const PricingRulesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const PricingRulesPage();
+}
+
+@TypedGoRoute<VenueServicesRoute>(path: RouteNames.venueServices)
+class VenueServicesRoute extends GoRouteData with $VenueServicesRoute {
+  const VenueServicesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const VenueServicesPage();
+}
+
+@TypedGoRoute<StaffBookingDetailRoute>(path: RouteNames.staffBookingDetail)
+class StaffBookingDetailRoute extends GoRouteData with $StaffBookingDetailRoute {
+  final StaffBookingDetailModel $extra;
+  final bool canAddAddon;
+  const StaffBookingDetailRoute({required this.$extra, this.canAddAddon = false});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => StaffBookingDetailPage(booking: $extra, canAddAddon: canAddAddon);
+}
+
+@TypedGoRoute<TodayScheduleRoute>(path: RouteNames.todaySchedule)
+class TodayScheduleRoute extends GoRouteData with $TodayScheduleRoute {
+  const TodayScheduleRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const TodaySchedulePage();
+}
+
+@TypedGoRoute<WeeklyScheduleRoute>(path: RouteNames.weeklySchedule)
+class WeeklyScheduleRoute extends GoRouteData with $WeeklyScheduleRoute {
+  const WeeklyScheduleRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const WeeklySchedulePage();
+}
+
+@TypedGoRoute<StaffManagementRoute>(path: RouteNames.staffManagement)
+class StaffManagementRoute extends GoRouteData with $StaffManagementRoute {
+  const StaffManagementRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const StaffManagementPage();
+}
+
+@TypedGoRoute<StaffProfileRoute>(path: RouteNames.staffProfile)
+class StaffProfileRoute extends GoRouteData with $StaffProfileRoute {
+  final bool isManager;
+  const StaffProfileRoute({this.isManager = false});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => StaffProfilePage(isManager: isManager);
+}
+
+@TypedGoRoute<CheckInConfirmRoute>(path: RouteNames.checkInConfirm)
+class CheckInConfirmRoute extends GoRouteData with $CheckInConfirmRoute {
+  final CheckInBookingModel $extra;
+  const CheckInConfirmRoute({required this.$extra});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => CheckInConfirmPage(booking: $extra);
+}
+
+@TypedGoRoute<QrCheckInRoute>(path: RouteNames.qrCheckIn)
+class QrCheckInRoute extends GoRouteData with $QrCheckInRoute {
+  const QrCheckInRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const QrCheckInPage();
+}
+
+@TypedGoRoute<CourtStatusRoute>(path: RouteNames.courtStatus)
+class CourtStatusRoute extends GoRouteData with $CourtStatusRoute {
+  final bool isManager;
+  const CourtStatusRoute({this.isManager = false});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => CourtStatusPage(isManager: isManager);
 }

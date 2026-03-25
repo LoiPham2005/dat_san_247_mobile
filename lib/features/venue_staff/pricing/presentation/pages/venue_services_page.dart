@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/data/models/staff_schedule_models.dart';
-
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 // ══════════════════════════════════════════════════════════════════════════════
 // VS-10: Dịch Vụ Bán Kèm [MANAGER only]
 // DB: venue_services (venue_id)  { name, price, unit, type, category,
 //     is_available, track_inventory, stock_quantity }
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class VenueServicesPage extends StatefulWidget {
   const VenueServicesPage({super.key});
 

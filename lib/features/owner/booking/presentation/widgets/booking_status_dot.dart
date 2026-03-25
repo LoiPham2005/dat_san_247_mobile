@@ -6,9 +6,9 @@ class BookingStatusDot extends StatelessWidget {
   const BookingStatusDot({super.key, required this.color, required this.label});
   @override
   Widget build(BuildContext context) => Row(children: [
-        Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+            width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 4),
-        Text(label,
-            style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.bold))
+        Text(label, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.bold))
       ]);
 }

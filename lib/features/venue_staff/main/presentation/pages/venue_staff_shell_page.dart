@@ -59,14 +59,10 @@ class _VenueStaffShellPageState extends State<VenueStaffShellPage>
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
-      extendBody: true,
+      extendBody: false,
       body: PageStorage(
         bucket: _bucket,
-        child: Padding(
-          // Reserve space for bottom nav + safe area
-          padding: EdgeInsets.only(bottom: 72 + bottomPadding),
-          child: _pages[_currentIndex],
-        ),
+        child: _pages[_currentIndex],
       ),
       bottomNavigationBar: _buildBottomNav(bottomPadding),
     );

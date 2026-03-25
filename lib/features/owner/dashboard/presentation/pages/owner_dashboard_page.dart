@@ -8,7 +8,6 @@ import 'package:dat_san_247_mobile/features/owner/dashboard/presentation/widgets
 import 'package:dat_san_247_mobile/features/owner/dashboard/presentation/widgets/dashboard_section_header.dart';
 import 'package:dat_san_247_mobile/features/owner/review/presentation/pages/owner_reviews_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -131,9 +130,12 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
   Widget _buildHeader() => SliverAppBar(
         pinned: true,
-        expandedHeight: 210,
+        expandedHeight: 180,
         backgroundColor: _brand,
         automaticallyImplyLeading: false,
+        centerTitle: false,
+        title: const Text('Tổng quan hệ thống',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.white),
@@ -145,41 +147,38 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           ),
         ],
         flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [_brandDark, _brand],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const SizedBox(height: 38),
-                    Text('Xin chào, $_ownerName 👋',
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
-                    Text(_venueName,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
-                    _buildStatsBar(),
-                  ]),
-                ),
+          background: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [_brandDark, _brand],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-            title: const Text('Dashboard 📊',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-            titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
-            centerTitle: false,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const SizedBox(height: 38),
+                  Text('Xin chào, $_ownerName 👋',
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 2),
+                  Text(_venueName,
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  _buildStatsBar(),
+                ]),
+              ),
+            ),
           ),
+        ),
       );
 
   Widget _buildStatsBar() => Row(children: [
-        _statItem(value: '${_stats['total']}', label: 'Tổng booking', icon: Icons.calendar_today_rounded),
+        _statItem(
+            value: '${_stats['total']}', label: 'Tổng booking', icon: Icons.calendar_today_rounded),
         _vDivider(),
         _statItem(
             value: '${_stats['pending']}',
@@ -194,7 +193,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
             color: const Color(0xFF34D399)),
       ]);
 
-  Widget _statItem({required String value, required String label, required IconData icon, Color? color}) =>
+  Widget _statItem(
+          {required String value, required String label, required IconData icon, Color? color}) =>
       Expanded(
         child: Column(children: [
           Icon(icon, size: 16, color: color ?? Colors.white70),

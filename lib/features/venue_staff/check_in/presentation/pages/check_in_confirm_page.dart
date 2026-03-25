@@ -1,9 +1,11 @@
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/data/models/check_in_models.dart';
 
+@route
 class CheckInConfirmPage extends StatefulWidget {
   final CheckInBookingModel booking;
 

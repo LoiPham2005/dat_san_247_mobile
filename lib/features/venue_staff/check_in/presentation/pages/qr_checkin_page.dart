@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/wi
 // ──────────────────────────────────────────────────────────────────────────
 // VS-02: QR Scanner Check-in page
 // ──────────────────────────────────────────────────────────────────────────
+@route
 class QrCheckInPage extends StatefulWidget {
   const QrCheckInPage({super.key});
 

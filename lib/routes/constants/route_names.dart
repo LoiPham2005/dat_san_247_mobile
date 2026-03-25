@@ -42,4 +42,19 @@ class RouteNames {
   static const String googleMap = '/google-map-example';
   static const String deals = '/deals';
   static const String venueMap = '/venue-map';
+  // Staff
+  // Main App
+  static const String staffDashboard = '/staff-dashboard';
+  static const String staffNotifications = '/staff-notifications';
+  static const String staffSystemNotifications = '/staff-system-notifications';
+  static const String pricingRules = '/pricing-rules';
+  static const String venueServices = '/venue-services';
+  static const String staffBookingDetail = '/staff-booking-detail';
+  static const String todaySchedule = '/today-schedule';
+  static const String weeklySchedule = '/weekly-schedule';
+  static const String staffManagement = '/staff-management';
+  static const String staffProfile = '/staff-profile';
+  static const String checkInConfirm = '/check-in-confirm';
+  static const String qrCheckIn = '/qr-check-in';
+  static const String courtStatus = '/court-status';
 }

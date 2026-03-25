@@ -8,10 +8,12 @@ import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/data/models/check_in_models.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pages/qr_checkin_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pages/check_in_confirm_page.dart';
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // VS-04: Lịch Booking Hôm Nay — Timeline grouped by court
 // ──────────────────────────────────────────────────────────────────────────
+@route
 class TodaySchedulePage extends StatefulWidget {
   const TodaySchedulePage({super.key});
 
@@ -124,7 +126,10 @@ class _TodaySchedulePageState extends State<TodaySchedulePage> {
             pinned: true,
             backgroundColor: _brand,
             automaticallyImplyLeading: false,
-            expandedHeight: 180,
+            expandedHeight: 110,
+            centerTitle: false,
+            title: const Text('Lịch trình hôm nay',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             actions: [
               IconButton(
                 icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 26),
@@ -147,11 +152,8 @@ class _TodaySchedulePageState extends State<TodaySchedulePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 36),
-                        Text('📅 ${DateFormat('EEEE, dd/MM', 'vi').format(DateTime.now())}',
-                            style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 12),
                         Row(children: [
-                          ScheduleMiniStat(value: '$_totalBookings', label: 'Tổng booking'),
+                          ScheduleMiniStat(value: '$_totalBookings', label: 'Booking'),
                           const SizedBox(width: 16),
                           ScheduleMiniStat(value: '$_checkedInTotal', label: 'Check-in', color: AppColors.success),
                           const SizedBox(width: 16),
@@ -162,10 +164,6 @@ class _TodaySchedulePageState extends State<TodaySchedulePage> {
                   ),
                 ),
               ),
-              title: const Text('Lịch Hôm Nay',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-              titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-              centerTitle: false,
             ),
           ),
 

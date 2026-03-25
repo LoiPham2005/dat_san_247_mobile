@@ -5,11 +5,12 @@ import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/data/models/check_in_models.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/widgets/schedule_status_badge.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/widgets/schedule_booking_tip_row.dart';
-
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 // ══════════════════════════════════════════════════════════════════════════════
 // VS-06: Lịch Tuần — Weekly Calendar grid view
 // DB: bookings (venue_id, date range week), courts, court_maintenance
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class WeeklySchedulePage extends StatefulWidget {
   const WeeklySchedulePage({super.key});
 

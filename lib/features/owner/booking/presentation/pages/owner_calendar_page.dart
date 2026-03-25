@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/booking/data/models/booking_models.dart';
 import 'package:dat_san_247_mobile/features/owner/booking/presentation/pages/owner_booking_detail_page.dart';
 import 'package:dat_san_247_mobile/features/owner/booking/presentation/widgets/booking_status_dot.dart';
 import 'package:dat_san_247_mobile/features/owner/booking/presentation/widgets/booking_time_card.dart';
 import 'package:dat_san_247_mobile/features/owner/booking/presentation/widgets/calendar_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // O-08: Calendar Booking (Owner View)
@@ -21,8 +21,8 @@ class OwnerCalendarPage extends StatefulWidget {
 }
 
 class _OwnerCalendarPageState extends State<OwnerCalendarPage> {
-  static const Color _brand = Color(0xFF0891B2);
-  static const Color _brandDark = Color(0xFF0E7490);
+  static const Color _brand = Color(0xFF1565C0);
+  static const Color _brandDark = Color(0xFF1565C0);
 
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
@@ -163,13 +163,12 @@ class _OwnerCalendarPageState extends State<OwnerCalendarPage> {
         // ── AppBar ──
         SliverAppBar(
           pinned: true,
-          expandedHeight: 210,
+          expandedHeight: 100,
           backgroundColor: _brand,
           automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 18),
-            onPressed: () => Navigator.pop(context),
-          ),
+          centerTitle: false,
+          title: const Text('Lịch đặt sân',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
               decoration: const BoxDecoration(
@@ -179,20 +178,20 @@ class _OwnerCalendarPageState extends State<OwnerCalendarPage> {
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: SafeArea(
+              child: const SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const SizedBox(height: 38),
-                    const Text('Quản lý đặt sân 🗓️',
-                        style: TextStyle(
-                            color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
-                    Text(widget.venueName,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
-                    const Row(children: [
+                    SizedBox(height: 38),
+                    // const Text('Quản lý đặt sân',
+                    //     style: TextStyle(
+                    //         color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                    SizedBox(height: 10),
+                    // Text(widget.venueName,
+                    //     style: const TextStyle(
+                    //         color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    // const SizedBox(height: 16),
+                    Row(children: [
                       BookingStatusDot(color: AppColors.warning, label: 'Chờ XN'),
                       SizedBox(width: 12),
                       BookingStatusDot(color: AppColors.info, label: 'Đã XN'),
@@ -203,10 +202,6 @@ class _OwnerCalendarPageState extends State<OwnerCalendarPage> {
                 ),
               ),
             ),
-            title: const Text('Lịch Booking',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-            titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
-            centerTitle: false,
           ),
         ),
 
@@ -290,7 +285,8 @@ class _OwnerCalendarPageState extends State<OwnerCalendarPage> {
                 child: Container(
                     margin: const EdgeInsets.all(16),
                     padding: const EdgeInsets.all(32),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+                    decoration:
+                        BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
                     child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Icon(Icons.event_available_rounded, size: 40, color: AppColors.textHint),
                       SizedBox(height: 8),

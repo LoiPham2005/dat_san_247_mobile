@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/pages/owner_venue_manage_page.dart';
@@ -8,6 +5,8 @@ import 'package:dat_san_247_mobile/features/owner/venue/presentation/widgets/ven
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/widgets/venue_empty_state.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/widgets/venue_filter_pill.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/widgets/venue_stats_chip.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // O-02: Danh Sách Venue Của Tôi
@@ -21,8 +20,8 @@ class OwnerVenueListPage extends StatefulWidget {
 }
 
 class _OwnerVenueListPageState extends State<OwnerVenueListPage> {
-  static const Color _brand = Color(0xFF0891B2); // Owner brand = cyan/teal
-  static const Color _brandDark = Color(0xFF0E7490);
+  static const Color _brand = Color(0xFF1565C0); // Owner brand = cyan/teal
+  static const Color _brandDark = Color(0xFF1565C0);
 
   VenueStatus? _filterStatus;
   bool _isSearching = false;
@@ -127,7 +126,9 @@ class _OwnerVenueListPageState extends State<OwnerVenueListPage> {
     var list = _venues.where((v) => _filterStatus == null || v.status == _filterStatus).toList();
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
-      list = list.where((v) => v.name.toLowerCase().contains(q) || v.district.toLowerCase().contains(q)).toList();
+      list = list
+          .where((v) => v.name.toLowerCase().contains(q) || v.district.toLowerCase().contains(q))
+          .toList();
     }
     return list;
   }
@@ -144,12 +145,13 @@ class _OwnerVenueListPageState extends State<OwnerVenueListPage> {
           // ── AppBar ──
           SliverAppBar(
             pinned: true,
-            expandedHeight: 200,
+            expandedHeight: 120,
             backgroundColor: _brand,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 18),
-              onPressed: () => Navigator.pop(context),
-            ),
+            automaticallyImplyLeading: false,
+            centerTitle: false,
+            title: Text(_isSearching ? 'Tìm kiếm...' : 'Quản lý sân bãi',
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             actions: [
               IconButton(
                   icon: Icon(_isSearching ? Icons.close_rounded : Icons.search_rounded,
@@ -196,10 +198,11 @@ class _OwnerVenueListPageState extends State<OwnerVenueListPage> {
                         ),
                       )
                     else ...[
-                      const Text('Venue Của Tôi',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                      Text('${_venues.length} venue đang quản lý',
+                      // const SizedBox(height: 38),
+                      // const Text('Sân của tôi',
+                      //     style: TextStyle(
+                      //         color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+                      Text('${_venues.length} địa điểm đang quản lý',
                           style: const TextStyle(color: Colors.white70, fontSize: 12)),
                     ],
                     const SizedBox(height: 12),
@@ -224,10 +227,6 @@ class _OwnerVenueListPageState extends State<OwnerVenueListPage> {
                   ]),
                 )),
               ),
-              title: Text(_isSearching ? 'Tìm kiếm...' : 'Venue Của Tôi',
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-              titlePadding: const EdgeInsets.only(left: 48, bottom: 16),
             ),
           ),
 
@@ -301,79 +300,83 @@ class _OwnerVenueListPageState extends State<OwnerVenueListPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape:
-          const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Center(
-                child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration:
-                        BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
-            const SizedBox(height: 14),
-            Row(children: [
-              Icon(Icons.add_business_rounded, color: _brand, size: 22),
-              const SizedBox(width: 8),
-              const Text('Tạo Venue Mới',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ]),
-            const SizedBox(height: 4),
-            const Text('Thông tin cơ bản — bổ sung chi tiết sau khi tạo',
-                style: TextStyle(fontSize: 11, color: AppColors.textHint)),
-            const SizedBox(height: 16),
-            _FormField(
-                controller: nameCtrl, label: 'Tên venue *', hint: 'VD: Sân K34 Phạm Văn Đồng'),
-            const SizedBox(height: 10),
-            _FormField(
-                controller: addressCtrl,
-                label: 'Địa chỉ *',
-                hint: '34 Phạm Văn Đồng, Bắc Từ Liêm, Hà Nội'),
-            const SizedBox(height: 10),
-            _FormField(
-                controller: phoneCtrl,
-                label: 'Số điện thoại liên hệ',
-                hint: '024...',
-                keyboardType: TextInputType.phone),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.warning.withOpacity(0.3))),
-              child: const Row(children: [
-                Icon(Icons.info_outline_rounded, size: 16, color: AppColors.warning),
-                SizedBox(width: 8),
-                Expanded(
-                    child: Text('Sau khi tạo, bạn cần nộp hồ sơ xác minh để venue được duyệt hoạt động.',
-                        style: TextStyle(fontSize: 11, color: AppColors.warning))),
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                    child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 14),
+                const Row(children: [
+                  Icon(Icons.add_business_rounded, color: _brand, size: 22),
+                  SizedBox(width: 8),
+                  Text('Tạo Venue Mới',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ]),
+                const SizedBox(height: 4),
+                const Text('Thông tin cơ bản — bổ sung chi tiết sau khi tạo',
+                    style: TextStyle(fontSize: 11, color: AppColors.textHint)),
+                const SizedBox(height: 16),
+                _FormField(
+                    controller: nameCtrl, label: 'Tên venue *', hint: 'VD: Sân K34 Phạm Văn Đồng'),
+                const SizedBox(height: 10),
+                _FormField(
+                    controller: addressCtrl,
+                    label: 'Địa chỉ *',
+                    hint: '34 Phạm Văn Đồng, Bắc Từ Liêm, Hà Nội'),
+                const SizedBox(height: 10),
+                _FormField(
+                    controller: phoneCtrl,
+                    label: 'Số điện thoại liên hệ',
+                    hint: '024...',
+                    keyboardType: TextInputType.phone),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: AppColors.warning.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.warning.withOpacity(0.3))),
+                  child: const Row(children: [
+                    Icon(Icons.info_outline_rounded, size: 16, color: AppColors.warning),
+                    SizedBox(width: 8),
+                    Expanded(
+                        child: Text(
+                            'Sau khi tạo, bạn cần nộp hồ sơ xác minh để venue được duyệt hoạt động.',
+                            style: TextStyle(fontSize: 11, color: AppColors.warning))),
+                  ]),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (nameCtrl.text.isEmpty || addressCtrl.text.isEmpty) return;
+                        Navigator.pop(ctx);
+                        HapticFeedback.mediumImpact();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('✅ Đã tạo venue: ${nameCtrl.text}'),
+                            backgroundColor: AppColors.success));
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: _brand,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      child: const Text('Tạo Venue',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    )),
               ]),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (nameCtrl.text.isEmpty || addressCtrl.text.isEmpty) return;
-                    Navigator.pop(ctx);
-                    HapticFeedback.mediumImpact();
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('✅ Đã tạo venue: ${nameCtrl.text}'),
-                        backgroundColor: AppColors.success));
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: _brand,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                  child: const Text('Tạo Venue',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                )),
-          ]),
         ),
       ),
     );
@@ -392,9 +395,11 @@ class _FormField extends StatelessWidget {
       this.keyboardType = TextInputType.text});
 
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget build(BuildContext context) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label,
-            style: const TextStyle(fontSize: 11, color: AppColors.textHint, fontWeight: FontWeight.bold)),
+            style: const TextStyle(
+                fontSize: 11, color: AppColors.textHint, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         TextField(
             controller: controller,

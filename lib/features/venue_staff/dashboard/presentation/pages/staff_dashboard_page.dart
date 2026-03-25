@@ -9,6 +9,7 @@ import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/w
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_revenue_summary_card.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_section_title.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/today_schedule_page.dart';
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +17,7 @@ import 'package:intl/intl.dart';
 // ══════════════════════════════════════════════════════════════════════════════
 // VS-01 Staff Dashboard Page
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class StaffDashboardPage extends StatefulWidget {
   const StaffDashboardPage({super.key});
 
@@ -148,9 +150,12 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
   // ── SliverAppBar header ────────────────────────────────────────────────────
   Widget _buildHeader() => SliverAppBar(
         pinned: true,
-        expandedHeight: 210,
+        expandedHeight: 170,
         backgroundColor: _brand,
         automaticallyImplyLeading: false,
+        centerTitle: false,
+        title: const Text('Tổng quan hệ thống',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.white),
@@ -180,7 +185,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                       const SizedBox(height: 2),
                       Text(_data.venueName,
                           style: const TextStyle(
-                              color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
+                              color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     ]),
                     const Spacer(),
                     // Shift badge
@@ -221,7 +226,7 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                     _vDivider(),
                     DashboardHeaderStat(
                         value: _fmtK(_data.revenueToday),
-                        label: 'Doanh thu',
+                        label: 'D.Thu',
                         icon: Icons.payments_rounded,
                         color: const Color(0xFF34D399)),
                   ]),
@@ -229,9 +234,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
               ),
             ),
           ),
-          title: const Text('Staff Dashboard',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-          titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
         ),
       );
 

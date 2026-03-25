@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/finance/data/models/finance_models.dart';
 import 'package:dat_san_247_mobile/features/owner/finance/presentation/widgets/revenue_commission_card.dart';
@@ -7,6 +5,8 @@ import 'package:dat_san_247_mobile/features/owner/finance/presentation/widgets/r
 import 'package:dat_san_247_mobile/features/owner/finance/presentation/widgets/revenue_monthly_chart.dart';
 import 'package:dat_san_247_mobile/features/owner/finance/presentation/widgets/revenue_payout_card.dart';
 import 'package:dat_san_247_mobile/features/owner/finance/presentation/widgets/revenue_wallet_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // O-11: Doanh Thu & Hoa Hồng
@@ -18,10 +18,9 @@ class OwnerRevenuePage extends StatefulWidget {
   State<OwnerRevenuePage> createState() => _OwnerRevenuePageState();
 }
 
-class _OwnerRevenuePageState extends State<OwnerRevenuePage>
-    with SingleTickerProviderStateMixin {
-  static const Color _brand = Color(0xFF0891B2);
-  static const Color _brandDark = Color(0xFF0E7490);
+class _OwnerRevenuePageState extends State<OwnerRevenuePage> with SingleTickerProviderStateMixin {
+  static const Color _brand = Color(0xFF1565C0);
+  static const Color _brandDark = Color(0xFF1565C0);
 
   late TabController _tabCtrl;
   CommissionStatus? _statusFilter;
@@ -222,13 +221,12 @@ class _OwnerRevenuePageState extends State<OwnerRevenuePage>
         headerSliverBuilder: (_, __) => [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 280,
+            expandedHeight: 230,
             backgroundColor: _brand,
             automaticallyImplyLeading: false,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 18),
-              onPressed: () => Navigator.pop(context),
-            ),
+            centerTitle: false,
+            title: const Text('Báo cáo doanh thu',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             actions: [
               IconButton(
                 icon: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white70),
@@ -249,14 +247,10 @@ class _OwnerRevenuePageState extends State<OwnerRevenuePage>
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       const SizedBox(height: 38),
-                      const Text('Báo cáo tài chính 📊',
-                          style: TextStyle(
-                              color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                      // const Text('Tài chính & Doanh thu',
+                      //     style: TextStyle(
+                      //         color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
-                      const Text('Tài chính & Doanh thu 💰',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 16),
                       RevenueWalletCard(
                         wallet: _wallet,
                         pendingAmount: _totalPending,
@@ -267,9 +261,6 @@ class _OwnerRevenuePageState extends State<OwnerRevenuePage>
                   ),
                 ),
               ),
-              title: const Text('Doanh Thu',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-              titlePadding: const EdgeInsets.only(left: 48, bottom: 64),
             ),
             bottom: TabBar(
               controller: _tabCtrl,
@@ -296,12 +287,10 @@ class _OwnerRevenuePageState extends State<OwnerRevenuePage>
               child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(children: [
-                    _FChip('Tất cả', _statusFilter == null, () => setState(() => _statusFilter = null)),
-                    ...CommissionStatus.values.map((s) => _FChip(
-                        s.label,
-                        _statusFilter == s,
-                        () => setState(
-                            () => _statusFilter = _statusFilter == s ? null : s))),
+                    _FChip('Tất cả', _statusFilter == null,
+                        () => setState(() => _statusFilter = null)),
+                    ...CommissionStatus.values.map((s) => _FChip(s.label, _statusFilter == s,
+                        () => setState(() => _statusFilter = _statusFilter == s ? null : s))),
                   ])),
             ),
             Expanded(
@@ -344,13 +333,13 @@ class _OwnerRevenuePageState extends State<OwnerRevenuePage>
 
   void _showPayoutSheet(BuildContext context) {
     final amtCtrl = TextEditingController();
-    BankAccountModel? selectedBank =
-        _wallet.bankAccounts.firstWhere((b) => b.isDefault, orElse: () => _wallet.bankAccounts.first);
+    BankAccountModel? selectedBank = _wallet.bankAccounts
+        .firstWhere((b) => b.isDefault, orElse: () => _wallet.bankAccounts.first);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape:
-          const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => StatefulBuilder(
           builder: (ctx, ss) => Padding(
                 padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
@@ -448,7 +437,8 @@ class _OwnerRevenuePageState extends State<OwnerRevenuePage>
                                 labelText: 'Số tiền rút (đ) *',
                                 prefixIcon: const Icon(Icons.monetization_on_outlined),
                                 suffixText: 'đ',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+                                border:
+                                    OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
                           ),
                           const SizedBox(height: 8),
                           Row(children: [
@@ -459,10 +449,11 @@ class _OwnerRevenuePageState extends State<OwnerRevenuePage>
                             _QuickAmt('5M', 5000000, amtCtrl, ss),
                             const SizedBox(width: 6),
                             GestureDetector(
-                                onTap: () => ss(() => amtCtrl.text =
-                                    _wallet.availableBalance.toInt().toString()),
+                                onTap: () => ss(() =>
+                                    amtCtrl.text = _wallet.availableBalance.toInt().toString()),
                                 child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                     decoration: BoxDecoration(
                                         color: AppColors.info.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(8)),
@@ -528,8 +519,8 @@ class _FChip extends StatelessWidget {
           decoration: BoxDecoration(
               color: selected ? const Color(0xFF0891B2) : Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                  color: selected ? const Color(0xFF0891B2) : AppColors.borderLight)),
+              border:
+                  Border.all(color: selected ? const Color(0xFF0891B2) : AppColors.borderLight)),
           child: Text(label,
               style: TextStyle(
                   fontSize: 11,

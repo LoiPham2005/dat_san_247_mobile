@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/pricing/data/models/pricing_models.dart';
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // VS-11: Thông Báo — Staff Notification Centre
 // DB: notifications { id, user_id, type, channel, title, message,
 //     reference_id, reference_type, is_read, read_at, created_at }
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class StaffSystemNotificationsPage extends StatefulWidget {
   const StaffSystemNotificationsPage({super.key});
 

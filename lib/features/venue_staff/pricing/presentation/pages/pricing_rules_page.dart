@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/pricing/data/models/pricing_models.dart';
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // VS-09: Bảng Giá [MANAGER only]
 // DB: pricing_rules (court_id IN venue), courts
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class PricingRulesPage extends StatefulWidget {
   const PricingRulesPage({super.key});
 

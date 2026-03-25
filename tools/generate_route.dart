@@ -104,11 +104,22 @@ void _scanAndGenerate() {
       String? path = (match.groupCount >= 1 && match.group(1) != null)
           ? match.group(1)
           : null;
-      path ??= '/${className.replaceAll('Page', '').toLowerCase()}';
+      
+      if (path == null) {
+        final kebab = className.replaceAll('Page', '').replaceAllMapped(
+          RegExp(r'([a-z0-9])([A-Z])'),
+          (m) => '${m.group(1)}-${m.group(2)}'
+        ).toLowerCase();
+        path = '/$kebab';
+      }
 
-      final String? group = (match.groupCount >= 2 && match.group(2) != null)
-          ? match.group(2)
+      String group = (match.groupCount >= 2 && match.group(2) != null)
+          ? match.group(2)!
           : 'Main App';
+      
+      // Auto-detect group from path
+      if (file.path.contains('lib/features/venue_staff/')) group = 'Staff';
+      else if (file.path.contains('lib/features/owner/')) group = 'Owner';
 
       String cleanPath = file.path.replaceAll('\\', '/');
       if (cleanPath.contains('/lib/')) {
@@ -122,7 +133,7 @@ void _scanAndGenerate() {
         path: path,
         page: pageName,
         importPath: cleanPath,
-        group: group!,
+        group: group,
         properties: props,
         isQuiet: true,
       );
@@ -217,18 +228,25 @@ String _buildRouteBlock({
       .map((e) => '  final ${e['type']} ${e['name']};')
       .join('\n');
 
-  // Tự động nhận diện default value nếu Page có default (giả định)
-  // Trong TypedRoute, nếu tham số không bắt buộc thì phải có default value trong constructor
-  // Tự động nhận diện default value nếu Page có default (giả định)
-  // Trong TypedRoute, nếu tham số không bắt buộc thì phải có default value trong constructor
-
-  // Để an toàn, ta dùng required hoặc gán default nếu là bool
-  final fixedEntries = properties
-      .map((k) => 'this.${k['name']} = ${k['type'] == 'bool' ? 'false' : '""'}')
+  final constructorParams = properties
+      .map((k) {
+        String def = '""';
+        if (k['type'] == 'bool') def = 'false';
+        else if (k['type'] == 'int') def = '0';
+        else if (k['type'] == 'double') def = '0.0';
+        else if (k['type']!.contains('?')) def = 'null';
+        else if (!['String', 'bool', 'int', 'double'].contains(k['type'])) {
+           // Complex types should be required if not nullable, or have a factory default
+           // For simple tool, we'll use 'required' or just omit default
+           return 'required this.${k['name']}';
+        }
+        return 'this.${k['name']} = $def';
+      })
       .join(', ');
+  
   final constructor = properties.isEmpty
       ? '  const $name();'
-      : '  const $name({$fixedEntries});';
+      : '  const $name({$constructorParams});';
 
   final passParams = properties
       .map((k) => '${k['name']}: ${k['name']}')
@@ -254,11 +272,31 @@ String _injectConstant({
 }) {
   final groupMarker = '// $group';
   int index = content.indexOf(groupMarker);
+  
+  // If group not found, look for similar markers or create one
+  if (index == -1 && group == 'Staff') {
+    index = content.indexOf('// Venue Staff'); // Check existing name
+    if (index == -1) index = content.indexOf('// Owner'); // fallback to near group
+  }
+  
   if (index == -1) index = content.indexOf('// Main App');
 
+  if (index == -1) {
+    final int lastBrace = content.lastIndexOf('}');
+    if (lastBrace == -1) return content;
+    return '${content.substring(0, lastBrace).trimRight()}\n  // $group\n  static const String $name = \'$path\';\n}';
+  }
+
+  // Find the end of the current group (next marker or empty line with spacing)
   final lineEnd = content.indexOf('\n', index);
-  final borderEnd = content.indexOf('// ════', lineEnd);
-  final int insertAt = borderEnd != -1 ? borderEnd : lineEnd + 1;
+  // Find next static const or next group or end of class
+  final nextGroup = content.indexOf('//', lineEnd + 1);
+  final endOfClass = content.indexOf('}', lineEnd + 1);
+  
+  int insertAt = endOfClass;
+  if (nextGroup != -1 && nextGroup < endOfClass) {
+    insertAt = nextGroup;
+  }
 
   return '${content.substring(0, insertAt).trimRight()}\n  static const String $name = \'$path\';\n${content.substring(insertAt).trimLeft()}';
 }

@@ -12,6 +12,6 @@ class VenueStatsChip extends StatelessWidget {
         decoration:
             BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
         child: Text('$count $label',
-            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+            style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
       );
 }

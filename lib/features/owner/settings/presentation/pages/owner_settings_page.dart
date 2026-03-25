@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/settings/presentation/widgets/settings_menu_group.dart';
 import 'package:dat_san_247_mobile/features/owner/settings/presentation/widgets/settings_menu_item.dart';
 import 'package:dat_san_247_mobile/features/owner/settings/presentation/widgets/settings_profile_header.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 class OwnerSettingsPage extends StatelessWidget {
   const OwnerSettingsPage({super.key});
 
-  static const Color _brand = Color(0xFF0891B2);
-  static const Color _brandDark = Color(0xFF0E7490);
+  static const Color _brand = Color(0xFF1565C0);
+  static const Color _brandDark = Color(0xFF1565C0);
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +21,12 @@ class OwnerSettingsPage extends StatelessWidget {
           // ── AppBar ──
           SliverAppBar(
             pinned: true,
-            expandedHeight: 220,
+            expandedHeight: 150,
             backgroundColor: _brand,
             automaticallyImplyLeading: false,
+            centerTitle: false,
+            title: const Text('Cài đặt hệ thống',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(
@@ -37,15 +40,6 @@ class OwnerSettingsPage extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      SizedBox(height: 38),
-                      Text('Quản lý thông tin 👤',
-                          style: TextStyle(
-                              color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
-                      SizedBox(height: 2),
-                      Text('Hồ sơ & Cài đặt ⚙️',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 16),
                       SettingsProfileHeader(
                         name: 'Nguyễn Văn Chủ Sân',
                         type: 'Partner (Đối tác)',
@@ -56,9 +50,6 @@ class OwnerSettingsPage extends StatelessWidget {
                   ),
                 ),
               ),
-              title: const Text('Cài đặt',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-              titlePadding: const EdgeInsets.only(left: 48, bottom: 16),
             ),
           ),
 
@@ -131,7 +122,8 @@ class OwnerSettingsPage extends StatelessWidget {
                     ),
                     child: const Center(
                       child: Text('Đăng xuất',
-                          style: TextStyle(color: AppColors.error, fontSize: 15, fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              color: AppColors.error, fontSize: 15, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ),
@@ -149,6 +141,7 @@ class OwnerSettingsPage extends StatelessWidget {
 
   void _stub(BuildContext context) {
     HapticFeedback.selectionClick();
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tính năng sắp ra mắt!')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Tính năng sắp ra mắt!')));
   }
 }

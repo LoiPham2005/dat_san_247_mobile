@@ -14,11 +14,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 // ══════════════════════════════════════════════════════════════════════════════
 // VS-12: Hồ Sơ Nhân Viên — Staff Profile (standalone page)
 // DB: users (me), venue_staff (user_id=me), venues
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class StaffProfilePage extends StatefulWidget {
   final bool isManager;
   const StaffProfilePage({super.key, this.isManager = false});
@@ -67,12 +68,12 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
           // ── AppBar / Hero ──
           SliverAppBar(
             pinned: true,
-            expandedHeight: 280,
+            expandedHeight: 210,
             backgroundColor: _brand,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 18),
-              onPressed: () => Navigator.canPop(context) ? Navigator.pop(context) : null,
-            ),
+            automaticallyImplyLeading: false,
+            centerTitle: false,
+            title: const Text('Hồ sơ nhân viên',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             actions: [
               IconButton(
                 icon: const Icon(Icons.notifications_outlined, color: Colors.white),
@@ -90,7 +91,7 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 44, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
                     child: Column(children: [
                       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         // ── Avatar ──
@@ -130,7 +131,7 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(_profile.fullName,
                               style: const TextStyle(
-                                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+                                  color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
                           if (_profile.phone != null)
                             Row(children: [
@@ -139,37 +140,8 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                               Text(_profile.phone!,
                                   style: const TextStyle(color: Colors.white70, fontSize: 12)),
                             ]),
-                          if (_profile.email != null)
-                            Row(children: [
-                              const Icon(Icons.email_rounded, size: 12, color: Colors.white70),
-                              const SizedBox(width: 4),
-                              Text(_profile.email!,
-                                  style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                            ]),
                           const SizedBox(height: 8),
-                          Row(children: [
-                            ProfileRolePill(role: role),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                                Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(
-                                        color: AppColors.success, shape: BoxShape.circle)),
-                                const SizedBox(width: 4),
-                                const Text('Đang làm việc',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold)),
-                              ]),
-                            ),
-                          ]),
+                          ProfileRolePill(role: role),
                         ])),
                       ]),
                       const SizedBox(height: 14),
@@ -193,27 +165,12 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis),
                           ])),
-                          if (_profile.venuePhone != null)
-                            GestureDetector(
-                              onTap: () => HapticFeedback.selectionClick(),
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                    color: AppColors.success.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: const Icon(Icons.phone_rounded, size: 14, color: AppColors.success),
-                              ),
-                            ),
                         ]),
                       ),
                     ]),
                   ),
                 ),
               ),
-              title: const Text('Hồ Sơ',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-              titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
-              centerTitle: false,
             ),
           ),
 

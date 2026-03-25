@@ -1,15 +1,17 @@
+import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/dashboard/data/models/staff_dashboard_models.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/notification_card.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/notification_date_separator.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/notification_filter_chip.dart';
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/venue_staff/dashboard/data/models/staff_dashboard_models.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Staff Notifications Page
 // DB: notifications (user_id=me), type filter for staff-relevant types
 // ══════════════════════════════════════════════════════════════════════════════
+@route
 class StaffNotificationsPage extends StatefulWidget {
   const StaffNotificationsPage({super.key});
 
@@ -106,29 +108,18 @@ class _StaffNotificationsPageState extends State<StaffNotificationsPage> {
             pinned: true,
             backgroundColor: _brand,
             automaticallyImplyLeading: false,
-            title: Row(children: [
-              const Text('Thông Báo',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              if (_unreadCount > 0) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                  decoration:
-                      BoxDecoration(color: AppColors.error, borderRadius: BorderRadius.circular(20)),
-                  child: Text('$_unreadCount',
-                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ]),
+            title: const Text('Thông báo hệ thống',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             actions: [
               if (_unreadCount > 0)
                 TextButton(
                   onPressed: _markAllRead,
-                  child: const Text('Đọc hết', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                  child:
+                      const Text('Đọc hết', style: TextStyle(color: Colors.white70, fontSize: 12)),
                 ),
             ],
             bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(46),
+              preferredSize: const Size.fromHeight(40),
               child: Container(
                 color: _brand,
                 child: SingleChildScrollView(
@@ -158,10 +149,10 @@ class _StaffNotificationsPageState extends State<StaffNotificationsPage> {
               ? const SliverFillRemaining(
                   child: Center(
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(Icons.notifications_off_outlined, size: 48, color: AppColors.textHint),
-                  SizedBox(height: 12),
-                  Text('Không có thông báo', style: TextStyle(color: AppColors.textHint)),
-                ])),
+                    Icon(Icons.notifications_off_outlined, size: 48, color: AppColors.textHint),
+                    SizedBox(height: 12),
+                    Text('Không có thông báo', style: TextStyle(color: AppColors.textHint)),
+                  ])),
                 )
               : SliverList(
                   delegate: SliverChildBuilderDelegate(
@@ -190,8 +181,7 @@ class _StaffNotificationsPageState extends State<StaffNotificationsPage> {
     );
   }
 
-  bool _sameDay(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
+  bool _sameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
 
   static const _typeFilters = [
     StaffNotifType.newBooking,
