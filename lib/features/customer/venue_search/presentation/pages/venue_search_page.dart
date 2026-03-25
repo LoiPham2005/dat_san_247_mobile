@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/search_history_model.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../widgets/venue_search_history_list.dart';
+import '../widgets/venue_search_input_field.dart';
 
 class VenueSearchPage extends StatefulWidget {
   final String? initialQuery;
@@ -79,103 +81,25 @@ class _VenueSearchPageState extends State<VenueSearchPage> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
-        title: _buildSearchInput(),
+        title: VenueSearchInputField(
+          controller: _searchController,
+          focusNode: _searchFocus,
+          onSubmitted: _onSearch,
+          onClear: () => _searchController.clear(),
+        ),
         titleSpacing: 0,
         backgroundColor: AppColors.white,
         elevation: 0,
       ),
-      body: _buildSearchHistory(),
-    );
-  }
-
-  Widget _buildSearchInput() {
-    return Container(
-      height: 40,
-      margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        color: AppColors.mutedLight,
-        borderRadius: BorderRadius.circular(12),
+      body: VenueSearchHistoryList(
+        history: _mockSearchHistory,
+        onItemTap: _onHistoryItemTap,
+        onClearHistory: () {
+          setState(() {
+            _mockSearchHistory.clear();
+          });
+        },
       ),
-      child: TextField(
-        controller: _searchController,
-        focusNode: _searchFocus,
-        textInputAction: TextInputAction.search,
-        onSubmitted: _onSearch,
-        decoration: InputDecoration(
-          hintText: 'Tìm kiếm sân...',
-          hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
-          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textHint, size: 20),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.close_rounded, color: AppColors.textHint, size: 18),
-            onPressed: () {
-              _searchController.clear();
-            },
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchHistory() {
-    if (_mockSearchHistory.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Lịch sử tìm kiếm',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  // Xóa lịch sử
-                  setState(() {
-                    _mockSearchHistory.clear();
-                  });
-                },
-                child: const Text(
-                  'Xóa lịch sử',
-                  style: TextStyle(color: AppColors.primaryLightBrand, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            itemCount: _mockSearchHistory.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.borderLight),
-            itemBuilder: (context, index) {
-              final history = _mockSearchHistory[index];
-              final title = history.searchQuery ?? 
-                            (history.district != null ? 'Khu vực ${history.district}' : 
-                            (history.sportType != null ? 'Môn thi đấu' : 'Tìm kiếm ẩn danh'));
-              return ListTile(
-                leading: const Icon(Icons.history_rounded, color: AppColors.textHint),
-                title: Text(title, style: const TextStyle(color: AppColors.textPrimary)),
-                trailing: const Icon(Icons.north_west_rounded, color: AppColors.textHint, size: 18),
-                onTap: () => _onHistoryItemTap(history),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }

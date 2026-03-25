@@ -14,6 +14,7 @@ class RouteNames {
   static const String register = '/register';
   static const String otp = '/otp';
   static const String forgotPassword = '/forgot-password';
+  static const String resetPassword = '/reset-password';
   // ═══════════════════════════════════════════════════════════════
   static const String main = '/main';
   static const String home = '/home'; // Customer Home

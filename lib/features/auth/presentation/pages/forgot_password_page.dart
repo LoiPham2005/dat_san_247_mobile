@@ -1,7 +1,11 @@
+import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+
 import '../widgets/auth_form_field.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_primary_button.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -31,35 +35,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                margin: const EdgeInsets.only(bottom: 24, top: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLightBrand.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.password_rounded, size: 40, color: AppColors.primaryLightBrand),
-              ),
-              const Text(
-                'Quên Mật Khẩu',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Vui lòng nhập Email hoặc Số điện thoại. Chúng tôi sẽ gửi một mã OTP để tạo lại mật khẩu mới.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
+              const AuthHeader(
+                title: 'Quên Mật Khẩu',
+                subtitle: 'Vui lòng nhập Email hoặc Số điện thoại. Chúng tôi sẽ gửi một mã OTP để tạo lại mật khẩu mới.',
               ),
               const SizedBox(height: 48),
 
@@ -73,24 +51,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               const SizedBox(height: 32),
 
               // Action Button
-              ElevatedButton(
+              AuthPrimaryButton(
+                text: 'Gửi Yêu Cầu OTP',
                 onPressed: () {
                   // Simulate sending success
                   setState(() {
                     _isEmailSent = true;
                   });
-                  // After OTP sends successfully, navigating to OTP screen is done in Cubit
+                  // Chuyển sang OTP (Demo)
+                  const OtpRoute(contactInfo: '123456').go(context);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryLightBrand,
-                  foregroundColor: AppColors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 0,
-                ),
-                child: const Text('Gửi Yêu Cầu OTP', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
-              
+
               if (_isEmailSent)
                 Padding(
                   padding: const EdgeInsets.only(top: 24),
@@ -108,7 +80,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         Expanded(
                           child: Text(
                             'Mã cấu hình gửi thành công! Hãy kiểm tra hòm thư của bạn.',
-                            style: TextStyle(color: AppColors.primaryLightBrand, fontWeight: FontWeight.w600, height: 1.4),
+                            style: TextStyle(
+                                color: AppColors.primaryLightBrand,
+                                fontWeight: FontWeight.w600,
+                                height: 1.4),
                           ),
                         ),
                       ],

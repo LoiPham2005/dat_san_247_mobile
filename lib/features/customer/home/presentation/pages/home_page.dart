@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/home/data/models/banner_model.dart';
 import 'package:dat_san_247_mobile/features/customer/home/data/models/sport_category_model.dart';
 import 'package:dat_san_247_mobile/features/shared/promotion/data/models/promotion_model.dart';
 import 'package:dat_san_247_mobile/features/shared/venue/data/models/venue_model.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/home_search_bar.dart';
-import '../widgets/home_banner_slider.dart';
-import '../widgets/home_sport_categories.dart';
-import '../widgets/home_featured_venues.dart';
 import '../widgets/home_active_promotions.dart';
+import '../widgets/home_banner_slider.dart';
+import '../widgets/home_featured_venues.dart';
+import '../widgets/home_search_bar.dart';
+import '../widgets/home_sport_categories.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,16 +22,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // --- MOCK DATA FOR UI ---
   final List<BannerModel> _mockBanners = [
-    BannerModel(
+    const BannerModel(
       id: '1',
       title: 'Khai trương sân mới',
-      mobileImageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=600&auto=format&fit=crop',
+      mobileImageUrl:
+          'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=600&auto=format&fit=crop',
     ),
-    BannerModel(
-      id: '2',
-      title: 'Giảm giá 50% cuối tuần',
-      mobileImageUrl: 'https://images.unsplash.com/photo-1518605368461-1ee12523f218?q=80&w=600&auto=format&fit=crop',
-    ),
+    const BannerModel(
+        id: '2',
+        title: 'Giảm giá 50% cuối tuần',
+        mobileImageUrl:
+            'https://free.vector6.com/wp-content/uploads/2020/06/T6-U20-oe03ck-Vector-The-Thao-011.jpg'),
+    const BannerModel(
+        id: '3',
+        title: 'Giảm giá 50% cuối tuần',
+        mobileImageUrl:
+            'https://free.vector6.com/wp-content/uploads/2020/06/T6-U20-oe03ck-Vector-The-Thao-011.jpg'),
   ];
 
   final List<SportCategoryModel> _mockCategories = const [
@@ -43,7 +49,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final List<VenueModel> _mockVenues = [
-    VenueModel(
+    const VenueModel(
       id: '1',
       ownerId: 'owner1',
       name: 'Sân bóng đá KTX Bách Khoa',
@@ -51,12 +57,13 @@ class _HomePageState extends State<HomePage> {
       address: '497 Hòa Hảo',
       district: 'Quận 10',
       city: 'TP.HCM',
-      thumbnailUrl: 'https://images.unsplash.com/photo-1516422453390-1c395fb8260f?q=80&w=400&auto=format&fit=crop',
+      thumbnailUrl:
+          'https://images.unsplash.com/photo-1516422453390-1c395fb8260f?q=80&w=400&auto=format&fit=crop',
       isFeatured: true,
       rating: 4.8,
       totalReviews: 120,
     ),
-    VenueModel(
+    const VenueModel(
       id: '2',
       ownerId: 'owner2',
       name: 'Sân cầu lông Kỳ Hòa',
@@ -126,7 +133,7 @@ class _HomePageState extends State<HomePage> {
               HomeFeaturedVenues(
                 venues: _mockVenues,
                 onVenueTap: (venue) {
-                   GoRouter.of(context).push('/venue-detail/${venue.id}');
+                  GoRouter.of(context).push('/venue-detail/${venue.id}');
                 },
                 onViewAllTap: () {
                   GoRouter.of(context).push('/venues?query=featured');
@@ -177,7 +184,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 4),
-              Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: AppColors.white.withOpacity(0.7)),
+              Icon(Icons.keyboard_arrow_down_rounded,
+                  size: 20, color: AppColors.white.withOpacity(0.7)),
             ],
           ),
         ],

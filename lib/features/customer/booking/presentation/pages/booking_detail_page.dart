@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/my_booking_models.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/write_review_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/cancel_booking_page.dart';
+import '../widgets/booking_code_status_card.dart';
+import '../widgets/venue_info_detail_card.dart';
+import '../widgets/addons_detail_card.dart';
+import '../widgets/price_detail_card.dart';
+import '../widgets/booking_payment_info_card.dart';
+import '../widgets/booking_history_card.dart';
+import '../widgets/booking_note_card.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // C-10: Chi Tiết Booking
@@ -93,34 +99,31 @@ class BookingDetailPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // ── Booking Code + Status ──
-            _buildCodeCard(context, detail, statusColor, statusBg, statusIcon),
+            BookingCodeStatusCard(
+              detail: detail,
+              statusColor: statusColor,
+              statusBg: statusBg,
+              statusIcon: statusIcon,
+            ),
             const SizedBox(height: 14),
-            // ── Venue Info ──
-            _buildInfoCard(detail, fmt),
+            VenueInfoDetailCard(detail: detail),
             const SizedBox(height: 14),
-            // ── Add-ons ──
             if (detail.addons.isNotEmpty) ...[
-              _buildAddonsCard(detail, fmt),
+              AddonsDetailCard(addons: detail.addons),
               const SizedBox(height: 14),
             ],
-            // ── Price Summary ──
-            _buildPriceCard(detail, fmt),
+            PriceDetailCard(detail: detail),
             const SizedBox(height: 14),
-            // ── Payment Info ──
             if (detail.payments.isNotEmpty) ...[
-              _buildPaymentCard(detail, fmt),
+              BookingPaymentInfoCard(payment: detail.payments.first),
               const SizedBox(height: 14),
             ],
-            // ── Status History ──
-            _buildHistoryCard(detail),
+            BookingHistoryCard(statusHistory: detail.statusHistory),
             const SizedBox(height: 14),
-            // ── Note ──
             if (detail.note?.isNotEmpty == true) ...[
-              _buildNoteCard(detail.note!),
+              BookingNoteCard(note: detail.note!),
               const SizedBox(height: 14),
             ],
-            // ── Actions ──
             _buildActions(context, detail, fmt),
             const SizedBox(height: 30),
           ],
@@ -129,235 +132,9 @@ class BookingDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCodeCard(BuildContext context, BookingDetailModel d, Color color, Color bg, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(icon, size: 13, color: color),
-                    const SizedBox(width: 4),
-                    Text(d.status.label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              Text('${DateFormat('dd/MM/yyyy').format(d.createdAt)}', style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              Clipboard.setData(ClipboardData(text: d.bookingCode));
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('📋 Đã sao chép mã booking'), duration: Duration(seconds: 1)));
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(color: AppColors.primaryLightBrand.withOpacity(0.07), borderRadius: BorderRadius.circular(12)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(d.bookingCode, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.primaryLightBrand, letterSpacing: 2)),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.copy_rounded, size: 16, color: AppColors.primaryLightBrand),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(BookingDetailModel d, NumberFormat fmt) {
-    final dateStr = DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(d.bookingDate);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader(Icons.stadium_rounded, 'Thông tin đặt sân'),
-          const SizedBox(height: 12),
-          _infoRow(Icons.location_on_rounded, 'Địa điểm', '${d.courtName} - ${d.venueName}'),
-          const SizedBox(height: 8),
-          _infoRow(Icons.map_rounded, 'Địa chỉ', d.venueAddress),
-          const SizedBox(height: 8),
-          _infoRow(Icons.calendar_today_rounded, 'Ngày', dateStr),
-          const SizedBox(height: 8),
-          _infoRow(Icons.access_time_rounded, 'Giờ', '${d.startTime} – ${d.endTime} (${d.totalHours.toStringAsFixed(0)}h)'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddonsCard(BookingDetailModel d, NumberFormat fmt) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader(Icons.add_shopping_cart_rounded, 'Dịch vụ kèm theo'),
-          const SizedBox(height: 12),
-          ...d.addons.map((a) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: AppColors.mutedLight, borderRadius: BorderRadius.circular(6)),
-                  child: Text('x${a.quantity}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
-                ),
-                const SizedBox(width: 8),
-                Expanded(child: Text(a.serviceName, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary))),
-                Text(fmt.format(a.totalPrice), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-              ],
-            ),
-          )),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPriceCard(BookingDetailModel d, NumberFormat fmt) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader(Icons.receipt_long_rounded, 'Chi tiết thanh toán'),
-          const SizedBox(height: 12),
-          _priceRow('Tiền sân', fmt.format(d.subTotal)),
-          if (d.addons.isNotEmpty) _priceRow('Dịch vụ', fmt.format(d.addons.fold(0.0, (s, a) => s + a.totalPrice))),
-          if (d.discountAmount > 0) _priceRow('Giảm giá', '-${fmt.format(d.discountAmount)}', isDiscount: true),
-          if (d.vatAmount > 0) _priceRow('VAT (${(d.vatRate * 100).toStringAsFixed(0)}%)', fmt.format(d.vatAmount)),
-          const Divider(height: 20, color: AppColors.borderLight),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Tổng cộng', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              Text(fmt.format(d.totalAmount), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.primaryLightBrand)),
-            ],
-          ),
-          if (d.refundAmount > 0) ...[
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Hoàn tiền', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-                Text(fmt.format(d.refundAmount), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.info)),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPaymentCard(BookingDetailModel d, NumberFormat fmt) {
-    final payment = d.payments.first;
-    final methodLabel = _paymentLabel(payment.paymentMethod);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader(Icons.payment_rounded, 'Thông tin thanh toán'),
-          const SizedBox(height: 12),
-          _infoRow(Icons.credit_card_rounded, 'Phương thức', methodLabel),
-          const SizedBox(height: 8),
-          _infoRow(Icons.attach_money_rounded, 'Số tiền', fmt.format(payment.amount)),
-          if (payment.paidAt != null) ...[
-            const SizedBox(height: 8),
-            _infoRow(Icons.schedule_rounded, 'Thanh toán lúc', DateFormat('HH:mm dd/MM/yyyy').format(payment.paidAt!)),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHistoryCard(BookingDetailModel d) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader(Icons.history_rounded, 'Lịch sử trạng thái'),
-          const SizedBox(height: 12),
-          ...List.generate(d.statusHistory.length, (i) {
-            final h = d.statusHistory[i];
-            final isLast = i == d.statusHistory.length - 1;
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      width: 10, height: 10,
-                      decoration: BoxDecoration(
-                        color: isLast ? AppColors.primaryLightBrand : AppColors.borderLight,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: isLast ? AppColors.primaryLightBrand : AppColors.greyLight, width: 2),
-                      ),
-                    ),
-                    if (!isLast) Container(width: 2, height: 36, color: AppColors.borderLight),
-                  ],
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(h.status.label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isLast ? AppColors.primaryLightBrand : AppColors.textPrimary)),
-                        if (h.note != null) Text(h.note!, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                        Text(DateFormat('HH:mm dd/MM/yyyy').format(h.createdAt), style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNoteCard(String note) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _card(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeader(Icons.note_alt_rounded, 'Ghi chú'),
-          const SizedBox(height: 8),
-          Text(note, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActions(BuildContext context, BookingDetailModel d, NumberFormat fmt) {
     return Column(
       children: [
-        // Download invoice
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -372,8 +149,6 @@ class BookingDetailPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-
-        // Review button
         if (d.canReview)
           SizedBox(
             width: double.infinity,
@@ -393,8 +168,6 @@ class BookingDetailPage extends StatelessWidget {
               ),
             ),
           ),
-
-        // Cancel button
         if (d.canCancel) ...[
           const SizedBox(height: 10),
           SizedBox(
@@ -452,53 +225,6 @@ class BookingDetailPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────────────────
-  BoxDecoration _card() => BoxDecoration(
-    color: AppColors.white,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
-  );
-
-  Widget _sectionHeader(IconData icon, String label) => Row(
-    children: [
-      Icon(icon, color: AppColors.primaryLightBrand, size: 18),
-      const SizedBox(width: 6),
-      Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-    ],
-  );
-
-  Widget _infoRow(IconData icon, String label, String value) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Icon(icon, size: 14, color: AppColors.textHint),
-      const SizedBox(width: 6),
-      SizedBox(width: 60, child: Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textHint))),
-      Expanded(child: Text(value, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontWeight: FontWeight.w600))),
-    ],
-  );
-
-  Widget _priceRow(String label, String value, {bool isDiscount = false}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-        Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDiscount ? const Color(0xFF16A34A) : AppColors.textPrimary)),
-      ],
-    ),
-  );
-
-  String _paymentLabel(PaymentMethod m) {
-    switch (m) {
-      case PaymentMethod.MOMO: return 'MoMo 💜';
-      case PaymentMethod.VNPAY: return 'VNPay 🔵';
-      case PaymentMethod.ZALOPAY: return 'ZaloPay 🟢';
-      case PaymentMethod.WALLET: return 'Ví tài khoản 👛';
-      case PaymentMethod.CASH: return 'Tiền mặt 💵';
-      case PaymentMethod.BANK_TRANSFER: return 'Chuyển khoản 🏦';
-    }
   }
 
   (Color, Color, IconData) _statusStyle(BookingStatus s) {

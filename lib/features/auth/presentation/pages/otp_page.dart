@@ -1,7 +1,10 @@
+import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'dart:async';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_primary_button.dart';
 
 class OtpPage extends StatefulWidget {
   final String contactInfo; // e.g: "0987654321" or "email@example.com"
@@ -77,39 +80,9 @@ class _OtpPageState extends State<OtpPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                margin: const EdgeInsets.only(bottom: 24, top: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLightBrand.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.mark_email_read_rounded, size: 40, color: AppColors.primaryLightBrand),
-              ),
-              const Text(
-                'Xác thực mã OTP',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: const TextStyle(fontSize: 16, color: AppColors.textSecondary, height: 1.5),
-                  children: [
-                    const TextSpan(text: 'Vui lòng nhập mã gồm 6 chữ số đã được gửi đến '),
-                    TextSpan(
-                      text: widget.contactInfo,
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                    ),
-                  ],
-                ),
+              AuthHeader(
+                title: 'Xác thực mã OTP',
+                subtitle: 'Vui lòng nhập mã gồm 6 chữ số đã được gửi đến ${widget.contactInfo}',
               ),
               const SizedBox(height: 48),
 
@@ -153,18 +126,12 @@ class _OtpPageState extends State<OtpPage> {
               const SizedBox(height: 40),
 
               // Verify Button
-              ElevatedButton(
+              AuthPrimaryButton(
+                text: 'Xác Thực',
                 onPressed: () {
-                  // TODO: Implement verify OTP logic
+                  // Chuyển sang Reset Password (Demo flow)
+                  const ResetPasswordRoute().go(context);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryLightBrand,
-                  foregroundColor: AppColors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 0,
-                ),
-                child: const Text('Xác Thực', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
               
               const SizedBox(height: 32),

@@ -6,6 +6,7 @@ import 'package:dat_san_247_mobile/features/auth/presentation/pages/forgot_passw
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/otp_page.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/register_page.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/my_booking_models.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_confirm_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_detail_page.dart';
@@ -23,6 +24,7 @@ import 'package:dat_san_247_mobile/features/customer/promotions/presentation/pag
 import 'package:dat_san_247_mobile/features/customer/recurring_booking/presentation/pages/recurring_booking_page.dart';
 import 'package:dat_san_247_mobile/features/customer/support/presentation/pages/support_ticket_list_page.dart';
 import 'package:dat_san_247_mobile/features/customer/profile/presentation/pages/profile_settings_page.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_map_page.dart';
 import 'package:dat_san_247_mobile/features/owner/dashboard/presentation/pages/owner_shell_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/presentation/pages/venue_staff_shell_page.dart';
 import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/home_page.dart';
@@ -83,6 +85,13 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
   const ForgotPasswordRoute();
   @override
   Widget build(BuildContext context, GoRouterState state) => const ForgotPasswordPage();
+}
+
+@TypedGoRoute<ResetPasswordRoute>(path: RouteNames.resetPassword)
+class ResetPasswordRoute extends GoRouteData with $ResetPasswordRoute {
+  const ResetPasswordRoute();
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const ResetPasswordPage();
 }
 
 // ─── Main Shell & Home ─────────────────────────────────────────────
@@ -346,12 +355,12 @@ class VenueStaffShellRoute extends GoRouteData with $VenueStaffShellRoute {
 }
 
 // ─── Example ─────────────────────────────────────────────
-@TypedGoRoute<GoogleMapExampleRoute>(path: RouteNames.googleMap)
-class GoogleMapExampleRoute extends GoRouteData with $GoogleMapExampleRoute {
-  const GoogleMapExampleRoute();
-  @override
-  Widget build(BuildContext context, GoRouterState state) => const GoogleMapExamplePage();
-}
+// @TypedGoRoute<GoogleMapExampleRoute>(path: RouteNames.googleMap)
+// class GoogleMapExampleRoute extends GoRouteData with $GoogleMapExampleRoute {
+//   const GoogleMapExampleRoute();
+//   @override
+//   Widget build(BuildContext context, GoRouterState state) => const GoogleMapExamplePage();
+// }
 
 @TypedGoRoute<VenueMapRoute>(path: RouteNames.venueMap)
 class VenueMapRoute extends GoRouteData with $VenueMapRoute {

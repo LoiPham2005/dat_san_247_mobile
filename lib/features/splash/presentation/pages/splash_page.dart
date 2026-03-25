@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/config/app/app_startup.dart';
+import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -34,8 +36,21 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   }
 
   Future<void> _startAppSequence() async {
+    // Thêm delay 2 giây để người dùng kịp thấy logo
+    await Future.delayed(const Duration(seconds: 2));
+
     // 4. Finally, Boot & Navigate
-    await AppStartup.launch(context);
+    if (mounted) {
+      final isFirstRun = await AppStartup.launch(context);
+      if (mounted) {
+        if (isFirstRun) {
+          context.go(RouteNames.onboarding);
+        } else {
+          // RouteGuard tự hiệu chỉnh redirect về login nếu chưa đăng nhập
+          context.go(RouteNames.login);
+        }
+      }
+    }
   }
 
   @override

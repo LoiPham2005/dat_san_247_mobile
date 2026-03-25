@@ -25,6 +25,7 @@ class RouteGuards {
     RouteNames.register,
     RouteNames.otp,
     RouteNames.forgotPassword,
+    RouteNames.resetPassword,
     RouteNames.googleMap,
     RouteNames.home,
     RouteNames.main,
@@ -32,8 +33,6 @@ class RouteGuards {
     RouteNames.venues,
     RouteNames.venueDetail,
     RouteNames.timeSlotPicker,
-
-
   };
 
   // Routes that authenticated users should not access (auth pages)
@@ -43,6 +42,7 @@ class RouteGuards {
     RouteNames.register,
     RouteNames.otp,
     RouteNames.forgotPassword,
+    RouteNames.resetPassword,
   };
 
   // Public route prefixes - cho các route có dynamic params như /venue-detail/:id

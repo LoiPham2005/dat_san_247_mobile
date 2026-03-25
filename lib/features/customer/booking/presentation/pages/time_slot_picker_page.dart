@@ -82,6 +82,8 @@ class _TimeSlotPickerPageState extends State<TimeSlotPickerPage> {
       ));
     }
 
+    if (!mounted) return;
+
     setState(() {
       _availability = CourtAvailabilityModel(
         courtId: widget.courtId,

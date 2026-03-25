@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import '../widgets/auth_form_field.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_primary_button.dart';
+import '../widgets/login_prompt.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -15,7 +19,7 @@ class RegisterPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/login'),
+          onPressed: () => context.canPop() ? context.pop() : context.go(RouteNames.login),
         ),
       ),
       body: SafeArea(
@@ -24,23 +28,11 @@ class RegisterPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Tạo tài khoản mới',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Điền thông tin của bạn để tham gia vào nền tảng thể thao',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
+              const AuthHeader(
+                title: 'Tạo tài khoản mới',
+                subtitle: 'Điền thông tin của bạn để tham gia vào nền tảng thể thao',
+                showIcon: false,
+                centerAlign: false,
               ),
               const SizedBox(height: 40),
 
@@ -67,54 +59,15 @@ class RegisterPage extends StatelessWidget {
               const SizedBox(height: 40),
 
               // Register Button
-              ElevatedButton(
+              AuthPrimaryButton(
+                text: 'Đăng Ký',
                 onPressed: () {
                   // TODO: Implement Logic and Navigate to OTP Page
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryLightBrand,
-                  foregroundColor: AppColors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 0,
-                ),
-                child: const Text('Đăng Ký', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
 
               const SizedBox(height: 24),
-              
-              // Login Prompt
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Đã có tài khoản?',
-                    style: TextStyle(color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(width: 4),
-                  TextButton(
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.go('/login');
-                      }
-                    },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(50, 30),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Đăng nhập',
-                      style: TextStyle(
-                        color: AppColors.primaryLightBrand,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              )
+              const LoginPrompt(),
             ],
           ),
         ),
