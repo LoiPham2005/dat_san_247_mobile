@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+
+import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
 
 class DealsAppBar extends StatelessWidget {
   const DealsAppBar({super.key});
@@ -7,6 +10,8 @@ class DealsAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
+      automaticallyImplyLeading:
+          context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null,
       expandedHeight: 120,
       pinned: true,
       backgroundColor: AppColors.primaryLightBrand,

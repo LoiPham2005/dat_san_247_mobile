@@ -6,6 +6,8 @@ import 'package:dat_san_247_mobile/features/shared/venue/data/models/venue_model
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
+
 import '../widgets/home_active_promotions.dart';
 import '../widgets/home_banner_slider.dart';
 import '../widgets/home_featured_venues.dart';
@@ -156,6 +158,8 @@ class _HomePageState extends State<HomePage> {
 
   AppBar _buildAppBar() {
     return AppBar(
+      automaticallyImplyLeading:
+          context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null,
       backgroundColor: AppColors.primaryLightBrand,
       elevation: 0,
       toolbarHeight: 70,

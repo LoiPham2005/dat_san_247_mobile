@@ -27,9 +27,11 @@ class VenueSearchInputField extends StatelessWidget {
       child: TextField(
         controller: controller,
         focusNode: focusNode,
+        textAlignVertical: TextAlignVertical.center,
         textInputAction: TextInputAction.search,
         onSubmitted: onSubmitted,
         decoration: InputDecoration(
+          isDense: true,
           hintText: 'Tìm kiếm sân...',
           hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
           prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textHint, size: 20),
@@ -40,7 +42,7 @@ class VenueSearchInputField extends StatelessWidget {
             constraints: const BoxConstraints(),
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          contentPadding: EdgeInsets.zero,
         ),
       ),
     );

@@ -1,12 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
+import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_filter_params.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/venue_list_item.dart';
 import '../widgets/venue_filter_bottom_sheet.dart';
+import '../widgets/venue_list_item.dart';
 
 class VenueListPage extends StatefulWidget {
   final String? initialQuery;
@@ -96,16 +98,23 @@ class _VenueListPageState extends State<VenueListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showBack =
+        context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null;
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
+        automaticallyImplyLeading: showBack,
         backgroundColor: AppColors.white,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
-        title: _buildSearchInput(),
+        leading: showBack
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+                onPressed: () => context.pop(),
+              )
+            : null,
+        title: _buildSearchInput(showBack),
         titleSpacing: 0,
         actions: [
           IconButton(
@@ -135,35 +144,29 @@ class _VenueListPageState extends State<VenueListPage> {
     );
   }
 
-  Widget _buildSearchInput() {
+  Widget _buildSearchInput(bool showBack) {
     return Container(
       height: 40,
-      margin: const EdgeInsets.only(right: 8),
+      margin: EdgeInsets.only(left: showBack ? 0 : 16, right: 8),
       decoration: BoxDecoration(
         color: AppColors.mutedLight,
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
         controller: _searchController,
-        textInputAction: TextInputAction.search,
-        onSubmitted: (val) {
-          // REFETCH DATA
+        readOnly: true,
+        textAlignVertical: TextAlignVertical.center,
+        onTap: () {
+          context.push(
+              '${RouteNames.venueSearch}?initialQuery=${Uri.encodeComponent(_searchController.text)}');
         },
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
+          isDense: true,
           hintText: 'Tìm kiếm sân...',
-          hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
-          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textHint, size: 20),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.close_rounded, color: AppColors.textHint, size: 18),
-            onPressed: () {
-              _searchController.clear();
-              // REFETCH DATA
-            },
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
+          hintStyle: TextStyle(color: AppColors.textHint, fontSize: 14),
+          prefixIcon: Icon(Icons.search_rounded, color: AppColors.textHint, size: 20),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          contentPadding: EdgeInsets.symmetric(horizontal: 0),
         ),
       ),
     );

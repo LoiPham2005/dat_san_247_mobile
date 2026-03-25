@@ -69,19 +69,12 @@ class _MainShellPageState extends State<MainShellPage>
 
   @override
   Widget build(BuildContext context) {
-    // Chiều cao ước tính của bottom nav: 80 (height) + safe area bottom
-    final double bottomPadding =
-        80 + MediaQuery.of(context).padding.bottom + 16;
-
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.only(bottom: bottomPadding),
-        child: PageStorage(
-          bucket: _bucket,
-          child: _pages[_currentIndex],
-        ),
+      body: PageStorage(
+        bucket: _bucket,
+        child: _pages[_currentIndex],
       ),
-      extendBody: true, // Vẫn giữ true để đảm bảo UI mướt
+      extendBody: false, // Tắt để không bị đè nội dung phía dưới
       bottomNavigationBar: MainBottomNav(
         currentIndex: _currentIndex,
         items: _navItems,

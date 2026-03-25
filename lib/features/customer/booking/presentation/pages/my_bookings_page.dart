@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/my_booking_models.dart';
+import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
 import '../widgets/booking_list_item_card.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -119,6 +120,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       appBar: AppBar(
+        automaticallyImplyLeading:
+            context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null,
         backgroundColor: AppColors.white,
         elevation: 0,
         title: const Text('Lịch đặt sân',

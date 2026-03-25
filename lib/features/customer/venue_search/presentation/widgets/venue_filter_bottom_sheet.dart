@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_filter_params.dart';
+import 'package:flutter/material.dart';
 
 class VenueFilterBottomSheet extends StatefulWidget {
   final VenueFilterParams initialParams;
@@ -20,7 +20,14 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
   late VenueFilterParams _currentParams;
 
   // Mock data for UI
-  final List<String> _districts = ['Quận 10', 'Quận 1', 'Quận 3', 'Bình Thạnh', 'Tân Bình', 'Thủ Đức'];
+  final List<String> _districts = [
+    'Quận 10',
+    'Quận 1',
+    'Quận 3',
+    'Bình Thạnh',
+    'Tân Bình',
+    'Thủ Đức'
+  ];
   final List<String> _sportTypes = ['FOOTBALL', 'BADMINTON', 'TENNIS', 'BASKETBALL', 'SWIMMING'];
   final List<String> _amenities = ['WIFI', 'Bãi xe Ô tô', 'Căng tin', 'Tủ đồ', 'Trọng tài'];
 
@@ -35,7 +42,7 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
     _currentParams = widget.initialParams;
     _priceRange = RangeValues(
       _currentParams.minPrice ?? 0,
-       _currentParams.maxPrice ?? 1000,
+      _currentParams.maxPrice ?? 1000,
     );
     _selectedDate = _currentParams.availableDate;
     if (_currentParams.availableStartTime != null) {
@@ -61,8 +68,12 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
       minPrice: _priceRange.start > 0 ? _priceRange.start : null,
       maxPrice: _priceRange.end < 1000 ? _priceRange.end : null,
       availableDate: _selectedDate,
-      availableStartTime: _startTime != null ? '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}' : null,
-      availableEndTime: _endTime != null ? '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}' : null,
+      availableStartTime: _startTime != null
+          ? '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}'
+          : null,
+      availableEndTime: _endTime != null
+          ? '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}'
+          : null,
     );
     widget.onApply(updatedParams);
     Navigator.pop(context);
@@ -85,23 +96,19 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   const SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildSectionTitle('Môn thể thao'),
                   _buildSportChips(),
                   const Divider(height: 32),
-                  
                   _buildSectionTitle('Khu vực (Theo Quận)'),
                   _buildDistrictChips(),
                   const Divider(height: 32),
-                  
                   _buildSectionTitle('Khoảng giá (Nghìn VND / Giờ)'),
                   _buildPriceSlider(),
                   const Divider(height: 32),
-
                   _buildSectionTitle('Tiện ích đi kèm'),
                   _buildAmenitiesChips(),
                   const Divider(height: 32),
-
                   _buildSectionTitle('Thời gian còn trống'),
                   _buildTimeSelector(),
                 ],
@@ -116,7 +123,8 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: const BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -127,15 +135,14 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
         children: [
           const Text(
             'Bộ lọc',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+            style:
+                TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
           ),
-          Positioned(
-            right: 0,
+          Align(
+            alignment: Alignment.centerRight,
             child: IconButton(
               icon: const Icon(Icons.close_rounded, color: AppColors.textPrimary),
               onPressed: () => Navigator.pop(context),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
             ),
           ),
         ],
@@ -148,7 +155,8 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        style: const TextStyle(
+            fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
       ),
     );
   }
@@ -172,7 +180,8 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
           backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight),
+            side:
+                BorderSide(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight),
           ),
         );
       }).toList(),
@@ -198,7 +207,8 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
           backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight),
+            side:
+                BorderSide(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight),
           ),
         );
       }).toList(),
@@ -230,7 +240,8 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
           backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight),
+            side:
+                BorderSide(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight),
           ),
         );
       }).toList(),
@@ -243,8 +254,10 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('${_priceRange.start.toInt()}K', style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text('${_priceRange.end.toInt()}K+', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('${_priceRange.start.toInt()}K',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('${_priceRange.end.toInt()}K+',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         RangeSlider(
@@ -271,7 +284,9 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
           contentPadding: EdgeInsets.zero,
           title: const Text('Ngày thi đấu', style: TextStyle(fontSize: 14)),
           trailing: Text(
-            _selectedDate != null ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}' : 'Chọn ngày',
+            _selectedDate != null
+                ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
+                : 'Chọn ngày',
             style: TextStyle(
               color: _selectedDate != null ? AppColors.textPrimary : AppColors.textHint,
               fontWeight: FontWeight.bold,
@@ -300,7 +315,7 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
             ),
           ),
           onTap: () async {
-             final picked = await showTimePicker(
+            final picked = await showTimePicker(
               context: context,
               initialTime: _startTime ?? TimeOfDay.now(),
             );
@@ -337,7 +352,8 @@ class _VenueFilterBottomSheetState extends State<VenueFilterBottomSheet> {
                 side: const BorderSide(color: AppColors.borderLight),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Thiết lập lại', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+              child: const Text('Thiết lập lại',
+                  style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(width: 16),

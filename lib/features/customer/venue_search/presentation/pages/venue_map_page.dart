@@ -2,10 +2,13 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/services/permission/permission_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
@@ -19,10 +22,9 @@ import '../widgets/venue_marker.dart';
 const _kHanoi = LatLng(21.0285, 105.8542);
 const _kInitialZoom = 13.5;
 const _kSelectedZoom = 15.5;
-const _kAnimDuration = Duration(milliseconds: 420);
 const _kOsmTile = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-enum _SheetSize { collapsed, list, detail }
+enum _SheetSize { collapsed, list, detail, full }
 
 class VenueMapPage extends StatefulWidget {
   final List<VenueSearchResultModel> venues;
@@ -157,20 +159,17 @@ class VenueMapPage extends StatefulWidget {
   State<VenueMapPage> createState() => _VenueMapPageState();
 }
 
-class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMixin {
+class _VenueMapPageState extends State<VenueMapPage> {
   final MapController _mapController = MapController();
   final DraggableScrollableController _sheetCtrl = DraggableScrollableController();
-
-  late final AnimationController _markerAnimCtrl = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 300),
-  );
 
   VenueSearchResultModel? _selected;
   String _sportFilter = 'Tất cả';
   LatLng? _userLocation;
 
   final NumberFormat _priceFmt = NumberFormat('#,###', 'vi_VN');
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   List<VenueSearchResultModel> get _allVenues =>
       widget.venues.isNotEmpty ? widget.venues : VenueMapPage.mockVenues;
@@ -180,9 +179,17 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
         ..._allVenues.expand((v) => v.sportTypes).toSet(),
       ];
 
-  List<VenueSearchResultModel> get _filtered => _sportFilter == 'Tất cả'
-      ? _allVenues
-      : _allVenues.where((v) => v.sportTypes.contains(_sportFilter)).toList();
+  List<VenueSearchResultModel> get _filtered {
+    return _allVenues.where((v) {
+      final matchesSport = _sportFilter == 'Tất cả' || v.sportTypes.contains(_sportFilter);
+      final matchesQuery = _searchQuery.isEmpty ||
+          v.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          v.address.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          v.city.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          v.district.toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesSport && matchesQuery;
+    }).toList();
+  }
 
   LatLng get _center {
     if (widget.initialLat != null && widget.initialLng != null) {
@@ -198,14 +205,15 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fitAllVenues());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _fitAllVenues();
+    });
   }
 
   @override
   void dispose() {
-    _mapController.dispose();
     _sheetCtrl.dispose();
-    _markerAnimCtrl.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -230,35 +238,7 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
 
   void _animatedMove(LatLng dest, double zoom) {
     if (!mounted) return;
-    
-    final latTween = Tween<double>(
-      begin: _mapController.camera.center.latitude,
-      end: dest.latitude,
-    );
-    final lngTween = Tween<double>(
-      begin: _mapController.camera.center.longitude,
-      end: dest.longitude,
-    );
-    final zoomTween = Tween<double>(
-      begin: _mapController.camera.zoom,
-      end: zoom,
-    );
-
-    final ctrl = AnimationController(vsync: this, duration: _kAnimDuration);
-    final anim = CurvedAnimation(parent: ctrl, curve: Curves.easeOutCubic);
-
-    ctrl.addListener(() {
-      _mapController.move(
-        LatLng(latTween.evaluate(anim), lngTween.evaluate(anim)),
-        zoomTween.evaluate(anim),
-      );
-    });
-    ctrl.addStatusListener((s) {
-      if (s == AnimationStatus.completed || s == AnimationStatus.dismissed) {
-        ctrl.dispose();
-      }
-    });
-    ctrl.forward();
+    _mapController.move(dest, zoom);
   }
 
   void _selectVenue(VenueSearchResultModel venue) {
@@ -280,35 +260,62 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
       _selected = null;
     });
     Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) _fitAllVenues();
+      if (!mounted) return;
+      _fitAllVenues();
     });
   }
 
   void _snapSheet(_SheetSize size) {
-    if (!_sheetCtrl.isAttached) return;
+    if (!mounted || !_sheetCtrl.isAttached) return;
 
     final target = switch (size) {
       _SheetSize.collapsed => 0.10,
       _SheetSize.list => 0.36,
       _SheetSize.detail => 0.52,
+      _SheetSize.full => 0.80,
     };
     _sheetCtrl.animateTo(
       target,
-      duration: const Duration(milliseconds: 340),
-      curve: Curves.easeOutCubic,
+      duration: const Duration(milliseconds: 1),
+      curve: Curves.linear,
     );
   }
 
   Future<void> _goToMyLocation() async {
-    if (_userLocation != null) {
-      _animatedMove(_userLocation!, 15);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Chưa lấy được vị trí GPS'),
-          behavior: SnackBarBehavior.floating,
+    if (!mounted) return;
+
+    final permissionService = getIt<PermissionService>();
+    final isGranted = await permissionService.requestLocation(context);
+
+    if (!isGranted) return;
+
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
         ),
       );
+
+      if (!mounted) return;
+
+      final userLat = position.latitude;
+      final userLng = position.longitude;
+
+      setState(() {
+        _userLocation = LatLng(userLat, userLng);
+      });
+
+      _animatedMove(_userLocation!, 15);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Không thể lấy vị trí: $e'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -316,6 +323,7 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F1923),
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           _buildMap(),
@@ -437,53 +445,80 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
         children: [
           MapFloatBtn(
             icon: Icons.arrow_back_rounded,
-            onTap: () => context.pop(),
+            onTap: () {
+              if (mounted) context.pop();
+            },
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: GestureDetector(
-              onTap: () => context.push('/search'),
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.18),
-                      blurRadius: 14,
-                      offset: const Offset(0, 3),
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    blurRadius: 14,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Row(
+                children: [
+                  Icon(Icons.search_rounded, color: Colors.grey[400], size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1F26)),
+                      decoration: InputDecoration(
+                        hintText: 'Tìm sân thể thao...',
+                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                    _selected = null;
+                                  });
+                                  _fitAllVenues();
+                                },
+                                child: Icon(Icons.close_rounded, size: 18, color: Colors.grey[400]),
+                              )
+                            : null,
+                      ),
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (val) {
+                        setState(() {
+                          _searchQuery = val.trim();
+                          _selected = null;
+                        });
+                        _fitAllVenues();
+                      },
                     ),
-                  ],
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Row(
-                  children: [
-                    Icon(Icons.search_rounded, color: Colors.grey[400], size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Tìm sân thể thao...',
-                        style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLightBrand.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${_filtered.length} sân',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryLightBrand,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLightBrand.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${_filtered.length} sân',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryLightBrand,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -525,12 +560,14 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
                   ),
                 ],
               ),
-              child: Text(
-                sport,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                  color: sel ? Colors.white : const Color(0xFF2C3E50),
+              child: Center(
+                child: Text(
+                  sport,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                    color: sel ? Colors.white : const Color(0xFF2C3E50),
+                  ),
                 ),
               ),
             ),
@@ -568,9 +605,9 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
       controller: _sheetCtrl,
       initialChildSize: 0.36,
       minChildSize: 0.10,
-      maxChildSize: 0.90,
+      maxChildSize: 0.80,
       snap: true,
-      snapSizes: const [0.10, 0.36, 0.52, 0.90],
+      snapSizes: const [0.10, 0.36, 0.52, 0.80],
       builder: (context, scrollCtrl) {
         final header = Column(
           children: [
@@ -579,8 +616,10 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
               final s = _sheetCtrl.size;
               if (s < 0.25) {
                 _snapSheet(_SheetSize.list);
-              } else if (s < 0.60) {
+              } else if (s < 0.45) {
                 _snapSheet(_SheetSize.detail);
+              } else if (s < 0.70) {
+                _snapSheet(_SheetSize.full);
               } else {
                 _snapSheet(_SheetSize.collapsed);
               }
@@ -634,7 +673,9 @@ class _VenueMapPageState extends State<VenueMapPage> with TickerProviderStateMix
                   priceFmt: _priceFmt,
                   scrollCtrl: scrollCtrl,
                   header: header,
-                  onBook: () => context.push('/venue-detail/${_selected!.slug}'),
+                  onBook: () {
+                    if (mounted) context.push('/venue-detail/${_selected!.slug}');
+                  },
                 )
               : VenueListPanel(
                   key: const ValueKey('list'),

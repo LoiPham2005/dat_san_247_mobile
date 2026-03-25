@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 
-export 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/my_bookings_page.dart' show MyBookingsPage;
+import 'main_shell_page.dart';
+
+export 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/my_bookings_page.dart'
+    show MyBookingsPage;
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -15,6 +18,8 @@ class ProfilePage extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            automaticallyImplyLeading:
+                context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null,
             expandedHeight: 180,
             pinned: true,
             backgroundColor: AppColors.primaryLightBrand,
