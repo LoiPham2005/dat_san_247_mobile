@@ -15,7 +15,7 @@ class AppRoutesObserver extends NavigatorObserver {
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
-    Logger.info('🔙 Pop: ${_routeName(route)} → ${_routeName(previousRoute)}', tag: 'NAV');
+    Logger.info('🔙 Pop: ${_routeName(previousRoute)} ← ${_routeName(route)}', tag: 'NAV');
   }
 
   @override
