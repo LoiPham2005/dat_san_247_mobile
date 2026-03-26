@@ -3,55 +3,41 @@
 // ════════════════════════════════════════════════════════════════
 
 /// Standard API response wrapper
-///
-/// Hỗ trợ 2 dạng response phổ biến từ backend:
-/// - `{ "success": true, "data": {...} }`
-/// - `{ "result": true,  "data": {...} }`
+/// Khớp hoàn toàn với TransformInterceptor của Backend NestJS
 class ApiResponse<T> {
   final bool isSuccess;
   final String? message;
   final T? data;
-  final String? error;
-  final int? code;
+  final int? statusCode;
+  final dynamic meta;
 
   const ApiResponse({
     required this.isSuccess,
     this.message,
     this.data,
-    this.error,
-    this.code,
+    this.statusCode,
+    this.meta,
   });
 
-  /// Parse từ JSON — tự detect field `success` hoặc `result`
+  /// Parse từ JSON với generic T
   factory ApiResponse.fromJson(
     Map<String, dynamic> json,
-    T Function(Object?) fromJsonT,
+    T Function(Object? json) fromJsonT,
   ) {
-    // Hỗ trợ cả "success" lẫn "result" từ các API khác nhau
-    final rawSuccess = json['success'] ?? json['result'] ?? false;
-    final isSuccess = rawSuccess is bool
-        ? rawSuccess
-        : rawSuccess.toString().toLowerCase() == 'true';
-
     return ApiResponse<T>(
-      isSuccess: isSuccess,
+      isSuccess: json['success'] ?? false,
       message: json['message']?.toString(),
       data: json['data'] != null ? fromJsonT(json['data']) : null,
-      error: json['error']?.toString(),
-      code: json['code'] is int
-          ? json['code']
-          : int.tryParse('${json['code']}'),
+      statusCode: json['statusCode'] as int?,
+      meta: json['meta'],
     );
   }
 
-  /// Convert thành JSON
-  Map<String, dynamic> toJson(Object? Function(T value)? toJsonT) {
-    return {
-      'success': isSuccess,
-      'message': message,
-      'data': data != null && toJsonT != null ? toJsonT(data as T) : data,
-      'error': error,
-      'code': code,
-    };
+  /// Tiện ích bóc tách dữ liệu an toàn
+  T get unwrappedData {
+    if (data == null) {
+      throw Exception('Response data is null');
+    }
+    return data!;
   }
 }

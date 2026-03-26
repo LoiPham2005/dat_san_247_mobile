@@ -1,47 +1,24 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/features/category/data/category_model.dart
 // ════════════════════════════════════════════════════════════════
-import 'package:equatable/equatable.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'category_model.freezed.dart';
 part 'category_model.g.dart';
 
-@JsonSerializable()
-class CategoryRutGonModel extends Equatable {
-  final int categoryId;
-  final String categoryName;
-  final String? description;
-  final String? iconUrl;
-  final String? cloudinaryId;
-  final String status;
-  final int displayOrder;
-  final DateTime createdAt;
-
-  const CategoryRutGonModel({
-    required this.categoryId,
-    required this.categoryName,
-    this.description,
-    this.iconUrl,
-    this.cloudinaryId,
-    required this.status,
-    required this.displayOrder,
-    required this.createdAt,
-  });
+@freezed
+abstract class CategoryRutGonModel with _$CategoryRutGonModel {
+  const factory CategoryRutGonModel({
+    required int categoryId,
+    required String categoryName,
+    String? description,
+    String? iconUrl,
+    String? cloudinaryId,
+    required String status,
+    required int displayOrder,
+    required DateTime createdAt,
+  }) = _CategoryRutGonModel;
 
   factory CategoryRutGonModel.fromJson(Map<String, dynamic> json) =>
       _$CategoryRutGonModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CategoryRutGonModelToJson(this);
-
-  @override
-  List<Object?> get props => [
-    categoryId,
-    categoryName,
-    description,
-    iconUrl,
-    cloudinaryId,
-    status,
-    displayOrder,
-    createdAt,
-  ];
 }

@@ -2,19 +2,19 @@ class ApiConstants {
   ApiConstants._();
 
   // ── Domains (private — chỉ dùng nội bộ file này) ──────────────
-  static const String _domainDev = 'http://192.168.2.4:3000';
-  static const String _domainStg = 'http://192.168.2.7:3000';
-  static const String _domainProd = 'https://api.example.com'; // TODO: prod domain
+  static const String _domainDev = 'http://192.168.60.102:3001';
+  static const String _domainStg = 'http://192.168.60.102:3001';
+  static const String _domainProd = 'http://192.168.60.102:3001'; // TODO: prod domain
 
   // ── Base REST URLs ────────────────────────────────────────────
-  static const String baseUrlDev = '$_domainDev/api';
-  static const String baseUrlStg = '$_domainStg/api';
-  static const String baseUrlProd = '$_domainProd/api';
+  static const String baseUrlDev = '$_domainDev/api/v1';
+  static const String baseUrlStg = '$_domainStg/api/v1';
+  static const String baseUrlProd = '$_domainProd/api/v1';
 
   // ── WebSocket URLs ────────────────────────────────────────────
-  static const String wsUrlDev = 'ws://192.168.2.4:3000/ws';
-  static const String wsUrlStg = 'ws://192.168.2.7:3000/ws';
-  static const String wsUrlProd = 'wss://api.example.com/ws';
+  static const String wsUrlDev = 'ws://192.168.60.102:3001/ws';
+  static const String wsUrlStg = 'ws://192.168.60.102:3001/ws';
+  static const String wsUrlProd = 'wss://192.168.60.102:3001/ws';
 
   // ── Timeouts (dùng chung 3 môi trường) ───────────────────────
   static const Duration connectTimeoutDev = Duration(seconds: 30);

@@ -8,7 +8,7 @@ import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../features/auth/data/models/auth_token_model.dart';
+import '../../../features/auth/data/models/auth_response.dart';
 import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
 
@@ -46,7 +46,7 @@ class AppAuthCubit extends Cubit<AppAuthState> {
   // ═══════════════════════════════════════════════════════════════
 
   /// Cập nhật trạng thái sau khi Login thành công
-  Future<void> loginSuccess(AuthResponseModel response) async {
+  Future<void> loginSuccess(AuthResponse response) async {
     await _authService.saveLoginData(response);
     // AppAuthService sẽ tự emit AuthStatus.authenticated, _listenToAuthChanges sẽ bắt được
   }

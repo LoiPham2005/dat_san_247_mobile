@@ -123,8 +123,8 @@ class ApiClient {
     }
 
     throw ServerException(
-      message: response.error ?? response.message ?? 'Request failed',
-      code: response.code?.toString(),
+      message: response.message ?? 'Request failed',
+      code: response.statusCode?.toString(),
     );
   }
 

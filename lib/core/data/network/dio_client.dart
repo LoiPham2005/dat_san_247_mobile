@@ -3,12 +3,8 @@
 // ════════════════════════════════════════════════════════════════
 import 'package:dio/dio.dart';
 import 'package:dat_san_247_mobile/config/app/flavor_config.dart';
-import 'package:dat_san_247_mobile/core/common/constants/api_constants.dart';
 import 'package:injectable/injectable.dart';
-
-import '../../common/constants/app_constants.dart';
 import 'interceptors/auth_interceptor.dart';
-// import 'interceptors/error_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/smart_cache_interceptor.dart';
 

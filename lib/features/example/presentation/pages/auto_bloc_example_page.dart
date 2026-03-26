@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/base/state/bloc/auto_bloc/auto_bloc.dart';
 import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/features/example/category_rut_gon/presentation/cubit/category_cubit.dart';
-import 'package:dat_san_247_mobile/gen/bloc/bloc_extensions.g.dart';
 
 class AutoBlocExamplePage extends StatelessWidget {
   const AutoBlocExamplePage({super.key});

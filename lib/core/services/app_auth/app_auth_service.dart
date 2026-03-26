@@ -12,6 +12,7 @@ import 'package:dat_san_247_mobile/core/data/storage/secure/secure_storage_servi
 import 'package:injectable/injectable.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+import '../../../features/auth/data/models/auth_response.dart';
 import '../../../features/auth/data/models/auth_token_model.dart';
 import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
@@ -133,7 +134,7 @@ class AppAuthService {
     );
   }
 
-  Future<void> saveLoginData(AuthResponseModel response) async {
+  Future<void> saveLoginData(AuthResponse response) async {
     await _secureStorage.saveAccessToken(response.accessToken);
     await _secureStorage.saveRefreshToken(response.refreshToken);
 

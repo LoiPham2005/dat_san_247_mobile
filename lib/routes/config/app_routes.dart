@@ -88,11 +88,12 @@ class RegisterRoute extends GoRouteData with $RegisterRoute {
 
 @TypedGoRoute<OtpRoute>(path: RouteNames.otp)
 class OtpRoute extends GoRouteData with $OtpRoute {
-  const OtpRoute({required this.contactInfo});
+  const OtpRoute({required this.contactInfo, this.type = 'EMAIL_VERIFY'});
   final String contactInfo;
+  final String type;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => OtpPage(contactInfo: contactInfo);
+  Widget build(BuildContext context, GoRouterState state) => OtpPage(contactInfo: contactInfo, type: type);
 }
 
 @TypedGoRoute<ForgotPasswordRoute>(path: RouteNames.forgotPassword)
@@ -104,9 +105,12 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
 
 @TypedGoRoute<ResetPasswordRoute>(path: RouteNames.resetPassword)
 class ResetPasswordRoute extends GoRouteData with $ResetPasswordRoute {
-  const ResetPasswordRoute();
+  const ResetPasswordRoute({required this.email, required this.code});
+  final String email;
+  final String code;
+
   @override
-  Widget build(BuildContext context, GoRouterState state) => const ResetPasswordPage();
+  Widget build(BuildContext context, GoRouterState state) => ResetPasswordPage(email: email, code: code);
 }
 
 // ─── Main Shell & Home ─────────────────────────────────────────────
