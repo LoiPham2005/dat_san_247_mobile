@@ -11,3 +11,4 @@ nhớ viết thêm chữ abstract và thêm @JsonSerializable(fieldRename: Field
 5. nhớ viết đường dẫn vào file api_endpoints.dart xong với vào file _service
 6. mỗi lần dùng cubit phải kiển tra đã khai báo BlocProvider của nó chưa
 7. check thông tin hay valifate ô nhập thì đọc file validators.dart hoặc các file trong thư mục extensions nó có đủ hết rồi
+8. nếu cái nào mà có thể dùng chung nhiều màn có thể viết vào thưu mục shared xong gọi ra
