@@ -1,19 +1,24 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'finance_models.freezed.dart';
+part 'finance_models.g.dart';
+
 // ── CommissionStatus (schema enum) ───────────────────────────────────────────
 enum CommissionStatus { PENDING, APPROVED, PAID, CANCELLED }
 
 extension CommissionStatusX on CommissionStatus {
   String get label => switch (this) {
-    CommissionStatus.PENDING   => 'Chờ duyệt',
-    CommissionStatus.APPROVED  => 'Đã duyệt',
-    CommissionStatus.PAID      => 'Đã thanh toán',
-    CommissionStatus.CANCELLED => 'Đã huỷ',
-  };
+        CommissionStatus.PENDING => 'Chờ duyệt',
+        CommissionStatus.APPROVED => 'Đã duyệt',
+        CommissionStatus.PAID => 'Đã thanh toán',
+        CommissionStatus.CANCELLED => 'Đã huỷ',
+      };
   String get emoji => switch (this) {
-    CommissionStatus.PENDING   => '⏳',
-    CommissionStatus.APPROVED  => '✅',
-    CommissionStatus.PAID      => '💰',
-    CommissionStatus.CANCELLED => '❌',
-  };
+        CommissionStatus.PENDING => '⏳',
+        CommissionStatus.APPROVED => '✅',
+        CommissionStatus.PAID => '💰',
+        CommissionStatus.CANCELLED => '❌',
+      };
 }
 
 // ── PayoutStatus (schema enum) ───────────────────────────────────────────────
@@ -21,146 +26,139 @@ enum PayoutStatus { PENDING, PROCESSING, COMPLETED, REJECTED, CANCELLED }
 
 extension PayoutStatusX on PayoutStatus {
   String get label => switch (this) {
-    PayoutStatus.PENDING    => 'Chờ xử lý',
-    PayoutStatus.PROCESSING => 'Đang xử lý',
-    PayoutStatus.COMPLETED  => 'Hoàn thành',
-    PayoutStatus.REJECTED   => 'Bị từ chối',
-    PayoutStatus.CANCELLED  => 'Đã huỷ',
-  };
+        PayoutStatus.PENDING => 'Chờ xử lý',
+        PayoutStatus.PROCESSING => 'Đang xử lý',
+        PayoutStatus.COMPLETED => 'Hoàn thành',
+        PayoutStatus.REJECTED => 'Bị từ chối',
+        PayoutStatus.CANCELLED => 'Đã huỷ',
+      };
 }
 
 // ── commission_records ────────────────────────────────────────────────────────
-class CommissionRecordModel {
-  final String id;
-  final String bookingId;
-  final String bookingCode;   // denormalized for display
-  final String venueId;
-  final String venueName;     // denormalized
-  final String ownerId;
-  final DateTime bookingDate; // denormalized
-  final String courtName;     // denormalized
-  final String customerName;  // denormalized
-  final double bookingAmount;
-  final double commissionRate;   // % e.g. 10.0
-  final double commissionAmount; // platform thu
-  final double ownerReceives;    // chủ sân nhận
-  final CommissionStatus status;
-  final DateTime? paidAt;
-  final DateTime createdAt;
+@freezed
+abstract class CommissionRecordModel with _$CommissionRecordModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory CommissionRecordModel({
+    required String id,
+    required String bookingId,
+    required String bookingCode,
+    required String venueId,
+    required String venueName,
+    required String ownerId,
+    required DateTime bookingDate,
+    required String courtName,
+    required String customerName,
+    required double bookingAmount,
+    required double commissionRate,
+    required double commissionAmount,
+    required double ownerReceives,
+    required CommissionStatus status,
+    DateTime? paidAt,
+    required DateTime createdAt,
+  }) = _CommissionRecordModel;
 
-  const CommissionRecordModel({
-    required this.id,
-    required this.bookingId,
-    required this.bookingCode,
-    required this.venueId,
-    required this.venueName,
-    required this.ownerId,
-    required this.bookingDate,
-    required this.courtName,
-    required this.customerName,
-    required this.bookingAmount,
-    required this.commissionRate,
-    required this.commissionAmount,
-    required this.ownerReceives,
-    required this.status,
-    this.paidAt,
-    required this.createdAt,
-  });
+  const CommissionRecordModel._();
+
+  factory CommissionRecordModel.fromJson(Map<String, dynamic> json) =>
+      _$CommissionRecordModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }
 
 // ── wallets ───────────────────────────────────────────────────────────────────
-class WalletModel {
-  final String id;
-  final String userId;
-  final double balance;
-  final double lockedBalance;
-  final bool isActive;
-  final List<BankAccountModel> bankAccounts;
-  final DateTime updatedAt;
+@freezed
+abstract class WalletModel with _$WalletModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory WalletModel({
+    required String id,
+    required String userId,
+    required double balance,
+    @Default(0) double lockedBalance,
+    @Default(true) bool isActive,
+    @Default([]) List<BankAccountModel> bankAccounts,
+    required DateTime updatedAt,
+  }) = _WalletModel;
 
-  const WalletModel({
-    required this.id,
-    required this.userId,
-    required this.balance,
-    this.lockedBalance = 0,
-    this.isActive = true,
-    this.bankAccounts = const [],
-    required this.updatedAt,
-  });
+  const WalletModel._();
 
   double get availableBalance => balance - lockedBalance;
+
+  factory WalletModel.fromJson(Map<String, dynamic> json) =>
+      _$WalletModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }
 
 // ── payout_bank_accounts ──────────────────────────────────────────────────────
-class BankAccountModel {
-  final String id;
-  final String walletId;
-  final String bankName;
-  final String bankCode;
-  final String accountNumber;
-  final String accountName;
-  final bool isDefault;
+@freezed
+abstract class BankAccountModel with _$BankAccountModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory BankAccountModel({
+    required String id,
+    required String walletId,
+    required String bankName,
+    required String bankCode,
+    required String accountNumber,
+    required String accountName,
+    @Default(false) bool isDefault,
+  }) = _BankAccountModel;
 
-  const BankAccountModel({
-    required this.id,
-    required this.walletId,
-    required this.bankName,
-    required this.bankCode,
-    required this.accountNumber,
-    required this.accountName,
-    this.isDefault = false,
-  });
+  const BankAccountModel._();
 
-  String get maskedAccount =>
-      accountNumber.length > 4 ? '****${accountNumber.substring(accountNumber.length - 4)}' : accountNumber;
+  String get maskedAccount => accountNumber.length > 4
+      ? '****${accountNumber.substring(accountNumber.length - 4)}'
+      : accountNumber;
+
+  factory BankAccountModel.fromJson(Map<String, dynamic> json) =>
+      _$BankAccountModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }
 
 // ── payout_requests ───────────────────────────────────────────────────────────
-class PayoutRequestModel {
-  final String id;
-  final String userId;
-  final double amount;
-  final PayoutStatus status;
-  final String bankAccountId;
-  final String bankAccountName; // denormalized for display
-  final String bankName;
-  final String? adminNote;
-  final String? rejectionReason;
-  final DateTime? processedAt;
-  final DateTime createdAt;
+@freezed
+abstract class PayoutRequestModel with _$PayoutRequestModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory PayoutRequestModel({
+    required String id,
+    required String userId,
+    required double amount,
+    required PayoutStatus status,
+    required String bankAccountId,
+    required String bankAccountName,
+    required String bankName,
+    String? adminNote,
+    String? rejectionReason,
+    DateTime? processedAt,
+    required DateTime createdAt,
+  }) = _PayoutRequestModel;
 
-  const PayoutRequestModel({
-    required this.id,
-    required this.userId,
-    required this.amount,
-    required this.status,
-    required this.bankAccountId,
-    required this.bankAccountName,
-    required this.bankName,
-    this.adminNote,
-    this.rejectionReason,
-    this.processedAt,
-    required this.createdAt,
-  });
+  const PayoutRequestModel._();
+
+  factory PayoutRequestModel.fromJson(Map<String, dynamic> json) =>
+      _$PayoutRequestModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }
 
 // ── Revenue summary (computed) ────────────────────────────────────────────────
-class RevenueSummaryModel {
-  final String month; // 'YYYY-MM'
-  final int bookingCount;
-  final double totalBookingAmount;
-  final double totalCommissionAmount;
-  final double totalOwnerReceives;
-  final double paidAmount;
-  final double pendingAmount;
+@freezed
+abstract class RevenueSummaryModel with _$RevenueSummaryModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory RevenueSummaryModel({
+    required String month, // 'YYYY-MM'
+    required int bookingCount,
+    required double totalBookingAmount,
+    required double totalCommissionAmount,
+    required double totalOwnerReceives,
+    required double paidAmount,
+    required double pendingAmount,
+  }) = _RevenueSummaryModel;
 
-  const RevenueSummaryModel({
-    required this.month,
-    required this.bookingCount,
-    required this.totalBookingAmount,
-    required this.totalCommissionAmount,
-    required this.totalOwnerReceives,
-    required this.paidAmount,
-    required this.pendingAmount,
-  });
+  const RevenueSummaryModel._();
+
+  factory RevenueSummaryModel.fromJson(Map<String, dynamic> json) =>
+      _$RevenueSummaryModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }

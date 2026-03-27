@@ -1,5 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'operating_hours_model.freezed.dart';
 part 'operating_hours_model.g.dart';
 
 @JsonEnum(alwaysCreate: true)
@@ -20,57 +21,42 @@ enum DayOfWeek {
   sunday,
 }
 
-@JsonSerializable()
-class OperatingHoursModel {
-  final String id;
-  @JsonKey(name: 'venue_id')
-  final String venueId;
-  @JsonKey(name: 'day_of_week')
-  final DayOfWeek dayOfWeek;
-  @JsonKey(name: 'open_time')
-  final String openTime;
-  @JsonKey(name: 'close_time')
-  final String closeTime;
-  @JsonKey(name: 'is_closed')
-  final bool isClosed;
+@freezed
+abstract class OperatingHoursModel with _$OperatingHoursModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory OperatingHoursModel({
+    required String id,
+    required String venueId,
+    required DayOfWeek dayOfWeek,
+    required String openTime,
+    required String closeTime,
+    required bool isClosed,
+  }) = _OperatingHoursModel;
 
-  OperatingHoursModel({
-    required this.id,
-    required this.venueId,
-    required this.dayOfWeek,
-    required this.openTime,
-    required this.closeTime,
-    required this.isClosed,
-  });
+  const OperatingHoursModel._();
 
   factory OperatingHoursModel.fromJson(Map<String, dynamic> json) =>
       _$OperatingHoursModelFromJson(json);
-  Map<String, dynamic> toJson() => _$OperatingHoursModelToJson(this);
+
+  Map<String, dynamic> toJson();
 }
 
-@JsonSerializable()
-class VenueScheduleExceptionModel {
-  final String id;
-  @JsonKey(name: 'venue_id')
-  final String venueId;
-  final DateTime date;
-  @JsonKey(name: 'open_time')
-  final String? openTime;
-  @JsonKey(name: 'close_time')
-  final String? closeTime;
-  @JsonKey(name: 'is_closed')
-  final bool isClosed;
+@freezed
+abstract class VenueScheduleExceptionModel with _$VenueScheduleExceptionModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory VenueScheduleExceptionModel({
+    required String id,
+    required String venueId,
+    required DateTime date,
+    String? openTime,
+    String? closeTime,
+    required bool isClosed,
+  }) = _VenueScheduleExceptionModel;
 
-  VenueScheduleExceptionModel({
-    required this.id,
-    required this.venueId,
-    required this.date,
-    this.openTime,
-    this.closeTime,
-    required this.isClosed,
-  });
+  const VenueScheduleExceptionModel._();
 
   factory VenueScheduleExceptionModel.fromJson(Map<String, dynamic> json) =>
       _$VenueScheduleExceptionModelFromJson(json);
-  Map<String, dynamic> toJson() => _$VenueScheduleExceptionModelToJson(this);
+
+  Map<String, dynamic> toJson();
 }

@@ -1,6 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'booking_waitlist_model.freezed.dart';
 part 'booking_waitlist_model.g.dart';
 
 enum WaitlistStatus {
@@ -11,62 +11,22 @@ enum WaitlistStatus {
   CANCELLED,
 }
 
-@JsonSerializable()
-class BookingWaitlistModel extends Equatable {
-  final String? id;
-  
-  @JsonKey(name: 'user_id')
-  final String userId;
-  
-  @JsonKey(name: 'court_id')
-  final String courtId;
-  
-  @JsonKey(name: 'booking_date')
-  final DateTime bookingDate;
-  
-  @JsonKey(name: 'start_time')
-  final String startTime;
-  
-  @JsonKey(name: 'end_time')
-  final String endTime;
-  
-  final int priority;
-  
-  @JsonKey(name: 'is_notified')
-  final bool isNotified;
-  
-  final WaitlistStatus status;
-  
-  @JsonKey(name: 'created_at')
-  final DateTime? createdAt;
+@freezed
+abstract class BookingWaitlistModel with _$BookingWaitlistModel {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  const factory BookingWaitlistModel({
+    String? id,
+    required String userId,
+    required String courtId,
+    required DateTime bookingDate,
+    required String startTime,
+    required String endTime,
+    @Default(1) int priority,
+    @Default(false) bool isNotified,
+    @Default(WaitlistStatus.WAITING) WaitlistStatus status,
+    DateTime? createdAt,
+  }) = _BookingWaitlistModel;
 
-  const BookingWaitlistModel({
-    this.id,
-    required this.userId,
-    required this.courtId,
-    required this.bookingDate,
-    required this.startTime,
-    required this.endTime,
-    this.priority = 1,
-    this.isNotified = false,
-    this.status = WaitlistStatus.WAITING,
-    this.createdAt,
-  });
-
-  factory BookingWaitlistModel.fromJson(Map<String, dynamic> json) => _$BookingWaitlistModelFromJson(json);
-  Map<String, dynamic> toJson() => _$BookingWaitlistModelToJson(this);
-
-  @override
-  List<Object?> get props => [
-        id,
-        userId,
-        courtId,
-        bookingDate,
-        startTime,
-        endTime,
-        priority,
-        isNotified,
-        status,
-        createdAt,
-      ];
+  factory BookingWaitlistModel.fromJson(Map<String, dynamic> json) =>
+      _$BookingWaitlistModelFromJson(json);
 }

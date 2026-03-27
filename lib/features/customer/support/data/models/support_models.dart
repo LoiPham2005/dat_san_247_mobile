@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'support_models.freezed.dart';
+part 'support_models.g.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // Enums (mapping schema.prisma)
@@ -121,325 +124,186 @@ enum Gender { MALE, FEMALE, OTHER;
 // ──────────────────────────────────────────────────────────────────────────
 // support_ticket_messages model
 // ──────────────────────────────────────────────────────────────────────────
-class TicketMessageModel extends Equatable {
-  final String id;
-  final String ticketId;
-  final String senderId;
-  final String senderName;
-  final String? senderAvatar;
-  final String message;
-  final bool isStaff;
-  final String? attachmentUrl;
-  final DateTime createdAt;
+@freezed
+abstract class TicketMessageModel with _$TicketMessageModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory TicketMessageModel({
+    required String id,
+    required String ticketId,
+    required String senderId,
+    required String senderName,
+    String? senderAvatar,
+    required String message,
+    @Default(false) bool isStaff,
+    String? attachmentUrl,
+    required DateTime createdAt,
+  }) = _TicketMessageModel;
 
-  const TicketMessageModel({
-    required this.id,
-    required this.ticketId,
-    required this.senderId,
-    required this.senderName,
-    this.senderAvatar,
-    required this.message,
-    required this.isStaff,
-    this.attachmentUrl,
-    required this.createdAt,
-  });
+  const TicketMessageModel._();
 
-  factory TicketMessageModel.fromJson(Map<String, dynamic> json) =>
-      TicketMessageModel(
-        id: json['id'],
-        ticketId: json['ticket_id'],
-        senderId: json['sender_id'],
-        senderName: json['users']?['full_name'] ?? 'Unknown',
-        senderAvatar: json['users']?['avatar_url'],
-        message: json['message'],
-        isStaff: json['is_staff'] ?? false,
-        attachmentUrl: json['attachment_url'],
-        createdAt: DateTime.parse(json['created_at']),
-      );
+  factory TicketMessageModel.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    if (json['users'] != null && json['users'] is Map) {
+      mappedJson['sender_name'] = json['users']['full_name'];
+      mappedJson['sender_avatar'] = json['users']['avatar_url'];
+    }
+    return _$TicketMessageModelFromJson(mappedJson);
+  }
 
-  @override
-  List<Object?> get props => [id, isStaff, createdAt];
+  Map<String, dynamic> toJson();
 }
 
 // ──────────────────────────────────────────────────────────────────────────
 // support_tickets model
 // ──────────────────────────────────────────────────────────────────────────
-class SupportTicketModel extends Equatable {
-  final String id;
-  final String ticketNumber;
-  final String customerId;
-  final SupportTicketCategory category;
-  final SupportTicketPriority priority;
-  final SupportTicketStatus status;
-  final String subject;
-  final String description;
-  final String? bookingId;
-  final String? bookingCode;
-  final String? venueId;
-  final String? venueName;
-  final String? resolution;
-  final DateTime? resolvedAt;
-  final DateTime? firstResponseAt;
-  final int? customerRating;
-  final String? customerFeedback;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final List<TicketMessageModel> messages;
+@freezed
+abstract class SupportTicketModel with _$SupportTicketModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory SupportTicketModel({
+    required String id,
+    required String ticketNumber,
+    required String customerId,
+    @Default(SupportTicketCategory.OTHER) SupportTicketCategory category,
+    @Default(SupportTicketPriority.MEDIUM) SupportTicketPriority priority,
+    @Default(SupportTicketStatus.OPEN) SupportTicketStatus status,
+    required String subject,
+    required String description,
+    String? bookingId,
+    String? bookingCode,
+    String? venueId,
+    String? venueName,
+    String? resolution,
+    DateTime? resolvedAt,
+    DateTime? firstResponseAt,
+    int? customerRating,
+    String? customerFeedback,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    @Default([]) List<TicketMessageModel> messages,
+  }) = _SupportTicketModel;
 
-  const SupportTicketModel({
-    required this.id,
-    required this.ticketNumber,
-    required this.customerId,
-    required this.category,
-    required this.priority,
-    required this.status,
-    required this.subject,
-    required this.description,
-    this.bookingId,
-    this.bookingCode,
-    this.venueId,
-    this.venueName,
-    this.resolution,
-    this.resolvedAt,
-    this.firstResponseAt,
-    this.customerRating,
-    this.customerFeedback,
-    required this.createdAt,
-    required this.updatedAt,
-    this.messages = const [],
-  });
+  const SupportTicketModel._();
 
-  factory SupportTicketModel.fromJson(Map<String, dynamic> json) =>
-      SupportTicketModel(
-        id: json['id'],
-        ticketNumber: json['ticket_number'],
-        customerId: json['customer_id'],
-        category: SupportTicketCategory.values.firstWhere(
-            (e) => e.name == json['category'],
-            orElse: () => SupportTicketCategory.OTHER),
-        priority: SupportTicketPriority.values.firstWhere(
-            (e) => e.name == json['priority'],
-            orElse: () => SupportTicketPriority.MEDIUM),
-        status: SupportTicketStatus.values.firstWhere(
-            (e) => e.name == json['status'],
-            orElse: () => SupportTicketStatus.OPEN),
-        subject: json['subject'],
-        description: json['description'],
-        bookingId: json['booking_id'],
-        bookingCode: json['bookings']?['booking_code'],
-        venueId: json['venue_id'],
-        venueName: json['venues']?['name'],
-        resolution: json['resolution'],
-        resolvedAt: json['resolved_at'] != null ? DateTime.parse(json['resolved_at']) : null,
-        firstResponseAt: json['first_response_at'] != null ? DateTime.parse(json['first_response_at']) : null,
-        customerRating: json['customer_rating'],
-        customerFeedback: json['customer_feedback'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        messages: (json['messages'] as List? ?? [])
-            .map((m) => TicketMessageModel.fromJson(m))
-            .toList(),
-      );
+  factory SupportTicketModel.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    if (json['bookings'] != null && json['bookings'] is Map) {
+      mappedJson['booking_code'] = json['bookings']['booking_code'];
+    }
+    if (json['venues'] != null && json['venues'] is Map) {
+      mappedJson['venue_name'] = json['venues']['name'];
+    }
+    return _$SupportTicketModelFromJson(mappedJson);
+  }
 
-  @override
-  List<Object?> get props => [id, status, ticketNumber];
+  Map<String, dynamic> toJson();
 }
 
 // ──────────────────────────────────────────────────────────────────────────
 // reports model
 // ──────────────────────────────────────────────────────────────────────────
-class ReportModel extends Equatable {
-  final String id;
-  final String reporterId;
-  final ReportTargetType targetType;
-  final String targetId;
-  final ReportReason reason;
-  final String? description;
-  final DateTime createdAt;
+@freezed
+abstract class ReportModel with _$ReportModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory ReportModel({
+    required String id,
+    required String reporterId,
+    required ReportTargetType targetType,
+    required String targetId,
+    required ReportReason reason,
+    String? description,
+    required DateTime createdAt,
+  }) = _ReportModel;
 
-  const ReportModel({
-    required this.id,
-    required this.reporterId,
-    required this.targetType,
-    required this.targetId,
-    required this.reason,
-    this.description,
-    required this.createdAt,
-  });
+  const ReportModel._();
 
-  Map<String, dynamic> toJson() => {
-        'reporter_id': reporterId,
-        'target_type': targetType.name,
-        'target_id': targetId,
-        'reason': reason.name,
-        'description': description,
-      };
+  factory ReportModel.fromJson(Map<String, dynamic> json) =>
+      _$ReportModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, targetType, reason];
+  Map<String, dynamic> toJson();
 }
 
 // ──────────────────────────────────────────────────────────────────────────
 // user_sport_preferences model
 // ──────────────────────────────────────────────────────────────────────────
-class SportPreferenceModel extends Equatable {
-  final String id;
-  final String userProfileId;
-  final String sportType;
-  final int skillLevel; // 1-5
+@freezed
+abstract class SportPreferenceModel with _$SportPreferenceModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory SportPreferenceModel({
+    required String id,
+    required String userProfileId,
+    required String sportType,
+    @Default(1) int skillLevel,
+  }) = _SportPreferenceModel;
 
-  const SportPreferenceModel({
-    required this.id,
-    required this.userProfileId,
-    required this.sportType,
-    required this.skillLevel,
-  });
+  const SportPreferenceModel._();
 
   factory SportPreferenceModel.fromJson(Map<String, dynamic> json) =>
-      SportPreferenceModel(
-        id: json['id'],
-        userProfileId: json['user_profile_id'],
-        sportType: json['sport_type'],
-        skillLevel: json['skill_level'] ?? 1,
-      );
+      _$SportPreferenceModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, sportType, skillLevel];
+  Map<String, dynamic> toJson();
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// user_profiles model (notification prefs gộp vào đây theo schema)
+// user_profiles model
 // ──────────────────────────────────────────────────────────────────────────
-class UserProfileModel extends Equatable {
-  final String id;
-  final String userId;
-  final String? bio;
-  final String? address;
-  final String? city;
-  final String? district;
-  final String? referralCode;
-  final String? referredById;
-  final bool isProfilePublic;
-  // Notification prefs (user_profiles fields)
-  final bool notifPush;
-  final bool notifEmail;
-  final bool notifSms;
-  final bool notifBooking;
-  final bool notifPromotion;
-  final bool notifPayment;
-  final bool notifSystem;
-  final bool notifStaff;
-  final List<SportPreferenceModel> sportPreferences;
+@freezed
+abstract class UserProfileModel with _$UserProfileModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory UserProfileModel({
+    required String id,
+    required String userId,
+    String? bio,
+    String? address,
+    String? city,
+    String? district,
+    String? referralCode,
+    String? referredById,
+    @Default(true) bool isProfilePublic,
+    @Default(true) bool notifPush,
+    @Default(true) bool notifEmail,
+    @Default(false) bool notifSms,
+    @Default(true) bool notifBooking,
+    @Default(true) bool notifPromotion,
+    @Default(true) bool notifPayment,
+    @Default(true) bool notifSystem,
+    @Default(true) bool notifStaff,
+    @Default([]) List<SportPreferenceModel> sportPreferences,
+  }) = _UserProfileModel;
 
-  const UserProfileModel({
-    required this.id,
-    required this.userId,
-    this.bio,
-    this.address,
-    this.city,
-    this.district,
-    this.referralCode,
-    this.referredById,
-    this.isProfilePublic = true,
-    this.notifPush = true,
-    this.notifEmail = true,
-    this.notifSms = false,
-    this.notifBooking = true,
-    this.notifPromotion = true,
-    this.notifPayment = true,
-    this.notifSystem = true,
-    this.notifStaff = true,
-    this.sportPreferences = const [],
-  });
+  const UserProfileModel._();
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) =>
-      UserProfileModel(
-        id: json['id'],
-        userId: json['user_id'],
-        bio: json['bio'],
-        address: json['address'],
-        city: json['city'],
-        district: json['district'],
-        referralCode: json['referral_code'],
-        referredById: json['referred_by_id'],
-        isProfilePublic: json['is_profile_public'] ?? true,
-        notifPush: json['notif_push'] ?? true,
-        notifEmail: json['notif_email'] ?? true,
-        notifSms: json['notif_sms'] ?? false,
-        notifBooking: json['notif_booking'] ?? true,
-        notifPromotion: json['notif_promotion'] ?? true,
-        notifPayment: json['notif_payment'] ?? true,
-        notifSystem: json['notif_system'] ?? true,
-        notifStaff: json['notif_staff'] ?? true,
-        sportPreferences: (json['sport_preferences'] as List? ?? [])
-            .map((s) => SportPreferenceModel.fromJson(s))
-            .toList(),
-      );
+      _$UserProfileModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, userId];
+  Map<String, dynamic> toJson();
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Full user model (users + user_profiles joined)
+// Full user model
 // ──────────────────────────────────────────────────────────────────────────
-class UserModel extends Equatable {
-  final String id;
-  final String email;
-  final String fullName;
-  final String? phone;
-  final String? avatarUrl;
-  final Gender? gender;
-  final DateTime? dateOfBirth;
-  final KycStatus kycStatus;
-  final bool isEmailVerified;
-  final bool isPhoneVerified;
-  final DateTime? lastLoginAt;
-  final UserProfileModel? profile;
-  final DateTime createdAt;
+@freezed
+abstract class UserModel with _$UserModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory UserModel({
+    required String id,
+    required String email,
+    required String fullName,
+    String? phone,
+    String? avatarUrl,
+    Gender? gender,
+    DateTime? dateOfBirth,
+    @Default(KycStatus.UNVERIFIED) KycStatus kycStatus,
+    @Default(false) bool isEmailVerified,
+    @Default(false) bool isPhoneVerified,
+    DateTime? lastLoginAt,
+    UserProfileModel? profile,
+    required DateTime createdAt,
+  }) = _UserModel;
 
-  const UserModel({
-    required this.id,
-    required this.email,
-    required this.fullName,
-    this.phone,
-    this.avatarUrl,
-    this.gender,
-    this.dateOfBirth,
-    required this.kycStatus,
-    required this.isEmailVerified,
-    required this.isPhoneVerified,
-    this.lastLoginAt,
-    this.profile,
-    required this.createdAt,
-  });
+  const UserModel._();
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        id: json['id'],
-        email: json['email'],
-        fullName: json['full_name'],
-        phone: json['phone'],
-        avatarUrl: json['avatar_url'],
-        gender: json['gender'] != null
-            ? Gender.values.firstWhere((e) => e.name == json['gender'])
-            : null,
-        dateOfBirth: json['date_of_birth'] != null
-            ? DateTime.parse(json['date_of_birth'])
-            : null,
-        kycStatus: KycStatus.values.firstWhere(
-            (e) => e.name == json['kyc_status'],
-            orElse: () => KycStatus.UNVERIFIED),
-        isEmailVerified: json['is_email_verified'] ?? false,
-        isPhoneVerified: json['is_phone_verified'] ?? false,
-        lastLoginAt: json['last_login_at'] != null
-            ? DateTime.parse(json['last_login_at'])
-            : null,
-        profile: json['profile'] != null
-            ? UserProfileModel.fromJson(json['profile'])
-            : null,
-        createdAt: DateTime.parse(json['created_at']),
-      );
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, email, kycStatus];
+  Map<String, dynamic> toJson();
 }

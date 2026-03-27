@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'promotion_model.freezed.dart';
+part 'promotion_model.g.dart';
 
 // ── Enums (schema.prisma) ──────────────────────────────────────────────────
 
@@ -18,48 +21,39 @@ enum VoucherStatus {
 
   String get label {
     switch (this) {
-      case UNUSED: return 'Chưa dùng';
-      case USED: return 'Đã dùng';
-      case EXPIRED: return 'Hết hạn';
+      case UNUSED:
+        return 'Chưa dùng';
+      case USED:
+        return 'Đã dùng';
+      case EXPIRED:
+        return 'Hết hạn';
     }
   }
 }
 
 // ── promotions model ───────────────────────────────────────────────────────
-class PromotionModel extends Equatable {
-  final String id;
-  final String code;
-  final String name;
-  final String? description;
-  final PromotionDiscountType discountType;
-  final double discountValue;
-  final double? maxDiscountAmount;
-  final double minBookingAmount;
-  final int? usageLimit;
-  final int usageCount;
-  final int maxUsagePerUser;
-  final bool isPublic;
-  final DateTime validFrom;
-  final DateTime validTo;
-  final PromotionStatus status;
+@freezed
+abstract class PromotionModel with _$PromotionModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory PromotionModel({
+    required String id,
+    required String code,
+    required String name,
+    String? description,
+    required PromotionDiscountType discountType,
+    required double discountValue,
+    double? maxDiscountAmount,
+    @Default(0) double minBookingAmount,
+    int? usageLimit,
+    @Default(0) int usageCount,
+    @Default(1) int maxUsagePerUser,
+    @Default(true) bool isPublic,
+    required DateTime validFrom,
+    required DateTime validTo,
+    @Default(PromotionStatus.ACTIVE) PromotionStatus status,
+  }) = _PromotionModel;
 
-  const PromotionModel({
-    required this.id,
-    required this.code,
-    required this.name,
-    this.description,
-    required this.discountType,
-    required this.discountValue,
-    this.maxDiscountAmount,
-    required this.minBookingAmount,
-    this.usageLimit,
-    required this.usageCount,
-    required this.maxUsagePerUser,
-    required this.isPublic,
-    required this.validFrom,
-    required this.validTo,
-    required this.status,
-  });
+  const PromotionModel._();
 
   bool get isExpired => DateTime.now().isAfter(validTo);
   int get daysLeft => validTo.difference(DateTime.now()).inDays;
@@ -69,76 +63,41 @@ class PromotionModel extends Equatable {
     if (amount < minBookingAmount) return 0;
     if (discountType == PromotionDiscountType.PERCENTAGE) {
       final d = amount * discountValue / 100;
-      return maxDiscountAmount != null && d > maxDiscountAmount! ? maxDiscountAmount! : d;
+      return maxDiscountAmount != null && d > maxDiscountAmount!
+          ? maxDiscountAmount!
+          : d;
     }
     return discountValue;
   }
 
-  factory PromotionModel.fromJson(Map<String, dynamic> json) => PromotionModel(
-        id: json['id'],
-        code: json['code'],
-        name: json['name'],
-        description: json['description'],
-        discountType: PromotionDiscountType.values.firstWhere(
-            (e) => e.name == json['discount_type']),
-        discountValue: (json['discount_value'] as num).toDouble(),
-        maxDiscountAmount: (json['max_discount_amount'] as num?)?.toDouble(),
-        minBookingAmount: (json['min_booking_amount'] as num?)?.toDouble() ?? 0,
-        usageLimit: json['usage_limit'],
-        usageCount: json['usage_count'] ?? 0,
-        maxUsagePerUser: json['max_usage_per_user'] ?? 1,
-        isPublic: json['is_public'] ?? true,
-        validFrom: DateTime.parse(json['valid_from']),
-        validTo: DateTime.parse(json['valid_to']),
-        status: PromotionStatus.values.firstWhere(
-            (e) => e.name == json['status'],
-            orElse: () => PromotionStatus.ACTIVE),
-      );
+  factory PromotionModel.fromJson(Map<String, dynamic> json) =>
+      _$PromotionModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, code, status];
+  Map<String, dynamic> toJson();
 }
 
 // ── user_vouchers model ────────────────────────────────────────────────────
-class UserVoucherModel extends Equatable {
-  final String id;
-  final String userId;
-  final String promotionId;
-  final VoucherStatus status;
-  final DateTime? expiresAt;
-  final DateTime? usedAt;
-  final DateTime createdAt;
-  final PromotionModel promotion; // joined
+@freezed
+abstract class UserVoucherModel with _$UserVoucherModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory UserVoucherModel({
+    required String id,
+    required String userId,
+    required String promotionId,
+    required VoucherStatus status,
+    DateTime? expiresAt,
+    DateTime? usedAt,
+    required DateTime createdAt,
+    required PromotionModel promotion,
+  }) = _UserVoucherModel;
 
-  const UserVoucherModel({
-    required this.id,
-    required this.userId,
-    required this.promotionId,
-    required this.status,
-    this.expiresAt,
-    this.usedAt,
-    required this.createdAt,
-    required this.promotion,
-  });
+  const UserVoucherModel._();
 
   bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);
   int? get daysLeft => expiresAt?.difference(DateTime.now()).inDays;
 
   factory UserVoucherModel.fromJson(Map<String, dynamic> json) =>
-      UserVoucherModel(
-        id: json['id'],
-        userId: json['user_id'],
-        promotionId: json['promotion_id'],
-        status: VoucherStatus.values.firstWhere(
-            (e) => e.name == json['status']),
-        expiresAt: json['expires_at'] != null
-            ? DateTime.parse(json['expires_at'])
-            : null,
-        usedAt: json['used_at'] != null ? DateTime.parse(json['used_at']) : null,
-        createdAt: DateTime.parse(json['created_at']),
-        promotion: PromotionModel.fromJson(json['promotions']),
-      );
+      _$UserVoucherModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, status, promotionId];
+  Map<String, dynamic> toJson();
 }

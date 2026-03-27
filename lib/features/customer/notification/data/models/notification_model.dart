@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'notification_model.freezed.dart';
+part 'notification_model.g.dart';
 
 // ── Enums (schema.prisma) ──────────────────────────────────────────────────
 
@@ -15,15 +18,24 @@ enum NotificationType {
 
   String get icon {
     switch (this) {
-      case BOOKING_CONFIRMED: return '✅';
-      case BOOKING_CANCELLED: return '❌';
-      case BOOKING_REMINDER: return '⏰';
-      case PAYMENT_SUCCESS: return '💳';
-      case PAYMENT_FAILED: return '⚠️';
-      case REVIEW_RESPONSE: return '⭐';
-      case WAITLIST_AVAILABLE: return '🎉';
-      case PROMOTION: return '🎁';
-      case SYSTEM: return '🔔';
+      case BOOKING_CONFIRMED:
+        return '✅';
+      case BOOKING_CANCELLED:
+        return '❌';
+      case BOOKING_REMINDER:
+        return '⏰';
+      case PAYMENT_SUCCESS:
+        return '💳';
+      case PAYMENT_FAILED:
+        return '⚠️';
+      case REVIEW_RESPONSE:
+        return '⭐';
+      case WAITLIST_AVAILABLE:
+        return '🎉';
+      case PROMOTION:
+        return '🎁';
+      case SYSTEM:
+        return '🔔';
     }
   }
 }
@@ -40,110 +52,71 @@ enum NotificationReferenceType {
 }
 
 // ── notifications model ────────────────────────────────────────────────────
-class NotificationModel extends Equatable {
-  final String id;
-  final String userId;
-  final NotificationType type;
-  final NotificationChannel channel;
-  final String title;
-  final String message;
-  final String? referenceId;
-  final NotificationReferenceType? referenceType;
-  final bool isRead;
-  final DateTime? readAt;
-  final DateTime createdAt;
+@freezed
+abstract class NotificationModel with _$NotificationModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory NotificationModel({
+    required String id,
+    required String userId,
+    @Default(NotificationType.SYSTEM) NotificationType type,
+    @Default(NotificationChannel.IN_APP) NotificationChannel channel,
+    required String title,
+    required String message,
+    String? referenceId,
+    NotificationReferenceType? referenceType,
+    @Default(false) bool isRead,
+    DateTime? readAt,
+    required DateTime createdAt,
+  }) = _NotificationModel;
 
-  const NotificationModel({
-    required this.id,
-    required this.userId,
-    required this.type,
-    required this.channel,
-    required this.title,
-    required this.message,
-    this.referenceId,
-    this.referenceType,
-    required this.isRead,
-    this.readAt,
-    required this.createdAt,
-  });
+  const NotificationModel._();
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) =>
-      NotificationModel(
-        id: json['id'],
-        userId: json['user_id'],
-        type: NotificationType.values.firstWhere(
-            (e) => e.name == json['type'],
-            orElse: () => NotificationType.SYSTEM),
-        channel: NotificationChannel.values.firstWhere(
-            (e) => e.name == json['channel'],
-            orElse: () => NotificationChannel.IN_APP),
-        title: json['title'],
-        message: json['message'],
-        referenceId: json['reference_id'],
-        referenceType: json['reference_type'] != null
-            ? NotificationReferenceType.values.firstWhere(
-                (e) => e.name == json['reference_type'],
-                orElse: () => NotificationReferenceType.BOOKING)
-            : null,
-        isRead: json['is_read'] ?? false,
-        readAt: json['read_at'] != null ? DateTime.parse(json['read_at']) : null,
-        createdAt: DateTime.parse(json['created_at']),
-      );
+      _$NotificationModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, isRead, type];
+  Map<String, dynamic> toJson();
 }
 
 // ── favorite_venues model (dùng chung) ────────────────────────────────────
-class FavoriteVenueModel extends Equatable {
-  final String userId;
-  final String venueId;
-  final String venueName;
-  final String? thumbnailUrl;
-  final String city;
-  final String district;
-  final String address;
-  final double rating;
-  final int totalReviews;
-  final bool isActive;
-  final List<String> sportTypes;  // từ sport_assignments
-  final DateTime savedAt;         // favorite_venues.created_at
+@freezed
+abstract class FavoriteVenueModel with _$FavoriteVenueModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory FavoriteVenueModel({
+    required String userId,
+    required String venueId,
+    required String venueName,
+    String? thumbnailUrl,
+    required String city,
+    required String district,
+    required String address,
+    required double rating,
+    required int totalReviews,
+    required bool isActive,
+    @Default([]) List<String> sportTypes,
+    required DateTime savedAt,
+  }) = _FavoriteVenueModel;
 
-  const FavoriteVenueModel({
-    required this.userId,
-    required this.venueId,
-    required this.venueName,
-    this.thumbnailUrl,
-    required this.city,
-    required this.district,
-    required this.address,
-    required this.rating,
-    required this.totalReviews,
-    required this.isActive,
-    this.sportTypes = const [],
-    required this.savedAt,
-  });
+  const FavoriteVenueModel._();
 
   factory FavoriteVenueModel.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
     final venue = json['venues'] as Map<String, dynamic>? ?? {};
-    return FavoriteVenueModel(
-      userId: json['user_id'],
-      venueId: json['venue_id'],
-      venueName: venue['name'] ?? '',
-      thumbnailUrl: venue['thumbnail_url'],
-      city: venue['city'] ?? '',
-      district: venue['district'] ?? '',
-      address: venue['address'] ?? '',
-      rating: (venue['rating'] as num?)?.toDouble() ?? 0,
-      totalReviews: venue['total_reviews'] ?? 0,
-      isActive: venue['is_active'] ?? true,
-      sportTypes: (venue['sport_assignments'] as List? ?? [])
-          .map((s) => s['sport_type']?.toString() ?? '')
-          .toList(),
-      savedAt: DateTime.parse(json['created_at']),
-    );
+
+    mappedJson['venue_name'] = venue['name'] ?? '';
+    mappedJson['thumbnail_url'] = venue['thumbnail_url'];
+    mappedJson['city'] = venue['city'] ?? '';
+    mappedJson['district'] = venue['district'] ?? '';
+    mappedJson['address'] = venue['address'] ?? '';
+    mappedJson['rating'] = (venue['rating'] as num?)?.toDouble() ?? 0;
+    mappedJson['total_reviews'] = venue['total_reviews'] ?? 0;
+    mappedJson['is_active'] = venue['is_active'] ?? true;
+    mappedJson['sport_types'] = (venue['sport_assignments'] as List? ?? [])
+        .map((s) => s['sport_type']?.toString() ?? '')
+        .toList();
+    mappedJson['saved_at'] = json['created_at'];
+
+    return _$FavoriteVenueModelFromJson(mappedJson);
   }
 
-  @override
-  List<Object?> get props => [userId, venueId];
+  Map<String, dynamic> toJson();
 }

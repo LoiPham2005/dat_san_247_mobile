@@ -6,7 +6,7 @@ trigger: always_on
 2. khi dùng để thông báo không dùng ScaffoldMessenger.of(context).showSnackBar tôi đã có ở toast_service.dart,
 3. khi viết model @freezed
 abstract class UserDeviceModel with _$UserDeviceModel
-nhớ viết thêm chữ abstract
+nhớ viết thêm chữ abstract và thêm @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true) nữa khi thêm cái này thì không cần viết dạng như:  @JsonKey(name: 'full_name'), ban đầu khi lập model khoogn cần cho trường hợp chạy mà lỗi thì thêm ví dụ như: const BookingStatusHistoryModel._(); và Map<String, dynamic> toJson(); vào là đc
 4. nhớ đọc category_rut_gon ở example để học cashc call api tôi thiết lập
 5. nhớ viết đường dẫn vào file api_endpoints.dart xong với vào file _service
 6. mỗi lần dùng cubit phải kiển tra đã khai báo BlocProvider của nó chưa

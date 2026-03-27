@@ -5,6 +5,7 @@ part 'auth_token_model.g.dart';
 
 @freezed
 abstract class AuthTokenModel with _$AuthTokenModel {
+  @JsonSerializable(fieldRename: FieldRename.snake)
   const factory AuthTokenModel({
     required String id,
     @JsonKey(name: 'created_at') required DateTime createdAt,

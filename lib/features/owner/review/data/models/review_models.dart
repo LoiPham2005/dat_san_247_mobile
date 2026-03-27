@@ -1,54 +1,46 @@
-// ══════════════════════════════════════════════════════════════════════════════
-// reviews model — O-12
-// DB: reviews (venue_id), users (reviewer)
-// ══════════════════════════════════════════════════════════════════════════════
-class OwnerReviewModel {
-  final String id;
-  final String bookingId;
-  final String venueId;
-  final String? courtId;
-  final String userId;
-  final String reviewerName;
-  final String? reviewerAvatar;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final int rating;
-  final int? ratingCleanliness;
-  final int? ratingFacilities;
-  final int? ratingStaff;
-  final String? comment;
+part 'review_models.freezed.dart';
+part 'review_models.g.dart';
 
-  final String? response;
-  final String? respondedBy;
-  final DateTime? respondedAt;
+@freezed
+abstract class OwnerReviewModel with _$OwnerReviewModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory OwnerReviewModel({
+    required String id,
+    required String bookingId,
+    required String venueId,
+    String? courtId,
+    required String userId,
+    required String reviewerName,
+    String? reviewerAvatar,
+    required int rating,
+    int? ratingCleanliness,
+    int? ratingFacilities,
+    int? ratingStaff,
+    String? comment,
+    String? response,
+    String? respondedBy,
+    DateTime? respondedAt,
+    @Default(true) bool isVisible,
+    required DateTime createdAt,
+  }) = _OwnerReviewModel;
 
-  final bool isVisible;
-  final DateTime createdAt;
-
-  const OwnerReviewModel({
-    required this.id,
-    required this.bookingId,
-    required this.venueId,
-    this.courtId,
-    required this.userId,
-    required this.reviewerName,
-    this.reviewerAvatar,
-    required this.rating,
-    this.ratingCleanliness,
-    this.ratingFacilities,
-    this.ratingStaff,
-    this.comment,
-    this.response,
-    this.respondedBy,
-    this.respondedAt,
-    this.isVisible = true,
-    required this.createdAt,
-  });
+  const OwnerReviewModel._();
 
   bool get hasResponse => response != null && response!.isNotEmpty;
+
   double get avgSubRating {
     final scores = [ratingCleanliness, ratingFacilities, ratingStaff]
-        .where((s) => s != null).cast<int>().toList();
+        .where((s) => s != null)
+        .cast<int>()
+        .toList();
     if (scores.isEmpty) return rating.toDouble();
-    return scores.fold(0, (a, b) => a + b) / scores.length;
+    return scores.fold(0, (a, b) => a + (b as int)) / scores.length;
   }
+
+  factory OwnerReviewModel.fromJson(Map<String, dynamic> json) =>
+      _$OwnerReviewModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }

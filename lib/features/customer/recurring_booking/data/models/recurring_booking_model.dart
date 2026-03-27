@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'recurring_booking_model.freezed.dart';
+part 'recurring_booking_model.g.dart';
 
 // ── Enums ──────────────────────────────────────────────────────────────────
 
@@ -71,194 +74,162 @@ enum TransactionType {
 enum TransactionStatus { PENDING, COMPLETED, FAILED, CANCELLED }
 
 // ── recurring_bookings model ───────────────────────────────────────────────
-class RecurringBookingModel extends Equatable {
-  final String id;
-  final String venueId;
-  final String venueName;
-  final String courtId;
-  final String courtName;
-  final RecurringType repeatType;
-  final String startTime;   // HH:mm
-  final String endTime;     // HH:mm
-  final DateTime startDate;
-  final DateTime? endDate;
-  final bool isActive;
-  final DateTime createdAt;
-  final List<DayOfWeek> repeatDays;   // từ recurring_booking_days
-  final int totalBookingsGenerated;   // count từ bookings relation
+@freezed
+abstract class RecurringBookingModel with _$RecurringBookingModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory RecurringBookingModel({
+    required String id,
+    required String venueId,
+    required String venueName,
+    required String courtId,
+    required String courtName,
+    required RecurringType repeatType,
+    required String startTime,   // HH:mm
+    required String endTime,     // HH:mm
+    required DateTime startDate,
+    DateTime? endDate,
+    @Default(true) bool isActive,
+    required DateTime createdAt,
+    @Default([]) List<DayOfWeek> repeatDays,
+    @Default(0) int totalBookingsGenerated,
+  }) = _RecurringBookingModel;
 
-  const RecurringBookingModel({
-    required this.id,
-    required this.venueId,
-    required this.venueName,
-    required this.courtId,
-    required this.courtName,
-    required this.repeatType,
-    required this.startTime,
-    required this.endTime,
-    required this.startDate,
-    this.endDate,
-    required this.isActive,
-    required this.createdAt,
-    this.repeatDays = const [],
-    this.totalBookingsGenerated = 0,
-  });
+  const RecurringBookingModel._();
 
   factory RecurringBookingModel.fromJson(Map<String, dynamic> json) {
-    return RecurringBookingModel(
-      id: json['id'],
-      venueId: json['venue_id'],
-      venueName: json['venues']?['name'] ?? '',
-      courtId: json['court_id'],
-      courtName: json['courts']?['name'] ?? '',
-      repeatType: RecurringType.values.firstWhere((e) => e.name == json['repeat_type']),
-      startTime: json['start_time'].toString().substring(0, 5),
-      endTime: json['end_time'].toString().substring(0, 5),
-      startDate: DateTime.parse(json['start_date']),
-      endDate: json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
-      isActive: json['is_active'] ?? true,
-      createdAt: DateTime.parse(json['created_at']),
-      repeatDays: (json['recurring_days'] as List? ?? [])
-          .map((d) => DayOfWeek.values.firstWhere((e) => e.name == d['day_of_week']))
-          .toList(),
-      totalBookingsGenerated: json['_count']?['bookings'] ?? 0,
-    );
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    
+    // Join details
+    if (json['venues'] != null && json['venues'] is Map) {
+      mappedJson['venue_name'] = json['venues']['name'];
+    }
+    if (json['courts'] != null && json['courts'] is Map) {
+      mappedJson['court_name'] = json['courts']['name'];
+    }
+    
+    // Substring times
+    if (json['start_time'] != null) {
+      mappedJson['start_time'] = json['start_time'].toString().substring(0, 5);
+    }
+    if (json['end_time'] != null) {
+      mappedJson['end_time'] = json['end_time'].toString().substring(0, 5);
+    }
+    
+    // Mapping recurring_days relation to our list of enums
+    if (json['recurring_days'] != null && json['recurring_days'] is List) {
+      mappedJson['repeat_days'] = (json['recurring_days'] as List)
+          .map((d) => d['day_of_week'])
+          .toList();
+    }
+    
+    // Action: map total count
+    if (json['_count'] != null && json['_count'] is Map) {
+      mappedJson['total_bookings_generated'] = json['_count']['bookings'];
+    }
+
+    return _$RecurringBookingModelFromJson(mappedJson);
   }
 
-  @override
-  List<Object?> get props => [id, isActive, repeatType];
+  Map<String, dynamic> toJson();
 }
 
 // ── booking_waitlist model ─────────────────────────────────────────────────
-class WaitlistItemModel extends Equatable {
-  final String id;
-  final String courtId;
-  final String courtName;
-  final String venueId;
-  final String venueName;
-  final String venueAddress;
-  final String? venueThumbnailUrl;
-  final DateTime bookingDate;
-  final String startTime;
-  final String endTime;
-  final int priority;
-  final bool isNotified;
-  final WaitlistStatus status;
-  final DateTime createdAt;
+@freezed
+abstract class WaitlistItemModel with _$WaitlistItemModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory WaitlistItemModel({
+    required String id,
+    required String courtId,
+    required String courtName,
+    required String venueId,
+    required String venueName,
+    required String venueAddress,
+    String? venueThumbnailUrl,
+    required DateTime bookingDate,
+    required String startTime,
+    required String endTime,
+    @Default(1) int priority,
+    @Default(false) bool isNotified,
+    required WaitlistStatus status,
+    required DateTime createdAt,
+  }) = _WaitlistItemModel;
 
-  const WaitlistItemModel({
-    required this.id,
-    required this.courtId,
-    required this.courtName,
-    required this.venueId,
-    required this.venueName,
-    required this.venueAddress,
-    this.venueThumbnailUrl,
-    required this.bookingDate,
-    required this.startTime,
-    required this.endTime,
-    required this.priority,
-    required this.isNotified,
-    required this.status,
-    required this.createdAt,
-  });
+  const WaitlistItemModel._();
 
   factory WaitlistItemModel.fromJson(Map<String, dynamic> json) {
-    return WaitlistItemModel(
-      id: json['id'],
-      courtId: json['court_id'],
-      courtName: json['courts']?['name'] ?? '',
-      venueId: json['courts']?['venue_id'] ?? '',
-      venueName: json['courts']?['venues']?['name'] ?? '',
-      venueAddress: json['courts']?['venues']?['address'] ?? '',
-      venueThumbnailUrl: json['courts']?['venues']?['thumbnail_url'],
-      bookingDate: DateTime.parse(json['booking_date']),
-      startTime: json['start_time'].toString().substring(0, 5),
-      endTime: json['end_time'].toString().substring(0, 5),
-      priority: json['priority'] ?? 1,
-      isNotified: json['is_notified'] ?? false,
-      status: WaitlistStatus.values.firstWhere((e) => e.name == json['status']),
-      createdAt: DateTime.parse(json['created_at']),
-    );
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    
+    if (json['courts'] != null && json['courts'] is Map) {
+      mappedJson['court_name'] = json['courts']['name'];
+      mappedJson['venue_id'] = json['courts']['venue_id'];
+      if (json['courts']['venues'] != null) {
+        mappedJson['venue_name'] = json['courts']['venues']['name'];
+        mappedJson['venue_address'] = json['courts']['venues']['address'];
+        mappedJson['venue_thumbnail_url'] = json['courts']['venues']['thumbnail_url'];
+      }
+    }
+    
+    if (json['start_time'] != null) {
+      mappedJson['start_time'] = json['start_time'].toString().substring(0, 5);
+    }
+    if (json['end_time'] != null) {
+      mappedJson['end_time'] = json['end_time'].toString().substring(0, 5);
+    }
+
+    return _$WaitlistItemModelFromJson(mappedJson);
   }
 
-  @override
-  List<Object?> get props => [id, status, priority];
+  Map<String, dynamic> toJson();
 }
 
 // ── wallets model ──────────────────────────────────────────────────────────
-class WalletModel extends Equatable {
-  final String id;
-  final String userId;
-  final double balance;
-  final double lockedBalance;      // wallets.locked_balance (đang giữ)
-  final bool isActive;
-  final DateTime updatedAt;
+@freezed
+abstract class WalletModel with _$WalletModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory WalletModel({
+    required String id,
+    required String userId,
+    required double balance,
+    @Default(0) double lockedBalance,
+    @Default(true) bool isActive,
+    required DateTime updatedAt,
+  }) = _WalletModel;
+
+  const WalletModel._();
 
   double get availableBalance => balance - lockedBalance;
 
-  const WalletModel({
-    required this.id,
-    required this.userId,
-    required this.balance,
-    required this.lockedBalance,
-    required this.isActive,
-    required this.updatedAt,
-  });
+  factory WalletModel.fromJson(Map<String, dynamic> json) =>
+      _$WalletModelFromJson(json);
 
-  factory WalletModel.fromJson(Map<String, dynamic> json) {
-    return WalletModel(
-      id: json['id'],
-      userId: json['user_id'],
-      balance: (json['balance'] as num).toDouble(),
-      lockedBalance: (json['locked_balance'] as num).toDouble(),
-      isActive: json['is_active'] ?? true,
-      updatedAt: DateTime.parse(json['updated_at']),
-    );
-  }
-
-  @override
-  List<Object?> get props => [id, balance, lockedBalance];
+  Map<String, dynamic> toJson();
 }
 
 // ── transactions model ─────────────────────────────────────────────────────
-class TransactionModel extends Equatable {
-  final String id;
-  final TransactionType type;
-  final double amount;
-  final double balanceAfter;
-  final TransactionStatus status;
-  final String? description;
-  final String? bookingId;
-  final String? bookingCode;   // joined for display
-  final DateTime createdAt;
+@freezed
+abstract class TransactionModel with _$TransactionModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory TransactionModel({
+    required String id,
+    required TransactionType type,
+    required double amount,
+    required double balanceAfter,
+    required TransactionStatus status,
+    String? description,
+    String? bookingId,
+    String? bookingCode,
+    required DateTime createdAt,
+  }) = _TransactionModel;
 
-  const TransactionModel({
-    required this.id,
-    required this.type,
-    required this.amount,
-    required this.balanceAfter,
-    required this.status,
-    this.description,
-    this.bookingId,
-    this.bookingCode,
-    required this.createdAt,
-  });
+  const TransactionModel._();
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
-    return TransactionModel(
-      id: json['id'],
-      type: TransactionType.values.firstWhere((e) => e.name == json['type']),
-      amount: (json['amount'] as num).toDouble(),
-      balanceAfter: (json['balance_after'] as num).toDouble(),
-      status: TransactionStatus.values.firstWhere((e) => e.name == json['status']),
-      description: json['description'],
-      bookingId: json['booking_id'],
-      bookingCode: json['bookings']?['booking_code'],
-      createdAt: DateTime.parse(json['created_at']),
-    );
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    if (json['bookings'] != null && json['bookings'] is Map) {
+      mappedJson['booking_code'] = json['bookings']['booking_code'];
+    }
+    return _$TransactionModelFromJson(mappedJson);
   }
 
-  @override
-  List<Object?> get props => [id, type, amount, createdAt];
+  Map<String, dynamic> toJson();
 }

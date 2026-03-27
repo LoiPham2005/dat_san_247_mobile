@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'my_booking_models.freezed.dart';
+part 'my_booking_models.g.dart';
 
 // ── Enums mapping schema.prisma ─────────────────────────────────────────
 
@@ -12,198 +15,148 @@ enum BookingStatus {
 
   String get label {
     switch (this) {
-      case PENDING: return 'Chờ xác nhận';
-      case CONFIRMED: return 'Đã xác nhận';
-      case CHECKED_IN: return 'Đang chơi';
-      case COMPLETED: return 'Hoàn thành';
-      case CANCELLED: return 'Đã hủy';
-      case NO_SHOW: return 'Không đến';
+      case PENDING:
+        return 'Chờ xác nhận';
+      case CONFIRMED:
+        return 'Đã xác nhận';
+      case CHECKED_IN:
+        return 'Đang chơi';
+      case COMPLETED:
+        return 'Hoàn thành';
+      case CANCELLED:
+        return 'Đã hủy';
+      case NO_SHOW:
+        return 'Không đến';
     }
   }
 }
 
 enum PaymentStatus { PENDING, PAID, FAILED, REFUNDED, PARTIALLY_REFUNDED }
+
 enum PaymentMethod { CASH, VNPAY, MOMO, ZALOPAY, BANK_TRANSFER, WALLET }
+
 enum ActorRole { CUSTOMER, OWNER, VENUE_STAFF, STAFF, ADMIN, SUPER_ADMIN }
 
 // ── booking_status_history ───────────────────────────────────────────────
-class BookingStatusHistoryModel extends Equatable {
-  final String id;
-  final String bookingId;
-  final BookingStatus status;
-  final ActorRole? actorRole;
-  final String? note;
-  final DateTime createdAt;
+@freezed
+abstract class BookingStatusHistoryModel with _$BookingStatusHistoryModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory BookingStatusHistoryModel({
+    required String id,
+    required String bookingId,
+    required BookingStatus status,
+    ActorRole? actorRole,
+    String? note,
+    required DateTime createdAt,
+  }) = _BookingStatusHistoryModel;
 
-  const BookingStatusHistoryModel({
-    required this.id,
-    required this.bookingId,
-    required this.status,
-    this.actorRole,
-    this.note,
-    required this.createdAt,
-  });
+  const BookingStatusHistoryModel._();
 
-  factory BookingStatusHistoryModel.fromJson(Map<String, dynamic> json) {
-    return BookingStatusHistoryModel(
-      id: json['id'],
-      bookingId: json['booking_id'],
-      status: BookingStatus.values.firstWhere((e) => e.name == json['status']),
-      actorRole: json['actor_role'] != null
-          ? ActorRole.values.firstWhere((e) => e.name == json['actor_role'])
-          : null,
-      note: json['note'],
-      createdAt: DateTime.parse(json['created_at']),
-    );
-  }
+  factory BookingStatusHistoryModel.fromJson(Map<String, dynamic> json) =>
+      _$BookingStatusHistoryModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, bookingId, status, createdAt];
+  Map<String, dynamic> toJson();
 }
 
 // ── booking_addons ───────────────────────────────────────────────────────
-class BookingAddonDetailModel extends Equatable {
-  final String id;
-  final String bookingId;
-  final String serviceId;
-  final String serviceName;  // joined from venue_services
-  final int quantity;
-  final double pricePerUnit;
-  final double totalPrice;
-  final String? note;
+@freezed
+abstract class BookingAddonDetailModel with _$BookingAddonDetailModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory BookingAddonDetailModel({
+    required String id,
+    required String bookingId,
+    required String serviceId,
+    required String serviceName,
+    required int quantity,
+    required double pricePerUnit,
+    required double totalPrice,
+    String? note,
+  }) = _BookingAddonDetailModel;
 
-  const BookingAddonDetailModel({
-    required this.id,
-    required this.bookingId,
-    required this.serviceId,
-    required this.serviceName,
-    required this.quantity,
-    required this.pricePerUnit,
-    required this.totalPrice,
-    this.note,
-  });
+  const BookingAddonDetailModel._();
 
   factory BookingAddonDetailModel.fromJson(Map<String, dynamic> json) {
-    return BookingAddonDetailModel(
-      id: json['id'],
-      bookingId: json['booking_id'],
-      serviceId: json['service_id'],
-      serviceName: json['venue_services']?['name'] ?? json['service_name'] ?? '',
-      quantity: json['quantity'],
-      pricePerUnit: (json['price_per_unit'] as num).toDouble(),
-      totalPrice: (json['total_price'] as num).toDouble(),
-      note: json['note'],
-    );
+    // Porting manual logic from original fromJson for joined data
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    if (json['venue_services'] != null && json['venue_services'] is Map) {
+      mappedJson['service_name'] = json['venue_services']['name'];
+    }
+    return _$BookingAddonDetailModelFromJson(mappedJson);
   }
 
-  @override
-  List<Object?> get props => [id, bookingId, serviceId];
+  Map<String, dynamic> toJson();
 }
 
 // ── payments ─────────────────────────────────────────────────────────────
-class PaymentDetailModel extends Equatable {
-  final String id;
-  final String bookingId;
-  final double amount;
-  final PaymentMethod paymentMethod;
-  final PaymentStatus status;
-  final DateTime? paidAt;
-  final double? refundAmount;
-  final DateTime? refundedAt;
+@freezed
+abstract class PaymentDetailModel with _$PaymentDetailModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory PaymentDetailModel({
+    required String id,
+    required String bookingId,
+    required double amount,
+    required PaymentMethod paymentMethod,
+    required PaymentStatus status,
+    DateTime? paidAt,
+    double? refundAmount,
+    DateTime? refundedAt,
+  }) = _PaymentDetailModel;
 
-  const PaymentDetailModel({
-    required this.id,
-    required this.bookingId,
-    required this.amount,
-    required this.paymentMethod,
-    required this.status,
-    this.paidAt,
-    this.refundAmount,
-    this.refundedAt,
-  });
+  const PaymentDetailModel._();
 
-  factory PaymentDetailModel.fromJson(Map<String, dynamic> json) {
-    return PaymentDetailModel(
-      id: json['id'],
-      bookingId: json['booking_id'],
-      amount: (json['amount'] as num).toDouble(),
-      paymentMethod: PaymentMethod.values.firstWhere((e) => e.name == json['payment_method']),
-      status: PaymentStatus.values.firstWhere((e) => e.name == json['status']),
-      paidAt: json['paid_at'] != null ? DateTime.parse(json['paid_at']) : null,
-      refundAmount: json['refund_amount'] != null ? (json['refund_amount'] as num).toDouble() : null,
-      refundedAt: json['refunded_at'] != null ? DateTime.parse(json['refunded_at']) : null,
-    );
-  }
+  factory PaymentDetailModel.fromJson(Map<String, dynamic> json) =>
+      _$PaymentDetailModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, bookingId, amount, status];
+  Map<String, dynamic> toJson();
 }
 
 // ── refund_rules ─────────────────────────────────────────────────────────
-class RefundRuleModel extends Equatable {
-  final String id;
-  final int cancelBeforeHours;
-  final double refundPercentage;
-  final String? description;
+@freezed
+abstract class RefundRuleModel with _$RefundRuleModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory RefundRuleModel({
+    required String id,
+    required int cancelBeforeHours,
+    required double refundPercentage,
+    String? description,
+  }) = _RefundRuleModel;
 
-  const RefundRuleModel({
-    required this.id,
-    required this.cancelBeforeHours,
-    required this.refundPercentage,
-    this.description,
-  });
+  const RefundRuleModel._();
 
-  factory RefundRuleModel.fromJson(Map<String, dynamic> json) {
-    return RefundRuleModel(
-      id: json['id'],
-      cancelBeforeHours: json['cancel_before_hours'],
-      refundPercentage: (json['refund_percentage'] as num).toDouble(),
-      description: json['description'],
-    );
-  }
+  factory RefundRuleModel.fromJson(Map<String, dynamic> json) =>
+      _$RefundRuleModelFromJson(json);
 
-  @override
-  List<Object?> get props => [id, cancelBeforeHours, refundPercentage];
+  Map<String, dynamic> toJson();
 }
 
 // ── BookingListItemModel (cho C-09 danh sách) ────────────────────────────
-class BookingListItemModel extends Equatable {
-  final String id;
-  final String bookingCode;
-  final String? checkInCode;
-  final String venueName;
-  final String courtName;
-  final String venueAddress;
-  final String? venueThumbnailUrl;
-  final DateTime bookingDate;
-  final String startTime;  // HH:mm
-  final String endTime;    // HH:mm
-  final BookingStatus status;
-  final PaymentStatus paymentStatus;
-  final double totalAmount;
-  final DateTime? cancellationDeadline;
-  final DateTime createdAt;
+@freezed
+abstract class BookingListItemModel with _$BookingListItemModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory BookingListItemModel({
+    required String id,
+    required String bookingCode,
+    String? checkInCode,
+    required String venueName,
+    required String courtName,
+    required String venueAddress,
+    String? venueThumbnailUrl,
+    required DateTime bookingDate,
+    required String startTime, // HH:mm
+    required String endTime, // HH:mm
+    required BookingStatus status,
+    required PaymentStatus paymentStatus,
+    required double totalAmount,
+    DateTime? cancellationDeadline,
+    required DateTime createdAt,
+  }) = _BookingListItemModel;
 
-  const BookingListItemModel({
-    required this.id,
-    required this.bookingCode,
-    this.checkInCode,
-    required this.venueName,
-    required this.courtName,
-    required this.venueAddress,
-    this.venueThumbnailUrl,
-    required this.bookingDate,
-    required this.startTime,
-    required this.endTime,
-    required this.status,
-    required this.paymentStatus,
-    required this.totalAmount,
-    this.cancellationDeadline,
-    required this.createdAt,
-  });
+  const BookingListItemModel._();
 
   bool get canCancel {
-    if (status == BookingStatus.CANCELLED || status == BookingStatus.COMPLETED || status == BookingStatus.NO_SHOW) return false;
+    if (status == BookingStatus.CANCELLED ||
+        status == BookingStatus.COMPLETED ||
+        status == BookingStatus.NO_SHOW) return false;
     if (cancellationDeadline == null) return true;
     return DateTime.now().isBefore(cancellationDeadline!);
   }
@@ -212,123 +165,92 @@ class BookingListItemModel extends Equatable {
       status == BookingStatus.PENDING || status == BookingStatus.CONFIRMED;
 
   factory BookingListItemModel.fromJson(Map<String, dynamic> json) {
-    return BookingListItemModel(
-      id: json['id'],
-      bookingCode: json['booking_code'],
-      checkInCode: json['check_in_code'],
-      venueName: json['venues']?['name'] ?? '',
-      courtName: json['courts']?['name'] ?? '',
-      venueAddress: json['venues']?['address'] ?? '',
-      venueThumbnailUrl: json['venues']?['thumbnail_url'],
-      bookingDate: DateTime.parse(json['booking_date']),
-      startTime: json['start_time'].toString().substring(0, 5),
-      endTime: json['end_time'].toString().substring(0, 5),
-      status: BookingStatus.values.firstWhere((e) => e.name == json['status']),
-      paymentStatus: PaymentStatus.values.firstWhere((e) => e.name == json['payment_status']),
-      totalAmount: (json['total_amount'] as num).toDouble(),
-      cancellationDeadline: json['cancellation_deadline'] != null
-          ? DateTime.parse(json['cancellation_deadline'])
-          : null,
-      createdAt: DateTime.parse(json['created_at']),
-    );
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    if (json['venues'] != null && json['venues'] is Map) {
+      mappedJson['venue_name'] = json['venues']['name'];
+      mappedJson['venue_address'] = json['venues']['address'];
+      mappedJson['venue_thumbnail_url'] = json['venues']['thumbnail_url'];
+    }
+    if (json['courts'] != null && json['courts'] is Map) {
+      mappedJson['court_name'] = json['courts']['name'];
+    }
+    // Porting start_time/end_time substring logic
+    if (json['start_time'] != null) {
+      mappedJson['start_time'] = json['start_time'].toString().substring(0, 5);
+    }
+    if (json['end_time'] != null) {
+      mappedJson['end_time'] = json['end_time'].toString().substring(0, 5);
+    }
+    return _$BookingListItemModelFromJson(mappedJson);
   }
 
-  @override
-  List<Object?> get props => [id, bookingCode, status];
+  Map<String, dynamic> toJson();
 }
 
 // ── BookingDetailModel (cho C-10 chi tiết) ───────────────────────────────
-class BookingDetailModel extends Equatable {
-  final String id;
-  final String bookingCode;
-  final String? checkInCode;
-  final String venueName;
-  final String courtName;
-  final String venueAddress;
-  final String? venueThumbnailUrl;
-  final DateTime bookingDate;
-  final String startTime;
-  final String endTime;
-  final double totalHours;
-  final double pricePerHour;
-  final double subTotal;
-  final double discountAmount;
-  final double vatRate;
-  final double vatAmount;
-  final double totalAmount;
-  final double refundAmount;
-  final double cancellationFee;
-  final String? promotionCode;
-  final String? note;
-  final BookingStatus status;
-  final PaymentStatus paymentStatus;
-  final String? paymentMethod;
-  final DateTime? paidAt;
-  final DateTime? cancellationDeadline;
-  final DateTime? cancelledAt;
-  final String? cancellationReason;
-  final DateTime? checkedInAt;
-  final DateTime createdAt;
+@freezed
+abstract class BookingDetailModel with _$BookingDetailModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory BookingDetailModel({
+    required String id,
+    required String bookingCode,
+    String? checkInCode,
+    required String venueName,
+    required String courtName,
+    required String venueAddress,
+    String? venueThumbnailUrl,
+    required DateTime bookingDate,
+    required String startTime,
+    required String endTime,
+    required double totalHours,
+    required double pricePerHour,
+    required double subTotal,
+    required double discountAmount,
+    required double vatRate,
+    required double vatAmount,
+    required double totalAmount,
+    required double refundAmount,
+    required double cancellationFee,
+    String? promotionCode,
+    String? note,
+    required BookingStatus status,
+    required PaymentStatus paymentStatus,
+    String? paymentMethod,
+    DateTime? paidAt,
+    DateTime? cancellationDeadline,
+    DateTime? cancelledAt,
+    String? cancellationReason,
+    DateTime? checkedInAt,
+    required DateTime createdAt,
 
-  // Relations
-  final List<BookingAddonDetailModel> addons;
-  final List<BookingStatusHistoryModel> statusHistory;
-  final List<PaymentDetailModel> payments;
-  final bool hasReview;
-  final List<RefundRuleModel> refundRules;
+    // Relations
+    @Default([]) List<BookingAddonDetailModel> addons,
+    @Default([]) List<BookingStatusHistoryModel> statusHistory,
+    @Default([]) List<PaymentDetailModel> payments,
+    @Default(false) bool hasReview,
+    @Default([]) List<RefundRuleModel> refundRules,
+  }) = _BookingDetailModel;
 
-  const BookingDetailModel({
-    required this.id,
-    required this.bookingCode,
-    this.checkInCode,
-    required this.venueName,
-    required this.courtName,
-    required this.venueAddress,
-    this.venueThumbnailUrl,
-    required this.bookingDate,
-    required this.startTime,
-    required this.endTime,
-    required this.totalHours,
-    required this.pricePerHour,
-    required this.subTotal,
-    required this.discountAmount,
-    required this.vatRate,
-    required this.vatAmount,
-    required this.totalAmount,
-    required this.refundAmount,
-    required this.cancellationFee,
-    this.promotionCode,
-    this.note,
-    required this.status,
-    required this.paymentStatus,
-    this.paymentMethod,
-    this.paidAt,
-    this.cancellationDeadline,
-    this.cancelledAt,
-    this.cancellationReason,
-    this.checkedInAt,
-    required this.createdAt,
-    this.addons = const [],
-    this.statusHistory = const [],
-    this.payments = const [],
-    this.hasReview = false,
-    this.refundRules = const [],
-  });
+  const BookingDetailModel._();
 
   bool get canCancel {
-    if (status == BookingStatus.CANCELLED || status == BookingStatus.COMPLETED || status == BookingStatus.NO_SHOW) return false;
+    if (status == BookingStatus.CANCELLED ||
+        status == BookingStatus.COMPLETED ||
+        status == BookingStatus.NO_SHOW) return false;
     if (cancellationDeadline == null) return true;
     return DateTime.now().isBefore(cancellationDeadline!);
   }
 
-  bool get canReview =>
-      status == BookingStatus.COMPLETED && !hasReview;
+  bool get canReview => status == BookingStatus.COMPLETED && !hasReview;
 
   double computeRefundAmount(double totalAmount) {
     if (refundRules.isEmpty) return 0;
     final now = DateTime.now();
-    final bookingDateTime = DateTime(bookingDate.year, bookingDate.month, bookingDate.day)
-        .add(Duration(hours: int.parse(startTime.split(':')[0]), minutes: int.parse(startTime.split(':')[1])));
+    final bookingDateTime =
+        DateTime(bookingDate.year, bookingDate.month, bookingDate.day).add(
+            Duration(
+                hours: int.parse(startTime.split(':')[0]),
+                minutes: int.parse(startTime.split(':')[1])));
     final hoursLeft = bookingDateTime.difference(now).inHours;
 
     // Find applicable rule (highest cancel_before_hours that is still <= hoursLeft)
@@ -344,42 +266,32 @@ class BookingDetailModel extends Equatable {
     return totalAmount * best.refundPercentage / 100;
   }
 
-  @override
-  List<Object?> get props => [id, bookingCode, status];
+  factory BookingDetailModel.fromJson(Map<String, dynamic> json) =>
+      _$BookingDetailModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }
 
 // ── ReviewSubmitModel (cho C-12) ──────────────────────────────────────────
-class ReviewSubmitModel {
-  final String bookingId;
-  final String venueId;
-  final String courtId;
-  final int rating;
-  final int? ratingCleanliness;
-  final int? ratingFacilities;
-  final int? ratingStaff;
-  final String? comment;
-  final List<String> imagePaths;  // local file paths to upload
+@freezed
+abstract class ReviewSubmitModel with _$ReviewSubmitModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory ReviewSubmitModel({
+    required String bookingId,
+    required String venueId,
+    required String courtId,
+    required int rating,
+    int? ratingCleanliness,
+    int? ratingFacilities,
+    int? ratingStaff,
+    String? comment,
+    @Default([]) List<String> imagePaths, // local file paths to upload
+  }) = _ReviewSubmitModel;
 
-  ReviewSubmitModel({
-    required this.bookingId,
-    required this.venueId,
-    required this.courtId,
-    required this.rating,
-    this.ratingCleanliness,
-    this.ratingFacilities,
-    this.ratingStaff,
-    this.comment,
-    this.imagePaths = const [],
-  });
+  const ReviewSubmitModel._();
 
-  Map<String, dynamic> toJson() => {
-    'booking_id': bookingId,
-    'venue_id': venueId,
-    'court_id': courtId,
-    'rating': rating,
-    if (ratingCleanliness != null) 'rating_cleanliness': ratingCleanliness,
-    if (ratingFacilities != null) 'rating_facilities': ratingFacilities,
-    if (ratingStaff != null) 'rating_staff': ratingStaff,
-    if (comment != null) 'comment': comment,
-  };
+  factory ReviewSubmitModel.fromJson(Map<String, dynamic> json) =>
+      _$ReviewSubmitModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }

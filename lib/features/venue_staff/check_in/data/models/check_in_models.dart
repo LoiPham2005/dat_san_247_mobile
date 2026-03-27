@@ -1,20 +1,32 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-// ──────────────────────────────────────────────────────────────────────────
-// Enums (mirrors schema.prisma)
-// ──────────────────────────────────────────────────────────────────────────
+part 'check_in_models.freezed.dart';
+part 'check_in_models.g.dart';
+
+// ── Enums (mirrors schema.prisma) ───────────────────────────────────────────
 
 enum BookingStatusVS {
-  PENDING, CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED, NO_SHOW;
+  PENDING,
+  CONFIRMED,
+  CHECKED_IN,
+  COMPLETED,
+  CANCELLED,
+  NO_SHOW;
 
   String get label {
     switch (this) {
-      case PENDING: return 'Chờ xác nhận';
-      case CONFIRMED: return 'Đã xác nhận';
-      case CHECKED_IN: return 'Đã check-in';
-      case COMPLETED: return 'Hoàn thành';
-      case CANCELLED: return 'Đã huỷ';
-      case NO_SHOW: return 'Vắng mặt';
+      case PENDING:
+        return 'Chờ xác nhận';
+      case CONFIRMED:
+        return 'Đã xác nhận';
+      case CHECKED_IN:
+        return 'Đã check-in';
+      case COMPLETED:
+        return 'Hoàn thành';
+      case CANCELLED:
+        return 'Đã huỷ';
+      case NO_SHOW:
+        return 'Vắng mặt';
     }
   }
 
@@ -22,133 +34,93 @@ enum BookingStatusVS {
   bool get isActive => this == PENDING || this == CONFIRMED;
 }
 
-enum VenueStaffRole { OWNER, MANAGER, STAFF, RECEPTIONIST;
-  String get label => switch(this) {
-    OWNER => 'Chủ sân',
-    MANAGER => 'Quản lý',
-    STAFF => 'Nhân viên',
-    RECEPTIONIST => 'Nhân viên lễ tân',
-  };
+enum VenueStaffRole {
+  OWNER,
+  MANAGER,
+  STAFF,
+  RECEPTIONIST;
+
+  String get label => switch (this) {
+        OWNER => 'Chủ sân',
+        MANAGER => 'Quản lý',
+        STAFF => 'Nhân viên',
+        RECEPTIONIST => 'Nhân viên lễ tân',
+      };
   bool get canMarkNoShow => this == OWNER || this == MANAGER || this == STAFF;
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// booking_addons model (for check-in display)
-// ──────────────────────────────────────────────────────────────────────────
-class StaffBookingAddonModel extends Equatable {
-  final String id;
-  final String bookingId;
-  final String serviceId;
-  final String serviceName;
-  final String? serviceCategory;
-  final int quantity;
-  final double pricePerUnit;
-  final double totalPrice;
-  final String? note;
+// ── booking_addons model ───────────────────────────────────────────────────
+@freezed
+abstract class StaffBookingAddonModel with _$StaffBookingAddonModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory StaffBookingAddonModel({
+    required String id,
+    required String bookingId,
+    required String serviceId,
+    required String serviceName,
+    String? serviceCategory,
+    required int quantity,
+    required double pricePerUnit,
+    required double totalPrice,
+    String? note,
+  }) = _StaffBookingAddonModel;
 
-  const StaffBookingAddonModel({
-    required this.id,
-    required this.bookingId,
-    required this.serviceId,
-    required this.serviceName,
-    this.serviceCategory,
-    required this.quantity,
-    required this.pricePerUnit,
-    required this.totalPrice,
-    this.note,
-  });
+  const StaffBookingAddonModel._();
 
-  factory StaffBookingAddonModel.fromJson(Map<String, dynamic> json) =>
-      StaffBookingAddonModel(
-        id: json['id'],
-        bookingId: json['booking_id'],
-        serviceId: json['service_id'],
-        serviceName: json['venue_services']?['name'] ?? json['service_name'] ?? '',
-        serviceCategory: json['venue_services']?['category'],
-        quantity: json['quantity'] ?? 1,
-        pricePerUnit: (json['price_per_unit'] as num).toDouble(),
-        totalPrice: (json['total_price'] as num).toDouble(),
-        note: json['note'],
-      );
+  factory StaffBookingAddonModel.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    if (json['venue_services'] != null && json['venue_services'] is Map) {
+      mappedJson['service_name'] = json['venue_services']['name'] ??
+          json['service_name'] ??
+          '';
+      mappedJson['service_category'] = json['venue_services']['category'];
+    }
+    return _$StaffBookingAddonModelFromJson(mappedJson);
+  }
 
-  @override
-  List<Object?> get props => [id, serviceId, quantity];
+  Map<String, dynamic> toJson();
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Check-in booking model — full info needed for VS-02/VS-03
-// Joins: bookings + courts + venues + users (customer) + booking_addons
-// ──────────────────────────────────────────────────────────────────────────
-class CheckInBookingModel extends Equatable {
-  // booking fields
-  final String id;
-  final String bookingCode;
-  final String? checkInCode; // unique VarChar(10)
+// ── Check-in booking model ─────────────────────────────────────────────────
+@freezed
+abstract class CheckInBookingModel with _$CheckInBookingModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory CheckInBookingModel({
+    required String id,
+    required String bookingCode,
+    String? checkInCode,
+    required String courtId,
+    required String courtName,
+    required bool isIndoor,
+    required String venueName,
+    required String venueAddress,
+    required String customerId,
+    required String customerName,
+    String? customerPhone,
+    String? customerAvatar,
+    required DateTime bookingDate,
+    required String startTime,
+    required String endTime,
+    required BookingStatusVS status,
+    required double totalAmount,
+    String? paymentMethod,
+    @Default([]) List<StaffBookingAddonModel> addons,
+    DateTime? checkedInAt,
+    String? checkedInByName,
+  }) = _CheckInBookingModel;
 
-  // court + venue
-  final String courtId;
-  final String courtName;
-  final bool isIndoor;
-  final String venueName;
-  final String venueAddress;
+  const CheckInBookingModel._();
 
-  // customer
-  final String customerId;
-  final String customerName;
-  final String? customerPhone;
-  final String? customerAvatar;
-
-  // booking time
-  final DateTime bookingDate;
-  final String startTime; // HH:mm
-  final String endTime;
-
-  // status
-  final BookingStatusVS status;
-  final double totalAmount;
-  final String? paymentMethod;
-
-  // addons
-  final List<StaffBookingAddonModel> addons;
-
-  // check-in metadata
-  final DateTime? checkedInAt;
-  final String? checkedInByName;
-
-  const CheckInBookingModel({
-    required this.id,
-    required this.bookingCode,
-    this.checkInCode,
-    required this.courtId,
-    required this.courtName,
-    required this.isIndoor,
-    required this.venueName,
-    required this.venueAddress,
-    required this.customerId,
-    required this.customerName,
-    this.customerPhone,
-    this.customerAvatar,
-    required this.bookingDate,
-    required this.startTime,
-    required this.endTime,
-    required this.status,
-    required this.totalAmount,
-    this.paymentMethod,
-    this.addons = const [],
-    this.checkedInAt,
-    this.checkedInByName,
-  });
-
-  /// Validate trước check-in: status=CONFIRMED, booking_date=today, time range +/- 30 phút
   bool get isValidForCheckIn {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final bDate = DateTime(bookingDate.year, bookingDate.month, bookingDate.day);
     if (bDate != today) return false;
     if (status != BookingStatusVS.CONFIRMED) return false;
-    // parse startTime and allow 30 min grace
+
     final parts = startTime.split(':');
-    final startDt = DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
+    final startDt = DateTime(
+        now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
     return now.isAfter(startDt.subtract(const Duration(minutes: 30)));
   }
 
@@ -165,70 +137,70 @@ class CheckInBookingModel extends Equatable {
     return 'Chưa đến giờ check-in (30 phút trước giờ chơi)';
   }
 
-  factory CheckInBookingModel.fromJson(Map<String, dynamic> json) =>
-      CheckInBookingModel(
-        id: json['id'],
-        bookingCode: json['booking_code'],
-        checkInCode: json['check_in_code'],
-        courtId: json['court_id'],
-        courtName: json['courts']?['name'] ?? '',
-        isIndoor: json['courts']?['is_indoor'] ?? false,
-        venueName: json['venues']?['name'] ?? '',
-        venueAddress: json['venues']?['address'] ?? '',
-        customerId: json['customer_id'],
-        customerName: json['customers']?['full_name'] ?? 'Khách hàng',
-        customerPhone: json['customers']?['phone'],
-        customerAvatar: json['customers']?['avatar_url'],
-        bookingDate: DateTime.parse(json['booking_date']),
-        startTime: _parseTime(json['start_time']),
-        endTime: _parseTime(json['end_time']),
-        status: BookingStatusVS.values.firstWhere(
-            (e) => e.name == json['status'], orElse: () => BookingStatusVS.PENDING),
-        totalAmount: (json['total_amount'] as num).toDouble(),
-        paymentMethod: json['payment_method'],
-        addons: (json['booking_addons'] as List? ?? [])
-            .map((a) => StaffBookingAddonModel.fromJson(a))
-            .toList(),
-        checkedInAt: json['checked_in_at'] != null ? DateTime.parse(json['checked_in_at']) : null,
-        checkedInByName: json['check_in_staff']?['full_name'],
-      );
+  factory CheckInBookingModel.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> mappedJson = Map<String, dynamic>.from(json);
+    if (json['courts'] != null && json['courts'] is Map) {
+      mappedJson['court_name'] = json['courts']['name'] ?? '';
+      mappedJson['is_indoor'] = json['courts']['is_indoor'] ?? false;
+    }
+    if (json['venues'] != null && json['venues'] is Map) {
+      mappedJson['venue_name'] = json['venues']['name'] ?? '';
+      mappedJson['venue_address'] = json['venues']['address'] ?? '';
+    }
+    if (json['customers'] != null && json['customers'] is Map) {
+      mappedJson['customer_name'] = json['customers']['full_name'] ?? 'Khách hàng';
+      mappedJson['customer_phone'] = json['customers']['phone'];
+      mappedJson['customer_avatar'] = json['customers']['avatar_url'];
+    }
+    if (json['start_time'] != null) {
+      mappedJson['start_time'] = _parseTime(json['start_time']);
+    }
+    if (json['end_time'] != null) {
+      mappedJson['end_time'] = _parseTime(json['end_time']);
+    }
+    if (json['check_in_staff'] != null && json['check_in_staff'] is Map) {
+      mappedJson['checked_in_by_name'] = json['check_in_staff']['full_name'];
+    }
+    return _$CheckInBookingModelFromJson(mappedJson);
+  }
 
   static String _parseTime(dynamic t) {
     if (t == null) return '00:00';
     final s = t.toString();
     if (s.contains('T')) {
       final dt = DateTime.tryParse(s);
-      if (dt != null) return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+      if (dt != null)
+        return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     }
-    return s.substring(0, 5);
+    return s.length >= 5 ? s.substring(0, 5) : s;
   }
 
-  @override
-  List<Object?> get props => [id, bookingCode, status];
+  Map<String, dynamic> toJson();
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Today schedule model — for VS-04 timeline grouped by court
-// ──────────────────────────────────────────────────────────────────────────
-class TodayCourtScheduleModel extends Equatable {
-  final String courtId;
-  final String courtName;
-  final bool isIndoor;
-  final String? thumbnail;
-  final List<CheckInBookingModel> bookings;
+// ── Today schedule model ───────────────────────────────────────────────────
+@freezed
+abstract class TodayCourtScheduleModel with _$TodayCourtScheduleModel {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+  const factory TodayCourtScheduleModel({
+    required String courtId,
+    required String courtName,
+    required bool isIndoor,
+    String? thumbnail,
+    required List<CheckInBookingModel> bookings,
+  }) = _TodayCourtScheduleModel;
 
-  const TodayCourtScheduleModel({
-    required this.courtId,
-    required this.courtName,
-    required this.isIndoor,
-    this.thumbnail,
-    required this.bookings,
-  });
+  const TodayCourtScheduleModel._();
 
-  int get checkedInCount => bookings.where((b) => b.status == BookingStatusVS.CHECKED_IN).length;
-  int get confirmedCount => bookings.where((b) => b.status == BookingStatusVS.CONFIRMED).length;
-  int get pendingCount => bookings.where((b) => b.status == BookingStatusVS.PENDING).length;
+  int get checkedInCount =>
+      bookings.where((b) => b.status == BookingStatusVS.CHECKED_IN).length;
+  int get confirmedCount =>
+      bookings.where((b) => b.status == BookingStatusVS.CONFIRMED).length;
+  int get pendingCount =>
+      bookings.where((b) => b.status == BookingStatusVS.PENDING).length;
 
-  @override
-  List<Object?> get props => [courtId];
+  factory TodayCourtScheduleModel.fromJson(Map<String, dynamic> json) =>
+      _$TodayCourtScheduleModelFromJson(json);
+
+  Map<String, dynamic> toJson();
 }
