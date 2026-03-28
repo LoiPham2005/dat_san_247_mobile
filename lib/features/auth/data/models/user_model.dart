@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'auth_enums.dart';
 import 'auth_response.dart'; // For RoleModel if needed
 

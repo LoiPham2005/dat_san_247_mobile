@@ -1,29 +1,65 @@
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  language:
+    strict-casts: true          # ✅ Thêm: bắt lỗi cast ngầm định
+    strict-inference: true      # ✅ Thêm: bắt lỗi type inference mơ hồ
+    strict-raw-types: true      # ✅ Thêm: bắt List, Map không có type
+
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.config.dart"        # ✅ Thêm: injectable generated file
+    - "lib/generated/**"        # ✅ Thêm: flutter_gen output
+    - "bricks/**/__brick__/**"
+
+  errors:
+    # ── Freezed / Injectable bắt buộc ignore ──
+    invalid_annotation_target: ignore
+    library_private_types_in_public_api: ignore
+
+    # ── Nâng lên error (bắt buộc fix) ──
+    missing_required_param: error         # ✅ Thêm
+    missing_return: error                 # ✅ Thêm
+    dead_code: warning                    # ✅ Thêm
+
+    # ── Giữ ignore có lý do ──
+    unrelated_type_equality_checks: ignore
+
+    # ❌ Bỏ 2 cái này — nên fix thay vì ignore
+    # sort_constructors_first: ignore     # → dùng rule thay vì suppress
+    # use_build_context_synchronously: ignore  # → rất nguy hiểm, nên fix
+
 linter:
   rules:
-    # Error rules
+    # ══════════════════════════════════════
+    # ERROR PREVENTION
+    # ══════════════════════════════════════
     avoid_print: true
     avoid_relative_lib_imports: true
     avoid_types_as_parameter_names: true
-
-    # Style rules
-    always_declare_return_types: true
-    always_require_non_null_named_parameters: true
-    annotate_overrides: true
-    avoid_init_to_null: true
-    avoid_null_checks_in_equality_operators: true
-    avoid_return_types_on_setters: true
-    await_only_futures: true
-    camel_case_types: true
+    avoid_web_libraries_in_flutter: true    # ✅ Thêm
     cancel_subscriptions: true
+    close_sinks: true                       # ✅ Thêm: đóng StreamController
+    unawaited_futures: true
+    use_rethrow_when_possible: true
+    await_only_futures: true
+
+    # ══════════════════════════════════════
+    # STYLE & READABILITY
+    # ══════════════════════════════════════
+    always_declare_return_types: true
+    annotate_overrides: true
+    camel_case_types: true
     constant_identifier_names: true
-    empty_constructor_bodies: true
     file_names: true
     library_names: true
     library_prefixes: true
     non_constant_identifier_names: true
-    one_member_abstracts: false
+
+    # ══════════════════════════════════════
+    # PREFER (code gọn hơn)
+    # ══════════════════════════════════════
     prefer_adjacent_string_concatenation: true
     prefer_collection_literals: true
     prefer_conditional_assignment: true
@@ -35,25 +71,37 @@ linter:
     prefer_is_empty: true
     prefer_is_not_empty: true
     prefer_single_quotes: true
-    sort_constructors_first: true
-    sort_unnamed_constructors_first: true
-    unawaited_futures: true
+    prefer_spread_collections: true         # ✅ Thêm: dùng ... thay addAll
+    prefer_null_aware_operators: true       # ✅ Thêm: dùng ?. thay if null check
+
+    # ══════════════════════════════════════
+    # UNNECESSARY (xóa code thừa)
+    # ══════════════════════════════════════
     unnecessary_brace_in_string_interps: true
     unnecessary_const: true
     unnecessary_new: true
     unnecessary_null_in_if_null_operators: true
     unnecessary_this: true
-    use_rethrow_when_possible: true
+    unnecessary_nullable_for_final_variable_declarations: true  # ✅ Thêm
+    unnecessary_string_interpolations: true  # ✅ Thêm: '$x' → x.toString()
 
-analyzer:
-  exclude:
-    - "**/*.g.dart"
-    - "**/*.freezed.dart"
-    - "bricks/**/__brick__/**"
-  errors:
-    invalid_annotation_target: ignore
-    # avoid_print: ignore
-    sort_constructors_first: ignore
-    library_private_types_in_public_api: ignore
-    unrelated_type_equality_checks: ignore
-    use_build_context_synchronously: ignore
+    # ══════════════════════════════════════
+    # DART 3+ / MODERN
+    # ══════════════════════════════════════
+    use_super_parameters: true              # ✅ Thêm: super.key thay widget.key
+    use_colored_box: true                   # ✅ Thêm: ColoredBox thay Container(color:)
+    use_decorated_box: true                 # ✅ Thêm: DecoratedBox thay Container(decoration:)
+    sized_box_for_whitespace: true          # ✅ Thêm: SizedBox thay Container(width/height)
+    avoid_unnecessary_containers: true      # ✅ Thêm
+
+    # ══════════════════════════════════════
+    # TẮT CÓ LÝ DO
+    # ══════════════════════════════════════
+    one_member_abstracts: false             # Giữ: Retrofit/Injectable cần
+    always_require_non_null_named_parameters: false  # ❌ Deprecated Dart 3+
+    avoid_init_to_null: false               # ❌ Freezed hay dùng = null
+    avoid_null_checks_in_equality_operators: false   # ❌ Freezed generated
+    avoid_return_types_on_setters: false    # ❌ Thỉnh thoảng cần explicit
+    empty_constructor_bodies: false         # ❌ Freezed const factory cần
+    sort_constructors_first: false          # ❌ Freezed const factory phải đứng đầu rồi
+    sort_unnamed_constructors_first: false  # ❌ Tương tự

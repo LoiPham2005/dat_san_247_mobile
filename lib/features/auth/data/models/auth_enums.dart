@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+part 'auth_enums.g.dart';
 
 @JsonEnum(alwaysCreate: true)
 enum Gender {
