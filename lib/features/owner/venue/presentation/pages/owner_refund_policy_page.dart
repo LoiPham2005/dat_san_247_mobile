@@ -24,16 +24,16 @@ class _OwnerRefundPolicyPageState extends State<OwnerRefundPolicyPage> {
     final now = DateTime.now();
     return [
       RefundPolicyModel(id:'p1', venueId:'v1', name:'Chính sách tiêu chuẩn', description:'Áp dụng cho đặt sân thông thường.', isActive:true, isDefault:true, createdAt:now, updatedAt:now, rules:[
-        const RefundRuleModel(id:'r1', policyId:'p1', cancelBeforeHours:48, refundPercentage:100, description:'Hoàn 100% nếu hủy trước 2 ngày'),
-        const RefundRuleModel(id:'r2', policyId:'p1', cancelBeforeHours:24, refundPercentage:50, description:'Hoàn 50% nếu hủy trước 1 ngày'),
-        const RefundRuleModel(id:'r3', policyId:'p1', cancelBeforeHours:2, refundPercentage:0, description:'Không hoàn nếu hủy trong vòng 2 giờ'),
+        const RefundRuleModel(id:'r1', policyId:'p1', beforeHours:48, refundPercentage:100, description:'Hoàn 100% nếu hủy trước 2 ngày'),
+        const RefundRuleModel(id:'r2', policyId:'p1', beforeHours:24, refundPercentage:50, description:'Hoàn 50% nếu hủy trước 1 ngày'),
+        const RefundRuleModel(id:'r3', policyId:'p1', beforeHours:2, refundPercentage:0, description:'Không hoàn nếu hủy trong vòng 2 giờ'),
       ]),
       RefundPolicyModel(id:'p2', venueId:'v1', name:'Chính sách cuối tuần', description:'Điều kiện chặt hơn cho T7, CN.', isActive:true, isDefault:false, createdAt:now, updatedAt:now, rules:[
-        const RefundRuleModel(id:'r4', policyId:'p2', cancelBeforeHours:72, refundPercentage:100, description:'Hoàn 100% nếu hủy trước 3 ngày'),
-        const RefundRuleModel(id:'r5', policyId:'p2', cancelBeforeHours:0, refundPercentage:0, description:'Không hoàn các trường hợp còn lại'),
+        const RefundRuleModel(id:'r4', policyId:'p2', beforeHours:72, refundPercentage:100, description:'Hoàn 100% nếu hủy trước 3 ngày'),
+        const RefundRuleModel(id:'r5', policyId:'p2', beforeHours:0, refundPercentage:0, description:'Không hoàn các trường hợp còn lại'),
       ]),
       RefundPolicyModel(id:'p3', venueId:'v1', name:'Không hoàn tiền', description:'Dùng cho khuyến mãi giảm sâu.', isActive:false, isDefault:false, createdAt:now, updatedAt:now, rules:[
-        const RefundRuleModel(id:'r6', policyId:'p3', cancelBeforeHours:0, refundPercentage:0, description:'Không hoàn trong mọi trường hợp'),
+        const RefundRuleModel(id:'r6', policyId:'p3', beforeHours:0, refundPercentage:0, description:'Không hoàn trong mọi trường hợp'),
       ]),
     ];
   }
@@ -66,7 +66,7 @@ class _OwnerRefundPolicyPageState extends State<OwnerRefundPolicyPage> {
         ),
         SliverToBoxAdapter(child: Container(
           margin: const EdgeInsets.fromLTRB(12, 10, 12, 0), padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: AppColors.info.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: AppColors.info.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AppColors.info.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: AppColors.info.withValues(alpha: 0.3))),
           child: const Row(children: [Icon(Icons.info_outline_rounded, size: 14, color: AppColors.info), SizedBox(width: 8), Expanded(child: Text('Policy "Mặc định" áp dụng khi tạo booking mới nếu không chỉ định policy khác.', style: TextStyle(fontSize: 11, color: AppColors.info)))]),
         )),
         SliverPadding(
@@ -145,8 +145,8 @@ class _OwnerRefundPolicyPageState extends State<OwnerRefundPolicyPage> {
               final pIdx = _policies.indexWhere((p) => p.id == policy.id);
               if (pIdx >= 0) {
                 final rules = List<RefundRuleModel>.from(_policies[pIdx].rules);
-                if (existing == null) rules.add(RefundRuleModel(id:'r${DateTime.now().millisecondsSinceEpoch}', policyId:policy.id, cancelBeforeHours:h, refundPercentage:pct, description:descCtrl.text.isEmpty ? null : descCtrl.text));
-                else { final rIdx = rules.indexWhere((r) => r.id == existing.id); if (rIdx >= 0) rules[rIdx] = RefundRuleModel(id:existing.id, policyId:policy.id, cancelBeforeHours:h, refundPercentage:pct, description:descCtrl.text.isEmpty ? null : descCtrl.text); }
+                if (existing == null) rules.add(RefundRuleModel(id:'r${DateTime.now().millisecondsSinceEpoch}', policyId:policy.id, beforeHours:h, refundPercentage:pct, description:descCtrl.text.isEmpty ? null : descCtrl.text));
+                else { final rIdx = rules.indexWhere((r) => r.id == existing.id); if (rIdx >= 0) rules[rIdx] = RefundRuleModel(id:existing.id, policyId:policy.id, beforeHours:h, refundPercentage:pct, description:descCtrl.text.isEmpty ? null : descCtrl.text); }
                 _policies[pIdx] = _policies[pIdx].copyWith(rules: rules..sort((a,b) => b.cancelBeforeHours.compareTo(a.cancelBeforeHours)));
               }
             });
@@ -180,15 +180,15 @@ class _PolicyCardState extends State<_PolicyCard> {
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14),
           border: Border.all(color: p.isDefault ? AppColors.success.withOpacity(0.4) : AppColors.borderLight),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)]),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)]),
         child: Column(children: [
           GestureDetector(onTap: () => setState(() => _expanded = !_expanded), child: Padding(padding: const EdgeInsets.fromLTRB(14, 12, 10, 10), child: Row(children: [
-            Container(width: 36, height: 36, decoration: BoxDecoration(color: brand.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.policy_rounded, color: Color(0xFF0891B2), size: 18)),
+            Container(width: 36, height: 36, decoration: BoxDecoration(color: brand.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.policy_rounded, color: Color(0xFF0891B2), size: 18)),
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Expanded(child: Text(p.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900))),
-                if (p.isDefault) Container(padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3), decoration: BoxDecoration(color: AppColors.success.withOpacity(0.1), borderRadius: BorderRadius.circular(20)), child: const Text('Mặc định', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.success))),
+                if (p.isDefault) Container(padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3), decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)), child: const Text('Mặc định', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.success))),
                 if (!p.isActive) Container(padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3), decoration: BoxDecoration(color: AppColors.borderLight, borderRadius: BorderRadius.circular(20)), child: const Text('Tắt', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.textHint))),
               ]),
               if (p.description != null) Text(p.description!, style: const TextStyle(fontSize: 10, color: AppColors.textHint), maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -200,7 +200,7 @@ class _PolicyCardState extends State<_PolicyCard> {
             ...p.rules.map((r) {
               final color = r.refundPercentage >= 80 ? AppColors.success : r.refundPercentage >= 30 ? AppColors.warning : AppColors.error;
               return Padding(padding: const EdgeInsets.fromLTRB(14, 8, 14, 0), child: Row(children: [
-                Container(width: 46, height: 46, decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                Container(width: 46, height: 46, decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text('${r.refundPercentage.toStringAsFixed(0)}%', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)), Text('hoàn', style: TextStyle(fontSize: 8, color: color))])),
                 const SizedBox(width: 10),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -211,7 +211,7 @@ class _PolicyCardState extends State<_PolicyCard> {
               ]));
             }),
             Padding(padding: const EdgeInsets.all(10), child: GestureDetector(onTap: widget.onAddRule,
-              child: Container(padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: brand.withOpacity(0.05), borderRadius: BorderRadius.circular(8), border: Border.all(color: brand.withOpacity(0.2))),
+              child: Container(padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: brand.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8), border: Border.all(color: brand.withValues(alpha: 0.2))),
                 child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.add_rounded, size: 14, color: Color(0xFF0891B2)), SizedBox(width: 4), Text('Thêm mức hoàn tiền', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0891B2)))])))),
           ],
           const Divider(height: 1, color: AppColors.borderLight),
@@ -233,12 +233,12 @@ class _PolicyCardState extends State<_PolicyCard> {
 class _Chip extends StatelessWidget {
   final String label; final Color color; const _Chip(this.label, this.color);
   @override
-  Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(20)), child: Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)));
+  Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)), child: Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)));
 }
 
 class _Btn extends StatelessWidget {
   final IconData icon; final String label; final Color color; final VoidCallback onTap;
   const _Btn(this.icon, this.label, this.color, this.onTap);
   @override
-  Widget build(BuildContext context) => GestureDetector(onTap: () { HapticFeedback.selectionClick(); onTap(); }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5), decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 12, color: color), const SizedBox(width: 3), Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color))])));
+  Widget build(BuildContext context) => GestureDetector(onTap: () { HapticFeedback.selectionClick(); onTap(); }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5), decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 12, color: color), const SizedBox(width: 3), Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color))])));
 }

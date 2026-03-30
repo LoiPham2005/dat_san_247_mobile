@@ -4,6 +4,7 @@
 import 'package:dat_san_247_mobile/core/common/mixins/api_handler_mixin.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/base/errors/result.dart';
+import '../../../../core/services/app_auth/app_auth_state.dart';
 import '../../../../core/services/app_auth/app_auth_service.dart';
 import '../models/auth_request.dart';
 import '../models/auth_response.dart';
@@ -19,10 +20,10 @@ class AuthRepository with ApiHandlerMixin {
   AuthRepository(this._service, this._appAuthService);
 
   /// 🔐 Login
-  Future<Result<AuthResponse>> login(LoginRequest request) async {
+  Future<Result<AuthResponse>> login(LoginRequest request, {AppLoginMode mode = AppLoginMode.customer}) async {
     final result = await safeCallUnwrap(() => _service.login(request));
     if (result.isSuccess) {
-      await _appAuthService.saveLoginData(result.dataOrNull!);
+      await _appAuthService.saveLoginData(result.dataOrNull!, mode);
     }
     return result;
   }
@@ -51,7 +52,8 @@ class AuthRepository with ApiHandlerMixin {
   Future<Result<AuthResponse>> refresh(String refreshToken) async {
     final result = await safeCallUnwrap(() => _service.refresh({'refresh_token': refreshToken}));
     if (result.isSuccess) {
-      await _appAuthService.saveLoginData(result.dataOrNull!);
+      final mode = _appAuthService.getPersistentLoginMode();
+      await _appAuthService.saveLoginData(result.dataOrNull!, mode);
     }
     return result;
   }

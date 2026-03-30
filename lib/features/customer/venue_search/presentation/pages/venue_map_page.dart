@@ -3,16 +3,19 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/services/permission/permission_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../cubit/venue_search_cubit.dart';
 import '../widgets/map_ui_components.dart';
 import '../widgets/venue_detail_panel.dart';
 import '../widgets/venue_list_panel.dart';
@@ -26,7 +29,7 @@ const _kOsmTile = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 enum _SheetSize { collapsed, list, detail, full }
 
-class VenueMapPage extends StatefulWidget {
+class VenueMapPage extends StatelessWidget {
   final List<VenueSearchResultModel> venues;
   final double? initialLat;
   final double? initialLng;
@@ -40,128 +43,41 @@ class VenueMapPage extends StatefulWidget {
     this.initialZoom,
   });
 
-  static const List<VenueSearchResultModel> mockVenues = [
-    VenueSearchResultModel(
-      id: '1',
-      name: 'Sân Bóng Đá Cầu Giấy',
-      slug: 'san-bong-da-cau-giay',
-      address: '12 Trần Thái Tông, Cầu Giấy',
-      city: 'Hà Nội',
-      district: 'Cầu Giấy',
-      rating: 4.8,
-      totalReviews: 120,
-      minPricePerHour: 300000,
-      sportTypes: ['Bóng đá'],
-      latitude: 21.0285,
-      longitude: 105.8542,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600',
-      isOpen: true,
-    ),
-    VenueSearchResultModel(
-      id: '2',
-      name: 'Sân Cầu Lông StarSport',
-      slug: 'san-cau-long-starsport',
-      address: '45 Xuân Thủy, Cầu Giấy',
-      city: 'Hà Nội',
-      district: 'Cầu Giấy',
-      rating: 4.5,
-      totalReviews: 85,
-      minPricePerHour: 120000,
-      sportTypes: ['Cầu lông'],
-      latitude: 21.0310,
-      longitude: 105.8490,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600',
-      isOpen: true,
-    ),
-    VenueSearchResultModel(
-      id: '3',
-      name: 'Sân Pickleball Mỹ Đình',
-      slug: 'san-pickleball-my-dinh',
-      address: '3 Lê Đức Thọ, Nam Từ Liêm',
-      city: 'Hà Nội',
-      district: 'Nam Từ Liêm',
-      rating: 4.9,
-      totalReviews: 200,
-      minPricePerHour: 200000,
-      sportTypes: ['Pickleball'],
-      latitude: 21.0220,
-      longitude: 105.7630,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600',
-      isOpen: false,
-    ),
-    VenueSearchResultModel(
-      id: '4',
-      name: 'Sân Tennis Hồ Tây',
-      slug: 'san-tennis-ho-tay',
-      address: '18 Nguyễn Đình Thi, Tây Hồ',
-      city: 'Hà Nội',
-      district: 'Tây Hồ',
-      rating: 4.6,
-      totalReviews: 150,
-      minPricePerHour: 250000,
-      sportTypes: ['Tennis'],
-      latitude: 21.0620,
-      longitude: 105.8310,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600',
-      isOpen: true,
-    ),
-    VenueSearchResultModel(
-      id: '5',
-      name: 'Arena Basketball Đống Đa',
-      slug: 'arena-basketball-dong-da',
-      address: '67 Nguyễn Lương Bằng, Đống Đa',
-      city: 'Hà Nội',
-      district: 'Đống Đa',
-      rating: 4.3,
-      totalReviews: 95,
-      minPricePerHour: 180000,
-      sportTypes: ['Bóng rổ'],
-      latitude: 21.0168,
-      longitude: 105.8420,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600',
-      isOpen: true,
-    ),
-    VenueSearchResultModel(
-      id: '6',
-      name: 'Arena Basketball Đống Đa',
-      slug: 'arena-basketball-dong-da',
-      address: '67 Nguyễn Lương Bằng, Đống Đa',
-      city: 'Hà Nội',
-      district: 'Đống Đa',
-      rating: 4.3,
-      totalReviews: 95,
-      minPricePerHour: 180000,
-      sportTypes: ['Bóng rổ'],
-      latitude: 21.0168,
-      longitude: 105.8420,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600',
-      isOpen: true,
-    ),
-    VenueSearchResultModel(
-      id: '7',
-      name: 'Arena Basketball Đống Đa',
-      slug: 'arena-basketball-dong-da',
-      address: '67 Nguyễn Lương Bằng, Đống Đa',
-      city: 'Hà Nội',
-      district: 'Đống Đa',
-      rating: 4.3,
-      totalReviews: 95,
-      minPricePerHour: 180000,
-      sportTypes: ['Bóng rổ'],
-      latitude: 21.0168,
-      longitude: 105.8420,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600',
-      isOpen: true,
-    ),
-  ];
-
   @override
-  State<VenueMapPage> createState() => _VenueMapPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<VenueSearchCubit>(),
+      child: _VenueMapPageContent(
+        venues: venues,
+        initialLat: initialLat,
+        initialLng: initialLng,
+        initialZoom: initialZoom,
+      ),
+    );
+  }
 }
 
-class _VenueMapPageState extends State<VenueMapPage> {
+class _VenueMapPageContent extends StatefulWidget {
+  final List<VenueSearchResultModel> venues;
+  final double? initialLat;
+  final double? initialLng;
+  final double? initialZoom;
+
+  const _VenueMapPageContent({
+    this.venues = const [],
+    this.initialLat,
+    this.initialLng,
+    this.initialZoom,
+  });
+
+  @override
+  State<_VenueMapPageContent> createState() => _VenueMapPageContentState();
+}
+
+class _VenueMapPageContentState extends State<_VenueMapPageContent> {
   final MapController _mapController = MapController();
-  final DraggableScrollableController _sheetCtrl = DraggableScrollableController();
+  final DraggableScrollableController _sheetCtrl =
+      DraggableScrollableController();
 
   VenueSearchResultModel? _selected;
   String _sportFilter = 'Tất cả';
@@ -171,8 +87,9 @@ class _VenueMapPageState extends State<VenueMapPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  List<VenueSearchResultModel> get _allVenues =>
-      widget.venues.isNotEmpty ? widget.venues : VenueMapPage.mockVenues;
+  List<VenueSearchResultModel> _effectiveVenues = [];
+
+  List<VenueSearchResultModel> get _allVenues => _effectiveVenues;
 
   List<String> get _sports => [
         'Tất cả',
@@ -181,12 +98,14 @@ class _VenueMapPageState extends State<VenueMapPage> {
 
   List<VenueSearchResultModel> get _filtered {
     return _allVenues.where((v) {
-      final matchesSport = _sportFilter == 'Tất cả' || v.sportTypes.contains(_sportFilter);
+      final matchesSport =
+          _sportFilter == 'Tất cả' || v.sportTypes.contains(_sportFilter);
+      final q = _searchQuery.toLowerCase();
       final matchesQuery = _searchQuery.isEmpty ||
-          v.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          v.address.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          v.city.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          v.district.toLowerCase().contains(_searchQuery.toLowerCase());
+          v.name.toLowerCase().contains(q) ||
+          v.address.toLowerCase().contains(q) ||
+          v.city.toLowerCase().contains(q) ||
+          v.district.toLowerCase().contains(q);
       return matchesSport && matchesQuery;
     }).toList();
   }
@@ -195,18 +114,28 @@ class _VenueMapPageState extends State<VenueMapPage> {
     if (widget.initialLat != null && widget.initialLng != null) {
       return LatLng(widget.initialLat!, widget.initialLng!);
     }
-    final first = _allVenues.firstWhere(
-      (v) => v.latitude != null,
-      orElse: () => VenueMapPage.mockVenues.first,
-    );
-    return LatLng(first.latitude ?? _kHanoi.latitude, first.longitude ?? _kHanoi.longitude);
+    if (_allVenues.isNotEmpty) {
+      final first = _allVenues.firstWhere(
+        (v) => v.latitude != null,
+        orElse: () => _allVenues.first,
+      );
+      return LatLng(first.latitude ?? _kHanoi.latitude,
+          first.longitude ?? _kHanoi.longitude);
+    }
+    return _kHanoi;
   }
 
   @override
   void initState() {
     super.initState();
+    _effectiveVenues = widget.venues; // Initialize with passed venues
+    _searchQuery = _searchController.text.trim();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _fitAllVenues();
+      if (widget.venues.isEmpty) {
+        context.read<VenueSearchCubit>().searchVenues({});
+      } else {
+        _fitAllVenues();
+      }
     });
   }
 
@@ -259,10 +188,18 @@ class _VenueMapPageState extends State<VenueMapPage> {
       _sportFilter = sport;
       _selected = null;
     });
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (!mounted) return;
-      _fitAllVenues();
-    });
+
+    if (widget.venues.isEmpty) {
+      context.read<VenueSearchCubit>().searchVenues({
+        'keyword': _searchQuery,
+        if (_sportFilter != 'Tất cả') 'sport_type': _sportFilter,
+      });
+    } else {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (!mounted) return;
+        _fitAllVenues();
+      });
+    }
   }
 
   void _snapSheet(_SheetSize size) {
@@ -321,31 +258,51 @@ class _VenueMapPageState extends State<VenueMapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F1923),
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          _buildMap(),
-          _buildTopFade(),
-          SafeArea(child: _buildTopBar()),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 70),
-                child: _buildSportChips(),
+    return BlocConsumer<VenueSearchCubit,
+        BaseState<List<VenueSearchResultModel>>>(
+      listener: (context, state) {
+        if (state.isSuccess) {
+          setState(() {
+            _effectiveVenues = state.data ?? [];
+          });
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (mounted) _fitAllVenues();
+          });
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: const Color(0xFF0F1923),
+          resizeToAvoidBottomInset: false,
+          body: Stack(
+            children: [
+              _buildMap(),
+              _buildTopFade(),
+              SafeArea(child: _buildTopBar()),
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 70),
+                    child: _buildSportChips(),
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                right: 16,
+                bottom: MediaQuery.of(context).size.height * 0.40,
+                child: _buildZoomButtons(),
+              ),
+              if (state.isLoading && _allVenues.isEmpty)
+                const Center(
+                  child: CircularProgressIndicator(
+                      color: AppColors.primaryLightBrand),
+                ),
+              _buildBottomSheet(),
+            ],
           ),
-          Positioned(
-            right: 16,
-            bottom: MediaQuery.of(context).size.height * 0.40,
-            child: _buildZoomButtons(),
-          ),
-          _buildBottomSheet(),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -397,7 +354,9 @@ class _VenueMapPageState extends State<VenueMapPage> {
   }
 
   List<Marker> _buildVenueMarkers() {
-    return _filtered.where((v) => v.latitude != null && v.longitude != null).map((v) {
+    return _filtered
+        .where((v) => v.latitude != null && v.longitude != null)
+        .map((v) {
       final isSelected = _selected?.id == v.id;
       return Marker(
         point: LatLng(v.latitude!, v.longitude!),
@@ -472,12 +431,15 @@ class _VenueMapPageState extends State<VenueMapPage> {
                   Expanded(
                     child: TextField(
                       controller: _searchController,
-                      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1F26)),
+                      style: const TextStyle(
+                          fontSize: 14, color: Color(0xFF1A1F26)),
                       decoration: InputDecoration(
                         hintText: 'Tìm sân thể thao...',
-                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                        hintStyle:
+                            TextStyle(color: Colors.grey[400], fontSize: 14),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? GestureDetector(
                                 onTap: () {
@@ -488,7 +450,8 @@ class _VenueMapPageState extends State<VenueMapPage> {
                                   });
                                   _fitAllVenues();
                                 },
-                                child: Icon(Icons.close_rounded, size: 18, color: Colors.grey[400]),
+                                child: Icon(Icons.close_rounded,
+                                    size: 18, color: Colors.grey[400]),
                               )
                             : null,
                       ),
@@ -498,15 +461,25 @@ class _VenueMapPageState extends State<VenueMapPage> {
                           _searchQuery = val.trim();
                           _selected = null;
                         });
-                        _fitAllVenues();
+                        if (widget.venues.isEmpty) {
+                          context.read<VenueSearchCubit>().searchVenues({
+                            'keyword': _searchQuery,
+                            if (_sportFilter != 'Tất cả')
+                              'sport_type': _sportFilter,
+                          });
+                        } else {
+                          _fitAllVenues();
+                        }
                       },
                     ),
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLightBrand.withValues(alpha: 0.12),
+                      color:
+                          AppColors.primaryLightBrand.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -582,14 +555,14 @@ class _VenueMapPageState extends State<VenueMapPage> {
       children: [
         MapFloatBtn(
           icon: Icons.add,
-          onTap: () => _mapController.move(
-              _mapController.camera.center, math.min(_mapController.camera.zoom + 1, 19)),
+          onTap: () => _mapController.move(_mapController.camera.center,
+              math.min(_mapController.camera.zoom + 1, 19)),
         ),
         const SizedBox(height: 8),
         MapFloatBtn(
           icon: Icons.remove,
-          onTap: () => _mapController.move(
-              _mapController.camera.center, math.max(_mapController.camera.zoom - 1, 5)),
+          onTap: () => _mapController.move(_mapController.camera.center,
+              math.max(_mapController.camera.zoom - 1, 5)),
         ),
         const SizedBox(height: 8),
         MapFloatBtn(
@@ -632,7 +605,9 @@ class _VenueMapPageState extends State<VenueMapPage> {
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
                       child: Text(
-                        _selected != null ? 'Chi tiết sân' : '${_filtered.length} sân gần bạn',
+                        _selected != null
+                            ? 'Chi tiết sân'
+                            : '${_filtered.length} sân gần bạn',
                         key: ValueKey(_selected?.id ?? 'list'),
                         style: const TextStyle(
                           fontSize: 17,
@@ -651,7 +626,8 @@ class _VenueMapPageState extends State<VenueMapPage> {
                           color: const Color(0xFFF0F4F8),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.close_rounded, size: 18, color: Color(0xFF5A6A7D)),
+                        child: const Icon(Icons.close_rounded,
+                            size: 18, color: Color(0xFF5A6A7D)),
                       ),
                     ),
                 ],
@@ -664,7 +640,10 @@ class _VenueMapPageState extends State<VenueMapPage> {
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 24, offset: Offset(0, -4))],
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black26, blurRadius: 24, offset: Offset(0, -4))
+            ],
           ),
           child: _selected != null
               ? VenueDetailPanel(
@@ -674,7 +653,8 @@ class _VenueMapPageState extends State<VenueMapPage> {
                   scrollCtrl: scrollCtrl,
                   header: header,
                   onBook: () {
-                    if (mounted) context.push('/venue-detail/${_selected!.slug}');
+                    if (mounted)
+                      context.push('/venue-detail/${_selected!.slug}');
                   },
                 )
               : VenueListPanel(

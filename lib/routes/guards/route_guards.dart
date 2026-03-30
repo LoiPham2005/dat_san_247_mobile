@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
@@ -65,149 +66,49 @@ class RouteGuards {
 
     // 2. Logged in + Auth page (login/register) → redirect to appropriate dashboard
     if (isLoggedIn && isAuthPage) {
-      return _getDashboardByRole();
+      return _getDashboardByMode();
     }
 
-    // 3. Logged in + trying to access Main Shell (Customer) but has different role
-    if (isLoggedIn && location == RouteNames.main) {
-      return _getDashboardByRole();
-    }
-
-    // 4. Role-based Authorization for specific prefix
+    // 3. Role-based Authorization & Shell routing
     if (isLoggedIn) {
       final user = _appAuthCubit.state.user;
-      final role = user?.role?.slug;
-
-      if (location.startsWith('/owner') && role != 'OWNER') {
-        return _getDashboardByRole();
+      final mode = _appAuthCubit.state.loginMode;
+      
+      // Hậu kiểm Role thực tế để đảm bảo không vào nhầm DashBoard
+      AppLoginMode actualMode = mode;
+      if (mode == AppLoginMode.owner && user?.role?.slug != 'owner') {
+        actualMode = AppLoginMode.customer;
+      } else if (mode == AppLoginMode.staff && user?.isVenueStaff != true) {
+        actualMode = AppLoginMode.customer;
       }
-      if (location.startsWith('/venue-staff') && !(role == 'STAFF' || user?.isVenueStaff == true)) {
-        return _getDashboardByRole();
+
+      // If at main root, check if we need to redirect to a specific shell
+      if (location == RouteNames.main) {
+        if (actualMode == AppLoginMode.staff) return RouteNames.venueStaff;
+        if (actualMode == AppLoginMode.owner) return RouteNames.owner;
+        return RouteNames.main;
+      }
+      
+      // Prevent access to Staff screens if not in Staff mode
+      if (location.startsWith('/venue-staff') && actualMode != AppLoginMode.staff) {
+        return RouteNames.main;
+      }
+      
+      // Prevent access to Owner screens if not in Owner mode
+      if (location.startsWith('/owner') && actualMode != AppLoginMode.owner) {
+        return RouteNames.main;
       }
     }
 
     return null;
   }
 
-  String _getDashboardByRole() {
-    final user = _appAuthCubit.state.user;
-    final role = user?.role?.slug.toUpperCase();
+  String _getDashboardByMode() {
+    final mode = _appAuthCubit.state.loginMode;
 
-    if (role == 'OWNER') return RouteNames.owner;
-    if (role == 'STAFF' || user?.isVenueStaff == true) return RouteNames.venueStaff;
+    if (mode == AppLoginMode.owner) return RouteNames.owner;
+    if (mode == AppLoginMode.staff) return RouteNames.venueStaff;
     
     return RouteNames.main;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import 'dart:async';
-
-// import 'package:flutter/material.dart';
-// import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
-// import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
-// import 'package:go_router/go_router.dart';
-// import 'package:injectable/injectable.dart';
-
-// /// 🛡️ Auth Route Guard
-// ///
-// /// - Redirect unauthenticated users to login when accessing protected pages
-// /// - Redirect authenticated users away from auth pages (login/register/welcome)
-// /// - Splash page is always accessible (handles its own navigation)
-// @LazySingleton()
-// class RouteGuards {
-//   final AppAuthCubit _appAuthCubit;
-
-//   RouteGuards(this._appAuthCubit);
-
-//   // Routes that don't require authentication
-//   static const _publicRoutes = {
-//     RouteNames.splash,
-//     RouteNames.onboarding,
-//     RouteNames.login,
-//     RouteNames.register,
-//     RouteNames.otp,
-//     RouteNames.forgotPassword,
-//     RouteNames.googleMap,
-//     RouteNames.home,
-//     RouteNames.main,
-//     RouteNames.venueSearch,
-//     RouteNames.venues,
-//     RouteNames.deals,
-//   };
-
-//   // Routes that authenticated users should not access (auth pages)
-//   static const _authOnlyRoutes = {
-//     RouteNames.onboarding,
-//     RouteNames.login,
-//     RouteNames.register,
-//     RouteNames.otp,
-//     RouteNames.forgotPassword,
-//   };
-
-//   // Public route prefixes - cho các route có dynamic params như /venue-detail/:id
-//   static const _publicPrefixes = [
-//     '/venue-detail/',
-//     '/venues',
-//     '/venue-search',
-//     '/time-slot-picker',
-//     '/google-map-example',
-//   ];
-
-//   FutureOr<String?> authGuard(BuildContext context, GoRouterState state) {
-//     final bool isLoggedIn = _appAuthCubit.state.isAuthenticated;
-//     final String location = state.matchedLocation;
-
-//     final bool isPublicByPrefix = _publicPrefixes.any((prefix) => location.startsWith(prefix));
-//     final bool isPublicPage = _publicRoutes.contains(location) || isPublicByPrefix;
-//     final bool isAuthPage = _authOnlyRoutes.contains(location);
-
-//     // 1. Not logged in + protected page → redirect to login
-//     if (!isLoggedIn && !isPublicPage) {
-//       return RouteNames.login;
-//     }
-
-//     if (isLoggedIn && isAuthPage) {
-//       return RouteNames.main;
-//     }
-
-//     // 2. Role-based Authorization
-//     if (isLoggedIn) {
-//       final user = _appAuthCubit.state.user;
-//       final roleId = user?.roleId;
-
-//       // Restrict /owner to OWNER role
-//       if (location.startsWith('/owner') && roleId != 'OWNER') {
-//         return RouteNames.main;
-//       }
-
-//       // Restrict /venue-staff to STAFF role
-//       if (location.startsWith('/venue-staff') && roleId != 'STAFF') {
-//         return RouteNames.main;
-//       }
-//     }
-
-//     // 3. No redirect needed
-//     return null;
-//   }
-// }

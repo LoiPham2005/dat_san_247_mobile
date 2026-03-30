@@ -61,8 +61,8 @@ class DashboardRevenueCard extends StatelessWidget {
             Text(_fmt(revenue['thisMonth']),
                 style: const TextStyle(
                     color: AppColors.white, fontSize: 30, fontWeight: FontWeight.w900)),
-            const Text('doanh thu tháng này',
-                style: TextStyle(color: AppColors.white70, fontSize: 11)),
+            // const Text('doanh thu tháng này',
+            //     style: TextStyle(color: AppColors.white70, fontSize: 11)),
           ]),
           const SizedBox(height: 14),
           Row(children: [

@@ -46,8 +46,8 @@ class AppAuthCubit extends Cubit<AppAuthState> {
   // ═══════════════════════════════════════════════════════════════
 
   /// Cập nhật trạng thái sau khi Login thành công
-  Future<void> loginSuccess(AuthResponse response) async {
-    await _authService.saveLoginData(response);
+  Future<void> loginSuccess(AuthResponse response, AppLoginMode mode) async {
+    await _authService.saveLoginData(response, mode);
     // AppAuthService sẽ tự emit AuthStatus.authenticated, _listenToAuthChanges sẽ bắt được
   }
 
@@ -71,8 +71,9 @@ class AppAuthCubit extends Cubit<AppAuthState> {
     switch (status) {
       case AuthStatus.authenticated:
         final user = _authService.currentUser;
+        final mode = _authService.getPersistentLoginMode();
         if (user != null) {
-          emit(AppAuthState.authenticated(user));
+          emit(AppAuthState.authenticated(user, mode: mode));
         } else {
           emit(AppAuthState.unauthenticated());
         }

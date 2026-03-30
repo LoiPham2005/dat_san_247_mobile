@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════════
 import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/base/state/cubit/base_cubit.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../data/models/auth_request.dart';
@@ -16,9 +17,9 @@ class AuthCubit extends BaseCubit<Object?> {
   AuthCubit(this._repository) : super(BaseState.initial());
 
   /// 🔐 Login
-  Future<void> login(LoginRequest request) async {
+  Future<void> login(LoginRequest request, {AppLoginMode mode = AppLoginMode.customer}) async {
     await run<AuthResponse>(
-      action: () => _repository.login(request),
+      action: () => _repository.login(request, mode: mode),
       successMessage: 'Đăng nhập thành công!',
     );
   }

@@ -1,195 +1,121 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/pages/owner_court_pricing_page.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/widgets/court_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/features/owner/venue/presentation/cubit/owner_venue_detail_sub_cubits.dart';
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // O-04: Quản Lý Sân (Courts)
 // ──────────────────────────────────────────────────────────────────────────
-class OwnerCourtsPage extends StatefulWidget {
+class OwnerCourtsPage extends StatelessWidget {
   final String venueId;
   final String venueName;
   const OwnerCourtsPage({super.key, required this.venueId, required this.venueName});
 
   @override
-  State<OwnerCourtsPage> createState() => _OwnerCourtsPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<OwnerCourtsCubit>()..fetchCourts(venueId),
+      child: _OwnerCourtsView(venueId: venueId, venueName: venueName),
+    );
+  }
 }
 
-class _OwnerCourtsPageState extends State<OwnerCourtsPage> {
+class _OwnerCourtsView extends StatefulWidget {
+  final String venueId;
+  final String venueName;
+  const _OwnerCourtsView({required this.venueId, required this.venueName});
+
+  @override
+  State<_OwnerCourtsView> createState() => _OwnerCourtsViewState();
+}
+
+class _OwnerCourtsViewState extends State<_OwnerCourtsView> {
   static const Color _brand = Color(0xFF0891B2);
   static const Color _brandDark = Color(0xFF0E7490);
 
   bool _showInactive = false;
 
-  List<OwnerCourtModel> _courts = _buildMock();
-
-  static List<OwnerCourtModel> _buildMock() {
-    final now = DateTime.now();
-    return [
-      OwnerCourtModel(
-          id: 'c1',
-          venueId: 'v1',
-          name: 'Sân A',
-          description: 'Sân bóng đá 7 người cỏ nhân tạo thế hệ 3.',
-          pricePerHour: 150000,
-          surfaceType: CourtSurfaceType.ARTIFICIAL_GRASS,
-          size: '34x18m',
-          isIndoor: false,
-          isActive: true,
-          displayOrder: 1,
-          sportTypes: ['FOOTBALL'],
-          amenities: [
-            const AmenityModel(id: 'a1', courtId: 'c1', name: 'Đèn chiếu sáng', isFree: true),
-            const AmenityModel(id: 'a2', courtId: 'c1', name: 'Ghế ngồi', isFree: true)
-          ],
-          createdAt: now,
-          updatedAt: now),
-      OwnerCourtModel(
-          id: 'c2',
-          venueId: 'v1',
-          name: 'Sân B',
-          description: 'Sân bóng đá 7 người, góc thoáng mát.',
-          pricePerHour: 130000,
-          surfaceType: CourtSurfaceType.ARTIFICIAL_GRASS,
-          size: '34x18m',
-          isIndoor: false,
-          isActive: true,
-          displayOrder: 2,
-          sportTypes: ['FOOTBALL'],
-          amenities: [const AmenityModel(id: 'a3', courtId: 'c2', name: 'Đèn chiếu sáng', isFree: true)],
-          createdAt: now,
-          updatedAt: now),
-      OwnerCourtModel(
-          id: 'c3',
-          venueId: 'v1',
-          name: 'Sân CL',
-          description: 'Sân cầu lông trong nhà, máy lạnh.',
-          pricePerHour: 70000,
-          surfaceType: CourtSurfaceType.WOOD,
-          size: '13.4x6.1m',
-          isIndoor: true,
-          isActive: true,
-          displayOrder: 3,
-          sportTypes: ['BADMINTON'],
-          amenities: [],
-          createdAt: now,
-          updatedAt: now),
-      OwnerCourtModel(
-          id: 'c4',
-          venueId: 'v1',
-          name: 'Sân D',
-          description: 'Sân bóng đá 5 người mini.',
-          pricePerHour: 120000,
-          surfaceType: CourtSurfaceType.ARTIFICIAL_GRASS,
-          size: '25x14m',
-          isIndoor: false,
-          isActive: true,
-          displayOrder: 4,
-          sportTypes: ['FOOTBALL'],
-          amenities: [],
-          createdAt: now,
-          updatedAt: now),
-      OwnerCourtModel(
-          id: 'c5',
-          venueId: 'v1',
-          name: 'Sân E (Bảo trì)',
-          description: 'Đang nâng cấp hệ thống tưới cỏ.',
-          pricePerHour: 150000,
-          surfaceType: CourtSurfaceType.GRASS,
-          size: '34x18m',
-          isIndoor: false,
-          isActive: false,
-          displayOrder: 5,
-          sportTypes: ['FOOTBALL'],
-          amenities: [],
-          createdAt: now,
-          updatedAt: now),
-    ];
-  }
-
-  List<OwnerCourtModel> get _filtered => _showInactive ? _courts : _courts.where((c) => c.isActive).toList();
-  int get _activeCount => _courts.where((c) => c.isActive).length;
-
   @override
   Widget build(BuildContext context) {
-    final filtered = _filtered;
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
-      body: CustomScrollView(
-        slivers: [
-          _buildHeader(),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 80),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (_, i) => CourtCard(
-                  court: filtered[i],
-                  brand: _brand,
-                  onTap: () => _showEditSheet(context, filtered[i]),
-                  onToggleActive: () => setState(() {
-                    final idx = _courts.indexWhere((c) => c.id == filtered[i].id);
-                    if (idx >= 0) {
-                      final c = _courts[idx];
-                      _courts[idx] = OwnerCourtModel(
-                          id: c.id,
-                          venueId: c.venueId,
-                          name: c.name,
-                          description: c.description,
-                          pricePerHour: c.pricePerHour,
-                          surfaceType: c.surfaceType,
-                          size: c.size,
-                          isIndoor: c.isIndoor,
-                          isActive: !c.isActive,
-                          displayOrder: c.displayOrder,
-                          thumbnailUrl: c.thumbnailUrl,
-                          sportTypes: c.sportTypes,
-                          amenities: c.amenities,
-                          createdAt: c.createdAt,
-                          updatedAt: DateTime.now());
-                    }
-                    HapticFeedback.selectionClick();
-                  }),
-                  onPricing: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => OwnerCourtPricingPage(court: filtered[i]))),
-                  onReorder: i < filtered.length - 1
-                      ? () => setState(() {
-                            final a = _courts.indexWhere((c) => c.id == filtered[i].id);
-                            final b = _courts.indexWhere((c) => c.id == filtered[i + 1].id);
-                            if (a >= 0 && b >= 0) {
-                              final tmp = _courts[a];
-                              _courts[a] = _courts[b];
-                              _courts[b] = tmp;
-                            }
-                            HapticFeedback.selectionClick();
-                          })
-                      : null,
+    return BlocBuilder<OwnerCourtsCubit, BaseState<List<OwnerCourtModel>>>(
+      builder: (context, state) {
+        final courts = state.data ?? [];
+        final filtered = _showInactive ? courts : courts.where((c) => c.isActive).toList();
+        final activeCount = courts.where((c) => c.isActive).length;
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF4F6FA),
+          body: CustomScrollView(
+            slivers: [
+              _buildHeader(courts.length, activeCount),
+              if (state.isLoading && courts.isEmpty)
+                const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+              else if (filtered.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Icon(Icons.stadium_outlined, size: 60, color: Colors.grey.shade300),
+                      const SizedBox(height: 16),
+                      Text('Chưa có sân nào',
+                          style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
+                    ]),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 80),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (_, i) => CourtCard(
+                        court: filtered[i],
+                        brand: _brand,
+                        onTap: () => _showEditSheet(context, filtered[i]),
+                        onToggleActive: () {
+                          // TODO: API for toggle active
+                          HapticFeedback.selectionClick();
+                        },
+                        onPricing: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => OwnerCourtPricingPage(court: filtered[i]))),
+                        onReorder: null,
+                      ),
+                      childCount: filtered.length,
+                    ),
+                  ),
                 ),
-                childCount: filtered.length,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddCourtSheet(context),
-        backgroundColor: _brand,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text('Thêm Sân', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => _showAddCourtSheet(context),
+            backgroundColor: _brand,
+            icon: const Icon(Icons.add_rounded, color: Colors.white),
+            label: const Text('Thêm Sân', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader() => SliverAppBar(
+  Widget _buildHeader(int total, int active) => SliverAppBar(
         pinned: true,
-        expandedHeight: 180,
+        expandedHeight: 150,
         backgroundColor: _brand,
         automaticallyImplyLeading: false,
+        titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
+        title: const Text('Danh sách sân',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        centerTitle: false,
         actions: [
           TextButton.icon(
             onPressed: () => setState(() => _showInactive = !_showInactive),
@@ -217,18 +143,14 @@ class _OwnerCourtsPageState extends State<OwnerCourtsPage> {
                       style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   Row(children: [
-                    _HChip(label: '$_activeCount hoạt động', color: AppColors.success),
+                    _HChip(label: '$active hoạt động', color: AppColors.success),
                     const SizedBox(width: 8),
-                    _HChip(label: '${_courts.length - _activeCount} tạm nghỉ', color: Colors.white60),
+                    _HChip(label: '${total - active} tạm nghỉ', color: Colors.white60),
                   ]),
                 ]),
               ),
             ),
           ),
-          title: const Text('Danh sách sân',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-          titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
-          centerTitle: false,
         ),
       );
 
@@ -343,32 +265,30 @@ class _OwnerCourtsPageState extends State<OwnerCourtsPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (nameCtrl.text.isEmpty || priceCtrl.text.isEmpty) return;
+                        if (nameCtrl.text.isEmpty || priceCtrl.text.isEmpty) {
+                          getIt<ToastService>().error('Vui lòng nhập đủ thông tin');
+                          return;
+                        }
                         Navigator.pop(ctx);
-                        setState(() => _courts.add(OwnerCourtModel(
-                            id: 'new_${DateTime.now().millisecondsSinceEpoch}',
-                            venueId: widget.venueId,
-                            name: nameCtrl.text,
-                            pricePerHour: double.tryParse(priceCtrl.text) ?? 0,
-                            surfaceType: surface,
-                            size: sizeCtrl.text.isEmpty ? null : sizeCtrl.text,
-                            isIndoor: isIndoor,
-                            isActive: true,
-                            displayOrder: _courts.length + 1,
-                            sportTypes: sports,
-                            amenities: [],
-                            createdAt: DateTime.now(),
-                            updatedAt: DateTime.now())));
+                        context.read<OwnerCourtsCubit>().addCourt(widget.venueId, {
+                          'name': nameCtrl.text,
+                          'price_per_hour': int.tryParse(priceCtrl.text) ?? 0,
+                          'surface_type': surface?.name,
+                          'size': sizeCtrl.text.isEmpty ? null : sizeCtrl.text,
+                          'is_indoor': isIndoor,
+                          'sport_types': sports,
+                        }).then((_) {
+                          getIt<ToastService>().success('Đã thêm sân: ${nameCtrl.text}');
+                        });
                         HapticFeedback.mediumImpact();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('✅ Đã thêm sân: ${nameCtrl.text}'), backgroundColor: AppColors.success));
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: _brand,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 13),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                      child: const Text('Thêm Sân', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      child: const Text('Thêm Sân',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     )),
               ])),
         ),
@@ -426,8 +346,7 @@ class _OwnerCourtsPageState extends State<OwnerCourtsPage> {
                   onPressed: () {
                     Navigator.pop(ctx);
                     HapticFeedback.mediumImpact();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('✅ Đã cập nhật sân'), backgroundColor: AppColors.success));
+                    getIt<ToastService>().success('Tính năng đang phát triển');
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: _brand,
@@ -437,6 +356,18 @@ class _OwnerCourtsPageState extends State<OwnerCourtsPage> {
                   child: const Text('Lưu', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 )),
               ]),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    context.read<OwnerCourtsCubit>().deleteCourt(widget.venueId, court.id);
+                  },
+                  icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 18),
+                  label: const Text('Xóa Sân', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+                ),
+              ),
             ])),
       ),
     );

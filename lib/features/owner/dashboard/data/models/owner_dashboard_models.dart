@@ -1,58 +1,62 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'owner_dashboard_models.freezed.dart';
+part 'owner_dashboard_models.g.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // Owner Dashboard Models — mapping schema.prisma
 // ──────────────────────────────────────────────────────────────────────────
 
-// ── Booking stats ─────────────────────────────────────────────────────────
-class OwnerBookingStatsModel extends Equatable {
-  final int totalToday;
-  final int pending;
-  final int confirmed;
-  final int checkedIn;
-  final int completed;
-  final int cancelled;
+double _toDouble(dynamic v) {
+  if (v == null) return 0.0;
+  if (v is num) return v.toDouble();
+  if (v is String) return double.tryParse(v) ?? 0.0;
+  return 0.0;
+}
 
-  const OwnerBookingStatsModel({
-    required this.totalToday,
-    required this.pending,
-    required this.confirmed,
-    required this.checkedIn,
-    required this.completed,
-    required this.cancelled,
-  });
+Object? _readTotalToday(Map json, String key) => json['todayBookingsCount'] ?? json['total_today'];
+Object? _readPendingCount(Map json, String key) => json['pendingCount'] ?? json['pending'];
+Object? _readConfirmedCount(Map json, String key) => json['confirmedCount'] ?? json['confirmed'];
+Object? _readCheckedInCount(Map json, String key) => json['checkedInCount'] ?? json['checked_in'];
+Object? _readCompletedCount(Map json, String key) => json['completedCount'] ?? json['completed'];
+Object? _readCancelledCount(Map json, String key) => json['cancelledCount'] ?? json['cancelled'];
+
+// ── Booking stats ─────────────────────────────────────────────────────────
+@freezed
+abstract class OwnerBookingStatsModel with _$OwnerBookingStatsModel {
+  const factory OwnerBookingStatsModel({
+    @JsonKey(readValue: _readTotalToday) @Default(0) int totalToday,
+    @JsonKey(readValue: _readPendingCount) @Default(0) int pending,
+    @JsonKey(readValue: _readConfirmedCount) @Default(0) int confirmed,
+    @JsonKey(readValue: _readCheckedInCount) @Default(0) int checkedIn,
+    @JsonKey(readValue: _readCompletedCount) @Default(0) int completed,
+    @JsonKey(readValue: _readCancelledCount) @Default(0) int cancelled,
+  }) = _OwnerBookingStatsModel;
 
   factory OwnerBookingStatsModel.fromJson(Map<String, dynamic> json) =>
-      OwnerBookingStatsModel(
-        totalToday: json['total_today'] ?? 0,
-        pending: json['pending'] ?? 0,
-        confirmed: json['confirmed'] ?? 0,
-        checkedIn: json['checked_in'] ?? 0,
-        completed: json['completed'] ?? 0,
-        cancelled: json['cancelled'] ?? 0,
-      );
-
-  @override
-  List<Object?> get props => [totalToday, pending];
+      _$OwnerBookingStatsModelFromJson(json);
 }
 
 // ── Revenue summary ───────────────────────────────────────────────────────
-class OwnerRevenueModel extends Equatable {
-  final double revenueToday;
-  final double revenueThisMonth;
-  final double revenueLastMonth;
-  final double ownerReceivesThisMonth; // commission_records.owner_receives
-  final double platformFeeThisMonth;   // commission_records.platform_fee
-  final int bookingCountThisMonth;
+Object? _readRevenueToday(Map json, String key) => json['todayRevenue'] ?? json['revenue_today'];
+Object? _readRevenueMonth(Map json, String key) => json['thisMonthRevenue'] ?? json['revenue_this_month'];
+Object? _readRevenueLast(Map json, String key) => json['lastMonthRevenue'] ?? json['revenue_last_month'];
+Object? _readOwnerReceives(Map json, String key) => json['ownerReceivesThisMonth'] ?? json['owner_receives_this_month'];
+Object? _readPlatformFee(Map json, String key) => json['platformFeeThisMonth'] ?? json['platform_fee_this_month'];
+Object? _readBookCountMonth(Map json, String key) => json['thisMonthBookingsCount'] ?? json['booking_count_this_month'];
 
-  const OwnerRevenueModel({
-    required this.revenueToday,
-    required this.revenueThisMonth,
-    required this.revenueLastMonth,
-    required this.ownerReceivesThisMonth,
-    required this.platformFeeThisMonth,
-    required this.bookingCountThisMonth,
-  });
+@freezed
+abstract class OwnerRevenueModel with _$OwnerRevenueModel {
+  const OwnerRevenueModel._();
+
+  const factory OwnerRevenueModel({
+    @JsonKey(readValue: _readRevenueToday, fromJson: _toDouble) @Default(0.0) double revenueToday,
+    @JsonKey(readValue: _readRevenueMonth, fromJson: _toDouble) @Default(0.0) double revenueThisMonth,
+    @JsonKey(readValue: _readRevenueLast, fromJson: _toDouble) @Default(0.0) double revenueLastMonth,
+    @JsonKey(readValue: _readOwnerReceives, fromJson: _toDouble) @Default(0.0) double ownerReceivesThisMonth,
+    @JsonKey(readValue: _readPlatformFee, fromJson: _toDouble) @Default(0.0) double platformFeeThisMonth,
+    @JsonKey(readValue: _readBookCountMonth) @Default(0) int bookingCountThisMonth,
+  }) = _OwnerRevenueModel;
 
   double get growthPercent {
     if (revenueLastMonth == 0) return 100;
@@ -60,158 +64,87 @@ class OwnerRevenueModel extends Equatable {
   }
 
   factory OwnerRevenueModel.fromJson(Map<String, dynamic> json) =>
-      OwnerRevenueModel(
-        revenueToday: (json['revenue_today'] as num?)?.toDouble() ?? 0,
-        revenueThisMonth: (json['revenue_this_month'] as num?)?.toDouble() ?? 0,
-        revenueLastMonth: (json['revenue_last_month'] as num?)?.toDouble() ?? 0,
-        ownerReceivesThisMonth: (json['owner_receives_this_month'] as num?)?.toDouble() ?? 0,
-        platformFeeThisMonth: (json['platform_fee_this_month'] as num?)?.toDouble() ?? 0,
-        bookingCountThisMonth: json['booking_count_this_month'] ?? 0,
-      );
-
-  @override
-  List<Object?> get props => [revenueThisMonth, revenueToday];
+      _$OwnerRevenueModelFromJson(json);
 }
 
-// ── Pending booking (bookings join courts + users) ─────────────────────────
-class OwnerPendingBookingModel extends Equatable {
-  final String id;
-  final String bookingCode;
-  final String courtName;
-  final String venueName;
-  final String customerName;
-  final String? customerPhone;
-  final String? customerAvatar;
-  final DateTime bookingDate;
-  final String startTime;
-  final String endTime;
-  final double totalAmount;
-  final String paymentMethod;
-  final DateTime createdAt;
+// ── Pending booking ────────────────────────────────────────────────────────
+Object? _readCode(Map json, String key) => json['booking_code'] ?? json['bookingCode'];
+Object? _readCourtName(Map json, String key) => json['court_name'] ?? json['courtName'] ?? json['courts']?['name'];
+Object? _readVenueName(Map json, String key) => json['venue_name'] ?? json['venueName'] ?? json['courts']?['venues']?['name'];
+Object? _readCustomerName(Map json, String key) => json['customer_name'] ?? json['customerName'] ?? json['users']?['full_name'];
+Object? _readPhone(Map json, String key) => json['customer_phone'] ?? json['customerPhone'] ?? json['users']?['phone'];
+Object? _readAvatar(Map json, String key) => json['customer_avatar'] ?? json['customerAvatar'] ?? json['users']?['avatar_url'];
+Object? _readAmount(Map json, String key) => json['total_amount'] ?? json['totalAmount'];
 
-  const OwnerPendingBookingModel({
-    required this.id,
-    required this.bookingCode,
-    required this.courtName,
-    required this.venueName,
-    required this.customerName,
-    this.customerPhone,
-    this.customerAvatar,
-    required this.bookingDate,
-    required this.startTime,
-    required this.endTime,
-    required this.totalAmount,
-    required this.paymentMethod,
-    required this.createdAt,
-  });
+@freezed
+abstract class OwnerPendingBookingModel with _$OwnerPendingBookingModel {
+  const factory OwnerPendingBookingModel({
+    @Default('') String id,
+    @JsonKey(readValue: _readCode) @Default('') String bookingCode,
+    @JsonKey(readValue: _readCourtName) @Default('') String courtName,
+    @JsonKey(readValue: _readVenueName) @Default('') String venueName,
+    @JsonKey(readValue: _readCustomerName) @Default('Khách') String customerName,
+    @JsonKey(readValue: _readPhone) String? customerPhone,
+    @JsonKey(readValue: _readAvatar) String? customerAvatar,
+    @Default(null) DateTime? bookingDate,
+    @Default('') String startTime,
+    @Default('') String endTime,
+    @JsonKey(readValue: _readAmount, fromJson: _toDouble) @Default(0.0) double totalAmount,
+    @JsonKey(name: 'payment_method') @Default('CASH') String paymentMethod,
+    @Default('PENDING') String status,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+  }) = _OwnerPendingBookingModel;
 
   factory OwnerPendingBookingModel.fromJson(Map<String, dynamic> json) =>
-      OwnerPendingBookingModel(
-        id: json['id'],
-        bookingCode: json['booking_code'],
-        courtName: json['courts']?['name'] ?? '',
-        venueName: json['courts']?['venues']?['name'] ?? '',
-        customerName: json['users']?['full_name'] ?? 'Khách hàng',
-        customerPhone: json['users']?['phone'],
-        customerAvatar: json['users']?['avatar_url'],
-        bookingDate: DateTime.parse(json['booking_date']),
-        startTime: json['start_time'],
-        endTime: json['end_time'],
-        totalAmount: (json['total_amount'] as num).toDouble(),
-        paymentMethod: json['payment_method'],
-        createdAt: DateTime.parse(json['created_at']),
-      );
-
-  @override
-  List<Object?> get props => [id, bookingCode];
+      _$OwnerPendingBookingModelFromJson(json);
 }
 
-// ── Recent review (reviews join venues + users) ────────────────────────────
-class OwnerRecentReviewModel extends Equatable {
-  final String id;
-  final String venueName;
-  final String? courtName;
-  final String reviewerName;
-  final String? reviewerAvatar;
-  final int overallRating;
-  final String? comment;
-  final String? ownerReply;
-  final DateTime createdAt;
+// ── Recent review ──────────────────────────────────────────────────────────
+Object? _readRVVenueName(Map json, String key) => json['venue_name'] ?? json['venues']?['name'];
+Object? _readRVCourtName(Map json, String key) => json['court_name'] ?? json['bookings']?['courts']?['name'];
+Object? _readRVReviewerName(Map json, String key) => json['customer_name'] ?? json['users']?['full_name'];
+Object? _readRVReviewerAvatar(Map json, String key) => json['customer_avatar'] ?? json['users']?['avatar_url'];
+Object? _readRVRating(Map json, String key) => json['overall_rating'] ?? json['rating'];
 
-  const OwnerRecentReviewModel({
-    required this.id,
-    required this.venueName,
-    this.courtName,
-    required this.reviewerName,
-    this.reviewerAvatar,
-    required this.overallRating,
-    this.comment,
-    this.ownerReply,
-    required this.createdAt,
-  });
+@freezed
+abstract class OwnerRecentReviewModel with _$OwnerRecentReviewModel {
+  const OwnerRecentReviewModel._();
+
+  const factory OwnerRecentReviewModel({
+    @Default('') String id,
+    @JsonKey(readValue: _readRVVenueName) @Default('') String venueName,
+    @JsonKey(readValue: _readRVCourtName) String? courtName,
+    @JsonKey(readValue: _readRVReviewerName) @Default('Ẩn danh') String reviewerName,
+    @JsonKey(readValue: _readRVReviewerAvatar) String? reviewerAvatar,
+    @JsonKey(readValue: _readRVRating) @Default(5) int overallRating,
+    String? comment,
+    @JsonKey(name: 'owner_reply') String? ownerReply,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+  }) = _OwnerRecentReviewModel;
 
   bool get hasReplied => ownerReply != null && ownerReply!.isNotEmpty;
 
   factory OwnerRecentReviewModel.fromJson(Map<String, dynamic> json) =>
-      OwnerRecentReviewModel(
-        id: json['id'],
-        venueName: json['venues']?['name'] ?? '',
-        courtName: json['bookings']?['courts']?['name'],
-        reviewerName: json['users']?['full_name'] ?? 'Ẩn danh',
-        reviewerAvatar: json['users']?['avatar_url'],
-        overallRating: json['overall_rating'] ?? 5,
-        comment: json['comment'],
-        ownerReply: json['owner_reply'],
-        createdAt: DateTime.parse(json['created_at']),
-      );
-
-  @override
-  List<Object?> get props => [id, overallRating];
+      _$OwnerRecentReviewModelFromJson(json);
 }
 
 // ── Venue summary for owner ────────────────────────────────────────────────
-class OwnerVenueSummaryModel extends Equatable {
-  final String id;
-  final String name;
-  final String? thumbnailUrl;
-  final String status; // VenueStatus
-  final bool isOpen;
-  final bool autoAccept;
-  final double rating;
-  final int totalReviews;
-  final int activeCourts;
-  final String city;
-  final String district;
-
-  const OwnerVenueSummaryModel({
-    required this.id,
-    required this.name,
-    this.thumbnailUrl,
-    required this.status,
-    required this.isOpen,
-    required this.autoAccept,
-    required this.rating,
-    required this.totalReviews,
-    required this.activeCourts,
-    required this.city,
-    required this.district,
-  });
+@freezed
+abstract class OwnerVenueSummaryModel with _$OwnerVenueSummaryModel {
+  const factory OwnerVenueSummaryModel({
+    @Default('') String id,
+    @Default('') String name,
+    @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
+    @Default('APPROVED') String status,
+    @JsonKey(name: 'is_active') @Default(true) bool isOpen,
+    @JsonKey(name: 'auto_accept_bookings') @Default(false) bool autoAccept,
+    @JsonKey(fromJson: _toDouble) @Default(0.0) double rating,
+    @JsonKey(name: 'total_reviews') @Default(0) int totalReviews,
+    @JsonKey(name: 'active_courts') @Default(0) int activeCourts,
+    @Default('') String city,
+    @Default('') String district,
+  }) = _OwnerVenueSummaryModel;
 
   factory OwnerVenueSummaryModel.fromJson(Map<String, dynamic> json) =>
-      OwnerVenueSummaryModel(
-        id: json['id'],
-        name: json['name'],
-        thumbnailUrl: json['thumbnail_url'],
-        status: json['status'] ?? 'APPROVED',
-        isOpen: json['is_open'] ?? true,
-        autoAccept: json['auto_accept'] ?? false,
-        rating: (json['rating'] as num?)?.toDouble() ?? 0,
-        totalReviews: json['total_reviews'] ?? 0,
-        activeCourts: json['active_courts'] ?? 0,
-        city: json['city'] ?? '',
-        district: json['district'] ?? '',
-      );
-
-  @override
-  List<Object?> get props => [id, name, status];
+      _$OwnerVenueSummaryModelFromJson(json);
 }

@@ -3,19 +3,19 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
-import 'package:dat_san_247_mobile/core/common/constants/api_constants.dart';
 import 'package:dat_san_247_mobile/core/common/constants/api_endpoints.dart';
 import 'package:dat_san_247_mobile/core/common/utils/logger.dart';
 import 'package:dat_san_247_mobile/core/data/network/api_client.dart';
 import 'package:dat_san_247_mobile/core/data/storage/local/local_storage_service.dart';
 import 'package:dat_san_247_mobile/core/data/storage/secure/secure_storage_service.dart';
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:injectable/injectable.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../../../features/auth/data/models/auth_response.dart';
-import '../../../features/auth/data/models/auth_token_model.dart';
 import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
+import 'app_auth_state.dart';
 
 /// 🎯 AppAuthService - Centralized Authentication Service for the entire App
 @LazySingleton()
@@ -138,9 +138,26 @@ class AppAuthService {
     );
   }
 
-  Future<void> saveLoginData(AuthResponse response) async {
+  Future<void> saveLoginData(AuthResponse response, AppLoginMode mode) async {
     await _secureStorage.saveAccessToken(response.accessToken);
     await _secureStorage.saveRefreshToken(response.refreshToken);
+
+    // Tinh chỉnh mode dựa trên Role thực tế từ API để tránh sai lệch điều hướng
+    AppLoginMode refinedMode = mode;
+    final userFromApi = response.user;
+    
+    if (userFromApi.role?.slug == 'owner') {
+      refinedMode = AppLoginMode.owner;
+    } else if (mode == AppLoginMode.staff && !userFromApi.isVenueStaff) {
+      // Nếu chọn mode staff nhưng tài khoản không có quyền staff thì về customer
+      refinedMode = AppLoginMode.customer;
+      toast.warning(
+        'Tài khoản không có quyền nhân viên sân. Tự động chuyển màn hình khách hàng.',
+        title: 'Lưu ý',
+      );
+    }
+
+    await _storageService.saveLoginMode(refinedMode.name);
 
     // Lưu User sơ bộ từ login response trước để Router có data redirect ngay
     final minimalUser = response.user;
@@ -199,6 +216,14 @@ class AppAuthService {
       _authStateController.add(status);
       Logger.info('AppAuthService: Status -> $status');
     }
+  }
+
+  AppLoginMode getPersistentLoginMode() {
+    final modeStr = _storageService.getLoginMode();
+    return AppLoginMode.values.firstWhere(
+      (e) => e.name == modeStr,
+      orElse: () => AppLoginMode.customer,
+    );
   }
 
   void dispose() {

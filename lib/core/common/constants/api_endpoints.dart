@@ -36,6 +36,42 @@ class ApiEndpoints {
   static const String reviews = '/customer/reviews';
   static const String uploadReview = '/customer/reviews/upload';
 
+  // ── Owner ────────────────────────────────────────────────────
+  static const String ownerVenues = '/owner/venues';
+  static const String ownerStats = '/owner/venues/dashboard/stats';
+  static const String ownerRevenue = '/owner/venues/dashboard/revenue';
+  static const String ownerBookings = '/owner/bookings/{vId}';
+  static const String updateBookingStatus = '/owner/bookings/{id}/status';
+  static const String ownerVenueDetail = '/owner/venues/{id}';
+  static const String ownerCourts = '/owner/venues/{vId}/courts';
+  static const String ownerPricingRules = '/owner/venues/courts/{cId}/rules';
+  static const String ownerAmenities = '/owner/venues/{vId}/amenities';
+  static const String ownerOperatingHours = '/owner/venues/{vId}/operating-hours';
+  static const String ownerExceptions = '/owner/venues/{vId}/exceptions';
+  static const String ownerVenueServices = '/owner/venues/{vId}/services';
+  static const String ownerRefundPolicies = '/owner/venues/{vId}/refund-policies';
+  static const String ownerVerification = '/owner/venues/{vId}/verification';
+  static const String ownerVenueUpload = '/owner/venues/upload';
+  static const String ownerMedia = '/owner/venues/{vId}/media';
+
+  // ── Staff Management ──────────────────────────────────────────
+  static const String ownerStaff = '/venue-staff/owner/{venueId}';
+  static const String ownerStaffInvites = '/venue-staff/owner/{venueId}/invites';
+  static const String ownerStaffInvite = '/venue-staff/owner/invite';
+  static const String ownerStaffInviteAction = '/venue-staff/owner/invite/{inviteId}';
+  static const String ownerStaffStatus = '/venue-staff/owner/{staffId}/status';
+  static const String ownerStaffRole = '/venue-staff/owner/{staffId}/role';
+
+  static const String ownerReviews = '/owner/reviews';
+  static const String ownerReplyReview = '/owner/reviews/{id}/reply';
+
+  // ── Finance Management ──────────────────────────────────────────
+  static const String ownerWallet = '/owner/finance/wallet';
+  static const String ownerBankAccounts = '/owner/finance/bank-accounts';
+  static const String ownerPayouts = '/owner/finance/payouts';
+  static const String ownerFinanceStats = '/owner/finance/stats';
+  static const String ownerCommissions = '/owner/finance/commissions';
+
   // ── Public endpoints (không cần auth) ─────────────────────────
   static const List<String> publicEndpoints = [
     login,

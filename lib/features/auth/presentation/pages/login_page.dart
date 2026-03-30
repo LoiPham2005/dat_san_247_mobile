@@ -8,6 +8,7 @@ import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 
 import '../../data/models/auth_request.dart';
 import '../cubit/auth_cubit.dart';
@@ -27,6 +28,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isStaffMode = false;
 
   @override
   void dispose() {
@@ -44,8 +46,11 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    final mode = _isStaffMode ? AppLoginMode.staff : AppLoginMode.customer;
+
     context.read<AuthCubit>().login(
           LoginRequest(email: email, password: password),
+          mode: mode,
         );
   }
 
@@ -60,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
           }
           if (state.isSuccess) {
             // AppAuthService will handle the session, we just navigate
+            // RouteGuards will handle the correct redirection
             const MainShellRoute().go(context);
           }
         },
@@ -96,8 +102,39 @@ class _LoginPageState extends State<LoginPage> {
                       isPassword: true,
                       controller: _passwordController,
                     ),
+                    
                     const SizedBox(height: 12),
-
+                    
+                    // Staff Toggle
+                    Row(
+                      children: [
+                        SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: Checkbox(
+                            value: _isStaffMode,
+                            onChanged: (value) => setState(() => _isStaffMode = value ?? false),
+                            activeColor: AppColors.primaryLightBrand,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _isStaffMode = !_isStaffMode),
+                            child: const Text(
+                              'Đăng nhập cho nhân viên sân',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -112,10 +149,12 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             color: AppColors.primaryLightBrand,
                             fontWeight: FontWeight.bold,
+                            fontSize: 13,
                           ),
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 32),
 
                     // Login Button

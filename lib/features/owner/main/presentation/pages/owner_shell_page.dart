@@ -39,13 +39,16 @@ class _OwnerShellPageState extends State<OwnerShellPage> {
     _NavItem(label: 'Cài đặt', icon: Icons.settings_outlined, activeIcon: Icons.settings_rounded),
   ];
 
-  late final List<Widget> _pages = [
-    const OwnerDashboardPage(),
-    const OwnerCalendarPage(venueId: 'v1', venueName: 'Venue Của Bạn'),
-    const OwnerVenueListPage(), // O-02 → O-03 → O-04 → O-05
-    const OwnerRevenuePage(),
-    const OwnerSettingsPage(),
-  ];
+  Widget _buildPage(int index) {
+    return switch (index) {
+      0 => OwnerDashboardPage(onTabChange: _onTabTap),
+      1 => const OwnerCalendarPage(venueId: 'v1', venueName: 'Venue Của Bạn'),
+      2 => const OwnerVenueListPage(),
+      3 => const OwnerRevenuePage(),
+      4 => const OwnerSettingsPage(),
+      _ => const SizedBox.shrink(),
+    };
+  }
 
   void _onTabTap(int index) {
     HapticFeedback.selectionClick();
@@ -58,7 +61,7 @@ class _OwnerShellPageState extends State<OwnerShellPage> {
       backgroundColor: const Color(0xFFF4F6FA),
       body: PageStorage(
         bucket: _bucket,
-        child: _pages[_currentIndex],
+        child: _buildPage(_currentIndex),
       ),
       extendBody: false,
       bottomNavigationBar: _buildBottomNav(),

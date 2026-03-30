@@ -1,4 +1,18 @@
-// ── CommissionStatus (schema enum) ───────────────────────────────────────────
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'finance_models.freezed.dart';
+part 'finance_models.g.dart';
+
+// ── Helper for String/Num to Double ──────────────────────────────────────────
+double _toDouble(dynamic value) {
+  if (value == null) return 0.0;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0.0;
+  return 0.0;
+}
+
+// ── CommissionStatus ───────────────────────────────────────────────
+@JsonEnum(alwaysCreate: true)
 enum CommissionStatus { PENDING, APPROVED, PAID, CANCELLED }
 
 extension CommissionStatusX on CommissionStatus {
@@ -16,7 +30,8 @@ extension CommissionStatusX on CommissionStatus {
   };
 }
 
-// ── PayoutStatus (schema enum) ───────────────────────────────────────────────
+// ── PayoutStatus ───────────────────────────────────────────────────
+@JsonEnum(alwaysCreate: true)
 enum PayoutStatus { PENDING, PROCESSING, COMPLETED, REJECTED, CANCELLED }
 
 extension PayoutStatusX on PayoutStatus {
@@ -29,138 +44,124 @@ extension PayoutStatusX on PayoutStatus {
   };
 }
 
-// ── commission_records ────────────────────────────────────────────────────────
-class CommissionRecordModel {
-  final String id;
-  final String bookingId;
-  final String bookingCode;   // denormalized for display
-  final String venueId;
-  final String venueName;     // denormalized
-  final String ownerId;
-  final DateTime bookingDate; // denormalized
-  final String courtName;     // denormalized
-  final String customerName;  // denormalized
-  final double bookingAmount;
-  final double commissionRate;   // % e.g. 10.0
-  final double commissionAmount; // platform thu
-  final double ownerReceives;    // chủ sân nhận
-  final CommissionStatus status;
-  final DateTime? paidAt;
-  final DateTime createdAt;
+// ── CommissionRecordModel ─────────────────────────────────────────────
+@freezed
+abstract class CommissionRecordModel with _$CommissionRecordModel {
+  const factory CommissionRecordModel({
+    required String id,
+    @JsonKey(name: 'booking_id') required String bookingId,
+    @JsonKey(name: 'booking_code') required String bookingCode,
+    @JsonKey(name: 'venue_id') required String venueId,
+    @JsonKey(name: 'venue_name') required String venueName,
+    @JsonKey(name: 'owner_id') required String ownerId,
+    @JsonKey(name: 'booking_date') required DateTime bookingDate,
+    @JsonKey(name: 'court_name') required String courtName,
+    @JsonKey(name: 'customer_name') required String customerName,
+    @JsonKey(name: 'booking_amount', fromJson: _toDouble) required double bookingAmount,
+    @JsonKey(name: 'commission_rate', fromJson: _toDouble) required double commissionRate,
+    @JsonKey(name: 'commission_amount', fromJson: _toDouble) required double commissionAmount,
+    @JsonKey(name: 'owner_receives', fromJson: _toDouble) required double ownerReceives,
+    @Default(CommissionStatus.PENDING) CommissionStatus status,
+    @JsonKey(name: 'paid_at') DateTime? paidAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+  }) = _CommissionRecordModel;
 
-  const CommissionRecordModel({
-    required this.id,
-    required this.bookingId,
-    required this.bookingCode,
-    required this.venueId,
-    required this.venueName,
-    required this.ownerId,
-    required this.bookingDate,
-    required this.courtName,
-    required this.customerName,
-    required this.bookingAmount,
-    required this.commissionRate,
-    required this.commissionAmount,
-    required this.ownerReceives,
-    required this.status,
-    this.paidAt,
-    required this.createdAt,
-  });
+  factory CommissionRecordModel.fromJson(Map<String, dynamic> json) =>
+      _$CommissionRecordModelFromJson(json);
 }
 
-// ── wallets ───────────────────────────────────────────────────────────────────
-class WalletModel {
-  final String id;
-  final String userId;
-  final double balance;
-  final double lockedBalance;
-  final bool isActive;
-  final List<BankAccountModel> bankAccounts;
-  final DateTime updatedAt;
+// ── WalletModel ──────────────────────────────────────────────────────
+@freezed
+abstract class WalletModel with _$WalletModel {
+  const factory WalletModel({
+    required String id,
+    @JsonKey(name: 'user_id') required String userId,
+    @JsonKey(fromJson: _toDouble) required double balance,
+    @JsonKey(name: 'locked_balance', fromJson: _toDouble) @Default(0) double lockedBalance,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'bank_accounts') @Default([]) List<BankAccountModel> bankAccounts,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+  }) = _WalletModel;
 
-  const WalletModel({
-    required this.id,
-    required this.userId,
-    required this.balance,
-    this.lockedBalance = 0,
-    this.isActive = true,
-    this.bankAccounts = const [],
-    required this.updatedAt,
-  });
+  const WalletModel._();
+
+  factory WalletModel.fromJson(Map<String, dynamic> json) =>
+      _$WalletModelFromJson(json);
 
   double get availableBalance => balance - lockedBalance;
 }
 
-// ── payout_bank_accounts ──────────────────────────────────────────────────────
-class BankAccountModel {
-  final String id;
-  final String walletId;
-  final String bankName;
-  final String bankCode;
-  final String accountNumber;
-  final String accountName;
-  final bool isDefault;
+// ── BankAccountModel ─────────────────────────────────────────────────
+@freezed
+abstract class BankAccountModel with _$BankAccountModel {
+  const factory BankAccountModel({
+    required String id,
+    @JsonKey(name: 'wallet_id') required String walletId,
+    @JsonKey(name: 'bank_name') required String bankName,
+    @JsonKey(name: 'bank_code') required String bankCode,
+    @JsonKey(name: 'account_number') required String accountNumber,
+    @JsonKey(name: 'account_name') required String accountName,
+    @JsonKey(name: 'is_default') @Default(false) bool isDefault,
+  }) = _BankAccountModel;
 
-  const BankAccountModel({
-    required this.id,
-    required this.walletId,
-    required this.bankName,
-    required this.bankCode,
-    required this.accountNumber,
-    required this.accountName,
-    this.isDefault = false,
-  });
+  const BankAccountModel._();
+
+  factory BankAccountModel.fromJson(Map<String, dynamic> json) =>
+      _$BankAccountModelFromJson(json);
 
   String get maskedAccount =>
       accountNumber.length > 4 ? '****${accountNumber.substring(accountNumber.length - 4)}' : accountNumber;
 }
 
-// ── payout_requests ───────────────────────────────────────────────────────────
-class PayoutRequestModel {
-  final String id;
-  final String userId;
-  final double amount;
-  final PayoutStatus status;
-  final String bankAccountId;
-  final String bankAccountName; // denormalized for display
-  final String bankName;
-  final String? adminNote;
-  final String? rejectionReason;
-  final DateTime? processedAt;
-  final DateTime createdAt;
+// ── PayoutRequestModel ─────────────────────────────────────────────
+@freezed
+abstract class PayoutRequestModel with _$PayoutRequestModel {
+  const factory PayoutRequestModel({
+    required String id,
+    @JsonKey(name: 'user_id') required String userId,
+    @JsonKey(fromJson: _toDouble) required double amount,
+    @Default(PayoutStatus.PENDING) PayoutStatus status,
+    @JsonKey(name: 'bank_account_id') required String bankAccountId,
+    @JsonKey(name: 'bank_account_name') required String bankAccountName,
+    @JsonKey(name: 'bank_name') required String bankName,
+    @JsonKey(name: 'admin_note') String? adminNote,
+    @JsonKey(name: 'rejection_reason') String? rejectionReason,
+    @JsonKey(name: 'processed_at') DateTime? processedAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+  }) = _PayoutRequestModel;
 
-  const PayoutRequestModel({
-    required this.id,
-    required this.userId,
-    required this.amount,
-    required this.status,
-    required this.bankAccountId,
-    required this.bankAccountName,
-    required this.bankName,
-    this.adminNote,
-    this.rejectionReason,
-    this.processedAt,
-    required this.createdAt,
-  });
+  factory PayoutRequestModel.fromJson(Map<String, dynamic> json) =>
+      _$PayoutRequestModelFromJson(json);
 }
 
-// ── Revenue summary (computed) ────────────────────────────────────────────────
-class RevenueSummaryModel {
-  final String month; // 'YYYY-MM'
-  final int bookingCount;
-  final double totalBookingAmount;
-  final double totalCommissionAmount;
-  final double totalOwnerReceives;
-  final double paidAmount;
-  final double pendingAmount;
+// ── Finance Overview Stats ────────────────────────────────────────
+@freezed
+abstract class FinanceStatsModel with _$FinanceStatsModel {
+  const factory FinanceStatsModel({
+    @JsonKey(fromJson: _toDouble) @Default(0) double totalRevenue,
+    @JsonKey(fromJson: _toDouble) @Default(0) double totalCommission,
+    @JsonKey(fromJson: _toDouble) @Default(0) double netIncome,
+    @JsonKey(fromJson: _toDouble) @Default(0) double availableBalance,
+    @JsonKey(fromJson: _toDouble) @Default(0) double pendingPayout,
+  }) = _FinanceStatsModel;
 
-  const RevenueSummaryModel({
-    required this.month,
-    required this.bookingCount,
-    required this.totalBookingAmount,
-    required this.totalCommissionAmount,
-    required this.totalOwnerReceives,
-    required this.paidAmount,
-    required this.pendingAmount,
-  });
+  factory FinanceStatsModel.fromJson(Map<String, dynamic> json) =>
+      _$FinanceStatsModelFromJson(json);
+}
+
+// ── Revenue summary (per month) ───────────────────────────────────
+@freezed
+abstract class RevenueSummaryModel with _$RevenueSummaryModel {
+  const factory RevenueSummaryModel({
+    required String month, // 'YYYY-MM'
+    @JsonKey(name: 'booking_count') @Default(0) int bookingCount,
+    @JsonKey(name: 'total_booking_amount', fromJson: _toDouble) @Default(0) double totalBookingAmount,
+    @JsonKey(name: 'total_commission_amount', fromJson: _toDouble) @Default(0) double totalCommissionAmount,
+    @JsonKey(name: 'total_owner_receives', fromJson: _toDouble) @Default(0) double totalOwnerReceives,
+    @JsonKey(name: 'paid_amount', fromJson: _toDouble) @Default(0) double paidAmount,
+    @JsonKey(name: 'pending_amount', fromJson: _toDouble) @Default(0) double pendingAmount,
+  }) = _RevenueSummaryModel;
+
+  factory RevenueSummaryModel.fromJson(Map<String, dynamic> json) =>
+      _$RevenueSummaryModelFromJson(json);
 }

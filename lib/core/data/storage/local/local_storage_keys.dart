@@ -8,6 +8,7 @@ class LocalStorageKeys {
   // Auth
   static const String userProfile = 'user_profile';
   static const String isLogin = 'is_login';
+  static const String loginMode = 'login_mode';
 
   // App Settings
   static const String isFirstRun = 'is_first_run';

@@ -241,10 +241,8 @@ class _VenueDetailView extends StatelessWidget {
                           (court) => CourtListTile(
                             court: court,
                             onTapBooking: () {
-                              TimeSlotPickerRoute(
-                                courtId: court.id,
-                                venueName: venue.name,
-                              ).push(context);
+                              VenueOverviewRoute(slugOrId: venue.slug)
+                                  .push(context);
                             },
                           ),
                         )

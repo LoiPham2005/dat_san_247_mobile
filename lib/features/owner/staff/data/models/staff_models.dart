@@ -1,6 +1,11 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
 
+part 'staff_models.freezed.dart';
+part 'staff_models.g.dart';
+
 // ── venue_staff (owner view) ──────────────────────────────────────────────────
+@JsonEnum(alwaysCreate: true)
 enum StaffRole { OWNER, MANAGER, STAFF, RECEPTIONIST }
 
 extension StaffRoleX on StaffRole {
@@ -22,6 +27,7 @@ extension StaffRoleX on StaffRole {
   };
 }
 
+@JsonEnum(alwaysCreate: true)
 enum StaffInviteStatus { PENDING, ACCEPTED, REJECTED, EXPIRED, REVOKED }
 
 extension StaffInviteStatusX on StaffInviteStatus {
@@ -34,49 +40,47 @@ extension StaffInviteStatusX on StaffInviteStatus {
   };
 }
 
-class OwnerStaffModel {
-  final String id;
-  final String venueId;
-  final String userId;
-  final String fullName;
-  final String? email;
-  final String? phone;
-  final String? avatarUrl;
-  final StaffRole role;
-  final bool isActive;
-  final String? invitedBy;
-  final DateTime? joinedAt;
-  final DateTime? deactivatedAt;
-  final String? workStartTime;
-  final String? workEndTime;
-  final List<OwnerDayOfWeek> workDays;
-  final String? note;
-  final DateTime createdAt;
+@freezed
+abstract class OwnerStaffModel with _$OwnerStaffModel {
+  const factory OwnerStaffModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    @JsonKey(name: 'user_id') required String userId,
+    @JsonKey(name: 'full_name') required String fullName,
+    String? email,
+    String? phone,
+    @JsonKey(name: 'avatar_url') String? avatarUrl,
+    required StaffRole role,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'invited_by') String? invitedBy,
+    @JsonKey(name: 'joined_at') DateTime? joinedAt,
+    @JsonKey(name: 'deactivated_at') DateTime? deactivatedAt,
+    @JsonKey(name: 'work_start_time') String? workStartTime,
+    @JsonKey(name: 'work_end_time') String? workEndTime,
+    @JsonKey(name: 'work_days') @Default([]) List<OwnerDayOfWeek> workDays,
+    String? note,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+  }) = _OwnerStaffModel;
 
-  const OwnerStaffModel({
-    required this.id, required this.venueId, required this.userId,
-    required this.fullName, this.email, this.phone, this.avatarUrl,
-    required this.role, this.isActive = true, this.invitedBy,
-    this.joinedAt, this.deactivatedAt, this.workStartTime, this.workEndTime,
-    this.workDays = const [], this.note, required this.createdAt,
-  });
+  factory OwnerStaffModel.fromJson(Map<String, dynamic> json) => _$OwnerStaffModelFromJson(json);
 }
 
-class StaffInviteModel {
-  final String id;
-  final String venueId;
-  final String inviteEmail;
-  final StaffRole role;
-  final StaffInviteStatus status;
-  final String? message;
-  final DateTime expiresAt;
-  final DateTime createdAt;
+@freezed
+abstract class StaffInviteModel with _$StaffInviteModel {
+  const StaffInviteModel._();
+  
+  const factory StaffInviteModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    @JsonKey(name: 'invite_email') required String inviteEmail,
+    required StaffRole role,
+    required StaffInviteStatus status,
+    String? message,
+    @JsonKey(name: 'expires_at') required DateTime expiresAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+  }) = _StaffInviteModel;
 
-  const StaffInviteModel({
-    required this.id, required this.venueId, required this.inviteEmail,
-    required this.role, required this.status, this.message,
-    required this.expiresAt, required this.createdAt,
-  });
+  factory StaffInviteModel.fromJson(Map<String, dynamic> json) => _$StaffInviteModelFromJson(json);
 
   bool get isExpired => DateTime.now().isAfter(expiresAt);
 }

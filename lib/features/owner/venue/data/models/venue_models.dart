@@ -1,4 +1,8 @@
-import 'package:equatable/equatable.dart';
+import 'dart:io';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'venue_models.freezed.dart';
+part 'venue_models.g.dart';
 
 // ── VenueStatus enum ─────────────────────────────────────────
 enum VenueStatus { PENDING, APPROVED, REJECTED, SUSPENDED }
@@ -30,6 +34,19 @@ extension CourtSurfaceTypeExt on CourtSurfaceType {
 // ── VerificationStatus ────────────────────────────────────────────────────────
 enum VerificationStatus { PENDING, APPROVED, REJECTED }
 
+extension VerificationStatusExt on VerificationStatus {
+  String get label => switch (this) {
+        VerificationStatus.PENDING => 'Đang chờ duyệt',
+        VerificationStatus.APPROVED => 'Đã xác minh',
+        VerificationStatus.REJECTED => 'Bị từ chối',
+      };
+  String get emoji => switch (this) {
+        VerificationStatus.PENDING => '⏳',
+        VerificationStatus.APPROVED => '✅',
+        VerificationStatus.REJECTED => '❌',
+      };
+}
+
 // ── DayOfWeek ────────────────────────────────────────────────────────────────
 enum OwnerDayOfWeek { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY }
 
@@ -46,604 +63,371 @@ extension OwnerDayOfWeekExt on OwnerDayOfWeek {
   bool get isWeekend => this == OwnerDayOfWeek.SATURDAY || this == OwnerDayOfWeek.SUNDAY;
 }
 
+// ── VenueServiceType ────────────────────────────────────────────────────────
+enum VenueServiceType { PRODUCT, SERVICE }
+
+extension VenueServiceTypeExt on VenueServiceType {
+  String get label => this == VenueServiceType.PRODUCT ? 'Sản phẩm' : 'Dịch vụ';
+  String get emoji => this == VenueServiceType.PRODUCT ? '📦' : '🛎';
+}
+
+// ── ServiceUnit ─────────────────────────────────────────────────────────────
+enum ServiceUnit { UNIT, SESSION, PERSON, HOUR }
+
+extension ServiceUnitExt on ServiceUnit {
+  String get label => switch (this) {
+        ServiceUnit.UNIT => 'Cái/Chai',
+        ServiceUnit.SESSION => 'Lượt/Trận',
+        ServiceUnit.PERSON => 'Người',
+        ServiceUnit.HOUR => 'Giờ',
+      };
+}
+
+// ── VerificationDocStatus ───────────────────────────────────────────────────
+enum VerificationDocStatus { PENDING, APPROVED, REJECTED }
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+double _toDouble(dynamic v) {
+  if (v == null) return 0.0;
+  if (v is num) return v.toDouble();
+  if (v is String) return double.tryParse(v) ?? 0.0;
+  return 0.0;
+}
+
+String _pt(dynamic v) {
+  if (v == null) return '';
+  if (v is String && v.length >= 5) return v.substring(0, 5);
+  return v?.toString() ?? '';
+}
+
+Object? _readPublicUrl(Map json, String key) {
+  return json['public_url'] ?? json['files']?['public_url'];
+}
+
+Object? _readMimeType(Map json, String key) {
+  return json['file_type'] ?? json['files']?['mime_type'];
+}
+
+Object? _readCourtCount(Map json, String key) => json['_count']?['courts'];
+Object? _readSportTypes(Map json, String key) => (json['sport_assignments'] as List?)?.map((s) => s['sport_type']).toList();
+
+@freezed
+abstract class VenueUploadResponse with _$VenueUploadResponse {
+  const factory VenueUploadResponse({
+    required String url,
+  }) = _VenueUploadResponse;
+
+  factory VenueUploadResponse.fromJson(Map<String, dynamic> json) => _$VenueUploadResponseFromJson(json);
+}
+
 // ── OwnerVenueModel ─────────────────────────────────────────────────────────
-class OwnerVenueModel extends Equatable {
-  final String id;
-  final String ownerId;
-  final String name;
-  final String slug;
-  final String? description;
-  final String address;
-  final String city;
-  final String district;
-  final String? ward;
-  final String? phone;
-  final String? email;
-  final String? thumbnailUrl;
-  final String? fbUrl;
-  final String? instagramUrl;
-  final String? zaloUrl;
-  final String? youtubeUrl;
-  final VenueStatus status;
-  final String? rejectionReason;
-  final bool isActive;
-  final bool isFeatured;
-  final double rating;
-  final double ratingCleanliness;
-  final double ratingFacilities;
-  final double ratingStaff;
-  final int totalReviews;
-  final double commissionRate;
-  final double vatRate;
-  final bool autoAcceptBookings;
-  final int minBookingHours;
-  final int maxBookingHours;
-  final int minBookingBeforeHours;
-  final int cancellationBeforeHours;
-  final DateTime? approvedAt;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final int courtCount;
-  final List<String> sportTypes;
+@freezed
+abstract class OwnerVenueModel with _$OwnerVenueModel {
+  const factory OwnerVenueModel({
+    required String id,
+    @JsonKey(name: 'owner_id') required String ownerId,
+    required String name,
+    required String slug,
+    String? description,
+    required String address,
+    required String city,
+    required String district,
+    String? ward,
+    String? phone,
+    String? email,
+    @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
+    @JsonKey(name: 'fb_url') String? fbUrl,
+    @JsonKey(name: 'instagram_url') String? instagramUrl,
+    @JsonKey(name: 'zalo_url') String? zaloUrl,
+    @JsonKey(name: 'youtube_url') String? youtubeUrl,
+    @Default(VenueStatus.PENDING) VenueStatus status,
+    @JsonKey(name: 'rejection_reason') String? rejectionReason,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'is_featured') @Default(false) bool isFeatured,
+    @JsonKey(fromJson: _toDouble) @Default(0.0) double rating,
+    @JsonKey(name: 'rating_cleanliness', fromJson: _toDouble) @Default(0.0) double ratingCleanliness,
+    @JsonKey(name: 'rating_facilities', fromJson: _toDouble) @Default(0.0) double ratingFacilities,
+    @JsonKey(name: 'rating_staff', fromJson: _toDouble) @Default(0.0) double ratingStaff,
+    @JsonKey(name: 'total_reviews') @Default(0) int totalReviews,
+    @JsonKey(name: 'commission_rate', fromJson: _toDouble) @Default(0.0) double commissionRate,
+    @JsonKey(name: 'vat_rate', fromJson: _toDouble) @Default(0.0) double vatRate,
+    @JsonKey(name: 'auto_accept_bookings') @Default(true) bool autoAcceptBookings,
+    @JsonKey(name: 'min_booking_hours') @Default(1) int minBookingHours,
+    @JsonKey(name: 'max_booking_hours') @Default(24) int maxBookingHours,
+    @JsonKey(name: 'min_booking_before_hours') @Default(0) int minBookingBeforeHours,
+    @JsonKey(name: 'cancellation_before_hours') @Default(24) int cancellationBeforeHours,
+    @JsonKey(fromJson: _toDouble) double? latitude,
+    @JsonKey(fromJson: _toDouble) double? longitude,
+    @JsonKey(name: 'approved_at') DateTime? approvedAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(readValue: _readCourtCount) @Default(0) int courtCount,
+    @JsonKey(readValue: _readSportTypes) @Default([]) List<String> sportTypes,
+  }) = _OwnerVenueModel;
 
-  const OwnerVenueModel({
-    required this.id,
-    required this.ownerId,
-    required this.name,
-    required this.slug,
-    this.description,
-    required this.address,
-    required this.city,
-    required this.district,
-    this.ward,
-    this.phone,
-    this.email,
-    this.thumbnailUrl,
-    this.fbUrl,
-    this.instagramUrl,
-    this.zaloUrl,
-    this.youtubeUrl,
-    required this.status,
-    this.rejectionReason,
-    this.isActive = true,
-    this.isFeatured = false,
-    this.rating = 0,
-    this.ratingCleanliness = 0,
-    this.ratingFacilities = 0,
-    this.ratingStaff = 0,
-    this.totalReviews = 0,
-    this.commissionRate = 0,
-    this.vatRate = 0,
-    this.autoAcceptBookings = true,
-    this.minBookingHours = 1,
-    this.maxBookingHours = 24,
-    this.minBookingBeforeHours = 0,
-    this.cancellationBeforeHours = 24,
-    this.approvedAt,
-    required this.createdAt,
-    required this.updatedAt,
-    this.courtCount = 0,
-    this.sportTypes = const [],
-  });
-
-  factory OwnerVenueModel.fromJson(Map<String, dynamic> j) => OwnerVenueModel(
-        id: j['id'],
-        ownerId: j['owner_id'],
-        name: j['name'],
-        slug: j['slug'],
-        description: j['description'],
-        address: j['address'],
-        city: j['city'],
-        district: j['district'],
-        ward: j['ward'],
-        phone: j['phone'],
-        email: j['email'],
-        thumbnailUrl: j['thumbnail_url'],
-        fbUrl: j['fb_url'],
-        instagramUrl: j['instagram_url'],
-        zaloUrl: j['zalo_url'],
-        youtubeUrl: j['youtube_url'],
-        status: VenueStatus.values
-            .firstWhere((e) => e.name == j['status'], orElse: () => VenueStatus.PENDING),
-        rejectionReason: j['rejection_reason'],
-        isActive: j['is_active'] ?? true,
-        isFeatured: j['is_featured'] ?? false,
-        rating: (j['rating'] as num?)?.toDouble() ?? 0,
-        ratingCleanliness: (j['rating_cleanliness'] as num?)?.toDouble() ?? 0,
-        ratingFacilities: (j['rating_facilities'] as num?)?.toDouble() ?? 0,
-        ratingStaff: (j['rating_staff'] as num?)?.toDouble() ?? 0,
-        totalReviews: j['total_reviews'] ?? 0,
-        commissionRate: (j['commission_rate'] as num?)?.toDouble() ?? 0,
-        vatRate: (j['vat_rate'] as num?)?.toDouble() ?? 0,
-        autoAcceptBookings: j['auto_accept_bookings'] ?? true,
-        minBookingHours: j['min_booking_hours'] ?? 1,
-        maxBookingHours: j['max_booking_hours'] ?? 24,
-        minBookingBeforeHours: j['min_booking_before_hours'] ?? 0,
-        cancellationBeforeHours: j['cancellation_before_hours'] ?? 24,
-        approvedAt: j['approved_at'] != null ? DateTime.tryParse(j['approved_at']) : null,
-        createdAt: DateTime.parse(j['created_at']),
-        updatedAt: DateTime.parse(j['updated_at']),
-        courtCount: j['_count']?['courts'] ?? 0,
-        sportTypes: List<String>.from(j['sport_assignments']?.map((s) => s['sport_type']) ?? []),
-      );
-
-  @override
-  List<Object?> get props => [id];
+  factory OwnerVenueModel.fromJson(Map<String, dynamic> json) =>
+      _$OwnerVenueModelFromJson(json);
 }
 
 // ── VenueOperatingHoursModel ────────────────────────────────────────────────
-class VenueOperatingHoursModel extends Equatable {
-  final String id;
-  final String venueId;
-  final OwnerDayOfWeek dayOfWeek;
-  final String openingTime;
-  final String closingTime;
-  final bool isClosed;
+@freezed
+abstract class VenueOperatingHoursModel with _$VenueOperatingHoursModel {
+  const factory VenueOperatingHoursModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    @JsonKey(name: 'day_of_week') required OwnerDayOfWeek dayOfWeek,
+    @JsonKey(name: 'opening_time', fromJson: _pt) required String openingTime,
+    @JsonKey(name: 'closing_time', fromJson: _pt) required String closingTime,
+    @JsonKey(name: 'is_closed') @Default(false) bool isClosed,
+  }) = _VenueOperatingHoursModel;
 
-  const VenueOperatingHoursModel({
-    required this.id,
-    required this.venueId,
-    required this.dayOfWeek,
-    required this.openingTime,
-    required this.closingTime,
-    this.isClosed = false,
-  });
-
-  factory VenueOperatingHoursModel.fromJson(Map<String, dynamic> j) => VenueOperatingHoursModel(
-        id: j['id'],
-        venueId: j['venue_id'],
-        dayOfWeek: OwnerDayOfWeek.values
-            .firstWhere((e) => e.name == j['day_of_week'], orElse: () => OwnerDayOfWeek.MONDAY),
-        openingTime: _pt(j['opening_time']),
-        closingTime: _pt(j['closing_time']),
-        isClosed: j['is_closed'] ?? false,
-      );
-
-  static String _pt(dynamic t) {
-    if (t == null) return '00:00';
-    final s = t.toString();
-    if (s.contains('T')) {
-      final dt = DateTime.tryParse(s);
-      if (dt != null)
-        return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    }
-    return s.length >= 5 ? s.substring(0, 5) : s;
-  }
-
-  @override
-  List<Object?> get props => [id, dayOfWeek];
+  factory VenueOperatingHoursModel.fromJson(Map<String, dynamic> json) =>
+      _$VenueOperatingHoursModelFromJson(json);
 }
 
-// ── VenueScheduleExceptionModel ──────────────────────────────────────────────
-class VenueScheduleExceptionModel extends Equatable {
-  final String id;
-  final String venueId;
-  final DateTime date;
-  final bool isClosed;
-  final String? openTime;
-  final String? closeTime;
-  final String? reason;
-  final DateTime createdAt;
+// ── AmenityModel ────────────────────────────────────────────────────────────
+@freezed
+abstract class AmenityModel with _$AmenityModel {
+  const factory AmenityModel({
+    required String id,
+    @JsonKey(name: 'venue_id') String? venueId,
+    @JsonKey(name: 'court_id') String? courtId,
+    required String name,
+    String? icon,
+    @Default(true) bool isFree,
+  }) = _AmenityModel;
 
-  const VenueScheduleExceptionModel({
-    required this.id,
-    required this.venueId,
-    required this.date,
-    this.isClosed = true,
-    this.openTime,
-    this.closeTime,
-    this.reason,
-    required this.createdAt,
-  });
-
-  factory VenueScheduleExceptionModel.fromJson(Map<String, dynamic> j) =>
-      VenueScheduleExceptionModel(
-        id: j['id'],
-        venueId: j['venue_id'],
-        date: DateTime.parse(j['date']),
-        isClosed: j['is_closed'] ?? true,
-        openTime: j['open_time'] != null ? VenueOperatingHoursModel._pt(j['open_time']) : null,
-        closeTime: j['close_time'] != null ? VenueOperatingHoursModel._pt(j['close_time']) : null,
-        reason: j['reason'],
-        createdAt: DateTime.parse(j['created_at']),
-      );
-
-  @override
-  List<Object?> get props => [id, date];
-}
-
-// ── AmenityModel ─────────────────────────────────────────────────────────────
-class AmenityModel extends Equatable {
-  final String id;
-  final String? venueId;
-  final String? courtId;
-  final String name;
-  final String? icon;
-  final bool isFree;
-
-  const AmenityModel({
-    required this.id,
-    this.venueId,
-    this.courtId,
-    required this.name,
-    this.icon,
-    this.isFree = true,
-  });
-
-  factory AmenityModel.fromJson(Map<String, dynamic> j) => AmenityModel(
-        id: j['id'],
-        venueId: j['venue_id'],
-        courtId: j['court_id'],
-        name: j['name'],
-        icon: j['icon'],
-        isFree: j['is_free'] ?? true,
-      );
-
-  @override
-  List<Object?> get props => [id];
+  factory AmenityModel.fromJson(Map<String, dynamic> json) =>
+      _$AmenityModelFromJson(json);
 }
 
 // ── OwnerCourtModel ──────────────────────────────────────────────────────────
-class OwnerCourtModel extends Equatable {
-  final String id;
-  final String venueId;
-  final String name;
-  final String? description;
-  final double pricePerHour;
-  final CourtSurfaceType? surfaceType;
-  final String? size;
-  final bool isIndoor;
-  final bool isActive;
-  final int displayOrder;
-  final String? thumbnailUrl;
-  final List<String> sportTypes;
-  final List<AmenityModel> amenities;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+@freezed
+abstract class OwnerCourtModel with _$OwnerCourtModel {
+  const factory OwnerCourtModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    required String name,
+    String? description,
+    @JsonKey(name: 'price_per_hour', fromJson: _toDouble) @Default(0.0) double pricePerHour,
+    @JsonKey(name: 'court_type') String? courtType,
+    @JsonKey(name: 'surface_type') CourtSurfaceType? surfaceType,
+    String? size,
+    @Default(false) bool isIndoor,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'display_order') @Default(0) int displayOrder,
+    @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
+    @Default([]) List<String> sportTypes,
+    @Default([]) List<AmenityModel> amenities,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+  }) = _OwnerCourtModel;
 
-  const OwnerCourtModel({
-    required this.id,
-    required this.venueId,
-    required this.name,
-    this.description,
-    required this.pricePerHour,
-    this.surfaceType,
-    this.size,
-    this.isIndoor = false,
-    this.isActive = true,
-    this.displayOrder = 0,
-    this.thumbnailUrl,
-    this.sportTypes = const [],
-    this.amenities = const [],
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  factory OwnerCourtModel.fromJson(Map<String, dynamic> j) => OwnerCourtModel(
-        id: j['id'],
-        venueId: j['venue_id'],
-        name: j['name'],
-        description: j['description'],
-        pricePerHour: (j['price_per_hour'] as num).toDouble(),
-        surfaceType: j['surface_type'] != null
-            ? CourtSurfaceType.values.firstWhere((e) => e.name == j['surface_type'],
-                orElse: () => CourtSurfaceType.OTHER)
-            : null,
-        size: j['size'],
-        isIndoor: j['is_indoor'] ?? false,
-        isActive: j['is_active'] ?? true,
-        displayOrder: j['display_order'] ?? 0,
-        thumbnailUrl: j['thumbnail_url'],
-        sportTypes: List<String>.from(j['sport_assignments']?.map((s) => s['sport_type']) ?? []),
-        amenities: (j['amenities'] as List? ?? []).map((a) => AmenityModel.fromJson(a)).toList(),
-        createdAt: DateTime.parse(j['created_at']),
-        updatedAt: DateTime.parse(j['updated_at']),
-      );
-
-  @override
-  List<Object?> get props => [id];
+  factory OwnerCourtModel.fromJson(Map<String, dynamic> json) =>
+      _$OwnerCourtModelFromJson(json);
 }
 
-// ── OwnerPricingRuleModel ───────────────────────────────────────────────────
-class OwnerPricingRuleModel extends Equatable {
-  final String id;
-  final String courtId;
-  final String courtName;
-  final String? name;
-  final String? dayOfWeek;
-  final String startTime;
-  final String endTime;
-  final double price;
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final int priority;
-  final bool isActive;
-  final DateTime updatedAt;
+// ── OwnerPricingRuleModel ────────────────────────────────────────────────────
+@freezed
+abstract class OwnerPricingRuleModel with _$OwnerPricingRuleModel {
+  const factory OwnerPricingRuleModel({
+    required String id,
+    @JsonKey(name: 'court_id') required String courtId,
+    @JsonKey(name: 'court_name') String? courtName,
+    String? name,
+    @JsonKey(name: 'day_of_week') String? dayOfWeek,
+    @JsonKey(name: 'start_time') required String startTime,
+    @JsonKey(name: 'end_time') required String endTime,
+    @JsonKey(fromJson: _toDouble) required double price,
+    @Default(1) int priority,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+  }) = _OwnerPricingRuleModel;
 
-  const OwnerPricingRuleModel({
-    required this.id,
-    required this.courtId,
-    required this.courtName,
-    this.name,
-    this.dayOfWeek,
-    required this.startTime,
-    required this.endTime,
-    required this.price,
-    this.startDate,
-    this.endDate,
-    this.priority = 1,
-    this.isActive = true,
-    required this.updatedAt,
-  });
+  const OwnerPricingRuleModel._();
 
-  String get dayLabel {
-    const map = {
-      'MONDAY': 'T2',
-      'TUESDAY': 'T3',
-      'WEDNESDAY': 'T4',
-      'THURSDAY': 'T5',
-      'FRIDAY': 'T6',
-      'SATURDAY': 'T7',
-      'SUNDAY': 'CN'
-    };
-    return dayOfWeek != null ? (map[dayOfWeek] ?? dayOfWeek!) : 'Tất cả ngày';
-  }
-
-  bool get isPeakHour {
-    final h = int.tryParse(startTime.split(':')[0]) ?? 0;
-    return h >= 17 && h <= 21;
-  }
+  factory OwnerPricingRuleModel.fromJson(Map<String, dynamic> json) =>
+      _$OwnerPricingRuleModelFromJson(json);
 
   bool get isWeekend => dayOfWeek == 'SATURDAY' || dayOfWeek == 'SUNDAY';
-
-  OwnerPricingRuleModel copyWith({String? name, double? price, bool? isActive, int? priority}) =>
-      OwnerPricingRuleModel(
-        id: id,
-        courtId: courtId,
-        courtName: courtName,
-        name: name ?? this.name,
-        dayOfWeek: dayOfWeek,
-        startTime: startTime,
-        endTime: endTime,
-        price: price ?? this.price,
-        startDate: startDate,
-        endDate: endDate,
-        priority: priority ?? this.priority,
-        isActive: isActive ?? this.isActive,
-        updatedAt: DateTime.now(),
-      );
-
-  factory OwnerPricingRuleModel.fromJson(Map<String, dynamic> j) => OwnerPricingRuleModel(
-        id: j['id'],
-        courtId: j['court_id'],
-        courtName: j['courts']?['name'] ?? '',
-        name: j['name'],
-        dayOfWeek: j['day_of_week'],
-        startTime: _pt(j['start_time']),
-        endTime: _pt(j['end_time']),
-        price: (j['price'] as num).toDouble(),
-        startDate: j['start_date'] != null ? DateTime.tryParse(j['start_date']) : null,
-        endDate: j['end_date'] != null ? DateTime.tryParse(j['end_date']) : null,
-        priority: j['priority'] ?? 1,
-        isActive: j['is_active'] ?? true,
-        updatedAt: DateTime.parse(j['updated_at']),
-      );
-
-  static String _pt(dynamic t) {
-    if (t == null) return '00:00';
-    final s = t.toString();
-    if (s.contains('T')) {
-      final dt = DateTime.tryParse(s);
-      if (dt != null)
-        return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    }
-    return s.length >= 5 ? s.substring(0, 5) : s;
+  bool get isPeakHour => priority >= 3;
+  String get dayLabel {
+    if (dayOfWeek == null) return 'Mọi ngày';
+    return switch (dayOfWeek) {
+      'MONDAY' => 'Thứ 2',
+      'TUESDAY' => 'Thứ 3',
+      'WEDNESDAY' => 'Thứ 4',
+      'THURSDAY' => 'Thứ 5',
+      'FRIDAY' => 'Thứ 6',
+      'SATURDAY' => 'Thứ 7',
+      'SUNDAY' => 'Chủ Nhật',
+      _ => dayOfWeek!,
+    };
   }
+}
 
-  @override
-  List<Object?> get props => [id, courtId, dayOfWeek, startTime, endTime];
+// ── RefundPolicyModel ───────────────────────────────────────────────────────
+@freezed
+abstract class RefundPolicyModel with _$RefundPolicyModel {
+  const factory RefundPolicyModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    required String name,
+    String? description,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'is_default') @Default(false) bool isDefault,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @Default([]) List<RefundRuleModel> rules,
+  }) = _RefundPolicyModel;
+
+  factory RefundPolicyModel.fromJson(Map<String, dynamic> json) =>
+      _$RefundPolicyModelFromJson(json);
+}
+
+@freezed
+abstract class RefundRuleModel with _$RefundRuleModel {
+  const RefundRuleModel._();
+
+  const factory RefundRuleModel({
+    required String id,
+    @JsonKey(name: 'policy_id') required String policyId,
+    @JsonKey(name: 'before_hours') required int beforeHours,
+    @JsonKey(name: 'refund_percentage') required double refundPercentage,
+    String? description,
+  }) = _RefundRuleModel;
+
+  factory RefundRuleModel.fromJson(Map<String, dynamic> json) =>
+      _$RefundRuleModelFromJson(json);
+
+  // Getter để map từ UI
+  int get cancelBeforeHours => beforeHours;
+}
+
+// ── VenueScheduleExceptionModel ─────────────────────────────────────────────
+@freezed
+abstract class VenueScheduleExceptionModel with _$VenueScheduleExceptionModel {
+  const factory VenueScheduleExceptionModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    required DateTime date,
+    @JsonKey(name: 'is_closed') @Default(false) bool isClosed,
+    @JsonKey(name: 'open_time') String? openTime,
+    @JsonKey(name: 'close_time') String? closeTime,
+    String? reason,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+  }) = _VenueScheduleExceptionModel;
+
+  factory VenueScheduleExceptionModel.fromJson(Map<String, dynamic> json) =>
+      _$VenueScheduleExceptionModelFromJson(json);
 }
 
 // ── MediaAttachmentModel ────────────────────────────────────────────────────
-class MediaAttachmentModel extends Equatable {
-  final String id;
-  final String fileId;
-  final String publicUrl;
-  final String? caption;
-  final bool isCover;
-  final int displayOrder;
+@freezed
+abstract class MediaAttachmentModel with _$MediaAttachmentModel {
+  const factory MediaAttachmentModel({
+    required String id,
+    @JsonKey(readValue: _readPublicUrl) required String publicUrl,
+    @JsonKey(name: 'is_cover', defaultValue: false) @Default(false) bool isCover,
+    @JsonKey(readValue: _readMimeType) String? fileType,
+  }) = _MediaAttachmentModel;
 
-  const MediaAttachmentModel({
-    required this.id,
-    required this.fileId,
-    required this.publicUrl,
-    this.caption,
-    this.isCover = false,
-    this.displayOrder = 0,
-  });
-
-  factory MediaAttachmentModel.fromJson(Map<String, dynamic> j) => MediaAttachmentModel(
-        id: j['id'],
-        fileId: j['file_id'],
-        publicUrl: j['files']?['public_url'] ?? j['public_url'] ?? '',
-        caption: j['caption'],
-        isCover: j['is_cover'] ?? false,
-        displayOrder: j['display_order'] ?? 0,
-      );
-
-  @override
-  List<Object?> get props => [id];
+  factory MediaAttachmentModel.fromJson(Map<String, dynamic> json) =>
+      _$MediaAttachmentModelFromJson(json);
 }
 
-// ── Venue Verification Models ───────────────────────────────────────────────
-enum VerificationDocStatus { PENDING, APPROVED, REJECTED }
+// ── VenueServiceModel ───────────────────────────────────────────────────────
+@freezed
+abstract class VenueServiceModel with _$VenueServiceModel {
+  const factory VenueServiceModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    required String name,
+    String? description,
+    @JsonKey(fromJson: _toDouble) required double price,
+    @Default(ServiceUnit.UNIT) ServiceUnit unit,
+    @Default(VenueServiceType.SERVICE) VenueServiceType type,
+    String? category,
+    @JsonKey(name: 'is_available') @Default(true) bool isAvailable,
+    @JsonKey(name: 'track_inventory') @Default(false) bool trackInventory,
+    @JsonKey(name: 'stock_quantity') @Default(0) int stockQuantity,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+  }) = _VenueServiceModel;
 
-extension VerificationDocStatusX on VerificationDocStatus {
-  String get label => switch (this) {
-    VerificationDocStatus.PENDING  => 'Đang xét duyệt',
-    VerificationDocStatus.APPROVED => 'Đã xác minh',
-    VerificationDocStatus.REJECTED => 'Bị từ chối',
-  };
-  String get emoji => switch (this) {
-    VerificationDocStatus.PENDING  => '⏳',
-    VerificationDocStatus.APPROVED => '✅',
-    VerificationDocStatus.REJECTED => '❌',
-  };
-}
+  const VenueServiceModel._();
 
-class VenueVerificationModel {
-  final String id;
-  final String venueId;
-  final int version;
-  final String businessLicenseUrl;
-  final String idCardFrontUrl;
-  final String idCardBackUrl;
-  final String ownerPhotoUrl;
-  final VerificationDocStatus status;
-  final DateTime? verifiedAt;
-  final String? rejectionReason;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  factory VenueServiceModel.fromJson(Map<String, dynamic> json) =>
+      _$VenueServiceModelFromJson(json);
 
-  const VenueVerificationModel({
-    required this.id,
-    required this.venueId,
-    required this.version,
-    required this.businessLicenseUrl,
-    required this.idCardFrontUrl,
-    required this.idCardBackUrl,
-    required this.ownerPhotoUrl,
-    required this.status,
-    this.verifiedAt,
-    this.rejectionReason,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  bool get isPending  => status == VerificationDocStatus.PENDING;
-  bool get isApproved => status == VerificationDocStatus.APPROVED;
-  bool get isRejected => status == VerificationDocStatus.REJECTED;
-  bool get canResubmit => isRejected;
-}
-
-// ── VenueService Models ─────────────────────────────────────────────────────
-enum VenueServiceType { PRODUCT, SERVICE }
-
-extension VenueServiceTypeX on VenueServiceType {
-  String get label => switch (this) {
-    VenueServiceType.PRODUCT => 'Sản phẩm',
-    VenueServiceType.SERVICE => 'Dịch vụ',
-  };
-  String get emoji => switch (this) {
-    VenueServiceType.PRODUCT => '📦',
-    VenueServiceType.SERVICE => '🛎️',
-  };
-}
-
-enum ServiceUnit { UNIT, HOUR, SESSION, PERSON, SET }
-
-extension ServiceUnitX on ServiceUnit {
-  String get label => switch (this) {
-    ServiceUnit.UNIT    => 'cái',
-    ServiceUnit.HOUR    => 'giờ',
-    ServiceUnit.SESSION => 'buổi',
-    ServiceUnit.PERSON  => 'người',
-    ServiceUnit.SET     => 'bộ',
-  };
-}
-
-class VenueServiceModel {
-  final String id;
-  final String venueId;
-  final String name;
-  final String? description;
-  final double price;
-  final ServiceUnit unit;
-  final VenueServiceType type;
-  final String? category;
-  final bool isAvailable;
-  final bool trackInventory;
-  final int stockQuantity;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  const VenueServiceModel({
-    required this.id,
-    required this.venueId,
-    required this.name,
-    this.description,
-    required this.price,
-    this.unit = ServiceUnit.UNIT,
-    this.type = VenueServiceType.SERVICE,
-    this.category,
-    this.isAvailable = true,
-    this.trackInventory = false,
-    this.stockQuantity = 0,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  VenueServiceModel copyWith({
-    String? name, String? description, double? price, ServiceUnit? unit,
-    VenueServiceType? type, String? category, bool? isAvailable,
-    bool? trackInventory, int? stockQuantity,
-  }) => VenueServiceModel(
-    id: id, venueId: venueId,
-    name: name ?? this.name, description: description ?? this.description,
-    price: price ?? this.price, unit: unit ?? this.unit, type: type ?? this.type,
-    category: category ?? this.category, isAvailable: isAvailable ?? this.isAvailable,
-    trackInventory: trackInventory ?? this.trackInventory, stockQuantity: stockQuantity ?? this.stockQuantity,
-    createdAt: createdAt, updatedAt: DateTime.now(),
-  );
-
-  bool get isLowStock => trackInventory && stockQuantity <= 3 && stockQuantity > 0;
+  bool get isLowStock => trackInventory && stockQuantity > 0 && stockQuantity <= 5;
   bool get isOutOfStock => trackInventory && stockQuantity <= 0;
 }
 
-// ── RefundPolicy Models ─────────────────────────────────────────────────────
-class RefundRuleModel {
-  final String id;
-  final String policyId;
-  final int cancelBeforeHours;
-  final double refundPercentage;
-  final String? description;
+// ── VenueVerificationModel ──────────────────────────────────────────────────
+@freezed
+abstract class VenueVerificationModel with _$VenueVerificationModel {
+  const factory VenueVerificationModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    @Default(1) int version,
+    @Default(VerificationStatus.PENDING) VerificationStatus status,
+    @JsonKey(name: 'rejection_reason') String? rejectionReason,
+    @JsonKey(name: 'verified_at') DateTime? verifiedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @Default([]) List<VerificationDocumentModel> documents,
+    // Fields từ mock cho UI
+    String? businessLicenseUrl,
+    String? idCardFrontUrl,
+    String? idCardBackUrl,
+    String? ownerPhotoUrl,
+  }) = _VenueVerificationModel;
 
-  const RefundRuleModel({
-    required this.id, required this.policyId,
-    required this.cancelBeforeHours, required this.refundPercentage,
-    this.description,
-  });
+  const VenueVerificationModel._();
 
-  String get label {
-    if (cancelBeforeHours >= 24) return 'Hủy trước ${cancelBeforeHours ~/ 24} ngày';
-    return 'Hủy trước ${cancelBeforeHours}h';
-  }
+  factory VenueVerificationModel.fromJson(Map<String, dynamic> json) =>
+      _$VenueVerificationModelFromJson(json);
+
+  bool get isApproved => status == VerificationStatus.APPROVED;
+  bool get isRejected => status == VerificationStatus.REJECTED;
+  bool get isPending => status == VerificationStatus.PENDING;
+  bool get canResubmit => isRejected || !isPending;
 }
 
-class RefundPolicyModel {
-  final String id;
-  final String? venueId;
-  final String name;
-  final String? description;
-  final bool isActive;
-  final bool isDefault;
-  final List<RefundRuleModel> rules;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+@freezed
+abstract class VerificationDocumentModel with _$VerificationDocumentModel {
+  const factory VerificationDocumentModel({
+    required String id,
+    @JsonKey(name: 'verification_id') String? verificationId,
+    @JsonKey(name: 'document_type') required String documentType,
+    @JsonKey(name: 'document_url') required String documentUrl,
+    @Default(VerificationDocStatus.PENDING) VerificationDocStatus status,
+    @JsonKey(name: 'rejection_reason') String? rejectionReason,
+  }) = _VerificationDocumentModel;
 
-  const RefundPolicyModel({
-    required this.id, this.venueId, required this.name,
-    this.description, this.isActive = true, this.isDefault = false,
-    this.rules = const [], required this.createdAt, required this.updatedAt,
-  });
+  factory VerificationDocumentModel.fromJson(Map<String, dynamic> json) =>
+      _$VerificationDocumentModelFromJson(json);
+}
+// ── VenueHoursState ─────────────────────────────────────────────────────────
+@freezed
+abstract class VenueHoursState with _$VenueHoursState {
+  const factory VenueHoursState({
+    @Default([]) List<VenueOperatingHoursModel> hours,
+    @Default([]) List<VenueScheduleExceptionModel> exceptions,
+  }) = _VenueHoursState;
 
-  RefundPolicyModel copyWith({
-    String? name, String? description, bool? isActive, bool? isDefault,
-    List<RefundRuleModel>? rules,
-  }) => RefundPolicyModel(
-    id: id, venueId: venueId,
-    name: name ?? this.name, description: description ?? this.description,
-    isActive: isActive ?? this.isActive, isDefault: isDefault ?? this.isDefault,
-    rules: rules ?? this.rules, createdAt: createdAt, updatedAt: DateTime.now(),
-  );
+  factory VenueHoursState.fromJson(Map<String, dynamic> json) =>
+      _$VenueHoursStateFromJson(json);
+}
+// ── VenueMediaState ─────────────────────────────────────────────────────────
+@freezed
+abstract class VenueMediaState with _$VenueMediaState {
+  const factory VenueMediaState({
+    @Default([]) List<MediaAttachmentModel> media,
+    @JsonKey(includeFromJson: false, includeToJson: false) @Default([]) List<File> pendingFiles, // Local files to be uploaded
+  }) = _VenueMediaState;
+
+  factory VenueMediaState.fromJson(Map<String, dynamic> json) =>
+      _$VenueMediaStateFromJson(json);
 }

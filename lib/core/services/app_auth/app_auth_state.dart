@@ -7,17 +7,21 @@ import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
 
 /// 🔐 Global Authentication State
+enum AppLoginMode { customer, staff, owner }
+
 class AppAuthState extends Equatable {
   final AuthStatus status;
   final UserModel? user;
   final String? error;
   final String? message;
+  final AppLoginMode loginMode;
 
   const AppAuthState({
     required this.status,
     this.user,
     this.error,
     this.message,
+    this.loginMode = AppLoginMode.customer,
   });
 
   // ════════════════════════════════════════════════════════════
@@ -33,11 +37,12 @@ class AppAuthState extends Equatable {
   factory AppAuthState.loading() =>
       const AppAuthState(status: AuthStatus.loading);
 
-  factory AppAuthState.authenticated(UserModel user, {String? message}) =>
+  factory AppAuthState.authenticated(UserModel user, {String? message, AppLoginMode mode = AppLoginMode.customer}) =>
       AppAuthState(
         status: AuthStatus.authenticated,
         user: user,
         message: message,
+        loginMode: mode,
       );
 
   factory AppAuthState.expired({String? message}) => AppAuthState(
@@ -71,18 +76,20 @@ class AppAuthState extends Equatable {
     UserModel? user,
     String? error,
     String? message,
+    AppLoginMode? loginMode,
   }) {
     return AppAuthState(
       status: status ?? this.status,
       user: user ?? this.user,
       error: error ?? this.error,
       message: message ?? this.message,
+      loginMode: loginMode ?? this.loginMode,
     );
   }
 
   @override
-  List<Object?> get props => [status, user, error, message];
+  List<Object?> get props => [status, user, error, message, loginMode];
 
   @override
-  String toString() => 'AppAuthState(status: $status, user: ${user?.email})';
+  String toString() => 'AppAuthState(status: $status, user: ${user?.email}, mode: $loginMode)';
 }

@@ -65,7 +65,14 @@ class LocalStorageService {
   Future<void> clearAuthData() async {
     await remove(LocalStorageKeys.userProfile);
     await remove(LocalStorageKeys.isLogin);
+    await remove(LocalStorageKeys.loginMode);
   }
+
+  /// Save login mode
+  Future<bool> saveLoginMode(String mode) => set(LocalStorageKeys.loginMode, mode);
+
+  /// Get login mode
+  String? getLoginMode() => get<String>(LocalStorageKeys.loginMode);
 
   /// ════════════════════════════════════════════════════════════════
   /// APP SETTINGS
