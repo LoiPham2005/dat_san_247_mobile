@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -46,7 +47,9 @@ class BookingListItemCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     child: booking.venueThumbnailUrl != null
                         ? Image.network(booking.venueThumbnailUrl!,
-                            width: 56, height: 56, fit: BoxFit.cover,
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => _missingThumb())
                         : _missingThumb(),
                   ),
@@ -121,9 +124,10 @@ class BookingListItemCard extends StatelessWidget {
                 onTap: () {
                   HapticFeedback.lightImpact();
                   Clipboard.setData(ClipboardData(text: booking.checkInCode!));
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('✅ Đã sao chép mã check-in'),
-                      duration: Duration(seconds: 1)));
+                  // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  //     content: Text('✅ Đã sao chép mã check-in'),
+                  //     duration: Duration(seconds: 1)));
+                  toast.success('Đã sao chép mã check-in');
                 },
                 child: Container(
                   width: double.infinity,

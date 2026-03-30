@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/support/data/models/support_models.dart';
+import 'package:dat_san_247_mobile/features/customer/profile/data/models/profile_models.dart';
 import 'setting_card.dart';
 import 'skill_row.dart';
 
 class SportInterestsTab extends StatelessWidget {
   final UserModel user;
+  final Function(String sport, int level) onSkillChanged;
   final VoidCallback onSave;
 
   const SportInterestsTab({
     super.key,
     required this.user,
+    required this.onSkillChanged,
     required this.onSave,
   });
 

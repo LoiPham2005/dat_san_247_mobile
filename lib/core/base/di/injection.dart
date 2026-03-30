@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dat_san_247_mobile/core/data/network/dio_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dat_san_247_mobile/features/customer/profile/data/services/profile_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -37,4 +38,7 @@ abstract class RegisterModule {
 
   @lazySingleton
   Dio get dio => getIt<DioClient>().dio;
+
+  @lazySingleton
+  ProfileService get profileService => ProfileService(dio);
 }

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/customer/deals/data/models/promotion_model.dart';
 import 'dashed_line_painter.dart';
 
 class VoucherCard extends StatelessWidget {
-  final int index;
-  const VoucherCard({super.key, required this.index});
+  final PromotionModel promotion;
+  const VoucherCard({super.key, required this.promotion});
 
   @override
   Widget build(BuildContext context) {
+    // Format discount value based on type
+    final discountStr = promotion.discountType == PromotionDiscountType.percentage
+        ? '${promotion.discountValue.toInt()}%'
+        : NumberFormat.compactCurrency(symbol: '', decimalDigits: 0).format(promotion.discountValue);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       height: 100,
@@ -16,7 +23,7 @@ class VoucherCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -28,7 +35,7 @@ class VoucherCard extends StatelessWidget {
           Container(
             width: 100,
             decoration: BoxDecoration(
-              color: AppColors.primaryLightBrand.withOpacity(0.1),
+              color: AppColors.primaryLightBrand.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 bottomLeft: Radius.circular(16),
@@ -37,14 +44,14 @@ class VoucherCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  index % 2 == 0 ? Icons.sports_soccer_rounded : Icons.sports_tennis_rounded,
+                const Icon(
+                   Icons.local_offer_rounded,
                   color: AppColors.primaryLightBrand,
                   size: 32,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  index % 2 == 0 ? 'Giảm 20k' : 'Giảm 15%',
+                   'Giảm $discountStr',
                   style: const TextStyle(
                     color: AppColors.primaryLightBrand,
                     fontWeight: FontWeight.bold,
@@ -69,17 +76,17 @@ class VoucherCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    index % 2 == 0 ? 'Ưu đãi sân cỏ nhân tạo' : 'Voucher đặc biệt cuối tuần',
+                    promotion.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Cho tất cả các khung giờ từ thứ 2 - 6',
+                    promotion.description ?? 'Ưu đãi đặc biệt dành cho bạn',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
                   ),
                   const Spacer(),
                   Row(
@@ -91,8 +98,8 @@ class VoucherCard extends StatelessWidget {
                               size: 12, color: AppColors.textHint),
                           const SizedBox(width: 4),
                           Text(
-                            'Hết hạn: 31/12',
-                            style: TextStyle(color: AppColors.textHint, fontSize: 10),
+                            'Hết hạn: ${DateFormat('dd/MM/yyyy').format(promotion.validTo)}',
+                            style: const TextStyle(color: AppColors.textHint, fontSize: 10),
                           ),
                         ],
                       ),
@@ -103,7 +110,7 @@ class VoucherCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
-                          'Lưu',
+                          'Sử dụng',
                           style: TextStyle(
                               color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                         ),

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/booking_detail_cubit.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/data/models/booking_request.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/my_booking_models.dart';
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // C-11: Hủy Đặt Sân
@@ -33,8 +38,10 @@ class _CancelBookingPageState extends State<CancelBookingPage> {
   double get _cancellationFee => widget.booking.totalAmount - _refundAmount;
 
   Future<void> _submitCancel() async {
-    if (_selectedReason == null && _reasonController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng chọn lý do hủy'), backgroundColor: AppColors.error));
+    final reason = _selectedReason == 'Lý do khác' ? _reasonController.text.trim() : _selectedReason;
+    
+    if (reason == null || reason.isEmpty) {
+      toast.error('Vui lòng chọn lý do hủy');
       return;
     }
     // Confirm dialog
@@ -42,22 +49,9 @@ class _CancelBookingPageState extends State<CancelBookingPage> {
     if (!confirmed || !mounted) return;
 
     setState(() => _isSubmitting = true);
-    await Future.delayed(const Duration(milliseconds: 1200));
+    await context.read<BookingDetailCubit>().cancelBooking(widget.booking.id, reason);
     if (!mounted) return;
     setState(() => _isSubmitting = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_refundAmount > 0 ? '✅ Đã hủy booking. Hoàn tiền ${NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(_refundAmount)} vào ví.' : '✅ Đã hủy booking thành công.'),
-        backgroundColor: AppColors.primaryLightBrand,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-    // Pop twice (detail + cancel)
-    if (mounted) {
-      context.pop();
-      context.pop();
-    }
   }
 
   Future<bool> _showConfirmDialog() async {
@@ -122,188 +116,195 @@ class _CancelBookingPageState extends State<CancelBookingPage> {
     );
     final hoursLeft = bookingDateTime.difference(now).inHours;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
+    return BlocListener<BookingDetailCubit, BaseState<BookingResponse>>(
+      listener: (context, state) {
+        if (state.isSuccess && state.message != null) {
+          context.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF4F6FA),
+        appBar: AppBar(
+          backgroundColor: AppColors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+            onPressed: () => context.pop(),
+          ),
+          title: const Text('Hủy đặt sân', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
         ),
-        title: const Text('Hủy đặt sân', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // ── Warning banner ──
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.warning.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.warning.withOpacity(0.3)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          hoursLeft > 24 ? '⏰ Còn $hoursLeft giờ trước khi bắt đầu' : hoursLeft > 0 ? '⚠️ Còn $hoursLeft giờ nữa — phí hủy cao' : '🚫 Đã qua thời gian cho phép hủy',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.warning),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text('Hủy booking sẽ không thể hoàn tác. Tiền hoàn sẽ vào ví trong 5-15 phút.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ── Booking Summary ──
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: _cardDeco(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Thông tin đặt sân sẽ hủy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 10),
-                  _row(Icons.stadium_rounded, '${widget.booking.courtName} - ${widget.booking.venueName}'),
-                  const SizedBox(height: 6),
-                  _row(Icons.calendar_today_rounded, DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(widget.booking.bookingDate)),
-                  const SizedBox(height: 6),
-                  _row(Icons.access_time_rounded, '${widget.booking.startTime} – ${widget.booking.endTime}'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ── Refund Breakdown ──
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: _cardDeco(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Tính toán hoàn tiền', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 12),
-                  ...widget.booking.refundRules.map((r) {
-                    final bool isApplicable = hoursLeft >= r.cancelBeforeHours;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isApplicable ? AppColors.primaryLightBrand.withOpacity(0.08) : AppColors.mutedLight,
-                        borderRadius: BorderRadius.circular(10),
-                        border: isApplicable ? Border.all(color: AppColors.primaryLightBrand, width: 1.5) : null,
-                      ),
-                      child: Row(
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // ── Warning banner ──
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(isApplicable ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded, color: isApplicable ? AppColors.primaryLightBrand : AppColors.textHint, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(r.description ?? '', style: TextStyle(fontSize: 12, color: isApplicable ? AppColors.primaryLightBrand : AppColors.textSecondary, fontWeight: isApplicable ? FontWeight.bold : FontWeight.normal))),
+                          Text(
+                            hoursLeft > 24 ? '⏰ Còn $hoursLeft giờ trước khi bắt đầu' : hoursLeft > 0 ? '⚠️ Còn $hoursLeft giờ nữa — phí hủy cao' : '🚫 Đã qua thời gian cho phép hủy',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.warning),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text('Hủy booking sẽ không thể hoàn tác. Tiền hoàn sẽ vào ví trong 5-15 phút.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         ],
-                      ),
-                    );
-                  }),
-                  const Divider(height: 16, color: AppColors.borderLight),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Bạn sẽ nhận lại', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      Text(
-                        fmt.format(_refundAmount),
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _refundAmount > 0 ? AppColors.primaryLightBrand : AppColors.error),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ── Cancel Reason ──
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: _cardDeco(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Lý do hủy *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _cancelReasons.map((reason) {
-                      final isSelected = _selectedReason == reason;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedReason = reason),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected ? AppColors.primaryLightBrand.withOpacity(0.1) : AppColors.mutedLight,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight, width: isSelected ? 1.5 : 1),
-                          ),
-                          child: Text(
-                            reason,
-                            style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? AppColors.primaryLightBrand : AppColors.textSecondary),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  if (_selectedReason == 'Lý do khác') ...[
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _reasonController,
-                      maxLines: 3,
-                      style: const TextStyle(fontSize: 13),
-                      decoration: InputDecoration(
-                        hintText: 'Mô tả chi tiết lý do hủy...',
-                        hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 13),
-                        filled: true,
-                        fillColor: AppColors.mutedLight,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                        contentPadding: const EdgeInsets.all(12),
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.only(left: 20, right: 20, top: 16, bottom: MediaQuery.of(context).padding.bottom + 16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, -4))],
-        ),
-        child: ElevatedButton(
-          onPressed: _isSubmitting ? null : _submitCancel,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.error,
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            minimumSize: const Size(double.infinity, 52),
-            elevation: 0,
+              const SizedBox(height: 16),
+
+              // ── Booking Summary ──
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: _cardDeco(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Thông tin đặt sân sẽ hủy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 10),
+                    _row(Icons.stadium_rounded, '${widget.booking.courtName} - ${widget.booking.venueName}'),
+                    const SizedBox(height: 6),
+                    _row(Icons.calendar_today_rounded, DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(widget.booking.bookingDate)),
+                    const SizedBox(height: 6),
+                    _row(Icons.access_time_rounded, '${widget.booking.startTime} – ${widget.booking.endTime}'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ── Refund Breakdown ──
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: _cardDeco(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Tính toán hoàn tiền', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 12),
+                    ...widget.booking.refundRules.map((r) {
+                      final bool isApplicable = hoursLeft >= r.cancelBeforeHours;
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isApplicable ? AppColors.primaryLightBrand.withOpacity(0.08) : AppColors.mutedLight,
+                          borderRadius: BorderRadius.circular(10),
+                          border: isApplicable ? Border.all(color: AppColors.primaryLightBrand, width: 1.5) : null,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(isApplicable ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded, color: isApplicable ? AppColors.primaryLightBrand : AppColors.textHint, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(r.description ?? '', style: TextStyle(fontSize: 12, color: isApplicable ? AppColors.primaryLightBrand : AppColors.textSecondary, fontWeight: isApplicable ? FontWeight.bold : FontWeight.normal))),
+                          ],
+                        ),
+                      );
+                    }),
+                    const Divider(height: 16, color: AppColors.borderLight),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Bạn sẽ nhận lại', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        Text(
+                          fmt.format(_refundAmount),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _refundAmount > 0 ? AppColors.primaryLightBrand : AppColors.error),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ── Cancel Reason ──
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: _cardDeco(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Lý do hủy *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _cancelReasons.map((reason) {
+                        final isSelected = _selectedReason == reason;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedReason = reason),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.primaryLightBrand.withOpacity(0.1) : AppColors.mutedLight,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: isSelected ? AppColors.primaryLightBrand : AppColors.borderLight, width: isSelected ? 1.5 : 1),
+                            ),
+                            child: Text(
+                              reason,
+                              style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? AppColors.primaryLightBrand : AppColors.textSecondary),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    if (_selectedReason == 'Lý do khác') ...[
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _reasonController,
+                        maxLines: 3,
+                        style: const TextStyle(fontSize: 13),
+                        decoration: InputDecoration(
+                          hintText: 'Mô tả chi tiết lý do hủy...',
+                          hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 13),
+                          filled: true,
+                          fillColor: AppColors.mutedLight,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                          contentPadding: const EdgeInsets.all(12),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 80),
+            ],
           ),
-          child: _isSubmitting
-              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.white))
-              : const Text('Xác nhận hủy booking', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.white)),
+        ),
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.only(left: 20, right: 20, top: 16, bottom: MediaQuery.of(context).padding.bottom + 16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, -4))],
+          ),
+          child: ElevatedButton(
+            onPressed: _isSubmitting ? null : _submitCancel,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              minimumSize: const Size(double.infinity, 52),
+              elevation: 0,
+            ),
+            child: _isSubmitting
+                ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.white))
+                : const Text('Xác nhận hủy booking', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.white)),
+          ),
         ),
       ),
     );

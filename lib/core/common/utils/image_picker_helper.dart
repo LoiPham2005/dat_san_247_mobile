@@ -84,6 +84,24 @@ class ImagePickerHelper {
     }
   }
 
+  /// Pick video from gallery
+  static Future<File?> pickVideo(BuildContext? context) async {
+    try {
+      // ✅ Check permission first
+      final hasPermission = await _permissionService.requestPhotos(context);
+      if (!hasPermission) {
+        Logger.warning('Gallery permission denied');
+        return null;
+      }
+
+      final pickedFile = await _picker.pickVideo(source: ImageSource.gallery);
+      return pickedFile != null ? File(pickedFile.path) : null;
+    } catch (e) {
+      Logger.error('Failed to pick video', error: e);
+      return null;
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // COMPRESS OPERATION
   // ═══════════════════════════════════════════════════════════════

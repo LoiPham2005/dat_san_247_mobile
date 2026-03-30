@@ -1,68 +1,52 @@
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_filter_params.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/cubit/venue_search_cubit.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../widgets/venue_filter_bottom_sheet.dart';
 import '../widgets/venue_list_item.dart';
 
-class VenueListPage extends StatefulWidget {
+class VenueListPage extends StatelessWidget {
   final String? initialQuery;
   final String? initialDistrict;
 
   const VenueListPage({super.key, this.initialQuery, this.initialDistrict});
 
   @override
-  State<VenueListPage> createState() => _VenueListPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<VenueSearchCubit>()
+        ..searchVenues({
+          if (initialQuery != null && initialQuery != 'featured') 'keyword': initialQuery,
+          if (initialQuery == 'featured') 'is_featured': true,
+          if (initialDistrict != null) 'district': initialDistrict,
+        }),
+      child: _VenueListPageContent(initialQuery: initialQuery == 'featured' ? null : initialQuery, initialDistrict: initialDistrict, isFeatured: initialQuery == 'featured'),
+    );
+  }
 }
 
-class _VenueListPageState extends State<VenueListPage> {
-  late VenueFilterParams _currentFilter;
-  final TextEditingController _searchController = TextEditingController();
+class _VenueListPageContent extends StatefulWidget {
+  final String? initialQuery;
+  final String? initialDistrict;
+  final bool isFeatured;
 
-  final List<VenueSearchResultModel> _mockVenues = [
-    const VenueSearchResultModel(
-      id: '1',
-      name: 'Sân bóng đá KTX Bách Khoa',
-      slug: 'san-bong-da-ktx-bach-khoa',
-      address: '497 Hòa Hảo',
-      city: 'TP.HCM',
-      district: 'Quận 10',
-      thumbnailUrl: null,
-      rating: 4.8,
-      totalReviews: 120,
-      minPricePerHour: 150000,
-      sportTypes: ['FOOTBALL'],
-      amenities: ['WIFI', 'Bãi xe Ô tô', 'Tủ đồ'],
-      isFeatured: true,
-      isFavorite: false,
-      latitude: 10.762622,
-      longitude: 106.660172,
-    ),
-    const VenueSearchResultModel(
-      id: '2',
-      name: 'Sân cầu lông Kỳ Hòa',
-      slug: 'san-cau-long-ky-hoa',
-      address: '16A Lê Hồng Phong',
-      city: 'TP.HCM',
-      district: 'Quận 10',
-      thumbnailUrl:
-          'https://images.unsplash.com/photo-1549721067-15efba51ebce?q=80&w=400&auto=format&fit=crop',
-      rating: 4.5,
-      totalReviews: 85,
-      minPricePerHour: 80000,
-      sportTypes: ['BADMINTON'],
-      amenities: ['WIFI', 'Căng tin'],
-      isFeatured: false,
-      isFavorite: true,
-      latitude: 10.7769,
-      longitude: 106.7009,
-    ),
-  ];
+  const _VenueListPageContent({this.initialQuery, this.initialDistrict, this.isFeatured = false});
+
+  @override
+  State<_VenueListPageContent> createState() => _VenueListPageContentState();
+}
+
+class _VenueListPageContentState extends State<_VenueListPageContent> {
+  late VenueFilterParams _currentFilter;
+  late final TextEditingController _searchController;
 
   @override
   void initState() {
@@ -72,9 +56,22 @@ class _VenueListPageState extends State<VenueListPage> {
       city: null,
       district: widget.initialDistrict,
     );
-    if (widget.initialQuery != null) {
-      _searchController.text = widget.initialQuery!;
-    }
+    _searchController = TextEditingController(text: widget.initialQuery);
+  }
+
+  void _triggerSearch() {
+    final Map<String, dynamic> params = {
+      if (_searchController.text.isNotEmpty) 'keyword': _searchController.text,
+      if (_currentFilter.sportType != null) 'sport_type': _currentFilter.sportType,
+      if (_currentFilter.district != null) 'district': _currentFilter.district,
+      if (_currentFilter.city != null) 'city': _currentFilter.city,
+      if (_currentFilter.minPrice != null) 'price_min': _currentFilter.minPrice,
+      if (_currentFilter.maxPrice != null) 'price_max': _currentFilter.maxPrice,
+      if (_currentFilter.amenities.isNotEmpty) 'amenities': _currentFilter.amenities.join(','),
+      if (widget.isFeatured && _searchController.text.isEmpty) 'is_featured': true,
+    };
+
+    context.read<VenueSearchCubit>().searchVenues(params);
   }
 
   void _showFilterBottomModal() {
@@ -82,14 +79,14 @@ class _VenueListPageState extends State<VenueListPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      builder: (ctx) {
         return VenueFilterBottomSheet(
           initialParams: _currentFilter,
           onApply: (newFilter) {
             setState(() {
               _currentFilter = newFilter;
-              // REFETCH DATA based on new filter + current query
             });
+            _triggerSearch();
           },
         );
       },
@@ -100,6 +97,7 @@ class _VenueListPageState extends State<VenueListPage> {
   Widget build(BuildContext context) {
     final bool showBack =
         context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
@@ -130,16 +128,23 @@ class _VenueListPageState extends State<VenueListPage> {
           Expanded(child: _buildVenueList()),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.push(RouteNames.venueMap, extra: _mockVenues);
+      floatingActionButton: BlocBuilder<VenueSearchCubit, BaseState<List<VenueSearchResultModel>>>(
+        builder: (context, state) {
+          final venues = state.data ?? [];
+          if (venues.isEmpty) return const SizedBox.shrink();
+
+          return FloatingActionButton.extended(
+            onPressed: () {
+              context.push(RouteNames.venueMap, extra: venues);
+            },
+            backgroundColor: AppColors.primaryLightBrand,
+            icon: const Icon(Icons.map_rounded, color: AppColors.white),
+            label: const Text(
+              'Bản đồ',
+              style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+            ),
+          );
         },
-        backgroundColor: AppColors.primaryLightBrand,
-        icon: const Icon(Icons.map_rounded, color: AppColors.white),
-        label: const Text(
-          'Bản đồ',
-          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
-        ),
       ),
     );
   }
@@ -156,9 +161,14 @@ class _VenueListPageState extends State<VenueListPage> {
         controller: _searchController,
         readOnly: true,
         textAlignVertical: TextAlignVertical.center,
-        onTap: () {
-          context.push(
-              '${RouteNames.venueSearch}?initialQuery=${Uri.encodeComponent(_searchController.text)}');
+        onTap: () async {
+          final result = await context.push<String?>(
+            '${RouteNames.venueSearch}?initialQuery=${Uri.encodeComponent(_searchController.text)}',
+          );
+          if (result != null) {
+            _searchController.text = result;
+            _triggerSearch();
+          }
         },
         decoration: const InputDecoration(
           isDense: true,
@@ -175,11 +185,11 @@ class _VenueListPageState extends State<VenueListPage> {
   Widget _buildFilterChipsBar() {
     final List<Widget> chips = [];
 
-    // Convert filter object to chips
     if (_currentFilter.sportType != null) {
       chips.add(
         _buildRemovableChip(_currentFilter.sportType!, () {
           setState(() => _currentFilter = _currentFilter.copyWith(sportType: null));
+          _triggerSearch();
         }),
       );
     }
@@ -187,6 +197,7 @@ class _VenueListPageState extends State<VenueListPage> {
       chips.add(
         _buildRemovableChip(_currentFilter.district!, () {
           setState(() => _currentFilter = _currentFilter.copyWith(district: null));
+          _triggerSearch();
         }),
       );
     }
@@ -194,6 +205,7 @@ class _VenueListPageState extends State<VenueListPage> {
       chips.add(
         _buildRemovableChip('Theo giá', () {
           setState(() => _currentFilter = _currentFilter.copyWith(minPrice: null, maxPrice: null));
+          _triggerSearch();
         }),
       );
     }
@@ -202,6 +214,7 @@ class _VenueListPageState extends State<VenueListPage> {
         _buildRemovableChip(am, () {
           final newAm = List<String>.from(_currentFilter.amenities)..remove(am);
           setState(() => _currentFilter = _currentFilter.copyWith(amenities: newAm));
+          _triggerSearch();
         }),
       );
     }
@@ -234,14 +247,9 @@ class _VenueListPageState extends State<VenueListPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.primaryLightBrand,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text(label,
+              style: const TextStyle(
+                  color: AppColors.primaryLightBrand, fontSize: 13, fontWeight: FontWeight.bold)),
           const SizedBox(width: 4),
           InkWell(
             onTap: onRemove,
@@ -253,28 +261,33 @@ class _VenueListPageState extends State<VenueListPage> {
   }
 
   Widget _buildVenueList() {
-    if (_mockVenues.isEmpty) {
-      return const Center(
-        child: Text('Không tìm thấy sân phù hợp', style: TextStyle(color: AppColors.textHint)),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _mockVenues.length,
-      itemBuilder: (context, index) {
-        final venue = _mockVenues[index];
-        return VenueListItem(
-          venue: venue,
-          onTap: () {
-            GoRouter.of(context).push('/venue-detail/${venue.id}');
+    return BlocBuilder<VenueSearchCubit, BaseState<List<VenueSearchResultModel>>>(
+      builder: (context, state) {
+        return state.whenReady(
+          loading: (data) => const Center(child: CircularProgressIndicator()),
+          success: (venues, message) {
+            if (venues.isEmpty) {
+              return const Center(child: Text('Không tìm thấy sân phù hợp'));
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: venues.length,
+              itemBuilder: (context, index) {
+                final venue = venues[index];
+                return VenueListItem(
+                  venue: venue,
+                  onTap: () {
+                    context.push('/venue-detail/${venue.slug}');
+                  },
+                  onFavoriteTap: () {
+                    context.read<VenueSearchCubit>().toggleFavorite(venue.id);
+                  },
+                );
+              },
+            );
           },
-          onFavoriteTap: () {
-            // Toggle favorite API
-            setState(() {
-              // mock toggle
-            });
-          },
+          failure: (error, data) => Center(child: Text(error)),
+          empty: (message) => const Center(child: Text('Chưa có kết quả')),
         );
       },
     );

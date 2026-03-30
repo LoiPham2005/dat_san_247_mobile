@@ -36,19 +36,23 @@ class CourtListTile extends StatelessWidget {
               // Court image
               Container(
                 width: 100,
-                height: 100,
+                height: 122,
                 color: AppColors.mutedLight,
-                child: court.thumbnailUrl != null && court.thumbnailUrl!.isNotEmpty
-                    ? Image.network(
-                        court.thumbnailUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image_rounded, color: AppColors.mutedForegroundLight),
-                      )
-                    : const Icon(Icons.sports_soccer_rounded, size: 40, color: AppColors.mutedForegroundLight),
+                child:
+                    court.thumbnailUrl != null && court.thumbnailUrl!.isNotEmpty
+                        ? Image.network(
+                            court.thumbnailUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(
+                                Icons.broken_image_rounded,
+                                color: AppColors.mutedForegroundLight),
+                          )
+                        : const Icon(Icons.sports_soccer_rounded,
+                            size: 40, color: AppColors.mutedForegroundLight),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -69,9 +73,11 @@ class CourtListTile extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryLightBrand.withOpacity(0.1),
+                              color:
+                                  AppColors.primaryLightBrand.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
@@ -91,28 +97,37 @@ class CourtListTile extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            court.isIndoor ? Icons.roofing_rounded : Icons.wb_sunny_rounded,
+                            court.isIndoor
+                                ? Icons.roofing_rounded
+                                : Icons.wb_sunny_rounded,
                             size: 14,
                             color: AppColors.textSecondary,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             court.isIndoor ? 'Sân trong nhà' : 'Sân ngoài trời',
-                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            style: const TextStyle(
+                                fontSize: 12, color: AppColors.textSecondary),
                           ),
                           const SizedBox(width: 12),
                           if (court.surfaceType != null) ...[
-                             const Icon(Icons.terrain_rounded, size: 14, color: AppColors.textSecondary),
+                            const Icon(Icons.terrain_rounded,
+                                size: 14, color: AppColors.textSecondary),
                             const SizedBox(width: 4),
                             Text(
-                              court.surfaceType == CourtSurfaceType.artificialGrass ? 'Cỏ nhân tạo' : 
-                              court.surfaceType == CourtSurfaceType.grass ? 'Cỏ tự nhiên' : 'Khác',
-                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                              court.surfaceType ==
+                                      CourtSurfaceType.artificialGrass
+                                  ? 'Cỏ nhân tạo'
+                                  : court.surfaceType == CourtSurfaceType.grass
+                                      ? 'Cỏ tự nhiên'
+                                      : 'Khác',
+                              style: const TextStyle(
+                                  fontSize: 12, color: AppColors.textSecondary),
                             ),
                           ],
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 3),
 
                       // Price and Booking
                       Row(
@@ -132,11 +147,15 @@ class CourtListTile extends StatelessWidget {
                               backgroundColor: AppColors.primaryLightBrand,
                               foregroundColor: AppColors.white,
                               minimumSize: const Size(60, 32),
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
                               elevation: 0,
                             ),
-                            child: const Text('Đặt ngay', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            child: const Text('Đặt ngay',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),

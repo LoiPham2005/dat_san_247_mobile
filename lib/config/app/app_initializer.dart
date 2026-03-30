@@ -13,13 +13,11 @@ import 'package:dat_san_247_mobile/core/services/crashlytics/crashlytics_service
 import 'package:dat_san_247_mobile/core/services/notification/notification_service.dart';
 import 'package:dat_san_247_mobile/design/l10n/cubit/locale_cubit.dart';
 import 'package:dat_san_247_mobile/design/theme/cubit/theme_cubit.dart';
-import 'package:dat_san_247_mobile/modules/ads/services/ad_manager.dart';
 import 'package:dat_san_247_mobile/modules/iap/iap_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/base/di/injection.dart';
 import '../../core/data/cache/cache_service.dart';
-import '../../modules/ads/observers/ad_lifecycle_observer.dart';
 
 /// 🎯 Quản lý toàn bộ quá trình khởi tạo app
 class AppInitializer {
@@ -29,7 +27,7 @@ class AppInitializer {
   static bool get isInitialized => _isInitialized;
 
   // ✅ Add lifecycle observer instance
-  static AdLifecycleObserver? _adLifecycleObserver;
+  // static AdLifecycleObserver? _adLifecycleObserver;
 
   /// ✅ Entry point: Khởi tạo app
   static Future<void> initialize() async {
@@ -60,12 +58,12 @@ class AppInitializer {
       await configureDependencies();
 
       // Phase 4: Managers & Services
-      final adManager = await getIt.getAsync<AdManager>();
-      await adManager.initialize();
+      // final adManager = await getIt.getAsync<AdManager>();
+      // await adManager.initialize();
 
       // ✅ NEW: Initialize Ad Lifecycle Observer
-      _adLifecycleObserver = AdLifecycleObserver(adManager);
-      Logger.success('AdLifecycleObserver initialized', tag: 'INIT');
+      // _adLifecycleObserver = AdLifecycleObserver(adManager);
+      // Logger.success('AdLifecycleObserver initialized', tag: 'INIT');
 
       await _initializeCacheManager();
       await _initializeServices();
@@ -87,8 +85,8 @@ class AppInitializer {
     try {
       AppObserver().dispose();
       SystemUIManager.instance.dispose(); // ✅ Cleanup SystemUIManager
-      _adLifecycleObserver?.dispose(); // ✅ Cleanup observer
-      _adLifecycleObserver = null;
+      // _adLifecycleObserver?.dispose(); // ✅ Cleanup observer
+      // _adLifecycleObserver = null;
       await resetDependencies();
       _isInitialized = false;
       Logger.warning('Cleaned up after init failure', tag: 'INIT');

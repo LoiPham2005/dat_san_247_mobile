@@ -49,17 +49,14 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // Chỉ handle 401
-    if (err.response?.statusCode != 401) {
+    final path = err.requestOptions.path;
+
+    // Chỉ handle 401 cho các API cần Token
+    if (err.response?.statusCode != 401 || _isPublicApi(path)) {
       return handler.next(err);
     }
 
-    // Skip refresh nếu chính request refresh đang bị 401 (vòng lặp vô tận)
-    if (_isRefreshEndpoint(err.requestOptions.path)) {
-      return handler.next(err);
-    }
-
-    Logger.info('Token expired (401). Refreshing...', tag: 'AUTH');
+    Logger.info('Token expired (401) on $path. Refreshing...', tag: 'AUTH');
 
     // Nếu đang refresh, queue request này lại — tránh gửi nhiều refresh cùng lúc
     if (_isRefreshing) {
@@ -100,7 +97,7 @@ class AuthInterceptor extends Interceptor {
 
       return handler.resolve(response);
     } catch (e) {
-      Logger.error('Token refresh error', error: e, tag: 'AUTH');
+      Logger.error('Token refresh error retry sequence', error: e, tag: 'AUTH');
       _rejectAllPending(err);
       await _authService.logout();
       return handler.reject(err);
@@ -114,11 +111,10 @@ class AuthInterceptor extends Interceptor {
   // ═══════════════════════════════════════════════════════════════
 
   bool _isPublicApi(String path) {
+    // Endpoints containing '/me/' always require authentication
+    if (path.contains('/me/')) return false;
+    
     return ApiEndpoints.publicEndpoints.any((p) => path.contains(p));
-  }
-
-  bool _isRefreshEndpoint(String path) {
-    return path.contains('refresh');
   }
 
   /// Retry 1 request với token mới — dùng lại `_retryDio` thay vì tạo mới

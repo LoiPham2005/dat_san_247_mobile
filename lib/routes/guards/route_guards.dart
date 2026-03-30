@@ -26,14 +26,19 @@ class RouteGuards {
     RouteNames.otp,
     RouteNames.forgotPassword,
     RouteNames.resetPassword,
-    RouteNames.googleMap,
-    RouteNames.home,
-    RouteNames.main,
     RouteNames.venueSearch,
     RouteNames.venues,
-    RouteNames.venueDetail,
-    RouteNames.timeSlotPicker,
+    RouteNames.venueMap,
   };
+
+  // Public route prefixes - cho các route có dynamic params như /venue-detail/:id
+  static const _publicPrefixes = [
+    '/venue-detail/',
+    '/venues',
+    '/venue-search',
+    '/venue-map',
+    '/time-slot-picker',
+  ];
 
   // Routes that authenticated users should not access (auth pages)
   static const _authOnlyRoutes = {
@@ -44,33 +49,6 @@ class RouteGuards {
     RouteNames.forgotPassword,
     RouteNames.resetPassword,
   };
-
-  // Public route prefixes - cho các route có dynamic params như /venue-detail/:id
-  static const _publicPrefixes = [
-    '/venue-detail/',
-    '/venues',
-    '/venue-search',
-    '/time-slot-picker',
-    '/court-detail/',
-    '/booking-confirm',
-    '/payment',
-    '/booking-success',
-    '/booking-detail',
-    '/cancel-booking',
-    '/write-review',
-    '/recurring-bookings',
-    '/my-waitlist',
-    '/wallet',
-    '/invoices',
-    '/promotions',
-    '/favorite-venues',
-    '/notifications',
-    '/support-tickets',
-    '/profile-settings',
-    '/owner',
-    '/venue-staff',
-    '/venue-map',
-  ];
 
   FutureOr<String?> authGuard(BuildContext context, GoRouterState state) {
     final bool isLoggedIn = _appAuthCubit.state.isAuthenticated;
@@ -85,11 +63,40 @@ class RouteGuards {
       return RouteNames.login;
     }
 
+    // 2. Logged in + Auth page (login/register) → redirect to appropriate dashboard
     if (isLoggedIn && isAuthPage) {
-      return RouteNames.main;
+      return _getDashboardByRole();
     }
-    // 3. No redirect needed
+
+    // 3. Logged in + trying to access Main Shell (Customer) but has different role
+    if (isLoggedIn && location == RouteNames.main) {
+      return _getDashboardByRole();
+    }
+
+    // 4. Role-based Authorization for specific prefix
+    if (isLoggedIn) {
+      final user = _appAuthCubit.state.user;
+      final role = user?.role?.slug;
+
+      if (location.startsWith('/owner') && role != 'OWNER') {
+        return _getDashboardByRole();
+      }
+      if (location.startsWith('/venue-staff') && !(role == 'STAFF' || user?.isVenueStaff == true)) {
+        return _getDashboardByRole();
+      }
+    }
+
     return null;
+  }
+
+  String _getDashboardByRole() {
+    final user = _appAuthCubit.state.user;
+    final role = user?.role?.slug.toUpperCase();
+
+    if (role == 'OWNER') return RouteNames.owner;
+    if (role == 'STAFF' || user?.isVenueStaff == true) return RouteNames.venueStaff;
+    
+    return RouteNames.main;
   }
 }
 

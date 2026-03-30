@@ -3,6 +3,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'booking_models.g.dart';
 
+double _parsePrice(dynamic val) {
+  if (val == null) return 0;
+  if (val is num) return val.toDouble();
+  if (val is String) return double.tryParse(val) ?? 0;
+  return 0;
+}
+
 // ── Enums (mirrors schema.prisma) ─────────────────────────────────────────
 
 enum BookingStatus {
@@ -44,6 +51,7 @@ class PricingRuleModel extends Equatable {
   final String startTime;  // HH:mm
   @JsonKey(name: 'end_time')
   final String endTime;    // HH:mm
+  @JsonKey(fromJson: _parsePrice)
   final double price;
   final int priority;
   @JsonKey(name: 'is_active')
@@ -76,6 +84,7 @@ class VenueServiceModel extends Equatable {
   final String venueId;
   final String name;
   final String? description;
+  @JsonKey(fromJson: _parsePrice)
   final double price;
   final String unit;   // UNIT | HOUR | SESSION | PERSON | SET
   final String type;   // PRODUCT | SERVICE
@@ -114,6 +123,7 @@ class BookingAddonModel extends Equatable {
   @JsonKey(name: 'service_id')
   final String serviceId;
   final String name;
+  @JsonKey(fromJson: _parsePrice)
   final double pricePerUnit;
   final int quantity; // final → fix @immutable lint
   final String unit;
@@ -154,11 +164,11 @@ class PromotionModel extends Equatable {
   final String? description;
   @JsonKey(name: 'discount_type')
   final String discountType;  // PERCENTAGE | FIXED_AMOUNT
-  @JsonKey(name: 'discount_value')
+  @JsonKey(name: 'discount_value', fromJson: _parsePrice)
   final double discountValue;
-  @JsonKey(name: 'max_discount_amount')
+  @JsonKey(name: 'max_discount_amount', fromJson: _parsePrice)
   final double? maxDiscountAmount;
-  @JsonKey(name: 'min_booking_amount')
+  @JsonKey(name: 'min_booking_amount', fromJson: _parsePrice)
   final double minBookingAmount;
   @JsonKey(name: 'valid_from')
   final DateTime validFrom;
@@ -265,7 +275,7 @@ class BookingConfirmationModel extends Equatable {
   final String startTime;
   @JsonKey(name: 'end_time')
   final String endTime;
-  @JsonKey(name: 'total_amount')
+  @JsonKey(name: 'total_amount', fromJson: _parsePrice)
   final double totalAmount;
   @JsonKey(name: 'payment_method')
   final String paymentMethod;

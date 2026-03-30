@@ -1,45 +1,40 @@
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/search_history_model.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/cubit/search_history_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/venue_search_history_list.dart';
 import '../widgets/venue_search_input_field.dart';
 
-class VenueSearchPage extends StatefulWidget {
+class VenueSearchPage extends StatelessWidget {
   final String? initialQuery;
 
   const VenueSearchPage({super.key, this.initialQuery});
 
   @override
-  State<VenueSearchPage> createState() => _VenueSearchPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<SearchHistoryCubit>()..getSearchHistory(),
+      child: _VenueSearchPageContent(initialQuery: initialQuery),
+    );
+  }
 }
 
-class _VenueSearchPageState extends State<VenueSearchPage> {
+class _VenueSearchPageContent extends StatefulWidget {
+  final String? initialQuery;
+
+  const _VenueSearchPageContent({this.initialQuery});
+
+  @override
+  State<_VenueSearchPageContent> createState() => _VenueSearchPageContentState();
+}
+
+class _VenueSearchPageContentState extends State<_VenueSearchPageContent> {
   late TextEditingController _searchController;
   final FocusNode _searchFocus = FocusNode();
-
-  // Mock search history base on prisma model search_history
-  final List<SearchHistoryModel> _mockSearchHistory = [
-    SearchHistoryModel(
-      id: "1",
-      userId: "user-1",
-      searchQuery: "Sân bóng đá Kỳ Hòa",
-      createdAt: DateTime.now().subtract(const Duration(hours: 1)),
-    ),
-    SearchHistoryModel(
-      id: "2",
-      userId: "user-1",
-      sportType: "BADMINTON",
-      searchQuery: "Sân cầu lông Vạn Hạnh",
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    SearchHistoryModel(
-      id: "3",
-      userId: "user-1",
-      district: "Quận 10",
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-  ];
 
   @override
   void initState() {
@@ -59,16 +54,24 @@ class _VenueSearchPageState extends State<VenueSearchPage> {
 
   void _onSearch(String query) {
     if (query.trim().isEmpty) return;
-    // Log history & navigate to Venue List Page
-    GoRouter.of(context).push('/venues?query=${Uri.encodeComponent(query)}');
+    
+    // Log history
+    context.read<SearchHistoryCubit>().saveSearchHistory(query);
+    
+    // Navigate to Venue List Page
+    context.push('/venues?query=${Uri.encodeComponent(query)}');
   }
 
   void _onHistoryItemTap(SearchHistoryModel history) {
     if (history.searchQuery != null) {
       _searchController.text = history.searchQuery!;
       _onSearch(history.searchQuery!);
-    } else if (history.district != null) {
-      GoRouter.of(context).push('/venues?district=${Uri.encodeComponent(history.district!)}');
+    } else {
+      // Handle filters if any
+      final sport = history.filters?['sport'];
+      if (sport != null) {
+        context.push('/venues?sport=${Uri.encodeComponent(sport.toString())}');
+      }
     }
   }
 
@@ -89,15 +92,21 @@ class _VenueSearchPageState extends State<VenueSearchPage> {
         ),
         titleSpacing: 0,
         backgroundColor: AppColors.white,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
-      body: VenueSearchHistoryList(
-        history: _mockSearchHistory,
-        onItemTap: _onHistoryItemTap,
-        onClearHistory: () {
-          setState(() {
-            _mockSearchHistory.clear();
-          });
+      body: BlocBuilder<SearchHistoryCubit, BaseState<List<SearchHistoryModel>>>(
+        builder: (context, state) {
+          return state.whenReady(
+            loading: (data) => const Center(child: CircularProgressIndicator()),
+            success: (history, message) => VenueSearchHistoryList(
+              history: history,
+              onItemTap: _onHistoryItemTap,
+              onClearHistory: () => context.read<SearchHistoryCubit>().clearSearchHistory(),
+            ),
+            failure: (error, data) => Center(child: Text(error)),
+            empty: (message) => const SizedBox.shrink(),
+          );
         },
       ),
     );

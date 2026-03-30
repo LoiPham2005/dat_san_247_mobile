@@ -1,8 +1,10 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:dat_san_247_mobile/core/common/converters/json_converters.dart';
 import 'operating_hours_model.dart';
+
+part 'court_model.freezed.dart';
 part 'court_model.g.dart';
 
-@JsonEnum(alwaysCreate: true)
 enum CourtSurfaceType {
   @JsonValue('GRASS')
   grass,
@@ -22,145 +24,71 @@ enum CourtSurfaceType {
   other,
 }
 
-@JsonSerializable()
-class AmenityModel {
-  final String id;
-  @JsonKey(name: 'venue_id')
-  final String? venueId;
-  @JsonKey(name: 'court_id')
-  final String? courtId;
-  final String name;
-  final String? icon;
-  @JsonKey(name: 'is_free')
-  final bool isFree;
+@freezed
+abstract class AmenityModel with _$AmenityModel {
+  const factory AmenityModel({
+    required String id,
+    @JsonKey(name: 'venue_id') String? venueId,
+    @JsonKey(name: 'court_id') String? courtId,
+    required String name,
+    String? icon,
+    @JsonKey(name: 'is_free') @Default(true) bool isFree,
+  }) = _AmenityModel;
 
-  AmenityModel({
-    required this.id,
-    this.venueId,
-    this.courtId,
-    required this.name,
-    this.icon,
-    required this.isFree,
-  });
-
-  factory AmenityModel.fromJson(Map<String, dynamic> json) =>
-      _$AmenityModelFromJson(json);
-  Map<String, dynamic> toJson() => _$AmenityModelToJson(this);
+  factory AmenityModel.fromJson(Map<String, dynamic> json) => _$AmenityModelFromJson(json);
 }
 
-@JsonSerializable()
-class PricingRuleModel {
-  final String id;
-  @JsonKey(name: 'court_id')
-  final String courtId;
-  final String? name;
-  @JsonKey(name: 'day_of_week')
-  final DayOfWeek? dayOfWeek;
-  @JsonKey(name: 'start_time')
-  final String startTime;
-  @JsonKey(name: 'end_time')
-  final String endTime;
-  final double price;
-  @JsonKey(name: 'start_date')
-  final DateTime? startDate;
-  @JsonKey(name: 'end_date')
-  final DateTime? endDate;
-  final int priority;
-  @JsonKey(name: 'is_active')
-  final bool isActive;
+@freezed
+abstract class PricingRuleModel with _$PricingRuleModel {
+  const factory PricingRuleModel({
+    required String id,
+    @JsonKey(name: 'court_id') required String courtId,
+    String? name,
+    @JsonKey(name: 'day_of_week') DayOfWeek? dayOfWeek,
+    @JsonKey(name: 'start_time') required String startTime,
+    @JsonKey(name: 'end_time') required String endTime,
+    @StringToDoubleConverter() required double price,
+    @JsonKey(name: 'start_date') DateTime? startDate,
+    @JsonKey(name: 'end_date') DateTime? endDate,
+    @Default(1) int priority,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+  }) = _PricingRuleModel;
 
-  PricingRuleModel({
-    required this.id,
-    required this.courtId,
-    this.name,
-    this.dayOfWeek,
-    required this.startTime,
-    required this.endTime,
-    required this.price,
-    this.startDate,
-    this.endDate,
-    required this.priority,
-    required this.isActive,
-  });
-
-  factory PricingRuleModel.fromJson(Map<String, dynamic> json) =>
-      _$PricingRuleModelFromJson(json);
-  Map<String, dynamic> toJson() => _$PricingRuleModelToJson(this);
+  factory PricingRuleModel.fromJson(Map<String, dynamic> json) => _$PricingRuleModelFromJson(json);
 }
 
-@JsonSerializable()
-class MediaAttachmentModel {
-  final String id;
-  @JsonKey(name: 'file_id')
-  final String fileId;
-  @JsonKey(name: 'display_order')
-  final int displayOrder;
-  @JsonKey(name: 'is_cover')
-  final bool isCover;
-  final String? caption;
-  
-  // Custom field to get direct URL from response, or use files relation
-  final String? url;
+@freezed
+abstract class MediaAttachmentModel with _$MediaAttachmentModel {
+  const factory MediaAttachmentModel({
+    required String id,
+    @JsonKey(name: 'file_id') required String fileId,
+    @JsonKey(name: 'display_order') @Default(0) int displayOrder,
+    @JsonKey(name: 'is_cover') @Default(false) bool isCover,
+    String? caption,
+    String? url,
+  }) = _MediaAttachmentModel;
 
-  MediaAttachmentModel({
-    required this.id,
-    required this.fileId,
-    required this.displayOrder,
-    required this.isCover,
-    this.caption,
-    this.url,
-  });
-
-  factory MediaAttachmentModel.fromJson(Map<String, dynamic> json) =>
-      _$MediaAttachmentModelFromJson(json);
-  Map<String, dynamic> toJson() => _$MediaAttachmentModelToJson(this);
+  factory MediaAttachmentModel.fromJson(Map<String, dynamic> json) => _$MediaAttachmentModelFromJson(json);
 }
 
-@JsonSerializable()
-class CourtModel {
-  final String id;
-  @JsonKey(name: 'venue_id')
-  final String venueId;
-  final String name;
-  final String? description;
-  @JsonKey(name: 'price_per_hour')
-  final double pricePerHour;
-  @JsonKey(name: 'surface_type')
-  final CourtSurfaceType? surfaceType;
-  final String? size;
-  @JsonKey(name: 'is_indoor')
-  final bool isIndoor;
-  @JsonKey(name: 'is_active')
-  final bool isActive;
-  @JsonKey(name: 'display_order')
-  final int displayOrder;
-  @JsonKey(name: 'thumbnail_url')
-  final String? thumbnailUrl;
+@freezed
+abstract class CourtModel with _$CourtModel {
+  const factory CourtModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    required String name,
+    String? description,
+    @StringToDoubleConverter() @JsonKey(name: 'price_per_hour') required double pricePerHour,
+    @JsonKey(name: 'surface_type') CourtSurfaceType? surfaceType,
+    String? size,
+    @JsonKey(name: 'is_indoor') @Default(false) bool isIndoor,
+    @JsonKey(name: 'is_active') @Default(true) bool isActive,
+    @JsonKey(name: 'display_order') @Default(0) int displayOrder,
+    @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
+    List<AmenityModel>? amenities,
+    @JsonKey(name: 'pricing_rules') List<PricingRuleModel>? pricingRules,
+    @JsonKey(name: 'media_attachments') List<MediaAttachmentModel>? mediaAttachments,
+  }) = _CourtModel;
 
-  final List<AmenityModel>? amenities;
-  @JsonKey(name: 'pricing_rules')
-  final List<PricingRuleModel>? pricingRules;
-  @JsonKey(name: 'media_attachments')
-  final List<MediaAttachmentModel>? mediaAttachments;
-
-  CourtModel({
-    required this.id,
-    required this.venueId,
-    required this.name,
-    this.description,
-    required this.pricePerHour,
-    this.surfaceType,
-    this.size,
-    required this.isIndoor,
-    required this.isActive,
-    required this.displayOrder,
-    this.thumbnailUrl,
-    this.amenities,
-    this.pricingRules,
-    this.mediaAttachments,
-  });
-
-  factory CourtModel.fromJson(Map<String, dynamic> json) =>
-      _$CourtModelFromJson(json);
-  Map<String, dynamic> toJson() => _$CourtModelToJson(this);
+  factory CourtModel.fromJson(Map<String, dynamic> json) => _$CourtModelFromJson(json);
 }

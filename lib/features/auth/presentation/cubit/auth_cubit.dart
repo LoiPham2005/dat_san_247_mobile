@@ -56,9 +56,9 @@ class AuthCubit extends BaseCubit<Object?> {
   }
 
   /// 🚪 Logout
-  Future<void> logout(String refreshToken) async {
+  Future<void> logout() async {
     await run<SimpleResponse>(
-      action: () => _repository.logout(refreshToken),
+      action: () => _repository.logout(),
       successMessage: 'Đăng xuất thành công!',
     );
   }

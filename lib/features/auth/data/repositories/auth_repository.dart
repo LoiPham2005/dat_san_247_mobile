@@ -57,8 +57,9 @@ class AuthRepository with ApiHandlerMixin {
   }
 
   /// 🚪 Logout
-  Future<Result<SimpleResponse>> logout(String refreshToken) async {
-    final result = await safeCallUnwrap(() => _service.logout({'refresh_token': refreshToken}));
+  Future<Result<SimpleResponse>> logout() async {
+    final refreshToken = await _appAuthService.getRefreshToken();
+    final result = await safeCallUnwrap(() => _service.logout({'refresh_token': refreshToken ?? ''}));
     // Clear session always
     await _appAuthService.logout();
     return result;

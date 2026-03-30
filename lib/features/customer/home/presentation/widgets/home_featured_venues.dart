@@ -4,14 +4,18 @@ import 'package:dat_san_247_mobile/features/shared/venue/data/models/venue_model
 
 
 class HomeFeaturedVenues extends StatelessWidget {
+  final String title;
   final List<VenueModel> venues;
   final Function(VenueModel) onVenueTap;
+  final Function(VenueModel) onFavoriteTap;
   final VoidCallback onViewAllTap;
 
   const HomeFeaturedVenues({
     super.key,
+    this.title = 'Sân nổi bật',
     required this.venues,
     required this.onVenueTap,
+    required this.onFavoriteTap,
     required this.onViewAllTap,
   });
 
@@ -27,9 +31,9 @@ class HomeFeaturedVenues extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Sân nổi bật',
-                style: TextStyle(
+              Text(
+                title,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -124,32 +128,46 @@ class HomeFeaturedVenues extends StatelessWidget {
                         ),
                       ),
                     ),
-                   // Rating badge
-                   Positioned(
-                      top: 12,
-                      right: 12,
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: GestureDetector(
+                      onTap: () => onFavoriteTap(venue),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
                         ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.star_rounded, color: Colors.orange, size: 14),
-                            const SizedBox(width: 4),
-                            Text(
-                              venue.rating.toStringAsFixed(1),
-                              style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              ' (${venue.totalReviews})',
-                              style: const TextStyle(color: AppColors.textHint, fontSize: 10),
-                            ),
-                          ],
+                        child: Icon(
+                          venue.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: venue.isFavorite ? AppColors.destructiveLight : AppColors.textHint,
+                          size: 18,
                         ),
                       ),
                     ),
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star_rounded, color: Colors.orange, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            venue.rating.toStringAsFixed(1),
+                            style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

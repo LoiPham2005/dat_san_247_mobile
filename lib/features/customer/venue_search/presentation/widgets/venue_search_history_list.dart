@@ -54,10 +54,12 @@ class VenueSearchHistoryList extends StatelessWidget {
                 const Divider(height: 1, color: AppColors.borderLight),
             itemBuilder: (context, index) {
               final item = history[index];
+              final district = item.filters?['district'];
+              final sport = item.filters?['sport'];
               final title = item.searchQuery ??
-                  (item.district != null
-                      ? 'Khu vực ${item.district}'
-                      : (item.sportType != null ? 'Môn thi đấu' : 'Tìm kiếm ẩn danh'));
+                  (district != null
+                      ? 'Khu vực $district'
+                      : (sport != null ? 'Môn thi đấu' : 'Tìm kiếm ẩn danh'));
               return ListTile(
                 leading: const Icon(Icons.history_rounded, color: AppColors.textHint),
                 title: Text(title, style: const TextStyle(color: AppColors.textPrimary)),

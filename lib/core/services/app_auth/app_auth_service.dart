@@ -58,6 +58,10 @@ class AppAuthService {
     return AuthStatus.authenticated;
   }
 
+  Future<String?> getRefreshToken() async {
+    return await _secureStorage.getRefreshToken();
+  }
+
   bool isTokenExpired(String token) {
     try {
       return JwtDecoder.isExpired(token);
@@ -138,14 +142,34 @@ class AppAuthService {
     await _secureStorage.saveAccessToken(response.accessToken);
     await _secureStorage.saveRefreshToken(response.refreshToken);
 
-    // Fetch user profile from API since it's not in the token response
-    final user = await fetchUserProfile();
-    if (user != null) {
-      await _storageService.saveUser(user.toJson());
-    }
-
+    // Lưu User sơ bộ từ login response trước để Router có data redirect ngay
+    final minimalUser = response.user;
+    final Map<String, dynamic> userData = {
+      'id': minimalUser.id,
+      'email': minimalUser.email,
+      'full_name': minimalUser.fullName,
+      'avatar_url': minimalUser.avatarUrl,
+      'role': minimalUser.role?.toJson(),
+      'role_id': minimalUser.role?.id,
+      'is_venue_staff': minimalUser.isVenueStaff,
+      'kyc_status': 'PENDING', // Default cho đến khi fetch xong profile
+      'status': 'ACTIVE',
+      'created_at': DateTime.now().toIso8601String(),
+      'updated_at': DateTime.now().toIso8601String(),
+      'is_email_verified': true,
+      'is_phone_verified': false,
+    };
+    
+    await _storageService.saveUser(userData);
     await _storageService.setLoggedIn(true);
     _updateStatus(AuthStatus.authenticated);
+
+    // Fetch detail ngầm sau khi đã chuyển màn
+    unawaited(fetchUserProfile().then((user) async {
+      if (user != null) {
+        await _storageService.saveUser(user.toJson());
+      }
+    }));
   }
 
   Future<void> logout() async {

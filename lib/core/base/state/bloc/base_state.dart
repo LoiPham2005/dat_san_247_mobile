@@ -91,7 +91,10 @@ class BaseState<T> extends Equatable {
   }) {
     if (isInitial) return initial();
     if (isLoading) return loading(data);
-    if (isSuccess) return success(data as T, message);
+    if (isSuccess) {
+      if (data != null) return success(data as T, message);
+      return (empty ?? (_) => initial())(message);
+    }
     if (isFailure) return failure(error ?? 'Unknown Error', data);
     if (isEmpty) return (empty ?? (_) => initial())(message);
     return initial();
@@ -106,7 +109,10 @@ class BaseState<T> extends Equatable {
     R Function(String? message)? empty,
   }) {
     if (isInitial || isLoading) return loading(data);
-    if (isSuccess) return success(data as T, message);
+    if (isSuccess) {
+      if (data != null) return success(data as T, message);
+      return (empty ?? (_) => loading(data))(message);
+    }
     if (isFailure) return failure(error ?? 'Unknown Error', data);
     if (isEmpty) return (empty ?? (_) => loading(data))(message);
     return loading(data);
@@ -123,9 +129,13 @@ class BaseState<T> extends Equatable {
   }) {
     if (isInitial && initial != null) return initial();
     if (isLoading && loading != null) return loading(data);
-    if (isSuccess && success != null) return success(data as T, message);
-    if (isFailure && failure != null)
+    if (isSuccess && success != null) {
+      if (data != null) return success(data as T, message);
+      if (empty != null) return empty(message);
+    }
+    if (isFailure && failure != null) {
       return failure(error ?? 'Unknown Error', data);
+    }
     if (isEmpty && empty != null) return empty(message);
     return orElse();
   }
@@ -134,6 +144,14 @@ class BaseState<T> extends Equatable {
   BaseState<T> mapSuccess(BaseState<T> Function(T data) fn) {
     if (isSuccess && data != null) return fn(data as T);
     return this;
+  }
+
+  /// 🎯 Only handle Success state
+  R? whenSuccess<R>(R Function(T data, String? message) onSuccess) {
+    if (isSuccess && data != null) {
+      return onSuccess(data as T, message);
+    }
+    return null;
   }
 
   @override

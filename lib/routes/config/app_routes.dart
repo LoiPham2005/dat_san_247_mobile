@@ -8,8 +8,13 @@ import 'package:dat_san_247_mobile/features/auth/presentation/pages/otp_page.dar
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/register_page.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/my_booking_models.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/booking_confirm_cubit.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/booking_detail_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_confirm_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_detail_page.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/review_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_success_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/cancel_booking_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/payment_page.dart';
@@ -54,6 +59,8 @@ import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentati
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../features/customer/venue_detail/presentation/pages/venue_overview_page.dart';
 
 part 'app_routes.g.dart';
 
@@ -156,6 +163,15 @@ class VenueDetailRoute extends GoRouteData with $VenueDetailRoute {
   Widget build(BuildContext context, GoRouterState state) => VenueDetailPage(slugOrId: slugOrId);
 }
 
+@TypedGoRoute<VenueOverviewRoute>(path: RouteNames.venueOverview)
+class VenueOverviewRoute extends GoRouteData with $VenueOverviewRoute {
+  const VenueOverviewRoute({required this.slugOrId});
+  final String slugOrId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => VenueOverviewPage(slugOrId: slugOrId);
+}
+
 // ─── Booking ─────────────────────────────────────────────
 @TypedGoRoute<TimeSlotPickerRoute>(path: RouteNames.timeSlotPicker)
 class TimeSlotPickerRoute extends GoRouteData with $TimeSlotPickerRoute {
@@ -175,14 +191,17 @@ class BookingConfirmRoute extends GoRouteData with $BookingConfirmRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extra = $extra ?? {};
-    return BookingConfirmPage(
-      courtId: extra['courtId'] ?? '',
-      courtName: extra['courtName'] ?? '',
-      venueId: extra['venueId'] ?? '',
-      venueName: extra['venueName'] ?? '',
-      venueAddress: extra['venueAddress'] ?? '',
-      bookingDate: extra['bookingDate'] ?? '',
-      selectedSlots: extra['selectedSlots'] ?? [],
+    return BlocProvider(
+      create: (context) => getIt<BookingConfirmCubit>(),
+      child: BookingConfirmPage(
+        courtId: extra['courtId'] ?? '',
+        courtName: extra['courtName'] ?? '',
+        venueId: extra['venueId'] ?? '',
+        venueName: extra['venueName'] ?? '',
+        venueAddress: extra['venueAddress'] ?? '',
+        bookingDate: extra['bookingDate'] ?? '',
+        selectedSlots: extra['selectedSlots'] ?? [],
+      ),
     );
   }
 }
@@ -259,7 +278,10 @@ class BookingDetailRoute extends GoRouteData with $BookingDetailRoute {
       cancellationDeadline: extra['cancellationDeadline'] != null ? DateTime.parse(extra['cancellationDeadline']) : null,
       createdAt: extra['createdAt'] != null ? DateTime.parse(extra['createdAt']) : DateTime.now(),
     );
-    return BookingDetailPage(booking: booking);
+    return BlocProvider(
+      create: (context) => getIt<BookingDetailCubit>()..getBookingDetail(booking.id),
+      child: BookingDetailPage(booking: booking),
+    );
   }
 }
 
@@ -280,9 +302,12 @@ class WriteReviewRoute extends GoRouteData with $WriteReviewRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extra = $extra ?? {};
-    return WriteReviewPage(
-      bookingId: extra['bookingId'] ?? '',
-      venueName: extra['venueName'] ?? '',
+    return BlocProvider(
+      create: (context) => getIt<ReviewCubit>(),
+      child: WriteReviewPage(
+        bookingId: extra['bookingId'] ?? '',
+        venueName: extra['venueName'] ?? '',
+      ),
     );
   }
 }

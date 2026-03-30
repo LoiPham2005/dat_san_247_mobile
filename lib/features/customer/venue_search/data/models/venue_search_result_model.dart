@@ -1,88 +1,31 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:dat_san_247_mobile/core/common/converters/json_converters.dart';
 
+part 'venue_search_result_model.freezed.dart';
 part 'venue_search_result_model.g.dart';
 
-@JsonSerializable()
-class VenueSearchResultModel extends Equatable {
-  final String id;
-  final String name;
-  final String slug;
-  final String address;
-  final String city;
-  final String district;
-  @JsonKey(name: 'thumbnail_url')
-  final String? thumbnailUrl;
+@freezed
+abstract class VenueSearchResultModel with _$VenueSearchResultModel {
+  const factory VenueSearchResultModel({
+    required String id,
+    required String name,
+    required String slug,
+    required String address,
+    required String city,
+    required String district,
+    @JsonKey(name: 'thumbnail_url') String? thumbnailUrl,
+    @StringToDoubleConverter() @Default(0.0) double rating,
+    @JsonKey(name: 'total_reviews') @Default(0) int totalReviews,
+    @StringToDoubleNullableConverter() @JsonKey(name: 'min_price') double? minPricePerHour,
+    @StringToDoubleNullableConverter() @JsonKey(name: 'max_price') double? maxPricePerHour,
+    @JsonKey(name: 'sports') @Default([]) List<String> sportTypes,
+    @Default([]) List<String> amenities,
+    @JsonKey(name: 'is_featured') @Default(false) bool isFeatured,
+    @JsonKey(name: 'is_favorite') @Default(false) bool isFavorite,
+    @StringToDoubleNullableConverter() double? latitude,
+    @StringToDoubleNullableConverter() double? longitude,
+    @JsonKey(name: 'is_open') bool? isOpen,
+  }) = _VenueSearchResultModel;
 
-  final double rating;
-  @JsonKey(name: 'total_reviews')
-  final int totalReviews;
-
-  @JsonKey(name: 'min_price_per_hour')
-  final double? minPricePerHour;
-  @JsonKey(name: 'max_price_per_hour')
-  final double? maxPricePerHour;
-
-  @JsonKey(name: 'sport_types')
-  final List<String> sportTypes;
-  final List<String> amenities;
-
-  @JsonKey(name: 'is_featured')
-  final bool isFeatured;
-
-  @JsonKey(name: 'is_favorite')
-  final bool isFavorite;
-
-  final double? latitude;
-  final double? longitude;
-
-  @JsonKey(name: 'is_open')
-  final bool? isOpen;
-
-  const VenueSearchResultModel({
-    required this.id,
-    required this.name,
-    required this.slug,
-    required this.address,
-    required this.city,
-    required this.district,
-    this.thumbnailUrl,
-    this.rating = 0.0,
-    this.totalReviews = 0,
-    this.minPricePerHour,
-    this.maxPricePerHour,
-    this.sportTypes = const [],
-    this.amenities = const [],
-    this.isFeatured = false,
-    this.isFavorite = false,
-    this.latitude,
-    this.longitude,
-    this.isOpen,
-  });
-
-  factory VenueSearchResultModel.fromJson(Map<String, dynamic> json) =>
-      _$VenueSearchResultModelFromJson(json);
-  Map<String, dynamic> toJson() => _$VenueSearchResultModelToJson(this);
-
-  @override
-  List<Object?> get props => [
-    id,
-    name,
-    slug,
-    address,
-    city,
-    district,
-    thumbnailUrl,
-    rating,
-    totalReviews,
-    minPricePerHour,
-    maxPricePerHour,
-    sportTypes,
-    amenities,
-    isFeatured,
-    isFavorite,
-    latitude,
-    longitude,
-    isOpen,
-  ];
+  factory VenueSearchResultModel.fromJson(Map<String, dynamic> json) => _$VenueSearchResultModelFromJson(json);
 }

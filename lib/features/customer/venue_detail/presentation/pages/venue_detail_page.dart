@@ -1,66 +1,82 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_detail/data/models/venue_detail_model.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/cubit/venue_detail_cubit.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
-import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../data/models/venue_detail_model.dart';
-import '../../data/models/court_model.dart';
-import '../widgets/venue_gallery.dart';
-import '../widgets/venue_info_card.dart';
 import '../widgets/amenities_grid.dart';
+import '../widgets/court_list_tile.dart';
 import '../widgets/operating_hours_widget.dart';
 import '../widgets/review_summary_widget.dart';
-import '../widgets/court_list_tile.dart';
+import '../widgets/venue_gallery.dart';
+import '../widgets/venue_info_card.dart';
 
-class VenueDetailPage extends StatefulWidget {
+class VenueDetailPage extends StatelessWidget {
   final String slugOrId;
 
   const VenueDetailPage({super.key, required this.slugOrId});
 
   @override
-  State<VenueDetailPage> createState() => _VenueDetailPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<VenueDetailCubit>()..fetchVenueDetail(slugOrId),
+      child: const _VenueDetailView(),
+    );
+  }
 }
 
-class _VenueDetailPageState extends State<VenueDetailPage> {
-  // This should ideally come from Cubit/State, mocking for UI preview
-  VenueDetailModel? venue;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    // Simulate fetching data
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-          venue = _getDummyVenue();
-        });
-      }
-    });
-  }
+class _VenueDetailView extends StatelessWidget {
+  const _VenueDetailView();
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.backgroundLight,
-        body: Center(child: CircularProgressIndicator(color: AppColors.primaryLightBrand)),
-      );
-    }
+    return BlocBuilder<VenueDetailCubit, BaseState<VenueDetailModel>>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: AppColors.backgroundLight,
+          body: state.whenReady(
+            loading: (data) => const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryLightBrand),
+            ),
+            success: (venue, message) => _buildContent(context, venue),
+            failure: (error, data) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: AppColors.destructiveLight),
+                  const SizedBox(height: 16),
+                  Text(error, style: const TextStyle(color: AppColors.textSecondary)),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      final slugOrId = (context.findAncestorWidgetOfExactType<VenueDetailPage>())?.slugOrId;
+                      if (slugOrId != null) {
+                        context.read<VenueDetailCubit>().fetchVenueDetail(slugOrId);
+                      }
+                    },
+                    child: const Text('Thử lại'),
+                  ),
+                ],
+              ),
+            ),
+            empty: (message) => const Center(child: Text('Không có dữ liệu')),
+          ),
+        );
+      },
+    );
+  }
 
-    if (venue == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Lỗi')),
-        body: const Center(child: Text('Không tìm thấy sân')),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: AppColors.secondaryLightBrand, // Light grayish background for contrast
-      body: CustomScrollView(
+  Widget _buildContent(BuildContext context, VenueDetailModel venue) {
+    return RefreshIndicator(
+      onRefresh: () => context.read<VenueDetailCubit>().fetchVenueDetail(venue.slug),
+      color: AppColors.primaryLightBrand,
+      child: CustomScrollView(
         slivers: [
           // 1. App Bar with Gallery Background
           SliverAppBar(
@@ -84,22 +100,22 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: const BoxDecoration(color: AppColors.white70, shape: BoxShape.circle),
-                  child: const Icon(
-                    Icons.favorite_border_rounded,
-                    color: AppColors.destructiveLight,
+                  child: Icon(
+                    venue.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    color: venue.isFavorite ? AppColors.destructiveLight : AppColors.textHint,
                     size: 22,
                   ),
                 ),
                 onPressed: () {
-                  // Toggle favorite
+                  context.read<VenueDetailCubit>().toggleFavorite(venue.id);
                 },
               ),
               const SizedBox(width: 8),
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: VenueGallery(
-                mediaAttachments: venue!.mediaAttachments ?? [],
-                fallbackThumbnail: venue!.thumbnailUrl,
+                mediaAttachments: venue.mediaAttachments ?? [],
+                fallbackThumbnail: venue.thumbnailUrl,
               ),
             ),
           ),
@@ -111,7 +127,7 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
               offset: const Offset(0, -20),
               child: Container(
                 decoration: const BoxDecoration(
-                  color: AppColors.secondaryLightBrand,
+                  color: AppColors.backgroundLight,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
                 child: Padding(
@@ -120,28 +136,45 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Basic Info Card
-                      VenueInfoCard(venue: venue!),
+                      VenueInfoCard(venue: venue),
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
                           onPressed: () {
-                            if (venue!.latitude != null && venue!.longitude != null) {
+                             VenueOverviewRoute(slugOrId: venue.slug).push(context);
+                          },
+                          icon: const Icon(Icons.grid_on_outlined),
+                          label: const Text('Xem lịch trống bao quát'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primaryLightBrand,
+                            side: const BorderSide(color: AppColors.primaryLightBrand),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            if (venue.latitude != null && venue.longitude != null) {
                               final resultModel = VenueSearchResultModel(
-                                id: venue!.id,
-                                name: venue!.name,
-                                slug: venue!.slug,
-                                address: venue!.address,
-                                city: venue!.city,
-                                district: venue!.district,
-                                thumbnailUrl: venue!.thumbnailUrl,
-                                rating: venue!.rating,
-                                totalReviews: venue!.totalReviews,
-                                latitude: venue!.latitude,
-                                longitude: venue!.longitude,
+                                id: venue.id,
+                                name: venue.name,
+                                slug: venue.slug,
+                                address: venue.address,
+                                city: venue.city,
+                                district: venue.district,
+                                thumbnailUrl: venue.thumbnailUrl,
+                                rating: venue.rating,
+                                totalReviews: venue.totalReviews,
+                                latitude: venue.latitude,
+                                longitude: venue.longitude,
                                 sportTypes: const [],
                                 amenities: const [],
-                                isFeatured: venue!.isFeatured,
+                                isFeatured: venue.isFeatured,
                                 isFavorite: false,
                               );
                               context.push(RouteNames.venueMap, extra: [resultModel]);
@@ -160,21 +193,21 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                       const SizedBox(height: 24),
 
                       // Amenities Grid
-                      if ((venue!.amenities ?? []).isNotEmpty) ...[
-                        AmenitiesGrid(amenities: venue!.amenities!),
+                      if ((venue.amenities ?? []).isNotEmpty) ...[
+                        AmenitiesGrid(amenities: venue.amenities!),
                         const SizedBox(height: 24),
                       ],
 
                       // Operating Hours
-                      if ((venue!.operatingHours ?? []).isNotEmpty) ...[
-                        OperatingHoursWidget(operatingHours: venue!.operatingHours!),
+                      if ((venue.operatingHours ?? []).isNotEmpty) ...[
+                        OperatingHoursWidget(operatingHours: venue.operatingHours!),
                         const SizedBox(height: 24),
                       ],
 
                       // Reviews Summary
-                      if (venue!.totalReviews > 0) ...[
+                      if (venue.totalReviews > 0) ...[
                         ReviewSummaryWidget(
-                          venue: venue!,
+                          venue: venue,
                           onViewAll: () {
                             // Navigate to full reviews
                           },
@@ -203,14 +236,14 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      if (venue!.courts != null && venue!.courts!.isNotEmpty)
-                        ...venue!.courts!.map(
+                      if (venue.courts != null && venue.courts!.isNotEmpty)
+                        ...venue.courts!.map(
                           (court) => CourtListTile(
                             court: court,
                             onTapBooking: () {
                               TimeSlotPickerRoute(
                                 courtId: court.id,
-                                venueName: venue!.name,
+                                venueName: venue.name,
                               ).push(context);
                             },
                           ),
@@ -235,86 +268,6 @@ class _VenueDetailPageState extends State<VenueDetailPage> {
           ),
         ],
       ),
-    );
-  }
-
-  // --- MOCK DATA FOR UI PREVIEW ---
-  VenueDetailModel _getDummyVenue() {
-    return VenueDetailModel(
-      id: 'mock-123',
-      ownerId: 'owner-1',
-      name: 'Sân Bóng Đá Cỏ Nhân Tạo K34',
-      slug: 'san-bong-da-k34',
-      description:
-          'Sân bóng K34 cung cấp cụm 4 sân cỏ nhân tạo đạt chuẩn FIFA, hệ thống chiếu sáng LED hiện đại, mặt cỏ êm ái chống trơn trượt. Có canteen giải khát tiện lợi.',
-      address: 'Số 10 Phạm Văn Đồng',
-      city: 'Hà Nội',
-      district: 'Cầu Giấy',
-      ward: 'Mai Dịch',
-      phone: '0987654321',
-      fbUrl: 'https://facebook.com/k34',
-      status: 'APPROVED',
-      isActive: true,
-      isFeatured: true,
-      rating: 4.8,
-      ratingCleanliness: 4.9,
-      ratingFacilities: 4.7,
-      ratingStaff: 4.8,
-      totalReviews: 125,
-      thumbnailUrl:
-          'https://images.unsplash.com/photo-1574629810360-7efbbc09e99c?auto=format&fit=crop&q=80',
-      amenities: [
-        AmenityModel(id: 'a1', venueId: 'mock-123', name: 'WiFi miễn phí', isFree: true),
-        AmenityModel(id: 'a2', venueId: 'mock-123', name: 'Bãi xe ô tô', isFree: true),
-        AmenityModel(id: 'a3', venueId: 'mock-123', name: 'Phòng thay đồ', isFree: true),
-        AmenityModel(id: 'a4', venueId: 'mock-123', name: 'Canteen', isFree: false),
-        AmenityModel(id: 'a5', venueId: 'mock-123', name: 'Đèn chiếu sáng LED', isFree: true),
-        AmenityModel(id: 'a6', venueId: 'mock-123', name: 'Camera an ninh', isFree: true),
-      ],
-      courts: [
-        CourtModel(
-          id: 'court-1',
-          venueId: 'mock-123',
-          name: 'Sân A - 5 người',
-          description: 'Sân cỏ nhân tạo chuẩn FIFA, đèn LED 1200W',
-          pricePerHour: 150000,
-          surfaceType: CourtSurfaceType.artificialGrass,
-          size: '25x45m',
-          isIndoor: false,
-          isActive: true,
-          displayOrder: 1,
-          thumbnailUrl:
-              'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?q=80&w=400&auto=format&fit=crop',
-        ),
-        CourtModel(
-          id: 'court-2',
-          venueId: 'mock-123',
-          name: 'Sân B - 7 người',
-          description: 'Sân cỏ rộng hơn, phù hợp nhóm 7-8 người',
-          pricePerHour: 200000,
-          surfaceType: CourtSurfaceType.artificialGrass,
-          size: '35x55m',
-          isIndoor: false,
-          isActive: true,
-          displayOrder: 2,
-          thumbnailUrl: null,
-        ),
-        CourtModel(
-          id: 'court-3',
-          venueId: 'mock-123',
-          name: 'Sân C - Trong nhà',
-          description: 'Sân trong nhà có điều hòa, phù hợp ngày mưa',
-          pricePerHour: 250000,
-          surfaceType: CourtSurfaceType.wood,
-          size: '20x40m',
-          isIndoor: true,
-          isActive: true,
-          displayOrder: 3,
-          thumbnailUrl: null,
-        ),
-      ],
-      latitude: 21.0367,
-      longitude: 105.7822,
     );
   }
 }

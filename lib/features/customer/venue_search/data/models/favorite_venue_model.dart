@@ -1,33 +1,17 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:equatable/equatable.dart';
 import 'package:dat_san_247_mobile/features/shared/venue/data/models/venue_model.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'favorite_venue_model.freezed.dart';
 part 'favorite_venue_model.g.dart';
 
-@JsonSerializable()
-class FavoriteVenueModel extends Equatable {
-  final String id;
-  @JsonKey(name: 'user_id')
-  final String userId;
-  @JsonKey(name: 'venue_id')
-  final String venueId;
-  @JsonKey(name: 'created_at')
-  final DateTime createdAt;
-  
-  // Optional inclusion of venue details when fetching favorites
-  final VenueModel? venue;
-
-  const FavoriteVenueModel({
-    required this.id,
-    required this.userId,
-    required this.venueId,
-    required this.createdAt,
-    this.venue,
-  });
+@freezed
+abstract class FavoriteVenueModel with _$FavoriteVenueModel {
+  const factory FavoriteVenueModel({
+    required String id,
+    @JsonKey(name: 'venue_id') required String venueId,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    VenueModel? venue,
+  }) = _FavoriteVenueModel;
 
   factory FavoriteVenueModel.fromJson(Map<String, dynamic> json) => _$FavoriteVenueModelFromJson(json);
-  Map<String, dynamic> toJson() => _$FavoriteVenueModelToJson(this);
-
-  @override
-  List<Object?> get props => [id, userId, venueId, createdAt, venue];
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/support/data/models/support_models.dart';
+import 'package:dat_san_247_mobile/features/customer/profile/data/models/profile_models.dart';
 import 'setting_card.dart';
 import 'edit_row.dart';
 import 'verified_chip.dart';

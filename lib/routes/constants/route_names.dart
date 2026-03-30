@@ -21,6 +21,7 @@ class RouteNames {
   static const String venueSearch = '/venue-search';
   static const String venues = '/venues';
   static const String venueDetail = '/venue-detail/:slugOrId';
+  static const String venueOverview = '/venue-overview/:slugOrId';
   static const String timeSlotPicker = '/time-slot-picker';
   static const String bookingConfirm = '/booking-confirm';
   static const String payment = '/payment';

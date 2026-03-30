@@ -1,102 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/my_bookings_cubit.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/data/models/booking_request.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/my_booking_models.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
 import '../widgets/booking_list_item_card.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // C-09: Danh Sách Booking
 // ──────────────────────────────────────────────────────────────────────────
-class MyBookingsPage extends StatefulWidget {
+class MyBookingsPage extends StatelessWidget {
   const MyBookingsPage({super.key});
 
   @override
-  State<MyBookingsPage> createState() => _MyBookingsPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => GetIt.I<MyBookingsCubit>()..getMyBookings(),
+      child: const MyBookingsView(),
+    );
+  }
 }
 
-class _MyBookingsPageState extends State<MyBookingsPage>
+class MyBookingsView extends StatefulWidget {
+  const MyBookingsView({super.key});
+
+  @override
+  State<MyBookingsView> createState() => _MyBookingsViewState();
+}
+
+class _MyBookingsViewState extends State<MyBookingsView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTab = 0;
 
-  // ------- MOCK DATA (thay thế bằng API call sau) -------
-  final List<BookingListItemModel> _mockBookings = [
-    BookingListItemModel(
-      id: 'b1',
-      bookingCode: 'DS24701234',
-      checkInCode: 'CI1001',
-      venueName: 'Sân K34 Phạm Văn Đồng',
-      courtName: 'Sân A - 5 người',
-      venueAddress: 'Số 10 Phạm Văn Đồng, Cầu Giấy, Hà Nội',
-      venueThumbnailUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbc09e99c?w=400&q=80',
-      bookingDate: DateTime.now().add(const Duration(days: 2)),
-      startTime: '18:00',
-      endTime: '19:00',
-      status: BookingStatus.CONFIRMED,
-      paymentStatus: PaymentStatus.PAID,
-      totalAmount: 150000,
-      cancellationDeadline: DateTime.now().add(const Duration(days: 1, hours: 2)),
-      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    BookingListItemModel(
-      id: 'b2',
-      bookingCode: 'DS24705678',
-      checkInCode: null,
-      venueName: 'Sân Thể Thao Vạn Hạnh',
-      courtName: 'Sân Cầu Lông B',
-      venueAddress: '45 Điện Biên Phủ, Bình Thạnh, TP.HCM',
-      venueThumbnailUrl: null,
-      bookingDate: DateTime.now().add(const Duration(days: 5)),
-      startTime: '07:00',
-      endTime: '08:30',
-      status: BookingStatus.PENDING,
-      paymentStatus: PaymentStatus.PENDING,
-      totalAmount: 90000,
-      cancellationDeadline: DateTime.now().add(const Duration(days: 4)),
-      createdAt: DateTime.now().subtract(const Duration(hours: 10)),
-    ),
-    BookingListItemModel(
-      id: 'b3',
-      bookingCode: 'DS24799001',
-      checkInCode: 'CI9900',
-      venueName: 'Sân K34 Phạm Văn Đồng',
-      courtName: 'Sân A - 5 người',
-      venueAddress: 'Số 10 Phạm Văn Đồng, Cầu Giấy, Hà Nội',
-      venueThumbnailUrl: 'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=400&q=80',
-      bookingDate: DateTime.now().subtract(const Duration(days: 3)),
-      startTime: '19:00',
-      endTime: '21:00',
-      status: BookingStatus.COMPLETED,
-      paymentStatus: PaymentStatus.PAID,
-      totalAmount: 300000,
-      createdAt: DateTime.now().subtract(const Duration(days: 4)),
-    ),
-    BookingListItemModel(
-      id: 'b4',
-      bookingCode: 'DS24788002',
-      checkInCode: null,
-      venueName: 'Sân Thể Thao Vạn Hạnh',
-      courtName: 'Sân Pickleball 1',
-      venueAddress: '45 Điện Biên Phủ, Bình Thạnh, TP.HCM',
-      venueThumbnailUrl: null,
-      bookingDate: DateTime.now().subtract(const Duration(days: 7)),
-      startTime: '06:00',
-      endTime: '07:00',
-      status: BookingStatus.CANCELLED,
-      paymentStatus: PaymentStatus.REFUNDED,
-      totalAmount: 120000,
-      createdAt: DateTime.now().subtract(const Duration(days: 8)),
-    ),
-  ];
+  List<BookingListItemModel> _mapBookings(List<BookingResponse> responses) {
+    return responses.map((res) {
+      return BookingListItemModel(
+        id: res.id,
+        bookingCode: res.bookingCode,
+        checkInCode: res.checkInCode,
+        venueName: res.venueName,
+        courtName: res.courtName,
+        venueAddress: res.venueAddress,
+        venueThumbnailUrl:
+            null, // Backend doesn't return thumb yet in this list
+        bookingDate: DateTime.tryParse(res.bookingDate) ?? DateTime.now(),
+        startTime: res.startTime,
+        endTime: res.endTime,
+        status:
+            BookingStatus.values.firstWhere((e) => e.name == res.status.name),
+        paymentStatus: PaymentStatus.values
+            .firstWhere((e) => e.name == res.paymentStatus.name),
+        totalAmount: res.totalAmount,
+        createdAt: DateTime.tryParse(res.createdAt) ?? DateTime.now(),
+      );
+    }).toList();
+  }
 
-  List<BookingListItemModel> get _filteredBookings {
+  List<BookingListItemModel> _filterList(List<BookingListItemModel> list) {
     switch (_selectedTab) {
-      case 0: return _mockBookings; // Tất cả
-      case 1: return _mockBookings.where((b) => b.isUpcoming).toList(); // Sắp tới
-      case 2: return _mockBookings.where((b) => b.status == BookingStatus.COMPLETED).toList();
-      case 3: return _mockBookings.where((b) => b.status == BookingStatus.CANCELLED || b.status == BookingStatus.NO_SHOW).toList();
-      default: return _mockBookings;
+      case 0:
+        return list; // Tất cả
+      case 1:
+        return list.where((b) => b.isUpcoming).toList(); // Sắp tới
+      case 2:
+        return list.where((b) => b.status == BookingStatus.COMPLETED).toList();
+      case 3:
+        return list
+            .where((b) =>
+                b.status == BookingStatus.CANCELLED ||
+                b.status == BookingStatus.NO_SHOW)
+            .toList();
+      default:
+        return list;
     }
   }
 
@@ -105,7 +85,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging) setState(() => _selectedTab = _tabController.index);
+      if (_tabController.indexIsChanging)
+        setState(() => _selectedTab = _tabController.index);
     });
   }
 
@@ -120,16 +101,19 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       appBar: AppBar(
-        automaticallyImplyLeading:
-            context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null,
+        automaticallyImplyLeading: context.canPop() &&
+            context.findAncestorWidgetOfExactType<MainShellPage>() == null,
         backgroundColor: AppColors.white,
         elevation: 0,
         title: const Text('Lịch đặt sân',
             style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
+            icon: const Icon(Icons.notifications_outlined,
+                color: AppColors.textPrimary),
             onPressed: () {},
           ),
         ],
@@ -141,8 +125,10 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               controller: _tabController,
               labelColor: AppColors.primaryLightBrand,
               unselectedLabelColor: AppColors.textHint,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+              labelStyle:
+                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+              unselectedLabelStyle:
+                  const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
               indicatorColor: AppColors.primaryLightBrand,
               indicatorWeight: 2.5,
               tabs: const [
@@ -155,22 +141,37 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: List.generate(4, (i) => _buildList()),
+      body: BlocBuilder<MyBookingsCubit, BaseState<List<BookingResponse>>>(
+        builder: (context, state) {
+          return state.when(
+            initial: () => const Center(child: CircularProgressIndicator()),
+            loading: (data) => const Center(child: CircularProgressIndicator()),
+            failure: (error, data) => Center(child: Text('Lỗi: $error')),
+            success: (data, message) {
+              final mapped = _mapBookings(data);
+              return TabBarView(
+                controller: _tabController,
+                children:
+                    List.generate(4, (i) => _buildList(_filterList(mapped))),
+              );
+            },
+          );
+        },
       ),
     );
   }
 
-  Widget _buildList() {
-    final list = _filteredBookings;
+  Widget _buildList(List<BookingListItemModel> list) {
     if (list.isEmpty) return _buildEmpty();
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      itemCount: list.length,
-      itemBuilder: (context, i) => BookingListItemCard(
-        booking: list[i],
-        onTap: () => _goToDetail(list[i]),
+    return RefreshIndicator(
+      onRefresh: () => context.read<MyBookingsCubit>().getMyBookings(),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        itemCount: list.length,
+        itemBuilder: (context, i) => BookingListItemCard(
+          booking: list[i],
+          onTap: () => _goToDetail(list[i]),
+        ),
       ),
     );
   }
@@ -184,27 +185,33 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             width: 88,
             height: 88,
             decoration: BoxDecoration(
-                color: AppColors.primaryLightBrand.withOpacity(0.08), shape: BoxShape.circle),
-            child:
-                const Icon(Icons.calendar_month_rounded, size: 44, color: AppColors.primaryLightBrand),
+                color: AppColors.primaryLightBrand.withOpacity(0.08),
+                shape: BoxShape.circle),
+            child: const Icon(Icons.calendar_month_rounded,
+                size: 44, color: AppColors.primaryLightBrand),
           ),
           const SizedBox(height: 16),
           const Text('Chưa có lịch đặt sân',
               style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary)),
           const SizedBox(height: 6),
           const Text('Hãy đặt sân đầu tiên của bạn!',
               style: TextStyle(color: AppColors.textHint, fontSize: 13)),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: () => context.go('/venues'),
-            icon: const Icon(Icons.sports_soccer_rounded, color: AppColors.white),
+            icon:
+                const Icon(Icons.sports_soccer_rounded, color: AppColors.white),
             label: const Text('Tìm sân ngay',
-                style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    color: AppColors.white, fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryLightBrand,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ],
@@ -212,8 +219,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     );
   }
 
-  void _goToDetail(BookingListItemModel booking) {
-    context.push('/booking-detail', extra: {
+  void _goToDetail(BookingListItemModel booking) async {
+    await context.push('/booking-detail', extra: {
       'id': booking.id,
       'bookingCode': booking.bookingCode,
       'checkInCode': booking.checkInCode,
@@ -230,5 +237,9 @@ class _MyBookingsPageState extends State<MyBookingsPage>
       'cancellationDeadline': booking.cancellationDeadline?.toIso8601String(),
       'createdAt': booking.createdAt.toIso8601String(),
     });
+
+    if (mounted) {
+      context.read<MyBookingsCubit>().getMyBookings();
+    }
   }
 }

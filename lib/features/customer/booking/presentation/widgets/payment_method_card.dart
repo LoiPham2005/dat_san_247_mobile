@@ -29,13 +29,14 @@ class PaymentMethodCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
-            childAspectRatio: 2.2,
+            childAspectRatio: 1.6, // Increased height
             children: paymentMethods.map((pm) {
               final isSelected = selectedPayment == pm['id'];
               return GestureDetector(
                 onTap: () => onChanged(pm['id']!),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primaryLightBrand.withOpacity(0.1)
@@ -50,16 +51,22 @@ class PaymentMethodCard extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(pm['icon']!, style: const TextStyle(fontSize: 18)),
-                      Text(pm['label']!,
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected
-                                  ? AppColors.primaryLightBrand
-                                  : AppColors.textSecondary)),
+                      FittedBox(
+                        child: Text(pm['icon']!, style: const TextStyle(fontSize: 18)),
+                      ),
+                      const SizedBox(height: 2),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(pm['label']!,
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected
+                                    ? AppColors.primaryLightBrand
+                                    : AppColors.textSecondary)),
+                      ),
                     ],
                   ),
                 ),
