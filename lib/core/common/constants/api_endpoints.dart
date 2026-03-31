@@ -39,6 +39,7 @@ class ApiEndpoints {
   // ── Owner ────────────────────────────────────────────────────
   static const String ownerVenues = '/owner/venues';
   static const String ownerStats = '/owner/venues/dashboard/stats';
+  static const String staffStats = '/owner/venues/dashboard/staff-stats';
   static const String ownerRevenue = '/owner/venues/dashboard/revenue';
   static const String ownerBookings = '/owner/bookings/{vId}';
   static const String updateBookingStatus = '/owner/bookings/{id}/status';
@@ -61,6 +62,7 @@ class ApiEndpoints {
   static const String ownerStaffInviteAction = '/venue-staff/owner/invite/{inviteId}';
   static const String ownerStaffStatus = '/venue-staff/owner/{staffId}/status';
   static const String ownerStaffRole = '/venue-staff/owner/{staffId}/role';
+  static const String venueStaffSchedule = '/bookings/venue-staff/schedule';
 
   static const String ownerReviews = '/owner/reviews';
   static const String ownerReplyReview = '/owner/reviews/{id}/reply';

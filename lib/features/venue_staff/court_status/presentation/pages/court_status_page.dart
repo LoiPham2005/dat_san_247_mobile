@@ -42,8 +42,6 @@ class _CourtStatusPageState extends State<CourtStatusPage> {
           currentStartTime: '09:00',
           currentEndTime: '10:30',
           currentBookingCode: 'DS24799102',
-          nextCustomerName: 'Phạm Văn Cường',
-          nextStartTime: '18:00',
           todayBookingCount: 4,
           todayCheckedInCount: 2),
       CourtStatusModel(
@@ -71,9 +69,9 @@ class _CourtStatusPageState extends State<CourtStatusPage> {
           activeMaintenance: CourtMaintenanceModel(
               id: 'm1',
               courtId: 'c3',
-              startAt: DateTime(now.year, now.month, now.day, 8, 0),
-              endAt: DateTime(now.year, now.month, now.day, 11, 0),
-              reason: 'Thay lưới cầu lông định kỳ',
+              startAt: now.subtract(const Duration(hours: 1)),
+              endAt: now.add(const Duration(hours: 2)),
+              reason: 'Thay lưới',
               isEmergency: false),
           todayBookingCount: 2,
           todayCheckedInCount: 1),

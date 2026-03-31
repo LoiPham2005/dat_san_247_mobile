@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/data/models/check_in_models.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/schedule/data/services/staff_schedule_service.dart';
 
 @route
 class CheckInConfirmPage extends StatefulWidget {
@@ -34,18 +37,32 @@ class _CheckInConfirmPageState extends State<CheckInConfirmPage>
     super.dispose();
   }
 
-  Future<void> _doCheckIn() async {
-    HapticFeedback.mediumImpact();
+  Future<void> _updateStatus(BookingStatusVS status) async {
+    await HapticFeedback.mediumImpact();
     setState(() => _isConfirming = true);
-    await Future.delayed(const Duration(milliseconds: 800));
 
-    if (!mounted) return;
-    setState(() {
-      _isConfirming = false;
-      _isCheckedIn = true;
-    });
-    _successCtrl.forward();
-    HapticFeedback.heavyImpact();
+    try {
+      final service = getIt<StaffScheduleService>();
+      await service.updateStatus(widget.booking.id, {'status': status.name});
+
+      if (!mounted) return;
+      
+      if (status == BookingStatusVS.CHECKED_IN) {
+        setState(() {
+          _isConfirming = false;
+          _isCheckedIn = true;
+        });
+        await _successCtrl.forward();
+        toast.success('Check-in thành công cho ${widget.booking.customerName}');
+      } else {
+        toast.warning('Đã đánh dấu vắng mặt cho ${widget.booking.customerName}');
+        Navigator.pop(context, true); // true indicates status changed
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isConfirming = false);
+      toast.error('Có lỗi xảy ra: ${e.toString()}');
+    }
   }
 
   @override
@@ -145,7 +162,7 @@ class _CheckInConfirmPageState extends State<CheckInConfirmPage>
             child: Row(children: [
               CircleAvatar(
                 radius: 26,
-                backgroundColor: _brand.withOpacity(0.15),
+                backgroundColor: _brand.withValues(alpha: 0.15),
                 child: Text(b.customerName[0],
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _brand)),
               ),
@@ -230,14 +247,14 @@ class _CheckInConfirmPageState extends State<CheckInConfirmPage>
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: (!isValid || _isConfirming) ? null : _doCheckIn,
+              onPressed: (!isValid || _isConfirming) ? null : () => _updateStatus(BookingStatusVS.CHECKED_IN),
               style: ElevatedButton.styleFrom(
                 backgroundColor: isValid ? AppColors.success : AppColors.textHint,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                disabledBackgroundColor: AppColors.textHint.withOpacity(0.5),
+                disabledBackgroundColor: AppColors.textHint.withValues(alpha: 0.5),
               ),
               child: _isConfirming
                   ? const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -246,13 +263,28 @@ class _CheckInConfirmPageState extends State<CheckInConfirmPage>
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
                       SizedBox(width: 12),
-                      Text('Đang xác nhận...',
+                      Text('Đang xử lý...',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     ])
                   : Text(isValid ? '✅ Xác Nhận Check-in' : '⚠️ Không thể Check-in',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
             ),
           ),
+          const SizedBox(height: 12),
+          // ── No Show button ──
+          if (isValid && !_isConfirming)
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: () => _showNoShowConfirmation(),
+                icon: const Icon(Icons.person_off_rounded, color: AppColors.error, size: 20),
+                label: const Text('Khách vắng mặt (No-Show)',
+                    style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
@@ -263,11 +295,31 @@ class _CheckInConfirmPageState extends State<CheckInConfirmPage>
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              child: const Text('Quét lại',
+              child: const Text('Quay lại',
                   style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
             ),
           ),
           const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  void _showNoShowConfirmation() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xác nhận vắng mặt'),
+        content: Text('Bạn có chắc muốn đánh dấu khách ${widget.booking.customerName} là vắng mặt (No-Show)?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Huỷ')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _updateStatus(BookingStatusVS.NO_SHOW);
+            },
+            child: const Text('Xác nhận', style: TextStyle(color: AppColors.error)),
+          ),
         ],
       ),
     );
@@ -297,7 +349,7 @@ class _InfoCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,7 +458,7 @@ class _BriefCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.08),
+          color: AppColors.success.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.success.withOpacity(0.3)),
         ),

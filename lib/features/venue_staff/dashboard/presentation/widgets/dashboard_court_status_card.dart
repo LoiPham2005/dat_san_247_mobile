@@ -12,23 +12,23 @@ class DashboardCourtStatusCard extends StatelessWidget {
     final status = court.statusNow;
     final (bgColor, dotColor, icon) = switch (status) {
       CourtStatusNow.available => (
-          AppColors.success.withOpacity(0.08),
+          AppColors.success.withValues(alpha: 0.08),
           AppColors.success,
           Icons.sports_soccer_rounded
         ),
-      CourtStatusNow.occupied => (brand.withOpacity(0.08), brand, Icons.people_rounded),
+      CourtStatusNow.occupied => (brand.withValues(alpha: 0.08), brand, Icons.people_rounded),
       CourtStatusNow.reserved => (
-          AppColors.warning.withOpacity(0.08),
+          AppColors.warning.withValues(alpha: 0.08),
           AppColors.warning,
           Icons.event_rounded
         ),
       CourtStatusNow.maintenance => (
-          AppColors.error.withOpacity(0.08),
+          AppColors.error.withValues(alpha: 0.08),
           AppColors.error,
           Icons.build_rounded
         ),
       CourtStatusNow.inactive => (
-          AppColors.textHint.withOpacity(0.08),
+          AppColors.textHint.withValues(alpha: 0.08),
           AppColors.textHint,
           Icons.block_rounded
         ),
@@ -39,8 +39,8 @@ class DashboardCourtStatusCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: dotColor.withOpacity(0.3)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6)],
+        border: Border.all(color: dotColor.withValues(alpha: 0.3)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6)],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [

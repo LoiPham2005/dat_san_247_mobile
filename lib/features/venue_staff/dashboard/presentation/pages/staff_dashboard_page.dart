@@ -1,22 +1,23 @@
-import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_booking_status_summary.dart';
-import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pages/qr_checkin_page.dart';
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/cubit/staff_dashboard_cubit.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/data/models/staff_dashboard_models.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dat_san_247_mobile/routes/base/annotations.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
+import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_booking_status_summary.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_check_in_progress_card.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_court_status_card.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_header_stat.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_maintenance_card.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_revenue_summary_card.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/widgets/dashboard_section_title.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pages/qr_checkin_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/today_schedule_page.dart';
-import 'package:dat_san_247_mobile/routes/base/annotations.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
-// ══════════════════════════════════════════════════════════════════════════════
-// VS-01 Staff Dashboard Page
-// ══════════════════════════════════════════════════════════════════════════════
 @route
 class StaffDashboardPage extends StatefulWidget {
   const StaffDashboardPage({super.key});
@@ -29,103 +30,6 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
   static const Color _brand = Color(0xFF7C3AED);
   static const Color _brandDark = Color(0xFF4C1D95);
 
-  late final StaffDashboardModel _data = _buildMock();
-
-  // ── Mock data (replace with API call) ─────────────────────────────────────
-  static StaffDashboardModel _buildMock() {
-    final now = DateTime.now();
-    return StaffDashboardModel(
-      venueId: 'v1',
-      venueName: 'Sân K34 Phạm Văn Đồng',
-      venueAddress: '34 Phạm Văn Đồng, Cầu Giấy, HN',
-      date: now,
-      totalBookingsToday: 12,
-      pendingCount: 2,
-      confirmedCount: 3,
-      checkedInCount: 4,
-      completedCount: 3,
-      noShowCount: 1,
-      revenueToday: 1650000,
-      revenuePending: 675000,
-      staffName: 'Trần Thị Nhân Viên',
-      staffRole: 'STAFF',
-      shiftStart: '14:00',
-      shiftEnd: '22:00',
-      maintenanceToday: [
-        CourtMaintenanceModel(
-          id: 'm1',
-          courtId: 'c3',
-          startAt: DateTime(now.year, now.month, now.day, 8, 0),
-          endAt: DateTime(now.year, now.month, now.day, 11, 0),
-          reason: 'Thay lưới cầu lông định kỳ',
-          isEmergency: false,
-        ),
-      ],
-      courts: [
-        const CourtStatusModel(
-            id: 'c1',
-            name: 'Sân A',
-            isIndoor: false,
-            isActive: true,
-            surfaceType: 'ARTIFICIAL_GRASS',
-            size: '5 người',
-            pricePerHour: 150000,
-            displayOrder: 1,
-            currentBookingId: 'b2',
-            currentCustomerName: 'Trần Thị Bình',
-            currentCustomerPhone: '0987654321',
-            currentStartTime: '09:00',
-            currentEndTime: '10:30',
-            currentBookingCode: 'DS24799102',
-            todayBookingCount: 4,
-            todayCheckedInCount: 2),
-        const CourtStatusModel(
-            id: 'c2',
-            name: 'Sân B',
-            isIndoor: false,
-            isActive: true,
-            surfaceType: 'ARTIFICIAL_GRASS',
-            size: '7 người',
-            pricePerHour: 200000,
-            displayOrder: 2,
-            nextCustomerName: 'Lê Hoàng Dũng',
-            nextStartTime: '20:00',
-            todayBookingCount: 3,
-            todayCheckedInCount: 1),
-        CourtStatusModel(
-            id: 'c3',
-            name: 'Sân CL',
-            isIndoor: true,
-            isActive: true,
-            surfaceType: 'WOOD',
-            size: 'Cầu Lông',
-            pricePerHour: 80000,
-            displayOrder: 3,
-            activeMaintenance: CourtMaintenanceModel(
-                id: 'm1',
-                courtId: 'c3',
-                startAt: DateTime(now.year, now.month, now.day, 8, 0),
-                endAt: DateTime(now.year, now.month, now.day, 11, 0),
-                reason: 'Thay lưới',
-                isEmergency: false),
-            todayBookingCount: 2,
-            todayCheckedInCount: 1),
-        const CourtStatusModel(
-            id: 'c4',
-            name: 'Sân D',
-            isIndoor: false,
-            isActive: true,
-            surfaceType: 'ARTIFICIAL_GRASS',
-            size: '5 người',
-            pricePerHour: 150000,
-            displayOrder: 4,
-            todayBookingCount: 3,
-            todayCheckedInCount: 0),
-      ],
-    );
-  }
-
-  // ── Derived ────────────────────────────────────────────────────────────────
   String get _greeting {
     final h = DateTime.now().hour;
     if (h < 12) return 'Chào buổi sáng';
@@ -135,20 +39,61 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
-      body: CustomScrollView(
-        slivers: [
-          _buildHeader(),
-          SliverToBoxAdapter(child: _buildBody()),
-        ],
+    return BlocProvider(
+      create: (context) => getIt<StaffDashboardCubit>()..initDashboard(),
+      child: BlocBuilder<StaffDashboardCubit, BaseState<StaffDashboardState>>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator(color: _brand)));
+          }
+
+          if (state.isFailure) {
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
+                    const SizedBox(height: 16),
+                    Text('Lỗi: ${state.error ?? 'Đã xảy ra lỗi'}', 
+                      style: const TextStyle(color: AppColors.textPrimary)),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: _brand),
+                      onPressed: () => context.read<StaffDashboardCubit>().initDashboard(),
+                      child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          final data = state.data?.dashboardData;
+          if (data == null) {
+            return const Scaffold(body: Center(child: Text('Không có dữ liệu')));
+          }
+
+          return Scaffold(
+            backgroundColor: const Color(0xFFF4F6FA),
+            body: RefreshIndicator(
+              color: _brand,
+              onRefresh: () => context.read<StaffDashboardCubit>().initDashboard(),
+              child: CustomScrollView(
+                slivers: [
+                  _buildHeader(data),
+                  SliverToBoxAdapter(child: _buildBody(context, data)),
+                ],
+              ),
+            ),
+            floatingActionButton: _buildQrFab(context),
+          );
+        },
       ),
-      floatingActionButton: _buildQrFab(),
     );
   }
 
-  // ── SliverAppBar header ────────────────────────────────────────────────────
-  Widget _buildHeader() => SliverAppBar(
+  Widget _buildHeader(StaffDashboardModel data) => SliverAppBar(
         pinned: true,
         expandedHeight: 170,
         backgroundColor: _brand,
@@ -176,56 +121,53 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const SizedBox(height: 38),
-                  // Greeting row
                   Row(children: [
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('$_greeting, ${_data.staffName.split(' ').last}! 👋',
+                      Text('$_greeting, ${data.staffName.split(' ').last}! 👋',
                           style: const TextStyle(
                               color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
-                      Text(_data.venueName,
+                      Text(data.venueName,
                           style: const TextStyle(
                               color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     ]),
                     const Spacer(),
-                    // Shift badge
-                    if (_data.shiftStart != null)
+                    if (data.shiftStart != null)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(20)),
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
                           const Icon(Icons.schedule_rounded, size: 13, color: Colors.white70),
                           const SizedBox(width: 4),
-                          Text('${_data.shiftStart}–${_data.shiftEnd}',
+                          Text('${data.shiftStart}–${data.shiftEnd}',
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                         ]),
                       ),
                   ]),
                   const SizedBox(height: 16),
-                  // Quick stats row
                   Row(children: [
                     DashboardHeaderStat(
-                        value: '${_data.totalBookingsToday}',
+                        value: '${data.totalBookingsToday}',
                         label: 'Booking',
                         icon: Icons.calendar_today_rounded),
                     _vDivider(),
                     DashboardHeaderStat(
-                        value: '${_data.checkedInCount}',
+                        value: '${data.checkedInCount}',
                         label: 'Check-in',
                         icon: Icons.check_circle_rounded,
                         color: AppColors.success),
                     _vDivider(),
                     DashboardHeaderStat(
-                        value: '${_data.availableCourts}/${_data.courts.length}',
+                        value: '${data.availableCourts}/${data.courts.length}',
                         label: 'Sân trống',
                         icon: Icons.sports_soccer_rounded,
                         color: const Color(0xFF38BDF8)),
                     _vDivider(),
                     DashboardHeaderStat(
-                        value: _fmtK(_data.revenueToday),
+                        value: _fmtK(data.revenueToday),
                         label: 'D.Thu',
                         icon: Icons.payments_rounded,
                         color: const Color(0xFF34D399)),
@@ -240,23 +182,22 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
   Widget _vDivider() => Container(
       height: 32,
       width: 1,
-      color: Colors.white.withOpacity(0.2),
+      color: Colors.white.withValues(alpha: 0.2),
       margin: const EdgeInsets.symmetric(horizontal: 10));
 
-  Widget _buildBody() => Padding(
+  Widget _buildBody(BuildContext context, StaffDashboardModel data) => Padding(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 80),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // ── Date bar ──
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6)]),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6)]),
             child: Row(children: [
               const Icon(Icons.today_rounded, size: 16, color: Color(0xFF7C3AED)),
               const SizedBox(width: 8),
-              Text(DateFormat('EEEE, dd/MM/yyyy', 'vi').format(_data.date),
+              Text(DateFormat('EEEE, dd/MM/yyyy', 'vi').format(data.date),
                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
               const Spacer(),
               GestureDetector(
@@ -271,43 +212,33 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
             ]),
           ),
           const SizedBox(height: 14),
-
-          // ── Booking Status Summary ──
           const DashboardSectionTitle(title: 'Trạng thái booking hôm nay', action: ''),
           const SizedBox(height: 8),
           DashboardBookingStatusSummary(
-            pendingCount: _data.pendingCount,
-            confirmedCount: _data.confirmedCount,
-            checkedInCount: _data.checkedInCount,
-            completedCount: _data.completedCount,
-            noShowCount: _data.noShowCount,
+            pendingCount: data.pendingCount,
+            confirmedCount: data.confirmedCount,
+            checkedInCount: data.checkedInCount,
+            completedCount: data.completedCount,
+            noShowCount: data.noShowCount,
           ),
           const SizedBox(height: 16),
-
-          // ── Court Status ──
-          DashboardSectionTitle(title: 'Trạng thái sân hiện tại', action: '${_data.courts.length} sân'),
+          DashboardSectionTitle(title: 'Trạng thái sân hiện tại', action: '${data.courts.length} sân'),
           const SizedBox(height: 8),
-          _courtStatusGrid(),
+          _courtStatusGrid(data),
           const SizedBox(height: 16),
-
-          // ── Check-in Progress ──
-          DashboardCheckInProgressCard(data: _data, brand: _brand),
+          DashboardCheckInProgressCard(data: data, brand: _brand),
           const SizedBox(height: 16),
-
-          // ── Maintenance alerts ──
-          if (_data.maintenanceToday.isNotEmpty) ...[
+          if (data.maintenanceToday.isNotEmpty) ...[
             const DashboardSectionTitle(title: '🔧 Bảo trì hôm nay', action: ''),
             const SizedBox(height: 8),
-            ..._data.maintenanceToday.map((m) => DashboardMaintenanceCard(m: m)),
+            ...data.maintenanceToday.map((m) => DashboardMaintenanceCard(m: m)),
             const SizedBox(height: 16),
           ],
-
-          // ── Revenue summary ──
-          DashboardRevenueSummaryCard(data: _data, brand: _brand),
+          DashboardRevenueSummaryCard(data: data, brand: _brand),
         ]),
       );
 
-  Widget _courtStatusGrid() {
+  Widget _courtStatusGrid(StaffDashboardModel data) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -317,12 +248,12 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
         crossAxisSpacing: 10,
         childAspectRatio: 1.65,
       ),
-      itemCount: _data.courts.length,
-      itemBuilder: (_, i) => DashboardCourtStatusCard(court: _data.courts[i], brand: _brand),
+      itemCount: data.courts.length,
+      itemBuilder: (_, i) => DashboardCourtStatusCard(court: data.courts[i], brand: _brand),
     );
   }
 
-  Widget _buildQrFab() => FloatingActionButton.extended(
+  Widget _buildQrFab(BuildContext context) => FloatingActionButton.extended(
         onPressed: () {
           HapticFeedback.mediumImpact();
           Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QrCheckInPage()));

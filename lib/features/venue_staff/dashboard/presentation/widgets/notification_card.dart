@@ -16,18 +16,18 @@ class NotificationCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: notif.isRead ? Colors.white : color.withOpacity(0.05),
+          color: notif.isRead ? Colors.white : color.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border:
-              Border.all(color: notif.isRead ? AppColors.borderLight : color.withOpacity(0.3)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6)],
+              Border.all(color: notif.isRead ? AppColors.borderLight : color.withValues(alpha: 0.3)),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6)],
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Container(
             width: 38,
             height: 38,
             decoration:
-                BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
             child: Icon(icon, size: 20, color: color),
           ),
           const SizedBox(width: 10),
