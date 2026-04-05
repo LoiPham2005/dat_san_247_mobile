@@ -16,12 +16,16 @@ class DealsPage extends StatefulWidget {
   State<DealsPage> createState() => _DealsPageState();
 }
 
-class _DealsPageState extends State<DealsPage> {
+class _DealsPageState extends State<DealsPage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   int _selectedCategoryIndex = 0;
   final List<String> _categories = ['Tất cả', 'Voucher sân', 'Cầu lông', 'Bóng đá', 'Ưu đãi hot'];
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocProvider(
       create: (context) => getIt<DealsCubit>()..fetchDeals(),
       child: Scaffold(

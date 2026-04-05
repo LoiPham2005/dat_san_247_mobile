@@ -1,6 +1,9 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/network/dio_client.dart (UPDATED)
 // ════════════════════════════════════════════════════════════════
+import 'package:dat_san_247_mobile/core/data/network/interceptors/network_check_interceptor.dart';
+import 'package:dat_san_247_mobile/core/data/network/interceptors/retry_interceptor.dart';
+import 'package:dat_san_247_mobile/core/data/network/network_info.dart';
 import 'package:dio/dio.dart';
 import 'package:dat_san_247_mobile/config/app/flavor_config.dart';
 import 'package:injectable/injectable.dart';
@@ -14,9 +17,9 @@ class DioClient {
 
   DioClient(
     AuthInterceptor authInterceptor,
-    // ErrorInterceptor errorInterceptor,
     LoggingInterceptor loggingInterceptor,
     SmartCacheInterceptor cacheInterceptor,
+    NetworkInfo networkInfo,
   ) {
     _dio = Dio(
       BaseOptions(
@@ -34,8 +37,10 @@ class DioClient {
     _dio.interceptors.addAll([
       cacheInterceptor, // 1. Cache
       authInterceptor, // 2. Auth (token + 401 refresh)
-      // errorInterceptor, // 3. Error logging
-      loggingInterceptor, // 4. Request/Response logging
+      RetryInterceptor(dio: _dio, retries: 2), // 3. Retry (thử lại nếu lỗi)
+      NetworkCheckInterceptor(networkInfo), // 4. Check mạng (trước khi ra ngoài)
+      loggingInterceptor, // 5. Request/Response logging
+
       // PrettyDioLogger(
       //   requestHeader: false,
       //   requestBody: true,

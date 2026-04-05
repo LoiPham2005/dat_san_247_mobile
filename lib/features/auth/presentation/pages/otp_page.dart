@@ -84,13 +84,23 @@ class _OtpPageState extends State<OtpPage> {
     final code = _controllers.map((c) => c.text).join();
     if (code.length < 6) return;
 
-    context.read<AuthCubit>().verifyEmail(
-      VerifyOtpRequest(
-        email: widget.contactInfo,
-        code: code,
-        type: widget.type,
-      ),
-    );
+    if (widget.type == 'RESET_PASSWORD') {
+      context.read<AuthCubit>().verifyOtp(
+            VerifyOtpRequest(
+              email: widget.contactInfo,
+              code: code,
+              type: widget.type,
+            ),
+          );
+    } else {
+      context.read<AuthCubit>().verifyEmail(
+            VerifyOtpRequest(
+              email: widget.contactInfo,
+              code: code,
+              type: widget.type,
+            ),
+          );
+    }
   }
 
   @override
@@ -202,8 +212,7 @@ class _OtpPageState extends State<OtpPage> {
                                 _countdown = 60;
                                 startTimer();
                               });
-                              // TODO: Implement resend OTP API call
-                              context.read<AuthCubit>().forgotPassword(ForgotPasswordRequest(email: widget.contactInfo));
+                              context.read<AuthCubit>().resendOtp(widget.contactInfo, widget.type);
                             },
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,

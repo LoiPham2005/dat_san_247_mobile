@@ -79,7 +79,10 @@ class _MainShellPageState extends State<MainShellPage>
     return Scaffold(
       body: PageStorage(
         bucket: _bucket,
-        child: _pages[_currentIndex],
+        child: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
       ),
       extendBody: false, // Tắt để không bị đè nội dung phía dưới
       bottomNavigationBar: MainBottomNav(

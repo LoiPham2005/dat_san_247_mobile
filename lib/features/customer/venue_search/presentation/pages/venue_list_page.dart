@@ -44,7 +44,10 @@ class _VenueListPageContent extends StatefulWidget {
   State<_VenueListPageContent> createState() => _VenueListPageContentState();
 }
 
-class _VenueListPageContentState extends State<_VenueListPageContent> {
+class _VenueListPageContentState extends State<_VenueListPageContent> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   late VenueFilterParams _currentFilter;
   late final TextEditingController _searchController;
 
@@ -95,6 +98,7 @@ class _VenueListPageContentState extends State<_VenueListPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final bool showBack =
         context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null;
 

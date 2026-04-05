@@ -38,6 +38,16 @@ class AuthRepository with ApiHandlerMixin {
     return safeCallUnwrap(() => _service.verifyEmail(request));
   }
 
+  /// 🔄 Resend OTP
+  Future<Result<SimpleResponse>> resendOtp(String email, String type) {
+    return safeCallUnwrap(() => _service.resendOtp({'email': email, 'type': type}));
+  }
+
+  /// 🔍 Verify OTP Only (Check validity without consuming)
+  Future<Result<SimpleResponse>> verifyOtp(VerifyOtpRequest request) {
+    return safeCallUnwrap(() => _service.verifyOtp(request));
+  }
+
   /// 📧 Forgot Password
   Future<Result<SimpleResponse>> forgotPassword(ForgotPasswordRequest request) {
     return safeCallUnwrap(() => _service.forgotPassword(request));

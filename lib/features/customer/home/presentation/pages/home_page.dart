@@ -23,9 +23,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocProvider(
       create: (context) => getIt<HomeCubit>()..init(),
       child: BlocBuilder<HomeCubit, BaseState<HomeModel>>(
@@ -63,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                         categories: data.categories,
                         onCategorySelected: (category) {
                           GoRouter.of(context).push(
-                              '/venues?query=${Uri.encodeComponent(category.name)}');
+                              '/venues?query=${Uri.encodeComponent(category.label)}');
                         },
                       ),
                       const SizedBox(height: 32),

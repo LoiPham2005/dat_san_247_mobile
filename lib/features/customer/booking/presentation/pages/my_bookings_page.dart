@@ -33,7 +33,10 @@ class MyBookingsView extends StatefulWidget {
 }
 
 class _MyBookingsViewState extends State<MyBookingsView>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   late TabController _tabController;
   int _selectedTab = 0;
 
@@ -98,6 +101,7 @@ class _MyBookingsViewState extends State<MyBookingsView>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       appBar: AppBar(

@@ -32,11 +32,27 @@ class AuthCubit extends BaseCubit<Object?> {
     );
   }
 
-  /// ✅ Verify OTP
+  /// ✅ Verify Email (Consume OTP)
   Future<void> verifyEmail(VerifyOtpRequest request) async {
     await run<SimpleResponse>(
       action: () => _repository.verifyEmail(request),
       successMessage: 'Xác thực email thành công!',
+    );
+  }
+
+  /// 🔍 Verify OTP (Just check validity)
+  Future<void> verifyOtp(VerifyOtpRequest request) async {
+    await run<SimpleResponse>(
+      action: () => _repository.verifyOtp(request),
+      successMessage: 'Xác thực mã thành công!',
+    );
+  }
+
+  /// 🔄 Resend OTP
+  Future<void> resendOtp(String email, String type) async {
+    await run<SimpleResponse>(
+      action: () => _repository.resendOtp(email, type),
+      successMessage: 'Mã xác thực mới đã được gửi!',
     );
   }
 

@@ -44,7 +44,7 @@ abstract class RoleModel with _$RoleModel {
 abstract class RegisterResponse with _$RegisterResponse {
   const factory RegisterResponse({
     required String message,
-    required String userId,
+    String? userId,
   }) = _RegisterResponse;
 
   factory RegisterResponse.fromJson(Map<String, dynamic> json) => _$RegisterResponseFromJson(json);

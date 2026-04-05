@@ -46,11 +46,13 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    final bool isEmail = contact.contains('@');
+    
     context.read<AuthCubit>().register(
           RegisterRequest(
             fullName: fullName,
-            email: contact,
-            phone: contact, // Backend RegisterDto uses 'phone' field, for simplicity we use same contact
+            email: isEmail ? contact : '', // Backend requires email for registration
+            phone: isEmail ? null : contact, // Send null if it's an email to avoid DB length error
             password: password,
           ),
         );

@@ -27,6 +27,12 @@ abstract class AuthService {
   @POST(ApiEndpoints.verifyEmail)
   Future<ApiResponse<SimpleResponse>> verifyEmail(@Body() VerifyOtpRequest request);
 
+  @POST(ApiEndpoints.verifyOtp)
+  Future<ApiResponse<SimpleResponse>> verifyOtp(@Body() VerifyOtpRequest request);
+
+  @POST(ApiEndpoints.resendOtp)
+  Future<ApiResponse<SimpleResponse>> resendOtp(@Body() Map<String, dynamic> body);
+
   @POST(ApiEndpoints.forgotPassword)
   Future<ApiResponse<SimpleResponse>> forgotPassword(@Body() ForgotPasswordRequest request);
 

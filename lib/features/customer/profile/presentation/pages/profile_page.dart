@@ -9,11 +9,20 @@ import '../../../main/presentation/pages/main_shell_page.dart';
 import '../../data/models/profile_models.dart';
 import '../cubit/profile_cubit.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => getIt<ProfileCubit>()..fetchProfile()),
