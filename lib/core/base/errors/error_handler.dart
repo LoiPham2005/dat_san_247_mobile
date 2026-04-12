@@ -34,14 +34,12 @@ class ErrorHandler {
   }
 
   // ════════════════════════════════════════════════════════════
-  // Logging (Tách riêng)
+  // Logging
   // ════════════════════════════════════════════════════════════
 
   static void _logError(Object error, [StackTrace? stackTrace]) {
-    // Log error với đầy đủ context ra console
     Logger.error('Error occurred: ${error.runtimeType}', error: error, stackTrace: stackTrace);
 
-    // Ghi breadcrumb vào Crashlytics để trace hành trình lỗi
     CrashlyticsService.instance.log(
       '[ErrorHandler] ${error.runtimeType}: ${error.toString().length > 200 ? error.toString().substring(0, 200) : error.toString()}',
     );
@@ -62,9 +60,9 @@ class ErrorHandler {
       DioExceptionType.cancel => CancelledFailure(message: e.message ?? 'Đã hủy'),
 
       DioExceptionType.badCertificate => const NetworkFailure(
-        message: 'Lỗi chứng chỉ bảo mật',
-        code: 'SSL_ERROR',
-      ),
+          message: 'Lỗi chứng chỉ bảo mật',
+          code: 'SSL_ERROR',
+        ),
 
       DioExceptionType.badResponse => _fromHttpResponse(e.response),
 
@@ -81,65 +79,99 @@ class ErrorHandler {
   static Failure _fromHttpResponse(Response? response) {
     final statusCode = response?.statusCode;
     final data = response?.data;
+    
     final message = _extractMessage(data);
+    final code = _extractCode(data);
+    final requestId = _extractRequestId(data);
+    final extras = _extractExtras(data);
 
     return switch (statusCode) {
       // Auth
       401 => AuthFailure(
-        message: message.ifEmpty('Phiên đăng nhập hết hạn'),
-        type: _isTokenExpired(data)
-            ? AuthFailureType.tokenExpired
-            : AuthFailureType.unauthenticated,
-        statusCode: 401,
-      ),
+          message: message.ifEmpty('Phiên đăng nhập hết hạn'),
+          type: _isTokenExpired(code)
+              ? AuthFailureType.tokenExpired
+              : AuthFailureType.unauthenticated,
+          statusCode: 401,
+          code: code,
+          requestId: requestId,
+          extras: extras,
+        ),
       403 => AuthFailure(
-        message: message.ifEmpty('Không có quyền truy cập'),
-        type: AuthFailureType.unauthorized,
-        statusCode: 403,
-      ),
+          message: message.ifEmpty('Không có quyền truy cập'),
+          type: AuthFailureType.unauthorized,
+          statusCode: 403,
+          code: code,
+          requestId: requestId,
+        ),
 
       // Data
       400 || 422 => DataFailure(
-        message: message.ifEmpty('Dữ liệu không hợp lệ'),
-        type: DataFailureType.validation,
-        fieldErrors: _extractFieldErrors(data),
-        globalErrors: _extractGlobalErrors(data),
-        statusCode: statusCode,
-      ),
+          message: message.ifEmpty('Dữ liệu không hợp lệ'),
+          type: DataFailureType.validation,
+          fieldErrors: _extractFieldErrors(data),
+          globalErrors: _extractGlobalErrors(data),
+          statusCode: statusCode,
+          code: code,
+          requestId: requestId,
+        ),
       404 => DataFailure(
-        message: message.ifEmpty('Không tìm thấy'),
-        type: DataFailureType.notFound,
-        statusCode: 404,
-      ),
+          message: message.ifEmpty('Không tìm thấy'),
+          type: DataFailureType.notFound,
+          statusCode: 404,
+          code: code,
+          requestId: requestId,
+        ),
       409 => DataFailure(
-        message: message.ifEmpty('Dữ liệu đã tồn tại'),
-        type: DataFailureType.conflict,
-        statusCode: 409,
-      ),
+          message: message.ifEmpty('Dữ liệu đã tồn tại'),
+          type: DataFailureType.conflict,
+          statusCode: 409,
+          code: code,
+          requestId: requestId,
+        ),
       413 => DataFailure(
-        message: message.ifEmpty('Dữ liệu quá lớn'),
-        type: DataFailureType.payloadTooLarge,
-        maxSize: _extractInt(data, ['maxSize', 'maxFileSize']),
-        statusCode: 413,
-      ),
+          message: message.ifEmpty('Dữ liệu quá lớn'),
+          type: DataFailureType.payloadTooLarge,
+          maxSize: _extractInt(data, ['maxSize', 'maxFileSize']),
+          statusCode: 413,
+          code: code,
+          requestId: requestId,
+        ),
 
       // Server
       429 => ServerFailure(
-        message: message.ifEmpty('Quá nhiều yêu cầu'),
-        retryAfter: _extractRetryAfter(response),
-        statusCode: 429,
-      ),
-      500 ||
-      502 ||
-      504 => ServerFailure(message: 'Lỗi máy chủ, vui lòng thử lại', statusCode: statusCode),
-      503 when _isMaintenance(data) => ServerFailure(
-        message: message.ifEmpty('Hệ thống đang bảo trì'),
-        maintenanceEndTime: _extractDateTime(data, ['estimatedEndTime', 'endTime']),
-        statusCode: 503,
-      ),
-      503 => const ServerFailure(message: 'Dịch vụ tạm thời không khả dụng', statusCode: 503),
+          message: message.ifEmpty('Quá nhiều yêu cầu'),
+          retryAfter: _extractRetryAfter(response),
+          statusCode: 429,
+          code: code,
+          requestId: requestId,
+        ),
+      500 || 502 || 504 => ServerFailure(
+          message: 'Lỗi máy chủ, vui lòng thử lại', 
+          statusCode: statusCode,
+          code: code,
+          requestId: requestId,
+        ),
+      503 when _isMaintenance(code) => ServerFailure(
+          message: message.ifEmpty('Hệ thống đang bảo trì'),
+          maintenanceEndTime: _extractDateTime(data, ['estimatedEndTime', 'endTime']),
+          statusCode: 503,
+          code: code,
+          requestId: requestId,
+        ),
+      503 => ServerFailure(
+          message: 'Dịch vụ tạm thời không khả dụng', 
+          statusCode: 503,
+          code: code,
+          requestId: requestId,
+        ),
 
-      _ => ServerFailure(message: message.ifEmpty('Đã xảy ra lỗi'), statusCode: statusCode),
+      _ => ServerFailure(
+          message: message.ifEmpty('Đã xảy ra lỗi'), 
+          statusCode: statusCode,
+          code: code,
+          requestId: requestId,
+        ),
     };
   }
 
@@ -149,22 +181,36 @@ class ErrorHandler {
 
   static Failure _fromAppException(AppException e) {
     return switch (e) {
-      NetworkException() => NetworkFailure(message: e.message),
-      TimeoutException() => TimeoutFailure(message: e.message),
-      ServerException() => ServerFailure(message: e.message, statusCode: e.statusCode),
+      NetworkException() => NetworkFailure(message: e.message, code: e.code),
+      TimeoutException() => TimeoutFailure(message: e.message, code: e.code),
+      ServerException() => ServerFailure(
+          message: e.message, 
+          statusCode: e.statusCode, 
+          code: e.code, 
+          requestId: e.requestId,
+          extras: e.extras,
+        ),
       AuthException() => AuthFailure(
-        message: e.message,
-        type: _mapAuthType(e.type),
-        statusCode: e.statusCode,
-      ),
+          message: e.message,
+          type: _mapAuthType(e.type),
+          statusCode: e.statusCode,
+          code: e.code,
+          requestId: e.requestId,
+        ),
       DataException() => DataFailure(
-        message: e.message,
-        type: _mapDataType(e.type),
-        fieldErrors: e.fieldErrors,
-        statusCode: e.statusCode,
-      ),
-      StorageException() => StorageFailure(message: e.message, type: _mapStorageType(e.type)),
-      _ => UnknownFailure(message: e.message),
+          message: e.message,
+          type: _mapDataType(e.type),
+          fieldErrors: e.fieldErrors,
+          statusCode: e.statusCode,
+          code: e.code,
+          requestId: e.requestId,
+        ),
+      StorageException() => StorageFailure(
+          message: e.message, 
+          type: _mapStorageType(e.type),
+          code: e.code,
+        ),
+      _ => UnknownFailure(message: e.message, code: e.code, requestId: e.requestId),
     };
   }
 
@@ -174,19 +220,63 @@ class ErrorHandler {
 
   static String _extractMessage(dynamic data) {
     if (data is Map<String, dynamic>) {
-      return data['message']?.toString() ??
-          data['error']?.toString() ??
+      // Backend thường trả về message là String, nhưng ValidationPipe trả về Array
+      final msg = data['message'];
+      if (msg is List && msg.isNotEmpty) return msg.first.toString();
+      
+      return msg?.toString() ??
           data['msg']?.toString() ??
-          '';
+          ''; // Không lấy trường 'error' làm message nữa, vì 'error' sẽ làm 'code'
     }
     return data is String ? data : '';
+  }
+
+  static String? _extractCode(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      return data['code']?.toString() ??
+          data['errorCode']?.toString() ??
+          data['error']?.toString(); // NestJS mặc định để tên Exception vào trường 'error'
+    }
+    return null;
+  }
+
+  static String? _extractRequestId(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      return data['requestId']?.toString() ?? data['traceId']?.toString();
+    }
+    return null;
+  }
+
+  static Map<String, dynamic>? _extractExtras(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      return data['extras'] ?? data['meta'];
+    }
+    return null;
   }
 
   static Map<String, String>? _extractFieldErrors(dynamic data) {
     if (data is! Map<String, dynamic>) return null;
     final errors = data['errors'] ?? data['fieldErrors'];
-    if (errors is! Map<String, dynamic>) return null;
-    return errors.map((k, v) => MapEntry(k, v is List ? v.first.toString() : v.toString()));
+
+    // Dạng Map {"email": "invalid"}
+    if (errors is Map<String, dynamic>) {
+      return errors.map((k, v) => MapEntry(k, v is List ? v.first.toString() : v.toString()));
+    }
+
+    // Dạng List [{"field": "email", "message": "invalid"}] - Chuẩn NestJS custom filter
+    if (errors is List) {
+      final Map<String, String> fieldErrors = {};
+      for (final item in errors) {
+        if (item is Map<String, dynamic> && item.containsKey('field')) {
+          final field = item['field'].toString();
+          final message = item['message']?.toString() ?? 'Lỗi không xác định';
+          fieldErrors.putIfAbsent(field, () => message);
+        }
+      }
+      return fieldErrors.isNotEmpty ? fieldErrors : null;
+    }
+
+    return null;
   }
 
   static List<String>? _extractGlobalErrors(dynamic data) {
@@ -200,6 +290,7 @@ class ErrorHandler {
     for (final key in keys) {
       final value = data[key];
       if (value is int) return value;
+      if (value is String) return int.tryParse(value);
     }
     return null;
   }
@@ -217,22 +308,23 @@ class ErrorHandler {
   }
 
   static Duration? _extractRetryAfter(Response? response) {
-    final retryAfter = response?.headers.value('retry-after');
-    if (retryAfter == null) return null;
-    final seconds = int.tryParse(retryAfter);
-    return seconds != null ? Duration(seconds: seconds) : null;
+    final retryAfterHeader = response?.headers.value('retry-after');
+    if (retryAfterHeader != null) {
+      final seconds = int.tryParse(retryAfterHeader);
+      if (seconds != null) return Duration(seconds: seconds);
+    }
+    return null;
   }
 
-  static bool _isTokenExpired(dynamic data) {
-    if (data is! Map<String, dynamic>) return false;
-    final code = (data['code'] ?? data['errorCode'])?.toString().toLowerCase() ?? '';
-    return code.contains('token_expired') || code.contains('jwt_expired');
+  static bool _isTokenExpired(String? code) {
+    if (code == null) return false;
+    final c = code.toLowerCase();
+    return c.contains('token_expired') || c.contains('jwt_expired') || c.contains('unauthorizedexception');
   }
 
-  static bool _isMaintenance(dynamic data) {
-    if (data is! Map<String, dynamic>) return false;
-    final code = (data['code'] ?? data['errorCode'])?.toString().toLowerCase() ?? '';
-    return code.contains('maintenance');
+  static bool _isMaintenance(String? code) {
+    if (code == null) return false;
+    return code.toLowerCase().contains('maintenance');
   }
 
   // ════════════════════════════════════════════════════════════
@@ -240,26 +332,26 @@ class ErrorHandler {
   // ════════════════════════════════════════════════════════════
 
   static AuthFailureType _mapAuthType(AuthExceptionType t) => switch (t) {
-    AuthExceptionType.unauthenticated => AuthFailureType.unauthenticated,
-    AuthExceptionType.unauthorized => AuthFailureType.unauthorized,
-    AuthExceptionType.tokenExpired => AuthFailureType.tokenExpired,
-    AuthExceptionType.refreshFailed => AuthFailureType.refreshFailed,
-  };
+        AuthExceptionType.unauthenticated => AuthFailureType.unauthenticated,
+        AuthExceptionType.unauthorized => AuthFailureType.unauthorized,
+        AuthExceptionType.tokenExpired => AuthFailureType.tokenExpired,
+        AuthExceptionType.refreshFailed => AuthFailureType.refreshFailed,
+      };
 
   static DataFailureType _mapDataType(DataExceptionType t) => switch (t) {
-    DataExceptionType.notFound => DataFailureType.notFound,
-    DataExceptionType.validation => DataFailureType.validation,
-    DataExceptionType.conflict => DataFailureType.conflict,
-    DataExceptionType.payloadTooLarge => DataFailureType.payloadTooLarge,
-    DataExceptionType.unknown => DataFailureType.unknown,
-  };
+        DataExceptionType.notFound => DataFailureType.notFound,
+        DataExceptionType.validation => DataFailureType.validation,
+        DataExceptionType.conflict => DataFailureType.conflict,
+        DataExceptionType.payloadTooLarge => DataFailureType.payloadTooLarge,
+        DataExceptionType.unknown => DataFailureType.unknown,
+      };
 
   static StorageFailureType _mapStorageType(StorageExceptionType t) => switch (t) {
-    StorageExceptionType.cache => StorageFailureType.cacheNotFound,
-    StorageExceptionType.database => StorageFailureType.databaseError,
-    StorageExceptionType.file => StorageFailureType.fileNotFound,
-    StorageExceptionType.unknown => StorageFailureType.unknown,
-  };
+        StorageExceptionType.cache => StorageFailureType.cacheNotFound,
+        StorageExceptionType.database => StorageFailureType.databaseError,
+        StorageExceptionType.file => StorageFailureType.fileNotFound,
+        StorageExceptionType.unknown => StorageFailureType.unknown,
+      };
 
   // ════════════════════════════════════════════════════════════
   // Quick Checks
@@ -270,13 +362,10 @@ class ErrorHandler {
       e is NetworkFailure ||
       e is SocketException ||
       (e is DioException &&
-          (e.type == DioExceptionType.connectionError ||
-              e.type == DioExceptionType.connectionTimeout));
+          (e.type == DioExceptionType.connectionError || e.type == DioExceptionType.connectionTimeout));
 
   static bool isAuthError(Object e) =>
-      e is AuthException ||
-      e is AuthFailure ||
-      (e is DioException && [401, 403].contains(e.response?.statusCode));
+      e is AuthException || e is AuthFailure || (e is DioException && [401, 403].contains(e.response?.statusCode));
 
   static bool isRetryable(Object e) {
     if (e is Failure) return e.isRetryable;

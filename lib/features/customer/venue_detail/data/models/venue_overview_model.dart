@@ -3,6 +3,19 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'venue_overview_model.freezed.dart';
 part 'venue_overview_model.g.dart';
 
+enum VenueBookingMode { regular, recurring }
+
+@freezed
+abstract class RecurringBookingConfig with _$RecurringBookingConfig {
+  const factory RecurringBookingConfig({
+    @Default('WEEKLY') String repeatType,
+    @Default([]) List<int> days,
+    DateTime? endDate,
+  }) = _RecurringBookingConfig;
+
+  factory RecurringBookingConfig.fromJson(Map<String, dynamic> json) => _$RecurringBookingConfigFromJson(json);
+}
+
 @freezed
 abstract class VenueOverviewModel with _$VenueOverviewModel {
   const factory VenueOverviewModel({
@@ -10,6 +23,8 @@ abstract class VenueOverviewModel with _$VenueOverviewModel {
     required String venueName,
     required String venueAddress,
     required List<CourtOverviewModel> courts,
+    @Default(VenueBookingMode.regular) VenueBookingMode bookingMode,
+    RecurringBookingConfig? recurringConfig,
   }) = _VenueOverviewModel;
 
   factory VenueOverviewModel.fromJson(Map<String, dynamic> json) => _$VenueOverviewModelFromJson(json);

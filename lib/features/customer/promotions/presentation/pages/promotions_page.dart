@@ -1,14 +1,15 @@
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/features/customer/promotions/data/models/user_voucher_model.dart';
+import 'package:dat_san_247_mobile/features/customer/promotions/presentation/cubit/promotion_cubit.dart';
+import 'package:dat_san_247_mobile/features/customer/promotions/presentation/widgets/voucher_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/promotions/data/models/promotion_model.dart';
 import '../widgets/promo_card.dart';
-import '../widgets/voucher_card.dart';
 
-// ──────────────────────────────────────────────────────────────────────────
-// C-17: Khuyến Mãi & Voucher
-// ──────────────────────────────────────────────────────────────────────────
 class PromotionsPage extends StatefulWidget {
   const PromotionsPage({super.key});
 
@@ -20,68 +21,6 @@ class _PromotionsPageState extends State<PromotionsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final fmt = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
-
-  // Mock: promotions công khai
-  final List<PromotionModel> _promotions = [
-    PromotionModel(
-      id: 'p1', code: 'WELCOME50K', name: 'Chào mừng – Giảm 50K',
-      description: 'Giảm 50.000đ cho đơn đặt sân đầu tiên từ 200K',
-      discountType: PromotionDiscountType.FIXED_AMOUNT, discountValue: 50000,
-      minBookingAmount: 200000, usageLimit: 1000, usageCount: 345, maxUsagePerUser: 1,
-      isPublic: true, validFrom: DateTime(2026, 1, 1), validTo: DateTime(2026, 6, 30),
-      status: PromotionStatus.ACTIVE,
-    ),
-    PromotionModel(
-      id: 'p2', code: 'SUMMER20', name: 'Mùa hè 2026 – Giảm 20%',
-      description: 'Giảm 20% tối đa 100K. Áp dụng sân trong nhà',
-      discountType: PromotionDiscountType.PERCENTAGE, discountValue: 20, maxDiscountAmount: 100000,
-      minBookingAmount: 100000, usageLimit: 500, usageCount: 122, maxUsagePerUser: 3,
-      isPublic: true, validFrom: DateTime(2026, 3, 1), validTo: DateTime(2026, 8, 31),
-      status: PromotionStatus.ACTIVE,
-    ),
-    PromotionModel(
-      id: 'p3', code: 'WEEKEND15', name: 'Thứ 7 CN – Giảm 15%',
-      description: 'Ưu đãi cuối tuần, không giới hạn số lần dùng mỗi người',
-      discountType: PromotionDiscountType.PERCENTAGE, discountValue: 15, maxDiscountAmount: 80000,
-      minBookingAmount: 80000, usageLimit: null, usageCount: 0, maxUsagePerUser: 99,
-      isPublic: true, validFrom: DateTime(2026, 3, 15), validTo: DateTime(2026, 4, 30),
-      status: PromotionStatus.ACTIVE,
-    ),
-  ];
-
-  // Mock: voucher của user
-  final List<UserVoucherModel> _myVouchers = [
-    UserVoucherModel(
-      id: 'uv1', userId: 'u1', promotionId: 'p1', status: VoucherStatus.UNUSED,
-      expiresAt: DateTime(2026, 6, 30), createdAt: DateTime(2026, 1, 5),
-      promotion: PromotionModel(
-        id: 'p1', code: 'WELCOME50K', name: 'Chào mừng – Giảm 50K',
-        discountType: PromotionDiscountType.FIXED_AMOUNT, discountValue: 50000,
-        minBookingAmount: 200000, usageCount: 345, maxUsagePerUser: 1, isPublic: true,
-        validFrom: DateTime(2026, 1, 1), validTo: DateTime(2026, 6, 30), status: PromotionStatus.ACTIVE,
-      ),
-    ),
-    UserVoucherModel(
-      id: 'uv2', userId: 'u1', promotionId: 'p4', status: VoucherStatus.USED,
-      usedAt: DateTime(2026, 2, 20), createdAt: DateTime(2026, 2, 1),
-      promotion: PromotionModel(
-        id: 'p4', code: 'NEWYEAR30K', name: 'Tết 2026 – Giảm 30K',
-        discountType: PromotionDiscountType.FIXED_AMOUNT, discountValue: 30000,
-        minBookingAmount: 150000, usageCount: 1, maxUsagePerUser: 1, isPublic: false,
-        validFrom: DateTime(2026, 1, 27), validTo: DateTime(2026, 2, 28), status: PromotionStatus.ACTIVE,
-      ),
-    ),
-    UserVoucherModel(
-      id: 'uv3', userId: 'u1', promotionId: 'p5', status: VoucherStatus.EXPIRED,
-      expiresAt: DateTime(2026, 1, 31), createdAt: DateTime(2026, 1, 1),
-      promotion: PromotionModel(
-        id: 'p5', code: 'FLASH10', name: 'Flash Sale – Giảm 10%',
-        discountType: PromotionDiscountType.PERCENTAGE, discountValue: 10,
-        minBookingAmount: 100000, usageCount: 0, maxUsagePerUser: 1, isPublic: false,
-        validFrom: DateTime(2026, 1, 1), validTo: DateTime(2026, 1, 31), status: PromotionStatus.EXPIRED,
-      ),
-    ),
-  ];
 
   @override
   void initState() {
@@ -121,52 +60,111 @@ class _PromotionsPageState extends State<PromotionsPage>
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [_buildPromotionsList(), _buildMyVouchers()],
+      body: BlocBuilder<PromotionCubit, BaseState<PromotionData>>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.isFailure) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const SizedBox(height: 16),
+                  Text(state.message ?? 'Đã có lỗi xảy ra'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.read<PromotionCubit>().fetchAll(),
+                    child: const Text('Thử lại'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final data = state.data ?? PromotionData();
+
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              _buildPromotionsList(data.promotions),
+              _buildMyVouchers(data.myVouchers),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildPromotionsList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _promotions.length,
-      itemBuilder: (ctx, i) => PromoCard(
-        promo: _promotions[i],
-        fmt: fmt,
-        onSave: () => _saveVoucher(_promotions[i]),
+  Widget _buildPromotionsList(List<PromotionModel> promotions) {
+    if (promotions.isEmpty) {
+      return const Center(child: Text('Hiện không có khuyến mãi nào'));
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => context.read<PromotionCubit>().fetchAll(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: promotions.length,
+        itemBuilder: (ctx, i) => PromoCard(
+          promo: promotions[i],
+          fmt: fmt,
+          onSave: () => _saveVoucher(promotions[i]),
+        ),
       ),
     );
   }
 
-  Widget _buildMyVouchers() {
-    final unused = _myVouchers.where((v) => v.status == VoucherStatus.UNUSED).toList();
-    final history = _myVouchers.where((v) => v.status != VoucherStatus.UNUSED).toList();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (unused.isNotEmpty) ...[
-            _sectionLabel('Chưa dùng (${unused.length})'),
-            const SizedBox(height: 10),
-            ...unused.map((v) => VoucherCard(voucher: v, fmt: fmt)),
-            const SizedBox(height: 16),
-          ],
-          if (history.isNotEmpty) ...[
-            _sectionLabel('Đã dùng / Hết hạn'),
-            const SizedBox(height: 10),
-            ...history.map((v) => VoucherCard(voucher: v, fmt: fmt, dimmed: true)),
-          ],
-          if (_myVouchers.isEmpty)
-            const Padding(
-              padding: EdgeInsets.only(top: 80),
-              child: Center(
-                  child: Text('Chưa có voucher nào', style: TextStyle(color: AppColors.textHint))),
+  Widget _buildMyVouchers(List<UserVoucherModel> vouchers) {
+    if (vouchers.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () => context.read<PromotionCubit>().fetchAll(),
+        child: ListView(
+          children: [
+            SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.confirmation_num_outlined, size: 64, color: AppColors.textHint.withOpacity(0.3)),
+                  const SizedBox(height: 16),
+                  const Text('Bạn chưa có voucher nào', style: TextStyle(color: AppColors.textHint, fontSize: 13)),
+                  const SizedBox(height: 6),
+                  const Text('Lưu khuyến mãi để sử dụng khi đặt sân', style: TextStyle(color: AppColors.textHint, fontSize: 12)),
+                ],
+              ),
             ),
-        ],
+          ],
+        ),
+      );
+    }
+
+    final unused = vouchers.where((v) => v.status == VoucherStatus.UNUSED).toList();
+    final history = vouchers.where((v) => v.status != VoucherStatus.UNUSED).toList();
+
+    return RefreshIndicator(
+      onRefresh: () => context.read<PromotionCubit>().fetchAll(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (unused.isNotEmpty) ...[
+              _sectionLabel('Chưa dùng (${unused.length})'),
+              const SizedBox(height: 10),
+              ...unused.map((v) => VoucherCard(voucher: v, fmt: fmt)),
+              const SizedBox(height: 16),
+            ],
+            if (history.isNotEmpty) ...[
+              _sectionLabel('Đã dùng / Hết hạn'),
+              const SizedBox(height: 10),
+              ...history.map((v) => VoucherCard(voucher: v, fmt: fmt, dimmed: true)),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -176,9 +174,10 @@ class _PromotionsPageState extends State<PromotionsPage>
           fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textSecondary));
 
   void _saveVoucher(PromotionModel promo) {
+    context.read<PromotionCubit>().collectPromotion(promo.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text('✅ Đã lưu voucher "${promo.code}"'),
+          content: Text('⏳ Đang lưu voucher "${promo.code}"...'),
           backgroundColor: AppColors.primaryLightBrand),
     );
   }

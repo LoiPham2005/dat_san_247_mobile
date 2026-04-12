@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/recurring_booking/data/models/recurring_booking_model.dart';
+import 'package:dat_san_247_mobile/features/customer/waitlist/data/models/waitlist_model.dart';
 
 class WaitlistCard extends StatelessWidget {
-  final WaitlistItemModel item;
+  final WaitlistModel item;
   final VoidCallback? onCancel;
 
   const WaitlistCard({
@@ -42,7 +42,7 @@ class WaitlistCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: item.status == WaitlistStatus.WAITING
+                    color: item.status == WaitlistStatus.WAITING || item.status == WaitlistStatus.NOTIFIED
                         ? AppColors.primaryLightBrand
                         : AppColors.mutedLight,
                     shape: BoxShape.circle,
@@ -50,7 +50,7 @@ class WaitlistCard extends StatelessWidget {
                   child: Center(
                     child: Text('#${item.priority}',
                         style: TextStyle(
-                          color: item.status == WaitlistStatus.WAITING
+                          color: item.status == WaitlistStatus.WAITING || item.status == WaitlistStatus.NOTIFIED
                               ? AppColors.white
                               : AppColors.textHint,
                           fontWeight: FontWeight.w900,
@@ -101,7 +101,7 @@ class WaitlistCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: statusColor)),
                     ),
-                    if (item.isNotified) ...[
+                    if (item.status == WaitlistStatus.NOTIFIED) ...[
                       const SizedBox(height: 4),
                       const Row(
                         mainAxisSize: MainAxisSize.min,
@@ -109,9 +109,9 @@ class WaitlistCard extends StatelessWidget {
                           Icon(Icons.notifications_active_rounded,
                               size: 12, color: AppColors.primaryLightBrand),
                           SizedBox(width: 2),
-                          Text('Đã thông báo',
+                          Text('Đã có sân!',
                               style: TextStyle(
-                                  fontSize: 10, color: AppColors.primaryLightBrand)),
+                                  fontSize: 10, color: AppColors.primaryLightBrand, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ],
@@ -120,7 +120,7 @@ class WaitlistCard extends StatelessWidget {
               ],
             ),
           ),
-          if (onCancel != null) ...[
+          if (onCancel != null && item.status == WaitlistStatus.WAITING) ...[
             const Divider(height: 1, color: AppColors.borderLight),
             TextButton(
               onPressed: onCancel,
@@ -149,7 +149,13 @@ class WaitlistCard extends StatelessWidget {
           AppColors.warning.withOpacity(0.12),
           '⏳ Đang chờ'
         );
-      case WaitlistStatus.CONVERTED:
+      case WaitlistStatus.NOTIFIED:
+        return (
+          AppColors.primaryLightBrand,
+          AppColors.primaryLightBrand.withOpacity(0.12),
+          '📢 Có sân'
+        );
+      case WaitlistStatus.BOOKED:
         return (AppColors.success, AppColors.success.withOpacity(0.1), '✅ Đã đặt');
       case WaitlistStatus.EXPIRED:
         return (AppColors.textHint, AppColors.mutedLight, '⌛ Hết hạn');

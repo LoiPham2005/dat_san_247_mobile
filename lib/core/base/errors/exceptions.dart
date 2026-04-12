@@ -1,134 +1,85 @@
 // ════════════════════════════════════════════════════════════════
-// 📁 lib/core/errors/exceptions.dart (OPTIMIZED - Giảm 60%)
+// 📁 lib/core/errors/exceptions.dart
 // ════════════════════════════════════════════════════════════════
 
-/// Base exception cho toàn bộ app
-class AppException implements Exception {
+/// Base Exception for the app
+abstract class AppException implements Exception {
   final String message;
   final String? code;
   final int? statusCode;
-  final dynamic originalError;
-  final StackTrace? stackTrace;
-  final Map<String, dynamic>? metadata;
+  final String? requestId;
+  final Map<String, dynamic>? extras;
 
-  const AppException({
+  AppException({
     required this.message,
     this.code,
     this.statusCode,
-    this.originalError,
-    this.stackTrace,
-    this.metadata,
+    this.requestId,
+    this.extras,
   });
 
   @override
-  String toString() =>
-      '$runtimeType: $message${code != null ? ' ($code)' : ''}';
+  String toString() => message;
 }
 
-// ════════════════════════════════════════════════════════════════
-// Network Exceptions
-// ════════════════════════════════════════════════════════════════
-
 class NetworkException extends AppException {
-  const NetworkException({
-    super.message = 'Không có kết nối mạng',
-    super.code = 'NETWORK_ERROR',
-    super.originalError,
-    super.stackTrace,
-  });
+  NetworkException({super.message = 'No Internet Connection', super.code = 'NETWORK_ERROR'});
 }
 
 class TimeoutException extends AppException {
-  final Duration? timeout;
-
-  const TimeoutException({
-    super.message = 'Hết thời gian chờ',
-    super.code = 'TIMEOUT',
-    this.timeout,
-    super.originalError,
-    super.stackTrace,
-  });
+  TimeoutException({super.message = 'Request Timeout', super.code = 'TIMEOUT'});
 }
-
-// ════════════════════════════════════════════════════════════════
-// Server Exceptions
-// ════════════════════════════════════════════════════════════════
 
 class ServerException extends AppException {
-  const ServerException({
-    required super.message,
+  ServerException({
+    super.message = 'Server Error',
     super.code,
     super.statusCode,
-    super.originalError,
-    super.stackTrace,
+    super.requestId,
+    super.extras,
   });
 }
-
-// ════════════════════════════════════════════════════════════════
-// Auth Exceptions
-// ════════════════════════════════════════════════════════════════
 
 class AuthException extends AppException {
   final AuthExceptionType type;
-
-  const AuthException({
+  AuthException({
     required super.message,
     this.type = AuthExceptionType.unauthenticated,
     super.code,
     super.statusCode,
-    super.originalError,
-    super.stackTrace,
+    super.requestId,
   });
 }
 
-enum AuthExceptionType {
-  unauthenticated, // 401
-  unauthorized, // 403
-  tokenExpired,
-  refreshFailed,
-}
-
-// ════════════════════════════════════════════════════════════════
-// Data Exceptions
-// ════════════════════════════════════════════════════════════════
+enum AuthExceptionType { unauthenticated, unauthorized, tokenExpired, refreshFailed }
 
 class DataException extends AppException {
   final DataExceptionType type;
   final Map<String, String>? fieldErrors;
 
-  const DataException({
+  DataException({
     required super.message,
     this.type = DataExceptionType.unknown,
     this.fieldErrors,
     super.code,
     super.statusCode,
-    super.originalError,
-    super.stackTrace,
+    super.requestId,
   });
 }
 
-enum DataExceptionType {
-  notFound, // 404
-  validation, // 400, 422
-  conflict, // 409
-  payloadTooLarge, // 413
-  unknown,
-}
-
-// ════════════════════════════════════════════════════════════════
-// Storage Exceptions
-// ════════════════════════════════════════════════════════════════
+enum DataExceptionType { notFound, validation, conflict, payloadTooLarge, unknown }
 
 class StorageException extends AppException {
   final StorageExceptionType type;
-
-  const StorageException({
-    super.message = 'Lỗi lưu trữ',
+  StorageException({
+    super.message = 'Storage Error',
     this.type = StorageExceptionType.unknown,
     super.code,
-    super.originalError,
-    super.stackTrace,
   });
 }
 
 enum StorageExceptionType { cache, database, file, unknown }
+
+class CacheException extends StorageException {
+  CacheException({super.message = 'Cache Error'}) : super(type: StorageExceptionType.cache);
+}

@@ -20,7 +20,7 @@ class NetworkCheckInterceptor extends Interceptor {
       return handler.reject(
         DioException(
           requestOptions: options,
-          error: const NetworkException(message: 'Không có kết nối mạng'),
+          error: NetworkException(message: 'Không có kết nối mạng'),
           type: DioExceptionType.connectionError,
         ),
       );

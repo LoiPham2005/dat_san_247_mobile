@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/recurring_booking/data/models/recurring_booking_model.dart';
+import 'package:dat_san_247_mobile/features/customer/wallet/data/models/transaction_model.dart';
 
 class TransactionTile extends StatelessWidget {
   final TransactionModel transaction;

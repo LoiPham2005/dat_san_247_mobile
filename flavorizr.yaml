@@ -19,48 +19,48 @@ flavors:
   # ════════════════════════════════════════════════════════════
   dev:
     app:
-      name: "MyApp Dev"
+      name: "DatSan247 Dev"
     android:
-      applicationId: "com.example.flutter_base_template.dev"
+      applicationId: "com.datsan247.dev"
       icon: "assets/icons/dev.png"
-      # firebase:
-      #   config: "firebase/dev/google-services.json"
+      firebase:
+        config: "android/app/src/dev/google-services.json"
     ios:
-      bundleId: "com.example.flutter_base_template.dev"
+      bundleId: "com.datsan247.dev"
       icon: "assets/icons/dev.png"
-      # firebase:
-      #   config: "firebase/dev/GoogleService-Info.plist"
+      firebase:
+        config: "ios/Runner/dev/GoogleService-Info.plist"
 
   # ════════════════════════════════════════════════════════════
   # STAGING
   # ════════════════════════════════════════════════════════════
   stg:
     app:
-      name: "MyApp Stg"
+      name: "DatSan247 Stg"
     android:
-      applicationId: "com.example.flutter_base_template.stg"
+      applicationId: "com.datsan247.stg"
       icon: "assets/icons/stg.png"
-      # firebase:
-      #   config: "firebase/staging/google-services.json"
+      firebase:
+        config: "android/app/src/stg/google-services.json"
     ios:
-      bundleId: "com.example.flutter_base_template.stg"
+      bundleId: "com.datsan247.stg"
       icon: "assets/icons/stg.png"
-      # firebase:
-      #   config: "firebase/staging/GoogleService-Info.plist"
+      firebase:
+        config: "ios/Runner/stg/GoogleService-Info.plist"
 
   # ════════════════════════════════════════════════════════════
   # PRODUCTION
   # ════════════════════════════════════════════════════════════
   prod:
     app:
-      name: "MyApp"
+      name: "DatSan247"
     android:
-      applicationId: "com.example.flutter_base_template"
+      applicationId: "com.datsan247"
       icon: "assets/icons/prod.png"
-      # firebase:
-      #   config: "firebase/prod/google-services.json"
+      firebase:
+        config: "android/app/src/prod/google-services.json"
     ios:
-      bundleId: "com.example.flutter_base_template"
+      bundleId: "com.datsan247"
       icon: "assets/icons/prod.png"
-      # firebase:
-      #   config: "firebase/prod/GoogleService-Info.plist"
+      firebase:
+        config: "ios/Runner/prod/GoogleService-Info.plist"

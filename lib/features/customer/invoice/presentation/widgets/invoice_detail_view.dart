@@ -106,12 +106,11 @@ class InvoiceDetailView extends StatelessWidget {
             _InfoCard(children: [
               _InfoRow(
                   label: 'Địa điểm',
-                  value: '${invoice.courtName} · ${invoice.venueName}'),
-              if (invoice.bookingDate != null)
-                _InfoRow(
-                    label: 'Ngày bookings',
-                    value: DateFormat('dd/MM/yyyy').format(invoice.bookingDate!)),
-              _InfoRow(label: 'Mã booking', value: invoice.bookingCode ?? '—'),
+                  value: invoice.bookings.venues.name),
+              _InfoRow(
+                  label: 'Ngày đặt',
+                  value: DateFormat('dd/MM/yyyy').format(invoice.bookings.bookingDate)),
+              _InfoRow(label: 'Mã booking', value: invoice.bookings.bookingCode),
               _InfoRow(
                   label: 'Phát hành',
                   value: DateFormat('HH:mm dd/MM/yyyy').format(invoice.issuedAt)),

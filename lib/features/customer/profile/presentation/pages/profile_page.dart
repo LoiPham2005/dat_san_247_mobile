@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../../core/base/di/injection.dart';
 import '../../../../../core/base/state/bloc/base_state.dart';
 import '../../../../../design/theme/styles/app_colors.dart';
@@ -63,7 +64,8 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                     children: [
                       const SizedBox(height: 8),
                       Container(
-                        width: 76, height: 76,
+                        width: 76,
+                        height: 76,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.white.withOpacity(0.2),
@@ -84,7 +86,8 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                       const SizedBox(height: 10),
                       Text(
                         user?.fullName ?? (state.isLoading ? 'Đang tải...' : 'Chưa đăng nhập'),
-                        style: const TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: AppColors.white, fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         user?.email ?? '',
@@ -104,24 +107,59 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                   _ProfileSection(
                     title: 'Tài khoản',
                     items: [
-                      _ProfileTile(icon: Icons.person_outline_rounded, label: 'Thông tin cá nhân & Cài đặt', onTap: () => context.push('/profile-settings')),
-                      _ProfileTile(icon: Icons.account_balance_wallet_rounded, label: 'Ví của tôi', trailing: '1.250.000đ', onTap: () => context.push('/wallet')),
-                      _ProfileTile(icon: Icons.receipt_long_rounded, label: 'Hóa đơn', onTap: () => context.push('/invoices')),
-                      _ProfileTile(icon: Icons.favorite_border_rounded, label: 'Sân yêu thích', onTap: () => context.push('/favorite-venues')),
-                      _ProfileTile(icon: Icons.repeat_rounded, label: 'Lịch đặt định kỳ', onTap: () => context.push('/recurring-bookings')),
-                      _ProfileTile(icon: Icons.queue_rounded, label: 'Danh sách chờ', onTap: () => context.push('/my-waitlist')),
-                      _ProfileTile(icon: Icons.queue_rounded, label: 'map', onTap: () => context.push('/venue-map')),
+                      _ProfileTile(
+                          icon: Icons.person_outline_rounded,
+                          label: 'Thông tin cá nhân & Cài đặt',
+                          onTap: () => context.push('/profile-settings')),
+                      // _ProfileTile(icon: Icons.account_balance_wallet_rounded, label: 'Ví của tôi', trailing: '1.250.000đ', onTap: () => context.push('/wallet')),
+                      _ProfileTile(
+                          icon: Icons.receipt_long_rounded,
+                          label: 'Hóa đơn',
+                          onTap: () => context.push('/invoices')),
+                      _ProfileTile(
+                          icon: Icons.favorite_border_rounded,
+                          label: 'Sân yêu thích',
+                          onTap: () => context.push('/favorite-venues')),
+                      _ProfileTile(
+                          icon: Icons.repeat_rounded,
+                          label: 'Lịch đặt định kỳ',
+                          onTap: () => context.push('/recurring-bookings')),
+                      _ProfileTile(
+                          icon: Icons.queue_rounded,
+                          label: 'Danh sách chờ',
+                          onTap: () => context.push('/my-waitlist')),
+                      _ProfileTile(
+                          icon: Icons.queue_rounded,
+                          label: 'map',
+                          onTap: () => context.push('/venue-map')),
                     ],
                   ),
                   const SizedBox(height: 16),
                   _ProfileSection(
                     title: 'Tiện ích',
                     items: [
-                      _ProfileTile(icon: Icons.local_offer_rounded, label: 'Khuyến mãi & Voucher', onTap: () => context.push('/promotions')),
-                      _ProfileTile(icon: Icons.notifications_outlined, label: 'Thông báo', trailing: '3', trailingColor: AppColors.error, onTap: () => context.push('/notifications')),
-                      _ProfileTile(icon: Icons.history_rounded, label: 'Lịch sử giao dịch', onTap: () => context.push('/wallet')),
-                      _ProfileTile(icon: Icons.support_agent_rounded, label: 'Hỗ trợ & CSKH', onTap: () => context.push('/support-tickets')),
-                      _ProfileTile(icon: Icons.policy_outlined, label: 'Điều khoản & Chính sách', onTap: () {}),
+                      _ProfileTile(
+                          icon: Icons.local_offer_rounded,
+                          label: 'Khuyến mãi & Voucher',
+                          onTap: () => context.push('/promotions')),
+                      _ProfileTile(
+                          icon: Icons.notifications_outlined,
+                          label: 'Thông báo',
+                          trailing: '3',
+                          trailingColor: AppColors.error,
+                          onTap: () => context.push('/notifications')),
+                      // _ProfileTile(
+                      //     icon: Icons.history_rounded,
+                      //     label: 'Lịch sử giao dịch',
+                      //     onTap: () => context.push('/wallet')),
+                      _ProfileTile(
+                          icon: Icons.support_agent_rounded,
+                          label: 'Hỗ trợ & CSKH',
+                          onTap: () => context.push('/support-tickets')),
+                      _ProfileTile(
+                          icon: Icons.policy_outlined,
+                          label: 'Điều khoản & Chính sách',
+                          onTap: () {}),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -136,15 +174,19 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                             title: const Text('Đăng xuất?'),
                             content: const Text('Bạn sẽ cần đăng nhập lại để sử dụng ứng dụng.'),
                             actions: [
-                              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Huỷ')),
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Huỷ')),
                               ElevatedButton(
                                 onPressed: () => Navigator.pop(ctx, true),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.error, 
-                                  elevation: 0, 
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  backgroundColor: AppColors.error,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
                                 ),
-                                child: const Text('Đăng xuất', style: TextStyle(color: AppColors.white)),
+                                child: const Text('Đăng xuất',
+                                    style: TextStyle(color: AppColors.white)),
                               ),
                             ],
                           ),
@@ -154,7 +196,8 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                         }
                       },
                       icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                      label: const Text('Đăng xuất', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+                      label: const Text('Đăng xuất',
+                          style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.error, width: 1.5),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -184,14 +227,22 @@ class _ProfileSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+              color: AppColors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-            child: Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textHint, letterSpacing: 0.5)),
+            child: Text(title,
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textHint,
+                    letterSpacing: 0.5)),
           ),
           const Divider(height: 1, color: AppColors.borderLight),
           ...items,
@@ -207,14 +258,22 @@ class _ProfileTile extends StatelessWidget {
   final String? trailing;
   final Color? trailingColor;
   final VoidCallback onTap;
-  const _ProfileTile({required this.icon, required this.label, this.trailing, this.trailingColor, required this.onTap});
+  const _ProfileTile(
+      {required this.icon,
+      required this.label,
+      this.trailing,
+      this.trailingColor,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: Container(
-        width: 36, height: 36,
-        decoration: BoxDecoration(color: AppColors.primaryLightBrand.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+            color: AppColors.primaryLightBrand.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10)),
         child: Icon(icon, color: AppColors.primaryLightBrand, size: 20),
       ),
       title: Text(label, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
@@ -225,7 +284,11 @@ class _ProfileTile extends StatelessWidget {
                 color: (trailingColor ?? AppColors.primaryLightBrand).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(trailing!, style: TextStyle(fontWeight: FontWeight.bold, color: trailingColor ?? AppColors.primaryLightBrand, fontSize: 12)),
+              child: Text(trailing!,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: trailingColor ?? AppColors.primaryLightBrand,
+                      fontSize: 12)),
             )
           : const Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 20),
       onTap: onTap,

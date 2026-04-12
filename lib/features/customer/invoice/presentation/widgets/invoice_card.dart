@@ -60,19 +60,17 @@ class InvoiceCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text('${invoice.courtName ?? '—'} · ${invoice.venueName ?? '—'}',
+            Text('${invoice.bookings.venues.name} · ${invoice.bookings.bookingCode}',
                 style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
-            if (invoice.bookingDate != null) ...[
-              const SizedBox(height: 4),
-              Text(DateFormat('dd/MM/yyyy').format(invoice.bookingDate!),
-                  style: const TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary)),
-            ],
+            const SizedBox(height: 4),
+            Text(DateFormat('dd/MM/yyyy').format(invoice.bookings.bookingDate),
+                style: const TextStyle(
+                    fontSize: 12, color: AppColors.textSecondary)),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,6 +94,8 @@ class InvoiceCard extends StatelessWidget {
 
   (Color, Color, IconData) _statusStyle(InvoiceStatus s) {
     switch (s) {
+      case InvoiceStatus.DRAFT:
+        return (AppColors.textHint, AppColors.mutedLight, Icons.edit_note);
       case InvoiceStatus.ISSUED:
         return (
           AppColors.warning,

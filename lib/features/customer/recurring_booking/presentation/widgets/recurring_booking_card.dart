@@ -61,14 +61,14 @@ class RecurringBookingCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(item.venueName,
+                          Text(item.venueName ?? '',
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis),
-                          Text(item.courtName,
+                          Text(item.courtName ?? '',
                               style: const TextStyle(
                                   fontSize: 12, color: AppColors.textSecondary)),
                         ],
@@ -91,24 +91,24 @@ class RecurringBookingCard extends StatelessWidget {
                   ],
                 ),
 
-                if (item.repeatDays.isNotEmpty) ...[
+                if (item.days.isNotEmpty) ...[
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 6,
-                    children: item.repeatDays
+                    children: item.days
                         .map((d) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLightBrand.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(d.label,
-                                  style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryLightBrand)),
-                            ))
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLightBrand.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(d.label,
+                                    style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryLightBrand)),
+                              ))
                         .toList(),
                   ),
                 ],

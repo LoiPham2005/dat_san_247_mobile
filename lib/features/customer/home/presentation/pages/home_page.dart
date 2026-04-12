@@ -1,4 +1,5 @@
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/base/di/injection.dart';
 import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
@@ -159,6 +160,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
           icon: const Icon(Icons.notifications_none_rounded, color: AppColors.white),
           onPressed: () {
             // View notifications
+            NotificationsRoute().push(context);
           },
         ),
         const SizedBox(width: 8),

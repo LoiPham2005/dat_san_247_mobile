@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/promotions/data/models/promotion_model.dart';
+import 'package:dat_san_247_mobile/features/customer/promotions/data/models/user_voucher_model.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class VoucherCard extends StatelessWidget {
   final UserVoucherModel voucher;
@@ -85,10 +86,10 @@ class VoucherCard extends StatelessWidget {
                       const SizedBox(width: 3),
                       Text(promo.code,
                           style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textSecondary,
-                              letterSpacing: 0.5)),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textSecondary,
+                                  letterSpacing: 0.5)),
                       if (voucher.expiresAt != null) ...[
                         const SizedBox(width: 12),
                         const Icon(Icons.schedule_rounded,
@@ -111,13 +112,10 @@ class VoucherCard extends StatelessWidget {
   }
 
   (Color, String) _voucherStatus(VoucherStatus s) {
-    switch (s) {
-      case VoucherStatus.UNUSED:
-        return (AppColors.primaryLightBrand, 'Chưa dùng');
-      case VoucherStatus.USED:
-        return (AppColors.textHint, 'Đã dùng');
-      case VoucherStatus.EXPIRED:
-        return (AppColors.error, 'Hết hạn');
-    }
+    return switch (s) {
+      VoucherStatus.UNUSED => (AppColors.primaryLightBrand, 'Chưa dùng'),
+      VoucherStatus.USED => (AppColors.textHint, 'Đã dùng'),
+      VoucherStatus.EXPIRED => (AppColors.error, 'Hết hạn'),
+    };
   }
 }

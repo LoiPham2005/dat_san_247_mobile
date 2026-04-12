@@ -1,7 +1,10 @@
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/features/customer/recurring_booking/data/models/recurring_booking_model.dart';
+import 'package:dat_san_247_mobile/features/customer/recurring_booking/presentation/cubit/recurring_booking_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/recurring_booking/data/models/recurring_booking_model.dart';
 import '../widgets/recurring_booking_card.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -18,59 +21,6 @@ class _RecurringBookingPageState extends State<RecurringBookingPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTab = 0; // 0=Đang hoạt động, 1=Đã dừng
-
-  final List<RecurringBookingModel> _mockData = [
-    RecurringBookingModel(
-      id: 'r1',
-      venueId: 'v1',
-      venueName: 'Sân K34 Phạm Văn Đồng',
-      courtId: 'c1',
-      courtName: 'Sân A - 5 người',
-      repeatType: RecurringType.WEEKLY,
-      startTime: '18:00',
-      endTime: '19:00',
-      startDate: DateTime(2026, 1, 6),
-      endDate: DateTime(2026, 6, 30),
-      isActive: true,
-      createdAt: DateTime(2026, 1, 1),
-      repeatDays: [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY],
-      totalBookingsGenerated: 24,
-    ),
-    RecurringBookingModel(
-      id: 'r2',
-      venueId: 'v2',
-      venueName: 'Sân Thể Thao Vạn Hạnh',
-      courtId: 'c2',
-      courtName: 'Sân Cầu Lông B',
-      repeatType: RecurringType.WEEKLY,
-      startTime: '06:00',
-      endTime: '07:30',
-      startDate: DateTime(2026, 2, 1),
-      isActive: true,
-      createdAt: DateTime(2026, 1, 28),
-      repeatDays: [DayOfWeek.SATURDAY, DayOfWeek.SUNDAY],
-      totalBookingsGenerated: 8,
-    ),
-    RecurringBookingModel(
-      id: 'r3',
-      venueId: 'v1',
-      venueName: 'Sân K34 Phạm Văn Đồng',
-      courtId: 'c3',
-      courtName: 'Sân C - Trong nhà',
-      repeatType: RecurringType.DAILY,
-      startTime: '07:00',
-      endTime: '08:00',
-      startDate: DateTime(2025, 10, 1),
-      endDate: DateTime(2025, 12, 31),
-      isActive: false,
-      createdAt: DateTime(2025, 9, 25),
-      repeatDays: [],
-      totalBookingsGenerated: 61,
-    ),
-  ];
-
-  List<RecurringBookingModel> get _filteredList =>
-      _mockData.where((r) => _selectedTab == 0 ? r.isActive : !r.isActive).toList();
 
   @override
   void initState() {
@@ -113,17 +63,35 @@ class _RecurringBookingPageState extends State<RecurringBookingPage>
           ),
         ),
       ),
-      body: _filteredList.isEmpty ? _buildEmpty() : _buildList(),
+      body: BlocBuilder<RecurringBookingCubit, BaseState<List<RecurringBookingModel>>>(
+        builder: (context, state) {
+          return state.when(
+            initial: () => const Center(child: CircularProgressIndicator()),
+            loading: (previousData) => previousData == null 
+                ? const Center(child: CircularProgressIndicator()) 
+                : _buildList(previousData),
+            success: (data, message) {
+              final filtered = data.where((r) => _selectedTab == 0 ? r.isActive : !r.isActive).toList();
+              return filtered.isEmpty ? _buildEmpty() : _buildList(filtered);
+            },
+            failure: (error, data) => Center(child: Text(error)),
+            empty: (message) => _buildEmpty(),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _filteredList.length,
-      itemBuilder: (ctx, i) => RecurringBookingCard(
-        item: _filteredList[i],
-        onToggle: (item) => _toggleActive(item),
+  Widget _buildList(List<RecurringBookingModel> filteredList) {
+    return RefreshIndicator(
+      onRefresh: () => context.read<RecurringBookingCubit>().getBookings(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: filteredList.length,
+        itemBuilder: (ctx, i) => RecurringBookingCard(
+          item: filteredList[i],
+          onToggle: (item) => _toggleActive(item),
+        ),
       ),
     );
   }
@@ -151,34 +119,8 @@ class _RecurringBookingPageState extends State<RecurringBookingPage>
         ],
       ),
     );
-    if (confirmed == true) {
-      setState(() {
-        final idx = _mockData.indexOf(item);
-        _mockData[idx] = RecurringBookingModel(
-          id: item.id,
-          venueId: item.venueId,
-          venueName: item.venueName,
-          courtId: item.courtId,
-          courtName: item.courtName,
-          repeatType: item.repeatType,
-          startTime: item.startTime,
-          endTime: item.endTime,
-          startDate: item.startDate,
-          endDate: item.endDate,
-          isActive: !item.isActive,
-          createdAt: item.createdAt,
-          repeatDays: item.repeatDays,
-          totalBookingsGenerated: item.totalBookingsGenerated,
-        );
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(item.isActive
-              ? '⏸️ Đã tạm dừng lịch định kỳ'
-              : '▶️ Đã kích hoạt lại lịch định kỳ'),
-          backgroundColor: AppColors.primaryLightBrand,
-        ));
-      }
+    if (confirmed == true && mounted) {
+      context.read<RecurringBookingCubit>().toggleStatus(item.id, item.isActive);
     }
   }
 

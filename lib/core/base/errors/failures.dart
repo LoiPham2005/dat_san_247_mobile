@@ -10,11 +10,19 @@ abstract class Failure extends Equatable {
   final String message;
   final String? code;
   final int? statusCode;
+  final String? requestId; // ✨ Dùng để trace log trên Backend
+  final Map<String, dynamic>? extras; // ✨ Chứa dữ liệu thêm nếu cần
 
-  const Failure({required this.message, this.code, this.statusCode});
+  const Failure({
+    required this.message,
+    this.code,
+    this.statusCode,
+    this.requestId,
+    this.extras,
+  });
 
   @override
-  List<Object?> get props => [message, code, statusCode];
+  List<Object?> get props => [message, code, statusCode, requestId, extras];
 
   @override
   String toString() => message;
@@ -28,6 +36,7 @@ class NetworkFailure extends Failure {
   const NetworkFailure({
     super.message = 'Không có kết nối mạng',
     super.code = 'NETWORK_ERROR',
+    super.requestId,
   });
 }
 
@@ -35,6 +44,7 @@ class TimeoutFailure extends Failure {
   const TimeoutFailure({
     super.message = 'Yêu cầu đã hết thời gian',
     super.code = 'TIMEOUT',
+    super.requestId,
   });
 }
 
@@ -42,6 +52,7 @@ class CancelledFailure extends Failure {
   const CancelledFailure({
     super.message = 'Yêu cầu đã bị hủy',
     super.code = 'CANCELLED',
+    super.requestId,
   });
 }
 
@@ -57,13 +68,14 @@ class ServerFailure extends Failure {
     super.message = 'Lỗi máy chủ',
     super.code,
     super.statusCode,
+    super.requestId,
+    super.extras,
     this.maintenanceEndTime,
     this.retryAfter,
   });
 
   bool get isMaintenance => maintenanceEndTime != null;
   bool get isRateLimited => retryAfter != null;
-  // isRetryable định nghĩa trong FailureX extension — tránh duplicate
 
   @override
   List<Object?> get props => [...super.props, maintenanceEndTime, retryAfter];
@@ -81,6 +93,8 @@ class AuthFailure extends Failure {
     this.type = AuthFailureType.unauthenticated,
     super.code,
     super.statusCode,
+    super.requestId,
+    super.extras,
   });
 
   bool get needsReLogin => type != AuthFailureType.unauthorized;
@@ -114,6 +128,8 @@ class DataFailure extends Failure {
     this.maxSize,
     super.code,
     super.statusCode,
+    super.requestId,
+    super.extras,
   });
 
   String get firstError {
@@ -126,12 +142,12 @@ class DataFailure extends Failure {
 
   @override
   List<Object?> get props => [
-    ...super.props,
-    type,
-    fieldErrors,
-    globalErrors,
-    maxSize,
-  ];
+        ...super.props,
+        type,
+        fieldErrors,
+        globalErrors,
+        maxSize,
+      ];
 }
 
 enum DataFailureType {
@@ -153,6 +169,7 @@ class StorageFailure extends Failure {
     super.message = 'Lỗi lưu trữ',
     this.type = StorageFailureType.unknown,
     super.code,
+    super.requestId,
   });
 
   @override
@@ -169,11 +186,12 @@ class UnknownFailure extends Failure {
   const UnknownFailure({
     super.message = 'Đã xảy ra lỗi không xác định',
     super.code = 'UNKNOWN',
+    super.requestId,
   });
 }
 
 // ════════════════════════════════════════════════════════════════
-// Extension - Simplified
+// Extension - Helpers
 // ════════════════════════════════════════════════════════════════
 
 extension FailureX on Failure {
@@ -182,6 +200,7 @@ extension FailureX on Failure {
   bool get isAuth => this is AuthFailure;
   bool get isServer => this is ServerFailure;
   bool get isCancelled => this is CancelledFailure;
+  bool get isValidation => this is DataFailure && (this as DataFailure).type == DataFailureType.validation;
 
   // Behavior
   bool get isRetryable {
@@ -220,11 +239,22 @@ extension FailureX on Failure {
     };
   }
 
+  // Debug info
+  String get debugInfo {
+    final sb = StringBuffer();
+    sb.writeln('Failure: ${runtimeType}');
+    sb.writeln('Message: $message');
+    if (code != null) sb.writeln('Code: $code');
+    if (statusCode != null) sb.writeln('Status: $statusCode');
+    if (requestId != null) sb.writeln('Request ID: $requestId');
+    return sb.toString();
+  }
+
   // Suggested action
   FailureAction get action {
     return switch (this) {
       AuthFailure(needsReLogin: true) => FailureAction.reLogin,
-      _ when isRetryable => FailureAction.retry,
+      _ when isRetryable || isNetwork => FailureAction.retry,
       DataFailure(type: DataFailureType.validation) => FailureAction.fixInput,
       CancelledFailure() => FailureAction.none,
       _ => FailureAction.showError,

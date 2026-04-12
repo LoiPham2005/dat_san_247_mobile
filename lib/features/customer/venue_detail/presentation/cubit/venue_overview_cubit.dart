@@ -101,6 +101,25 @@ class VenueOverviewCubit extends BaseCubit<VenueOverviewModel> {
     );
   }
 
+  void setBookingMode(VenueBookingMode mode, {RecurringBookingConfig? config}) {
+    state.mapSuccess((model) {
+      // Clear all selected slots when switching mode to avoid confusion
+      final updatedCourts = model.courts.map((court) {
+        final updatedSlots = court.slots.map((slot) => slot.copyWith(isSelected: false)).toList();
+        return court.copyWith(slots: updatedSlots);
+      }).toList();
+
+      safeEmit(BaseState.success(
+        data: model.copyWith(
+          courts: updatedCourts,
+          bookingMode: mode,
+          recurringConfig: config,
+        ),
+      ));
+      return BaseState.success(data: model);
+    });
+  }
+
   void toggleSlot(String courtId, String startTime) {
     state.mapSuccess((model) {
       final updatedCourts = model.courts.map((court) {

@@ -1,5 +1,6 @@
 import 'package:dat_san_247_mobile/core/common/constants/api_endpoints.dart';
 import 'package:dat_san_247_mobile/core/data/network/api_response.dart';
+import 'package:dat_san_247_mobile/features/customer/favorite/data/models/favorite_venue_model.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/search_history_model.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:dio/dio.dart';
@@ -31,7 +32,7 @@ abstract class VenueSearchService {
   });
 
   @GET(ApiEndpoints.favorites)
-  Future<ApiResponse<List<dynamic>>> getFavorites(); // Returns a list of favorite objects
+  Future<ApiResponse<List<FavoriteVenueModel>>> getFavorites();
 
   @POST(ApiEndpoints.toggleFavorite)
   Future<ApiResponse<bool>> toggleFavorite({

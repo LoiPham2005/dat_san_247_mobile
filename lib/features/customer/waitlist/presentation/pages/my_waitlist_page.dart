@@ -1,12 +1,12 @@
+import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/features/customer/waitlist/presentation/cubit/waitlist_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/recurring_booking/data/models/recurring_booking_model.dart';
+import 'package:dat_san_247_mobile/features/customer/waitlist/data/models/waitlist_model.dart';
 import '../widgets/waitlist_card.dart';
 
-// ──────────────────────────────────────────────────────────────────────────
-// C-14: Waitlist Của Tôi
-// ──────────────────────────────────────────────────────────────────────────
 class MyWaitlistPage extends StatefulWidget {
   const MyWaitlistPage({super.key});
 
@@ -15,71 +15,7 @@ class MyWaitlistPage extends StatefulWidget {
 }
 
 class _MyWaitlistPageState extends State<MyWaitlistPage> {
-  final List<WaitlistItemModel> _mockData = [
-    WaitlistItemModel(
-      id: 'w1',
-      courtId: 'c1',
-      courtName: 'Sân A - 5 người',
-      venueId: 'v1',
-      venueName: 'Sân K34 Phạm Văn Đồng',
-      venueAddress: 'Số 10 Phạm Văn Đồng, Cầu Giấy, Hà Nội',
-      venueThumbnailUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbc09e99c?w=400&q=80',
-      bookingDate: DateTime.now().add(const Duration(days: 3)),
-      startTime: '19:00',
-      endTime: '20:00',
-      priority: 2,
-      isNotified: false,
-      status: WaitlistStatus.WAITING,
-      createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-    ),
-    WaitlistItemModel(
-      id: 'w2',
-      courtId: 'c2',
-      courtName: 'Sân Cầu Lông B',
-      venueId: 'v2',
-      venueName: 'Sân Thể Thao Vạn Hạnh',
-      venueAddress: '45 Điện Biên Phủ, Bình Thạnh, TP.HCM',
-      bookingDate: DateTime.now().add(const Duration(days: 1)),
-      startTime: '07:00',
-      endTime: '08:00',
-      priority: 1,
-      isNotified: true,
-      status: WaitlistStatus.WAITING,
-      createdAt: DateTime.now().subtract(const Duration(hours: 10)),
-    ),
-    WaitlistItemModel(
-      id: 'w3',
-      courtId: 'c3',
-      courtName: 'Sân Pickleball 1',
-      venueId: 'v2',
-      venueName: 'Sân Thể Thao Vạn Hạnh',
-      venueAddress: '45 Điện Biên Phủ, Bình Thạnh, TP.HCM',
-      bookingDate: DateTime.now().subtract(const Duration(days: 2)),
-      startTime: '15:00',
-      endTime: '16:00',
-      priority: 3,
-      isNotified: true,
-      status: WaitlistStatus.CONVERTED,
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    WaitlistItemModel(
-      id: 'w4',
-      courtId: 'c1',
-      courtName: 'Sân A - 5 người',
-      venueId: 'v1',
-      venueName: 'Sân K34 Phạm Văn Đồng',
-      venueAddress: 'Số 10 Phạm Văn Đồng, Cầu Giấy, Hà Nội',
-      bookingDate: DateTime.now().subtract(const Duration(days: 5)),
-      startTime: '18:00',
-      endTime: '19:00',
-      priority: 1,
-      isNotified: false,
-      status: WaitlistStatus.EXPIRED,
-      createdAt: DateTime.now().subtract(const Duration(days: 6)),
-    ),
-  ];
-
-  Future<void> _cancelWaitlist(WaitlistItemModel item) async {
+  Future<void> _cancelWaitlist(WaitlistModel item) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -100,38 +36,17 @@ class _MyWaitlistPageState extends State<MyWaitlistPage> {
         ],
       ),
     );
-    if (confirmed == true) {
-      setState(() {
-        final idx = _mockData.indexOf(item);
-        _mockData[idx] = WaitlistItemModel(
-          id: item.id,
-          courtId: item.courtId,
-          courtName: item.courtName,
-          venueId: item.venueId,
-          venueName: item.venueName,
-          venueAddress: item.venueAddress,
-          venueThumbnailUrl: item.venueThumbnailUrl,
-          bookingDate: item.bookingDate,
-          startTime: item.startTime,
-          endTime: item.endTime,
-          priority: item.priority,
-          isNotified: item.isNotified,
-          status: WaitlistStatus.CANCELLED,
-          createdAt: item.createdAt,
-        );
-      });
-      if (mounted)
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('✅ Đã hủy khỏi danh sách chờ'),
-            backgroundColor: AppColors.primaryLightBrand));
+    
+    if (confirmed == true && mounted) {
+      context.read<WaitlistCubit>().cancelWaitlist(item.id);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('✅ Đã gửi yêu cầu hủy danh sách chờ'),
+          backgroundColor: AppColors.primaryLightBrand));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final activeList = _mockData.where((w) => w.status == WaitlistStatus.WAITING).toList();
-    final historyList = _mockData.where((w) => w.status != WaitlistStatus.WAITING).toList();
-
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       appBar: AppBar(
@@ -145,35 +60,68 @@ class _MyWaitlistPageState extends State<MyWaitlistPage> {
             style: TextStyle(
                 fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
       ),
-      body: _mockData.isEmpty ? _buildEmpty() : _buildContent(activeList, historyList),
+      body: BlocBuilder<WaitlistCubit, BaseState<List<WaitlistModel>>>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.isFailure) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const SizedBox(height: 16),
+                  Text(state.message ?? 'Đã có lỗi xảy ra'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.read<WaitlistCubit>().getWaitlist(),
+                    child: const Text('Thử lại'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final list = state.data ?? [];
+          if (list.isEmpty) return _buildEmpty();
+
+          final activeList = list.where((w) => w.status == WaitlistStatus.WAITING || w.status == WaitlistStatus.NOTIFIED).toList();
+          final historyList = list.where((w) => w.status != WaitlistStatus.WAITING && w.status != WaitlistStatus.NOTIFIED).toList();
+
+          return _buildContent(activeList, historyList);
+        },
+      ),
     );
   }
 
-  Widget _buildContent(List<WaitlistItemModel> activeList, List<WaitlistItemModel> historyList) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Info Banner ──
-          _buildInfoBanner(),
-          const SizedBox(height: 16),
-
-          // ── Active waiting ──
-          if (activeList.isNotEmpty) ...[
-            _SectionLabel(label: '⏳ Đang chờ (${activeList.length})'),
-            const SizedBox(height: 10),
-            ...activeList.map((w) => WaitlistCard(item: w, onCancel: () => _cancelWaitlist(w))),
+  Widget _buildContent(List<WaitlistModel> activeList, List<WaitlistModel> historyList) {
+    return RefreshIndicator(
+      onRefresh: () => context.read<WaitlistCubit>().getWaitlist(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoBanner(),
             const SizedBox(height: 16),
-          ],
 
-          // ── History ──
-          if (historyList.isNotEmpty) ...[
-            _SectionLabel(label: 'Lịch sử'),
-            const SizedBox(height: 10),
-            ...historyList.map((w) => WaitlistCard(item: w, onCancel: null)),
+            if (activeList.isNotEmpty) ...[
+              _SectionLabel(label: '⏳ Đang chờ (${activeList.length})'),
+              const SizedBox(height: 10),
+              ...activeList.map((w) => WaitlistCard(item: w, onCancel: () => _cancelWaitlist(w))),
+              const SizedBox(height: 16),
+            ],
+
+            if (historyList.isNotEmpty) ...[
+              _SectionLabel(label: 'Lịch sử'),
+              const SizedBox(height: 10),
+              ...historyList.map((w) => WaitlistCard(item: w, onCancel: null)),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -202,17 +150,25 @@ class _MyWaitlistPageState extends State<MyWaitlistPage> {
   }
 
   Widget _buildEmpty() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return RefreshIndicator(
+      onRefresh: () => context.read<WaitlistCubit>().getWaitlist(),
+      child: ListView(
         children: [
-          Icon(Icons.queue_rounded, size: 64, color: AppColors.primaryLightBrand),
-          SizedBox(height: 16),
-          const Text('Danh sách chờ trống',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          const Text('Đăng ký chờ khi sân đầy để không bỏ lỡ slot',
-              style: TextStyle(color: AppColors.textHint, fontSize: 13)),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+          const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.queue_rounded, size: 64, color: AppColors.primaryLightBrand),
+                SizedBox(height: 16),
+                Text('Danh sách chờ trống',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                SizedBox(height: 6),
+                Text('Đăng ký chờ khi sân đầy để không bỏ lỡ slot',
+                    style: TextStyle(color: AppColors.textHint, fontSize: 13)),
+              ],
+            ),
+          ),
         ],
       ),
     );

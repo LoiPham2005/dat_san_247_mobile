@@ -35,8 +35,20 @@ class ApiEndpoints {
   static const String bookingDetail = '/customer/bookings/{id}';
   static const String cancelBooking = '/customer/bookings/{id}';
   static const String myBookings = '/customer/bookings';
+  static const String recurringBookings = '/customer/bookings/recurring';
+  static const String myInvoices = '/customer/invoices';
+
   static const String reviews = '/customer/reviews';
   static const String uploadReview = '/customer/reviews/upload';
+
+  static const String myWaitlist = '/customer/bookings/waitlists';
+  static const String cancelWaitlist = '/customer/bookings/waitlists/{id}';
+
+  static const String publicPromotions = '/public/promotions';
+  static const String myVouchers = '/customer/promotions/vouchers';
+  static const String collectPromotion = '/customer/promotions/collect/{id}';
+
+  static const String supportTickets = '/support/tickets';
 
   // ── Owner ────────────────────────────────────────────────────
   static const String ownerVenues = '/owner/venues';

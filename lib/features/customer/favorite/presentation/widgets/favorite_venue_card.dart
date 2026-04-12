@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/customer/notification/data/models/notification_model.dart';
+import 'package:dat_san_247_mobile/features/customer/favorite/data/models/favorite_venue_model.dart';
 
 class FavoriteVenueCard extends StatelessWidget {
   final FavoriteVenueModel fav;
@@ -13,6 +13,8 @@ class FavoriteVenueCard extends StatelessWidget {
     required this.onRemove,
     required this.onBook,
   });
+
+  FavoriteVenueDetail get detail => fav.venue;
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +40,8 @@ class FavoriteVenueCard extends StatelessWidget {
                 SizedBox(
                   height: 140,
                   width: double.infinity,
-                  child: fav.thumbnailUrl != null
-                      ? Image.network(fav.thumbnailUrl!, fit: BoxFit.cover,
+                  child: detail.thumbnailUrl != null
+                      ? Image.network(detail.thumbnailUrl!, fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => _placeholder())
                       : _placeholder(),
                 ),
@@ -81,13 +83,13 @@ class FavoriteVenueCard extends StatelessWidget {
                     const Icon(Icons.star_rounded,
                         color: AppColors.warning, size: 15),
                     const SizedBox(width: 3),
-                    Text('${fav.rating}',
+                    Text('${detail.averageRating}',
                         style: const TextStyle(
                             color: AppColors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 13)),
                     const SizedBox(width: 4),
-                    Text('(${fav.totalReviews})',
+                    Text('(${detail.reviewCount})',
                         style: const TextStyle(
                             color: AppColors.white70, fontSize: 11)),
                   ]),
@@ -98,7 +100,7 @@ class FavoriteVenueCard extends StatelessWidget {
                   right: 12,
                   child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: fav.sportTypes
+                      children: detail.sports
                           .take(2)
                           .map((s) => Container(
                                 margin: const EdgeInsets.only(left: 4),
@@ -127,7 +129,7 @@ class FavoriteVenueCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(fav.venueName,
+                      Text(detail.name,
                           style: const TextStyle(
                               fontSize: 14, fontWeight: FontWeight.bold),
                           maxLines: 1,
@@ -137,13 +139,18 @@ class FavoriteVenueCard extends StatelessWidget {
                         const Icon(Icons.location_on_rounded,
                             size: 12, color: AppColors.textHint),
                         const SizedBox(width: 3),
-                        Text('${fav.district}, ${fav.city}',
-                            style: const TextStyle(
-                                fontSize: 12, color: AppColors.textSecondary)),
+                        Flexible(
+                          child: Text(detail.address,
+                              style: const TextStyle(
+                                  fontSize: 12, color: AppColors.textSecondary),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                        ),
                       ]),
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: onBook,
                   style: ElevatedButton.styleFrom(

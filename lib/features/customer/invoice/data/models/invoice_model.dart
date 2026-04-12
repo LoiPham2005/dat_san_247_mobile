@@ -1,144 +1,100 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-// ── Enums (schema.prisma) ──────────────────────────────────────────────────
+part 'invoice_model.freezed.dart';
+part 'invoice_model.g.dart';
 
 enum InvoiceStatus {
+  @JsonValue('DRAFT')
+  DRAFT,
+  @JsonValue('ISSUED')
   ISSUED,
+  @JsonValue('PAID')
   PAID,
+  @JsonValue('VOID')
   VOID,
+  @JsonValue('REFUNDED')
   REFUNDED;
 
   String get label {
-    switch (this) {
-      case ISSUED: return 'Đã phát hành';
-      case PAID: return 'Đã thanh toán';
-      case VOID: return 'Đã hủy';
-      case REFUNDED: return 'Đã hoàn tiền';
-    }
+    return switch (this) {
+      InvoiceStatus.DRAFT => 'Nháp',
+      InvoiceStatus.ISSUED => 'Chờ thanh toán',
+      InvoiceStatus.PAID => 'Đã thanh toán',
+      InvoiceStatus.VOID => 'Đã hủy',
+      InvoiceStatus.REFUNDED => 'Đã hoàn trả',
+    };
   }
 }
 
 enum InvoiceItemType {
+  @JsonValue('COURT')
   COURT,
+  @JsonValue('ADDON')
   ADDON,
+  @JsonValue('VAT')
   VAT,
+  @JsonValue('DISCOUNT')
   DISCOUNT;
 
   String get label {
-    switch (this) {
-      case COURT: return 'Tiền sân';
-      case ADDON: return 'Dịch vụ';
-      case VAT: return 'Thuế VAT';
-      case DISCOUNT: return 'Giảm giá';
-    }
+    return switch (this) {
+      InvoiceItemType.COURT => 'Tiền sân',
+      InvoiceItemType.ADDON => 'Dịch vụ',
+      InvoiceItemType.VAT => 'Thuế VAT',
+      InvoiceItemType.DISCOUNT => 'Giảm giá',
+    };
   }
 }
 
-// ── invoice_items model ────────────────────────────────────────────────────
-class InvoiceItemModel extends Equatable {
-  final String id;
-  final String invoiceId;
-  final InvoiceItemType itemType;
-  final String? referenceId;
-  final String name;
-  final int quantity;
-  final double unitPrice;
-  final double subtotal;
-  final double taxAmount;
-  final double totalAmount;
+@freezed
+abstract class InvoiceModel with _$InvoiceModel {
+  const factory InvoiceModel({
+    required String id,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'invoice_number') required String invoiceNumber,
+    @JsonKey(name: 'booking_id') required String bookingId,
+    @JsonKey(name: 'transaction_id') required String transactionId,
+    required double amount,
+    required InvoiceStatus status,
+    @JsonKey(name: 'issued_at') required DateTime issuedAt,
+    @JsonKey(name: 'pdf_url') String? pdfUrl,
+    required BookingInfoModel bookings,
+    @Default([]) List<InvoiceItemModel> items,
+  }) = _InvoiceModel;
 
-  const InvoiceItemModel({
-    required this.id,
-    required this.invoiceId,
-    required this.itemType,
-    this.referenceId,
-    required this.name,
-    required this.quantity,
-    required this.unitPrice,
-    required this.subtotal,
-    required this.taxAmount,
-    required this.totalAmount,
-  });
-
-  factory InvoiceItemModel.fromJson(Map<String, dynamic> json) =>
-      InvoiceItemModel(
-        id: json['id'],
-        invoiceId: json['invoice_id'],
-        itemType: InvoiceItemType.values.firstWhere(
-            (e) => e.name == json['item_type']),
-        referenceId: json['reference_id'],
-        name: json['name'],
-        quantity: json['quantity'] ?? 1,
-        unitPrice: (json['unit_price'] as num).toDouble(),
-        subtotal: (json['subtotal'] as num).toDouble(),
-        taxAmount: (json['tax_amount'] as num?)?.toDouble() ?? 0,
-        totalAmount: (json['total_amount'] as num).toDouble(),
-      );
-
-  @override
-  List<Object?> get props => [id, itemType, totalAmount];
+  factory InvoiceModel.fromJson(Map<String, dynamic> json) => _$InvoiceModelFromJson(json);
 }
 
-// ── invoices model ─────────────────────────────────────────────────────────
-class InvoiceModel extends Equatable {
-  final String id;
-  final String invoiceNumber;
-  final String bookingId;
-  final String? bookingCode;
-  final String customerId;
-  final double amount;
-  final double taxAmount;
-  final InvoiceStatus status;
-  final DateTime issuedAt;
-  final String? pdfUrl;
-  final List<InvoiceItemModel> items;
+@freezed
+abstract class BookingInfoModel with _$BookingInfoModel {
+  const factory BookingInfoModel({
+    @JsonKey(name: 'booking_code') required String bookingCode,
+    @JsonKey(name: 'booking_date') required DateTime bookingDate,
+    required VenueSimpleInfo venues,
+  }) = _BookingInfoModel;
 
-  // Từ bookings join
-  final String? venueName;
-  final String? courtName;
-  final DateTime? bookingDate;
+  factory BookingInfoModel.fromJson(Map<String, dynamic> json) => _$BookingInfoModelFromJson(json);
+}
 
-  const InvoiceModel({
-    required this.id,
-    required this.invoiceNumber,
-    required this.bookingId,
-    this.bookingCode,
-    required this.customerId,
-    required this.amount,
-    required this.taxAmount,
-    required this.status,
-    required this.issuedAt,
-    this.pdfUrl,
-    this.items = const [],
-    this.venueName,
-    this.courtName,
-    this.bookingDate,
-  });
+@freezed
+abstract class VenueSimpleInfo with _$VenueSimpleInfo {
+  const factory VenueSimpleInfo({
+    required String name,
+  }) = _VenueSimpleInfo;
 
-  double get totalWithTax => amount + taxAmount;
+  factory VenueSimpleInfo.fromJson(Map<String, dynamic> json) => _$VenueSimpleInfoFromJson(json);
+}
 
-  factory InvoiceModel.fromJson(Map<String, dynamic> json) => InvoiceModel(
-        id: json['id'],
-        invoiceNumber: json['invoice_number'],
-        bookingId: json['booking_id'],
-        bookingCode: json['bookings']?['booking_code'],
-        customerId: json['customer_id'],
-        amount: (json['amount'] as num).toDouble(),
-        taxAmount: (json['tax_amount'] as num?)?.toDouble() ?? 0,
-        status: InvoiceStatus.values.firstWhere(
-            (e) => e.name == json['status']),
-        issuedAt: DateTime.parse(json['issued_at']),
-        pdfUrl: json['pdf_url'],
-        items: (json['invoice_items'] as List? ?? [])
-            .map((i) => InvoiceItemModel.fromJson(i))
-            .toList(),
-        venueName: json['bookings']?['courts']?['venues']?['name'],
-        courtName: json['bookings']?['courts']?['name'],
-        bookingDate: json['bookings']?['booking_date'] != null
-            ? DateTime.parse(json['bookings']['booking_date'])
-            : null,
-      );
+@freezed
+abstract class InvoiceItemModel with _$InvoiceItemModel {
+  const factory InvoiceItemModel({
+    required String id,
+    required String name,
+    required int quantity,
+    @JsonKey(name: 'unit_price') required double unitPrice,
+    @JsonKey(name: 'total_amount') required double totalAmount,
+    @JsonKey(name: 'item_type') required InvoiceItemType itemType,
+  }) = _InvoiceItemModel;
 
-  @override
-  List<Object?> get props => [id, invoiceNumber, status];
+  factory InvoiceItemModel.fromJson(Map<String, dynamic> json) => _$InvoiceItemModelFromJson(json);
 }
