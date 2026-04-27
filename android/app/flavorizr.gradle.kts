@@ -9,17 +9,17 @@ android.apply {
         create("dev") {
             dimension = "flavor"
             applicationId = "com.datsan247.dev"
-            resValue(type = "string", name = "app_name", value = "Dat San 247 Dev")
+            resValue(type = "string", name = "app_name", value = "DatSan247 Dev")
         }
         create("stg") {
             dimension = "flavor"
             applicationId = "com.datsan247.stg"
-            resValue(type = "string", name = "app_name", value = "Dat San 247 Stg")
+            resValue(type = "string", name = "app_name", value = "DatSan247 Stg")
         }
         create("prod") {
             dimension = "flavor"
             applicationId = "com.datsan247"
-            resValue(type = "string", name = "app_name", value = "Dat San 247")
+            resValue(type = "string", name = "app_name", value = "DatSan247")
         }
     }
 }

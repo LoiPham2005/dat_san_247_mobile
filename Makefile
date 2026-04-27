@@ -171,6 +171,9 @@ icons:
 splash:
 	fvm flutter pub run flutter_native_splash:create
 
+gen-flavor:
+	fvm flutter pub run flutter_flavorizr
+
 
 # 🧱 MASON CODE GEN
 feature:
