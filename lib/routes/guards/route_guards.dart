@@ -52,6 +52,32 @@ class RouteGuards {
   };
 
   FutureOr<String?> authGuard(BuildContext context, GoRouterState state) {
+    // Intercept payment gateway deep links before GoRouter resets the nav stack.
+    // datsan247://payment-return has an empty path ('/') so GoRouter can't match
+    // it to any route — redirect to /payment-return with parsed result.
+    if (state.uri.scheme == 'datsan247' && state.uri.host == 'payment-return') {
+      final p = state.uri.queryParameters;
+      final method = (p['method'] ?? '').toLowerCase();
+      String bookingCode = '';
+      String success = '0';
+
+      if (method == 'momo') {
+        bookingCode = p['orderId'] ?? '';
+        success = p['resultCode'] == '0' ? '1' : '0';
+      } else if (method == 'vnpay') {
+        bookingCode = p['vnp_TxnRef'] ?? '';
+        success = p['vnp_ResponseCode'] == '00' ? '1' : '0';
+      } else if (method == 'zalopay') {
+        bookingCode = p['orderId'] ?? p['apptransid']?.split('_').lastOrNull ?? '';
+        success = p['return_code'] == '1' ? '1' : '0';
+      }
+
+      return Uri(
+        path: RouteNames.paymentReturn,
+        queryParameters: {'method': method, 'bookingCode': bookingCode, 'success': success},
+      ).toString();
+    }
+
     final bool isLoggedIn = _appAuthCubit.state.isAuthenticated;
     final String location = state.matchedLocation;
 

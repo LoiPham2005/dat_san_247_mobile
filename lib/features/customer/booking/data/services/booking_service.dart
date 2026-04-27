@@ -33,6 +33,19 @@ abstract class BookingService {
   @GET('/customer/bookings/{id}/payment-status')
   Future<ApiResponse<dynamic>> checkPaymentStatus(@Path('id') String id);
 
+  // ── Gateway payment URL creation ──────────────────────────────
+  @POST('/customer/vnpay/create-payment')
+  Future<ApiResponse<dynamic>> createVNPayPayment(@Body() Map<String, dynamic> body);
+
+  @POST('/customer/momo/create-payment')
+  Future<ApiResponse<dynamic>> createMoMoPayment(@Body() Map<String, dynamic> body);
+
+  @POST('/customer/zalopay/create-payment')
+  Future<ApiResponse<dynamic>> createZaloPayPayment(@Body() Map<String, dynamic> body);
+
+  @GET('/customer/payment-status/{bookingCode}')
+  Future<ApiResponse<dynamic>> getPaymentStatus(@Path('bookingCode') String bookingCode);
+
   @GET(ApiEndpoints.myBookings)
   Future<ApiResponse<List<BookingResponse>>> getMyBookings();
 

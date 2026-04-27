@@ -58,4 +58,5 @@ class RouteNames {
   static const String checkInConfirm = '/check-in-confirm';
   static const String qrCheckIn = '/qr-check-in';
   static const String courtStatus = '/court-status';
+  static const String paymentReturn = '/payment-return';
 }

@@ -221,6 +221,7 @@ class PaymentRoute extends GoRouteData with $PaymentRoute {
   Widget build(BuildContext context, GoRouterState state) {
     final extra = $extra ?? {};
     return PaymentPage(
+      bookingCode: extra['bookingCode'] ?? '',
       venueName: extra['venueName'] ?? '',
       courtName: extra['courtName'] ?? '',
       bookingDate: extra['bookingDate'] ?? '',

@@ -180,15 +180,15 @@ class _BookingConfirmPageState extends State<BookingConfirmPage> {
         listener: (context, state) {
           state.maybeWhen(
             success: (data, message) {
-              context.go('/booking-success', extra: {
+              context.push('/payment', extra: {
                 'bookingCode': data.bookingCode,
-                'checkInCode': data.checkInCode ?? '',
-                'venueName': data.venueName,
-                'courtName': data.courtName,
+                'venueName': widget.venueName,
+                'courtName': widget.courtName,
                 'bookingDate': data.bookingDate,
                 'startTime': data.startTime,
                 'endTime': data.endTime,
                 'totalAmount': data.totalAmount,
+                'paymentMethod': _selectedPayment,
               });
             },
             failure: (error, data) {
