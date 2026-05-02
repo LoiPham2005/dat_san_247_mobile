@@ -64,6 +64,7 @@ import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentati
 import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentation/pages/staff_profile_page.dart';
 import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:flutter/material.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/payment_return_page.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/customer/venue_detail/presentation/pages/venue_overview_page.dart';
@@ -76,6 +77,26 @@ class SplashRoute extends GoRouteData with $SplashRoute {
   const SplashRoute();
   @override
   Widget build(BuildContext context, GoRouterState state) => const SplashPage();
+}
+
+@TypedGoRoute<PaymentReturnRoute>(path: RouteNames.paymentReturn)
+class PaymentReturnRoute extends GoRouteData with $PaymentReturnRoute {
+  final String method;
+  final String bookingCode;
+  final String success;
+
+  const PaymentReturnRoute({
+    this.method = '',
+    this.bookingCode = '',
+    this.success = '0',
+  });
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => PaymentReturnPage(
+        method: method,
+        bookingCode: bookingCode,
+        success: success == '1',
+      );
 }
 
 @TypedGoRoute<OnboardingRoute>(path: RouteNames.onboarding)
@@ -318,6 +339,7 @@ class WriteReviewRoute extends GoRouteData with $WriteReviewRoute {
     );
   }
 }
+
 
 // ─── Customer Features ─────────────────────────────────────────────
 @TypedGoRoute<RecurringBookingRoute>(path: RouteNames.recurringBookings)

@@ -4,7 +4,6 @@
 
 import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
 import 'package:dat_san_247_mobile/core/services/manager/navigation_service.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/payment_return_page.dart';
 import 'package:dat_san_247_mobile/routes/base/app_routes_observer.dart';
 import 'package:dat_san_247_mobile/routes/base/go_router_refresh_stream.dart';
 import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
@@ -12,7 +11,6 @@ import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
 import 'package:dat_san_247_mobile/routes/guards/route_guards.dart';
 import 'package:dat_san_247_mobile/routes/pages/not_found_page.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
@@ -48,19 +46,6 @@ class AppRouter {
     routes: [
       // ── Generated routes from app_routes.dart ──
       ...$appRoutes,
-
-      // ── Payment deep link return (datsan247://payment-return → /payment-return) ──
-      GoRoute(
-        path: RouteNames.paymentReturn,
-        builder: (context, state) {
-          final p = state.uri.queryParameters;
-          return PaymentReturnPage(
-            method: p['method'] ?? '',
-            bookingCode: p['bookingCode'] ?? '',
-            success: p['success'] == '1',
-          );
-        },
-      ),
     ],
 
     // 404
