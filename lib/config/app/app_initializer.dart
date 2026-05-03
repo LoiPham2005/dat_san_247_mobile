@@ -1,19 +1,18 @@
 // ════════════════════════════════════════════════════════════════
 // 📁 lib/core/config/app_initializer.dart (OPTIMIZED)
 // ════════════════════════════════════════════════════════════════
-import 'package:firebase_core/firebase_core.dart';
 import 'package:dat_san_247_mobile/config/app/flavor_config.dart';
 import 'package:dat_san_247_mobile/config/observers/app_bloc_observer.dart';
 import 'package:dat_san_247_mobile/config/observers/app_observer.dart';
 import 'package:dat_san_247_mobile/config/ui/system_ui_manager.dart';
+import 'package:dat_san_247_mobile/core/base/di/global_providers.dart';
 import 'package:dat_san_247_mobile/core/common/utils/logger.dart';
 import 'package:dat_san_247_mobile/core/common/utils/logger_config.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/providers/app_auth_notifier.dart';
 import 'package:dat_san_247_mobile/core/services/crashlytics/crashlytics_service.dart';
 import 'package:dat_san_247_mobile/core/services/notification/notification_service.dart';
-import 'package:dat_san_247_mobile/design/l10n/cubit/locale_cubit.dart';
-import 'package:dat_san_247_mobile/design/theme/cubit/theme_cubit.dart';
 import 'package:dat_san_247_mobile/modules/iap/iap_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -113,10 +112,10 @@ class AppInitializer {
   /// ⚙️ Khởi tạo services (theme, localization)
   static Future<void> _initializeServices() async {
     try {
-      await Future.wait([
-        getIt<ThemeCubit>().initTheme(),
-        getIt<LocaleCubit>().initLocale(),
-        getIt<AppAuthCubit>().checkAuthStatus(),
+      await Future.wait<void>([
+        // getIt<ThemeCubit>().initTheme(),
+        // getIt<LocaleCubit>().initLocale(),
+        globalContainer.read(appAuth.notifier).checkAuthStatus(),
         getIt<NotificationService>().initialize(),
       ]);
 

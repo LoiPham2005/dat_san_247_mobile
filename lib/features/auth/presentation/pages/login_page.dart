@@ -5,8 +5,7 @@ import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
-
+import '../../../../core/services/app_auth/providers/app_auth_state.dart';
 import '../../data/models/auth_request.dart';
 import '../providers/auth_notifier.dart';
 import '../widgets/auth_form_field.dart';

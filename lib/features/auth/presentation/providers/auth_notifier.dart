@@ -1,10 +1,10 @@
 import 'package:dat_san_247_mobile/core/base/di/injection.dart';
 import 'package:dat_san_247_mobile/core/base/state/riverpod/base_notifier.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:dat_san_247_mobile/features/auth/data/models/auth_request.dart';
-import 'package:dat_san_247_mobile/features/auth/data/models/auth_response.dart';
 import 'package:dat_san_247_mobile/features/auth/data/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../../core/services/app_auth/providers/app_auth_state.dart';
 
 part 'auth_notifier.g.dart';
 

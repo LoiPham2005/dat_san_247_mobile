@@ -3,9 +3,9 @@
 // ════════════════════════════════════════════════════════════════
 import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/base/state/cubit/base_cubit.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../../core/services/app_auth/providers/app_auth_state.dart';
 import '../../data/models/auth_request.dart';
 import '../../data/models/auth_response.dart';
 import '../../data/repositories/auth_repository.dart';

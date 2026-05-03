@@ -4,7 +4,7 @@ import 'package:dat_san_247_mobile/gen/fonts.gen.dart';
 
 import '../../gen/theme/color_palettes.dart';
 import '../../gen/theme/color_tokens.dart';
-import 'cubit/theme_state.dart';
+import 'providers/theme_state.dart';
 
 enum AppThemeMode { light, dark, system }
 

@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
+import 'package:dat_san_247_mobile/core/base/di/global_providers.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/providers/app_auth_notifier.dart';
+import 'package:dat_san_247_mobile/core/services/app_auth/providers/app_auth_state.dart';
 import 'package:dat_san_247_mobile/routes/config/route_names.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 
@@ -14,9 +15,9 @@ import 'package:injectable/injectable.dart';
 /// - Splash page is always accessible (handles its own navigation)
 @LazySingleton()
 class RouteGuards {
-  final AppAuthCubit _appAuthCubit;
+  RouteGuards();
 
-  RouteGuards(this._appAuthCubit);
+  AppAuthState get _authState => globalContainer.read(appAuth);
 
   // Routes that don't require authentication
   static const _publicRoutes = {
@@ -78,7 +79,7 @@ class RouteGuards {
       ).toString();
     }
 
-    final bool isLoggedIn = _appAuthCubit.state.isAuthenticated;
+    final bool isLoggedIn = _authState.isAuthenticated;
     final String location = state.matchedLocation;
 
     final bool isPublicByPrefix = _publicPrefixes.any((prefix) => location.startsWith(prefix));
@@ -97,8 +98,8 @@ class RouteGuards {
 
     // 3. Role-based Authorization & Shell routing
     if (isLoggedIn) {
-      final user = _appAuthCubit.state.user;
-      final mode = _appAuthCubit.state.loginMode;
+      final user = _authState.user;
+      final mode = _authState.loginMode;
 
       // Hậu kiểm Role thực tế để đảm bảo không vào nhầm DashBoard
       AppLoginMode actualMode = mode;
@@ -130,7 +131,7 @@ class RouteGuards {
   }
 
   String _getDashboardByMode() {
-    final mode = _appAuthCubit.state.loginMode;
+    final mode = _authState.loginMode;
 
     if (mode == AppLoginMode.owner) return RouteNames.owner;
     if (mode == AppLoginMode.staff) return RouteNames.venueStaff;

@@ -113,7 +113,7 @@ class AuthInterceptor extends Interceptor {
   bool _isPublicApi(String path) {
     // Endpoints containing '/me/' always require authentication
     if (path.contains('/me/')) return false;
-    
+
     return ApiEndpoints.publicEndpoints.any((p) => path.contains(p));
   }
 

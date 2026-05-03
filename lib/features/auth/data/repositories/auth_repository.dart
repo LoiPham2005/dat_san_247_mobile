@@ -4,8 +4,8 @@
 import 'package:dat_san_247_mobile/core/common/mixins/api_handler_mixin.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/base/errors/result.dart';
-import '../../../../core/services/app_auth/app_auth_state.dart';
 import '../../../../core/services/app_auth/app_auth_service.dart';
+import '../../../../core/services/app_auth/providers/app_auth_state.dart';
 import '../models/auth_request.dart';
 import '../models/auth_response.dart';
 import '../models/user_model.dart';

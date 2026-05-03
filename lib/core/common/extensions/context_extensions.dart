@@ -2,13 +2,9 @@
 // 📁 lib/extensions/context_extensions.dart (SỬ DỤNG CHÍNH)
 // ════════════════════════════════════════════════════════════════
 import 'package:flutter/material.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
-import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
 import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/routes/config/app_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../features/auth/data/models/user_model.dart';
 import '../../base/di/injection.dart';
 
 /// 🌍 Global BuildContext - CHỈ DÙNG KHI KHÔNG CÓ CONTEXT
@@ -100,22 +96,6 @@ extension ContextExtensions on BuildContext {
 
   void unfocus() => FocusScope.of(this).unfocus();
   void requestFocus(FocusNode node) => FocusScope.of(this).requestFocus(node);
-
-  // ═══════════════════════════════════════════════════════════════
-  // AUTH (⭐ NEW)
-  // ═══════════════════════════════════════════════════════════════
-
-  /// Access global AppAuthCubit
-  AppAuthCubit get authCubit => read<AppAuthCubit>();
-
-  /// Watch global AppAuthState
-  AppAuthState get authState => watch<AppAuthCubit>().state;
-
-  /// Get current authenticated user
-  UserModel? get currentUser => authState.user;
-
-  /// Check if user is authenticated
-  bool get isAuthenticated => authState.isAuthenticated;
 }
 
 extension ContextToastExtensions on BuildContext {

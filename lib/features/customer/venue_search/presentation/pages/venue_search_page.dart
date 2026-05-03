@@ -1,38 +1,33 @@
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
-import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/search_history_model.dart';
-import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/cubit/search_history_cubit.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/providers/search_history_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../../design/theme/styles/app_colors.dart';
 import '../widgets/venue_search_history_list.dart';
 import '../widgets/venue_search_input_field.dart';
 
-class VenueSearchPage extends StatelessWidget {
+class VenueSearchPage extends ConsumerWidget {
   final String? initialQuery;
 
   const VenueSearchPage({super.key, this.initialQuery});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<SearchHistoryCubit>()..getSearchHistory(),
-      child: _VenueSearchPageContent(initialQuery: initialQuery),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _VenueSearchPageContent(initialQuery: initialQuery);
   }
 }
 
-class _VenueSearchPageContent extends StatefulWidget {
+class _VenueSearchPageContent extends ConsumerStatefulWidget {
   final String? initialQuery;
 
   const _VenueSearchPageContent({this.initialQuery});
 
   @override
-  State<_VenueSearchPageContent> createState() => _VenueSearchPageContentState();
+  ConsumerState<_VenueSearchPageContent> createState() => _VenueSearchPageContentState();
 }
 
-class _VenueSearchPageContentState extends State<_VenueSearchPageContent> {
+class _VenueSearchPageContentState extends ConsumerState<_VenueSearchPageContent> {
   late TextEditingController _searchController;
   final FocusNode _searchFocus = FocusNode();
 
@@ -54,10 +49,10 @@ class _VenueSearchPageContentState extends State<_VenueSearchPageContent> {
 
   void _onSearch(String query) {
     if (query.trim().isEmpty) return;
-    
+
     // Log history
-    context.read<SearchHistoryCubit>().saveSearchHistory(query);
-    
+    ref.read(searchHistoryProvider.notifier).saveSearchHistory(query);
+
     // Navigate to Venue List Page
     context.push('/venues?query=${Uri.encodeComponent(query)}');
   }
@@ -95,19 +90,15 @@ class _VenueSearchPageContentState extends State<_VenueSearchPageContent> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
-      body: BlocBuilder<SearchHistoryCubit, BaseState<List<SearchHistoryModel>>>(
-        builder: (context, state) {
-          return state.whenReady(
-            loading: (data) => const Center(child: CircularProgressIndicator()),
-            success: (history, message) => VenueSearchHistoryList(
-              history: history,
-              onItemTap: _onHistoryItemTap,
-              onClearHistory: () => context.read<SearchHistoryCubit>().clearSearchHistory(),
-            ),
-            failure: (error, data) => Center(child: Text(error)),
-            empty: (message) => const SizedBox.shrink(),
-          );
-        },
+      body: ref.watch(searchHistoryProvider).when(
+        data: (history) => VenueSearchHistoryList(
+          history: history,
+          onItemTap: _onHistoryItemTap,
+          onClearHistory: () =>
+              ref.read(searchHistoryProvider.notifier).clearSearchHistory(),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(child: Text(error.toString())),
       ),
     );
   }

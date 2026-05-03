@@ -16,7 +16,7 @@ import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
 import '../../common/constants/api_endpoints.dart';
 import '../../data/network/dio_client.dart';
-import 'app_auth_state.dart';
+import 'providers/app_auth_state.dart';
 
 /// 🎯 AppAuthService - Centralized Authentication Service for the entire App
 @LazySingleton()
