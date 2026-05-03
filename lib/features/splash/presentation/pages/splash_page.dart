@@ -1,6 +1,6 @@
 import 'package:dat_san_247_mobile/config/app/app_startup.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:dat_san_247_mobile/routes/config/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

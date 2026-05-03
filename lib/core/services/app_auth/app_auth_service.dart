@@ -3,9 +3,8 @@
 // ════════════════════════════════════════════════════════════════
 import 'dart:async';
 
-import 'package:dat_san_247_mobile/core/common/constants/api_endpoints.dart';
+import 'package:dat_san_247_mobile/core/common/mixins/api_handler_mixin.dart';
 import 'package:dat_san_247_mobile/core/common/utils/logger.dart';
-import 'package:dat_san_247_mobile/core/data/network/api_client.dart';
 import 'package:dat_san_247_mobile/core/data/storage/local/local_storage_service.dart';
 import 'package:dat_san_247_mobile/core/data/storage/secure/secure_storage_service.dart';
 import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
@@ -15,16 +14,18 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../../features/auth/data/models/auth_response.dart';
 import '../../../features/auth/data/models/user_model.dart';
 import '../../base/state/base_status.dart';
+import '../../common/constants/api_endpoints.dart';
+import '../../data/network/dio_client.dart';
 import 'app_auth_state.dart';
 
 /// 🎯 AppAuthService - Centralized Authentication Service for the entire App
 @LazySingleton()
-class AppAuthService {
+class AppAuthService with ApiHandlerMixin {
   final SecureStorage _secureStorage;
   final LocalStorageService _storageService;
-  final ApiClient _apiClient;
+  final DioClient _dioClient;
 
-  AppAuthService(this._secureStorage, this._storageService, this._apiClient);
+  AppAuthService(this._secureStorage, this._storageService, this._dioClient);
 
   final _authStateController = StreamController<AuthStatus>.broadcast();
   Stream<AuthStatus> get authStateStream => _authStateController.stream;
@@ -75,21 +76,28 @@ class AppAuthService {
       final refreshToken = await _secureStorage.getRefreshToken();
       if (refreshToken == null || refreshToken.isEmpty) return false;
 
-      final result = await _apiClient.post(
-        ApiEndpoints.refreshToken,
-        (json) => json as Map<String, dynamic>,
-        data: {'refresh_token': refreshToken},
+      final result = await safeCall(
+        () => _dioClient.post(
+          ApiEndpoints.refreshToken,
+          data: {'refresh_token': refreshToken},
+        ),
       );
 
       return result.fold(
-        onSuccess: (data) async {
-          final accessToken = data['access_token'] ?? data['accessToken'];
-          final newRefreshToken = data['refresh_token'] ?? data['refreshToken'];
+        onSuccess: (response) async {
+          final data = response.data;
+          // Unwrap data field if API returns standard wrapper {success, data, ...}
+          final body = data is Map<String, dynamic> ? (data['data'] ?? data) : data;
 
-          if (accessToken != null)
+          final accessToken = body['access_token'] ?? body['accessToken'];
+          final newRefreshToken = body['refresh_token'] ?? body['refreshToken'];
+
+          if (accessToken != null) {
             await _secureStorage.saveAccessToken(accessToken);
-          if (newRefreshToken != null)
+          }
+          if (newRefreshToken != null) {
             await _secureStorage.saveRefreshToken(newRefreshToken);
+          }
           return true;
         },
         onFailure: (failure) {
@@ -125,12 +133,16 @@ class AppAuthService {
   }
 
   Future<UserModel?> fetchUserProfile() async {
-    final result = await _apiClient.get(
-      ApiEndpoints.profile,
-      (json) => UserModel.fromJson(json as Map<String, dynamic>),
+    final result = await safeCall(
+      () => _dioClient.get(ApiEndpoints.profile),
     );
+
     return result.fold(
-      onSuccess: (user) => user,
+      onSuccess: (response) {
+        final data = response.data;
+        final body = data is Map<String, dynamic> ? (data['data'] ?? data) : data;
+        return UserModel.fromJson(body as Map<String, dynamic>);
+      },
       onFailure: (failure) {
         Logger.error('AppAuthService: Fetch profile failed: ${failure.message}');
         return null;
@@ -145,7 +157,7 @@ class AppAuthService {
     // Tinh chỉnh mode dựa trên Role thực tế từ API để tránh sai lệch điều hướng
     AppLoginMode refinedMode = mode;
     final userFromApi = response.user;
-    
+
     if (userFromApi.role?.slug == 'owner') {
       refinedMode = AppLoginMode.owner;
     } else if (mode == AppLoginMode.staff && !userFromApi.isVenueStaff) {
@@ -176,7 +188,7 @@ class AppAuthService {
       'is_email_verified': true,
       'is_phone_verified': false,
     };
-    
+
     await _storageService.saveUser(userData);
     await _storageService.setLoggedIn(true);
     _updateStatus(AuthStatus.authenticated);
@@ -193,7 +205,7 @@ class AppAuthService {
     try {
       await _secureStorage.clearTokens();
       await _storageService.clearAuthData();
-      _apiClient.clearAuthorization();
+      _dioClient.clearAuthorization();
       _updateStatus(AuthStatus.unauthenticated);
     } catch (e) {
       Logger.error('AppAuthService: Logout failed', error: e);

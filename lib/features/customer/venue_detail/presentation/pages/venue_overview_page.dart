@@ -7,7 +7,7 @@ import 'package:dat_san_247_mobile/features/customer/booking/data/models/time_sl
 import 'package:dat_san_247_mobile/features/customer/recurring_booking/data/repositories/recurring_booking_repository.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_detail/data/models/venue_overview_model.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/cubit/venue_overview_cubit.dart';
-import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:dat_san_247_mobile/routes/config/route_names.dart';
 import 'package:dat_san_247_mobile/features/shared/widgets/app_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -741,9 +741,9 @@ class VenueOverviewView extends StatelessWidget {
       BuildContext context, VenueOverviewModel model) async {
     final listSelected =
         model.courts.expand((c) => c.slots.where((s) => s.isSelected)).toList();
-    
+
     Logger.info('Handle Recurring Submit: ${listSelected.length} total slots selected');
-    
+
     if (listSelected.isEmpty) {
       Logger.warning('Handle Recurring Submit: No slots selected, returning.');
       return;
@@ -830,7 +830,7 @@ class VenueOverviewView extends StatelessWidget {
       context
           .read<VenueOverviewCubit>()
           .setBookingMode(VenueBookingMode.regular);
-      
+
       await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -851,7 +851,7 @@ class VenueOverviewView extends StatelessWidget {
   /// Helper to merge contiguous time slots
   List<TimeSlotModel> _mergeTimeSlots(List<TimeSlotModel> slots) {
     if (slots.isEmpty) return [];
-    
+
     final List<TimeSlotModel> merged = [];
     TimeSlotModel? current;
 
@@ -869,7 +869,7 @@ class VenueOverviewView extends StatelessWidget {
       }
     }
     if (current != null) merged.add(current);
-    
+
     return merged;
   }
 }

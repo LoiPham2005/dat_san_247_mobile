@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_cubit.dart';
 import 'package:dat_san_247_mobile/core/services/app_auth/app_auth_state.dart';
-import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:dat_san_247_mobile/routes/config/route_names.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 
@@ -99,7 +99,7 @@ class RouteGuards {
     if (isLoggedIn) {
       final user = _appAuthCubit.state.user;
       final mode = _appAuthCubit.state.loginMode;
-      
+
       // Hậu kiểm Role thực tế để đảm bảo không vào nhầm DashBoard
       AppLoginMode actualMode = mode;
       if (mode == AppLoginMode.owner && user?.role?.slug != 'owner') {
@@ -114,12 +114,12 @@ class RouteGuards {
         if (actualMode == AppLoginMode.owner) return RouteNames.owner;
         return RouteNames.main;
       }
-      
+
       // Prevent access to Staff screens if not in Staff mode
       if (location.startsWith('/venue-staff') && actualMode != AppLoginMode.staff) {
         return RouteNames.main;
       }
-      
+
       // Prevent access to Owner screens if not in Owner mode
       if (location.startsWith('/owner') && actualMode != AppLoginMode.owner) {
         return RouteNames.main;
@@ -134,7 +134,7 @@ class RouteGuards {
 
     if (mode == AppLoginMode.owner) return RouteNames.owner;
     if (mode == AppLoginMode.staff) return RouteNames.venueStaff;
-    
+
     return RouteNames.main;
   }
 }

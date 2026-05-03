@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../design/theme/styles/app_colors.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../routes/constants/route_names.dart';
+import '../../../../routes/config/route_names.dart';
 
 class LoginPrompt extends StatelessWidget {
   const LoginPrompt({super.key});

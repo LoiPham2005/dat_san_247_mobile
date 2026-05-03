@@ -174,16 +174,21 @@ splash:
 gen-flavor:
 	fvm flutter pub run flutter_flavorizr
 
-
 # 🧱 MASON CODE GEN
-feature:
-	mason make feature --on-conflict overwrite
+feature-co-dien:
+	mason make feature_co_dien --on-conflict overwrite
 
 feature-rut-gon:
 	mason make feature_rut_gon --on-conflict overwrite
 
 feature-ket-hop:
 	mason make feature_ket_hop --on-conflict overwrite
+
+feature-rut-gon-gen:
+	mason make feature_rut_gon_gen --on-conflict overwrite
+
+feature-rut-gon-thu-cong:
+	mason make feature_rut_gon_thu_cong --on-conflict overwrite
 
 feature-pick:
 	@powershell -Command "\
@@ -203,3 +208,6 @@ rename-package:
 
 rename-app:
 	fvm flutter pub run rename setAppName --value "$(name)"
+
+rename-bundle-id:
+	fvm dart run rename setBundleId --targets android,ios --value "$(name)"

@@ -7,9 +7,9 @@ import 'package:dat_san_247_mobile/core/services/manager/navigation_service.dart
 import 'package:dat_san_247_mobile/routes/base/app_routes_observer.dart';
 import 'package:dat_san_247_mobile/routes/base/go_router_refresh_stream.dart';
 import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
-import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
-import 'package:dat_san_247_mobile/routes/guards/route_guards.dart';
-import 'package:dat_san_247_mobile/routes/pages/not_found_page.dart';
+import 'package:dat_san_247_mobile/routes/config/route_names.dart';
+import 'package:dat_san_247_mobile/routes/config/route_guards.dart';
+import 'package:dat_san_247_mobile/routes/base/not_found_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';

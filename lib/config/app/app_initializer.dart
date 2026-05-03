@@ -15,9 +15,11 @@ import 'package:dat_san_247_mobile/design/l10n/cubit/locale_cubit.dart';
 import 'package:dat_san_247_mobile/design/theme/cubit/theme_cubit.dart';
 import 'package:dat_san_247_mobile/modules/iap/iap_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/base/di/injection.dart';
 import '../../core/data/cache/cache_service.dart';
+import '../observers/app_riverpod_observer.dart';
 
 /// 🎯 Quản lý toàn bộ quá trình khởi tạo app
 class AppInitializer {
@@ -94,6 +96,12 @@ class AppInitializer {
       Logger.error('Cleanup error', error: e, tag: 'INIT');
     }
   }
+
+  /// Danh sách Riverpod observers — truyền vào ProviderContainer trước runApp.
+  /// Phải gọi trước initialize() vì container cần tạo trước DI.
+  static List<ProviderObserver> get riverpodObservers => [
+    if (!FlavorConfig.isProd) AppRiverpodObserver(),
+  ];
 
   /// 🔍 Setup BLoC observer (chỉ cho Dev/Staging)
   static void _configureBlocObserver() {

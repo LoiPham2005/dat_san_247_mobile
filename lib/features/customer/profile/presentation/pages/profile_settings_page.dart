@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../../core/base/di/injection.dart';
 import '../../../../../core/base/state/bloc/base_state.dart';
 import '../../../../../design/theme/styles/app_colors.dart';
+import '../../data/models/profile_models.dart';
 import '../cubit/profile_cubit.dart';
 import '../widgets/notification_tab.dart';
 import '../widgets/profile_tab.dart';
 import '../widgets/sport_interests_tab.dart';
-import '../../data/models/profile_models.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
@@ -42,9 +43,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage>
           final user = state.data;
 
           if (state.isLoading && user == null) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
 
           if (state.isFailure && user == null) {
@@ -66,9 +65,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage>
           }
 
           if (user == null) {
-            return const Scaffold(
-              body: Center(child: Text('Không tìm thấy thông tin người dùng')),
-            );
+            return const Scaffold(body: Center(child: Text('Không tìm thấy thông tin người dùng')));
           }
 
           return Scaffold(
@@ -162,7 +159,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage>
                               children: [
                                 _kycBadge(user.kycStatus),
                                 const SizedBox(width: 8),
-                                if (user.isEmailVerified) _verifyBadge('Email', Icons.email_rounded),
+                                if (user.isEmailVerified)
+                                  _verifyBadge('Email', Icons.email_rounded),
                                 const SizedBox(width: 4),
                                 if (user.isPhoneVerified) _verifyBadge('SĐT', Icons.phone_rounded),
                               ],
@@ -211,20 +209,28 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage>
                     notifPromotion: user.profile?.notifPromotion ?? true,
                     notifPayment: user.profile?.notifPayment ?? true,
                     notifSystem: user.profile?.notifSystem ?? true,
-                    onPushChanged: (v) => context.read<ProfileCubit>().updateNotificationSettings(notifPush: v),
-                    onEmailChanged: (v) => context.read<ProfileCubit>().updateNotificationSettings(notifEmail: v),
-                    onSmsChanged: (v) => context.read<ProfileCubit>().updateNotificationSettings(notifSms: v),
-                    onBookingChanged: (v) => context.read<ProfileCubit>().updateNotificationSettings(notifBooking: v),
-                    onPromotionChanged: (v) => context.read<ProfileCubit>().updateNotificationSettings(notifPromotion: v),
-                    onPaymentChanged: (v) => context.read<ProfileCubit>().updateNotificationSettings(notifPayment: v),
-                    onSystemChanged: (v) => context.read<ProfileCubit>().updateNotificationSettings(notifSystem: v),
+                    onPushChanged: (v) =>
+                        context.read<ProfileCubit>().updateNotificationSettings(notifPush: v),
+                    onEmailChanged: (v) =>
+                        context.read<ProfileCubit>().updateNotificationSettings(notifEmail: v),
+                    onSmsChanged: (v) =>
+                        context.read<ProfileCubit>().updateNotificationSettings(notifSms: v),
+                    onBookingChanged: (v) =>
+                        context.read<ProfileCubit>().updateNotificationSettings(notifBooking: v),
+                    onPromotionChanged: (v) =>
+                        context.read<ProfileCubit>().updateNotificationSettings(notifPromotion: v),
+                    onPaymentChanged: (v) =>
+                        context.read<ProfileCubit>().updateNotificationSettings(notifPayment: v),
+                    onSystemChanged: (v) =>
+                        context.read<ProfileCubit>().updateNotificationSettings(notifSystem: v),
                     onSave: () {}, // Handled by individual changes
                   ),
                   SportInterestsTab(
                     user: user,
-                    onSkillChanged: (sport, level) => context.read<ProfileCubit>().updateSportPreference(sport, level),
+                    onSkillChanged: (sport, level) =>
+                        context.read<ProfileCubit>().updateSportPreference(sport, level),
                     onSave: () {}, // Handled by individual changes
-                  )
+                  ),
                 ],
               ),
             ),

@@ -1,44 +1,43 @@
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../../core/base/di/injection.dart';
 import '../../../../../core/base/state/bloc/base_state.dart';
 import '../../../../../design/theme/styles/app_colors.dart';
-import '../../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../../auth/presentation/providers/auth_notifier.dart';
 import '../../../main/presentation/pages/main_shell_page.dart';
 import '../../data/models/profile_models.dart';
 import '../cubit/profile_cubit.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends HookConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ── Listen to logout success ──
+    useAsyncValueListener(
+      provider: authProvider,
+      ref: ref,
+      onSuccess: (_) {},
+    );
 
-class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => getIt<ProfileCubit>()..fetchProfile()),
-        BlocProvider(create: (context) => getIt<AuthCubit>()),
       ],
       child: BlocBuilder<ProfileCubit, BaseState<UserModel>>(
         builder: (context, state) {
           final user = state.data;
-          return _buildProfile(context, state, user);
+          return _buildProfile(context, ref, state, user);
         },
       ),
     );
   }
 
-  Widget _buildProfile(BuildContext context, BaseState<UserModel> state, UserModel? user) {
+  Widget _buildProfile(BuildContext context, WidgetRef ref, BaseState<UserModel> state, UserModel? user) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       body: CustomScrollView(
@@ -111,7 +110,6 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                           icon: Icons.person_outline_rounded,
                           label: 'Thông tin cá nhân & Cài đặt',
                           onTap: () => context.push('/profile-settings')),
-                      // _ProfileTile(icon: Icons.account_balance_wallet_rounded, label: 'Ví của tôi', trailing: '1.250.000đ', onTap: () => context.push('/wallet')),
                       _ProfileTile(
                           icon: Icons.receipt_long_rounded,
                           label: 'Hóa đơn',
@@ -148,10 +146,6 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                           trailing: '3',
                           trailingColor: AppColors.error,
                           onTap: () => context.push('/notifications')),
-                      // _ProfileTile(
-                      //     icon: Icons.history_rounded,
-                      //     label: 'Lịch sử giao dịch',
-                      //     onTap: () => context.push('/wallet')),
                       _ProfileTile(
                           icon: Icons.support_agent_rounded,
                           label: 'Hỗ trợ & CSKH',
@@ -191,8 +185,8 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                             ],
                           ),
                         );
-                        if (ok == true && context.mounted) {
-                          context.read<AuthCubit>().logout();
+                        if (ok == true) {
+                          ref.read(authProvider.notifier).logout();
                         }
                       },
                       icon: const Icon(Icons.logout_rounded, color: AppColors.error),

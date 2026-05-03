@@ -5,7 +5,7 @@ import 'package:dat_san_247_mobile/features/customer/venue_detail/data/models/ve
 import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/cubit/venue_detail_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
 import 'package:dat_san_247_mobile/routes/config/app_routes.dart';
-import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:dat_san_247_mobile/routes/config/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';

@@ -2,7 +2,7 @@ class ApiConstants {
   ApiConstants._();
 
   // ── Domains (private — chỉ dùng nội bộ file này) ──────────────
-  static const String _domainDev = 'http://192.168.60.102:3001';
+  static const String _domainDev = 'http://192.168.2.6:3001';
   static const String _domainStg = 'http://192.168.60.102:3001';
   static const String _domainProd = 'http://192.168.60.102:3001'; // TODO: prod domain
 

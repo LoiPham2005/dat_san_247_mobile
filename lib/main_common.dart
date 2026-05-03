@@ -8,8 +8,10 @@ import 'package:dat_san_247_mobile/app.dart';
 import 'package:dat_san_247_mobile/config/app/flavor_config.dart';
 import 'package:dat_san_247_mobile/core/common/utils/logger.dart';
 import 'package:dat_san_247_mobile/core/services/crashlytics/crashlytics_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/app/app_initializer.dart';
+import 'core/base/di/global_providers.dart';
 
 void mainCommon(AppFlavor flavor) {
   // Bắt lỗi Async (Dart Zone)
@@ -17,6 +19,10 @@ void mainCommon(AppFlavor flavor) {
     () async {
       // ✅ Đảm bảo Binding được khởi tạo TRONG Zone này để tránh lỗi "Zone mismatch"
       WidgetsFlutterBinding.ensureInitialized();
+
+      // Khởi tạo globalContainer trước runApp để có thể dùng ngoài widget tree
+      // (AppRouter, DioClient interceptor, push notification handler...)
+      globalContainer = ProviderContainer(observers: AppInitializer.riverpodObservers);
 
       FlavorConfig.setFlavor(flavor);
       await AppInitializer.initialize();

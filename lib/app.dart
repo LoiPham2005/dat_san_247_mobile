@@ -1,3 +1,4 @@
+import 'package:dat_san_247_mobile/core/base/di/global_providers.dart';
 import 'package:dat_san_247_mobile/core/base/di/injection.dart';
 import 'package:dat_san_247_mobile/core/common/constants/app_constants.dart';
 import 'package:dat_san_247_mobile/core/common/utils/error_utils.dart';
@@ -10,6 +11,7 @@ import 'package:dat_san_247_mobile/gen/l10n/app_localizations.dart';
 import 'package:dat_san_247_mobile/routes/config/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
@@ -23,11 +25,16 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (_, __) => _AppContent(),
+    // Dùng UncontrolledProviderScope để chia sẻ globalContainer với widget tree.
+    // Mọi ref.watch/read trong widget đều trỏ về cùng một container này.
+    return UncontrolledProviderScope(
+      container: globalContainer,
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (_, __) => _AppContent(),
+      ),
     );
   }
 }

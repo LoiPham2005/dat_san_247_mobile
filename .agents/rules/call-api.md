@@ -7,7 +7,7 @@ trigger: always_on
 3. khi viết model @freezed
 abstract class UserDeviceModel with _$UserDeviceModel
 nhớ viết thêm chữ abstract
-4. nhớ đọc category_rut_gon ở example để học cashc call api tôi thiết lập
+4. nhớ đọc voucher ở example để học cashc call api tôi thiết lập
 5. nhớ viết đường dẫn vào file api_endpoints.dart xong với vào file _service
 6. mỗi lần dùng cubit phải kiển tra đã khai báo BlocProvider của nó chưa
 7. check thông tin hay valifate ô nhập thì đọc file validators.dart hoặc các file trong thư mục extensions nó có đủ hết rồi

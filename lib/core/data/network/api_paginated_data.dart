@@ -79,34 +79,34 @@ class ApiPaginatedData<T> {
 
 
 
+/// 📊 Metadata phân trang từ API
 class ApiMeta {
+  static const int defaultPage = 1;
+  static const int defaultLimit = 10;
+
   final int total;
   final int page;
   final int limit;
   final int totalPages;
 
-  ApiMeta({
-    required this.total,
-    required this.page,
-    required this.limit,
-    required this.totalPages,
-  });
+  ApiMeta({required this.total, required this.page, required this.limit, required this.totalPages});
+
+  bool get hasMore => page < totalPages;
+  bool get isFirstPage => page == 1;
+  int? get nextPage => hasMore ? page + 1 : null;
+  int? get prevPage => page > 1 ? page - 1 : null;
 
   factory ApiMeta.fromJson(Map<String, dynamic> json) {
     return ApiMeta(
-      total: json['total'] ?? 0,
-      page: json['page'] ?? 1,
-      limit: json['limit'] ?? 0,
-      totalPages: json['totalPages'] ?? 0,
+      total: (json['total'] as num?)?.toInt() ?? 0,
+      page: (json['page'] as num?)?.toInt() ?? defaultPage,
+      limit: (json['limit'] as num?)?.toInt() ?? defaultLimit,
+      totalPages:
+          (json['totalPages'] as num?)?.toInt() ?? (json['total_pages'] as num?)?.toInt() ?? 1,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'total': total,
-      'page': page,
-      'limit': limit,
-      'totalPages': totalPages,
-    };
+    return {'total': total, 'page': page, 'limit': limit, 'totalPages': totalPages};
   }
 }

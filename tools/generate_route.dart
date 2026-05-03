@@ -1,9 +1,10 @@
 // =============================================================================
-// 🌉  Route Generator Tool (v6 - Clean & Typed)
+// 🌉  Route Generator Tool
 // =============================================================================
 // Triết lý:
-// 1. Chỉ dùng RouteNames để giữ Path Constant (bắt buộc cho Annotation).
-// 2. Việc truyền tham số sẽ dùng hoàn toàn qua Typed Route Class (IntroRoute(...)).
+// 1. Dùng RouteNames để giữ Path Constant (bắt buộc cho @TypedGoRoute annotation).
+// 2. Tham số truyền hoàn toàn qua Typed Route Class (IntroRoute(...)).
+// 3. Scan tự động file có marker // @route: <path> [Group] trong features/.
 // =============================================================================
 
 import 'dart:io';
@@ -11,9 +12,9 @@ import 'dart:io';
 const _featuresDir = 'lib/features';
 const _routesFile = 'lib/routes/config/app_routes.dart';
 const _routerFile = 'lib/routes/config/app_router.dart';
-const _routeNamesFile = 'lib/routes/constants/route_names.dart';
+const _routeNamesFile = 'lib/routes/config/route_names.dart'; // ← moved from constants/
 
-// ─── ANSI Colors ─────────────────────────────────────────────────────────────
+// ─── ANSI Colors ──────────────────────────────────────────────────────────────
 const _reset = '\x1B[0m';
 const _green = '\x1B[32m';
 const _yellow = '\x1B[33m';
@@ -24,29 +25,27 @@ const _bold = '\x1B[1m';
 void main(List<String> args) {
   final params = _parseArgs(args);
 
-  if (params['help'] == 'true') {
+  if (params.containsKey('help')) {
     _printHelp();
     return;
   }
-
-  if (params['list'] == 'true') {
+  if (params.containsKey('list')) {
     _listRoutes();
     return;
   }
-
-  if (params['scan'] == 'true') {
+  if (params.containsKey('scan')) {
     _scanAndGenerate();
     return;
   }
 
-  _error('Vui lòng dùng --scan để tự động quét.');
+  _error('Vui lòng dùng --scan để tự động quét. Xem --help để biết thêm.');
 }
 
 // =============================================================================
 // SCAN & GENERATE
 // =============================================================================
 void _scanAndGenerate() {
-  print('\n$_bold$_cyan🌉  Quét Routes (Tập trung Typed Routing)...$_reset\n');
+  stdout.writeln('\n$_bold$_cyan🌉  Quét Routes...$_reset\n');
 
   final featuresDir = Directory(_featuresDir);
   if (!featuresDir.existsSync()) {
@@ -54,97 +53,85 @@ void _scanAndGenerate() {
     return;
   }
 
-  final files = featuresDir
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.dart'));
+  // Validate các file đích tồn tại trước khi bắt đầu
+  for (final path in [_routesFile, _routerFile, _routeNamesFile]) {
+    if (!File(path).existsSync()) {
+      _error('File không tồn tại: $path');
+      return;
+    }
+  }
+
+  final files =
+      featuresDir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path)); // deterministic order
 
   int foundCount = 0;
   int addedCount = 0;
 
   for (final file in files) {
     final content = file.readAsStringSync();
-    final markerRegex = RegExp(
-      r'//\s*@route:\s*([^\s\[]+)(?:\s*\[([^\]]+)\])?|@route',
-    );
+
+    // Marker: // @route: /path [Group Name]
+    final markerRegex = RegExp(r'//\s*@route:\s*([^\s\[]+)(?:\s*\[([^\]]+)\])?');
     final match = markerRegex.firstMatch(content);
+    if (match == null) continue;
 
-    if (match != null) {
-      foundCount++;
-      final classRegex = RegExp(r'class\s+(\w+)\s+extends');
-      final classMatches = classRegex
-          .allMatches(content)
-          .where((m) => m.start > match.start);
-      if (classMatches.isEmpty) continue;
+    foundCount++;
 
-      final classMatch = classMatches.first;
-      final className = classMatch.group(1)!;
+    // Tìm class đầu tiên SAU marker
+    final classRegex = RegExp(r'class\s+(\w+)\s+extends');
+    final classMatch = classRegex
+        .allMatches(content)
+        .where((m) => m.start > match.start)
+        .firstOrNull;
 
-      final props = <Map<String, String>>[];
-      final propRegex = RegExp(
-        r'^\s*final\s+([\w<>?]+)\s+(\w+);',
-        multiLine: true,
-      );
-      final propMatches = propRegex.allMatches(content);
-      final buildIndex = content.indexOf('Widget build');
+    if (classMatch == null) {
+      _warn('⚠️  Tìm thấy @route marker nhưng không có class nào sau đó: ${file.path}');
+      continue;
+    }
 
-      for (final m in propMatches) {
-        if (m.start > classMatch.start &&
-            (buildIndex == -1 || m.start < buildIndex)) {
-          if (m.group(2) == 'key') continue;
-          props.add({'type': m.group(1)!, 'name': m.group(2)!});
-        }
-      }
+    final className = classMatch.group(1)!;
+    final routeClassName = className.endsWith('Page')
+        ? className.replaceFirst('Page', 'Route')
+        : '${className}Route';
 
-      final pageName = className;
-      final routeClassName = className.endsWith('Page')
-          ? className.replaceFirst('Page', 'Route')
-          : '${className}Route';
+    // Parse path từ marker
+    final path = match.group(1)!;
 
-      String? path = (match.groupCount >= 1 && match.group(1) != null)
-          ? match.group(1)
-          : null;
-      
-      if (path == null) {
-        final kebab = className.replaceAll('Page', '').replaceAllMapped(
-          RegExp(r'([a-z0-9])([A-Z])'),
-          (m) => '${m.group(1)}-${m.group(2)}'
-        ).toLowerCase();
-        path = '/$kebab';
-      }
+    // Parse group: ưu tiên từ marker, fallback từ folder structure
+    final group = _detectGroup(match.group(2), file.path);
 
-      String group = (match.groupCount >= 2 && match.group(2) != null)
-          ? match.group(2)!
-          : 'Main App';
-      
-      // Auto-detect group from path
-      if (file.path.contains('lib/features/venue_staff/')) group = 'Staff';
-      else if (file.path.contains('lib/features/owner/')) group = 'Owner';
+    // Parse constructor properties (final fields trước Widget build)
+    final props = _parseProperties(content, classMatch.start);
 
-      String cleanPath = file.path.replaceAll('\\', '/');
-      if (cleanPath.contains('/lib/')) {
-        cleanPath = cleanPath.substring(cleanPath.lastIndexOf('/lib/') + 5);
-      } else if (cleanPath.startsWith('lib/')) {
-        cleanPath = cleanPath.substring(4);
-      }
+    // Import path tương đối từ lib/
+    final importPath = _toLibRelativePath(file.path);
 
-      final added = _generate(
-        name: routeClassName,
-        path: path,
-        page: pageName,
-        importPath: cleanPath,
-        group: group,
-        properties: props,
-        isQuiet: true,
-      );
-      if (added) addedCount++;
+    final added = _generate(
+      name: routeClassName,
+      path: path,
+      page: className,
+      importPath: importPath,
+      group: group,
+      properties: props,
+    );
+    if (added) {
+      addedCount++;
+      stdout.writeln('  $_green✓$_reset $routeClassName → $path [$group]');
     }
   }
 
-  print('─' * 50);
-  print(
-    '📊 Kết quả: Hoàn tất quét $_bold$foundCount$_reset file, thêm/cập nhật $_green$_bold$addedCount$_reset routes.',
+  stdout.writeln('\n${'─' * 50}');
+  stdout.writeln(
+    '📊 Quét $_bold$foundCount$_reset file có marker | Thêm/cập nhật $_green$_bold$addedCount$_reset routes.',
   );
+  if (addedCount > 0) {
+    stdout.writeln('$_yellow⚡ Chạy Build Runner để regenerate app_routes.g.dart$_reset');
+  }
 }
 
 // =============================================================================
@@ -157,46 +144,37 @@ bool _generate({
   required String importPath,
   required String group,
   required List<Map<String, String>> properties,
-  bool isQuiet = false,
 }) {
-  final routesFile = File(_routesFile);
-  final routerFile = File(_routerFile);
-  final routeNamesFile = File(_routeNamesFile);
+  final routesContent = File(_routesFile).readAsStringSync();
+  final routerContent = File(_routerFile).readAsStringSync();
+  final routeNamesContent = File(_routeNamesFile).readAsStringSync();
 
-  final constantName =
-      name.replaceFirst('Route', '').substring(0, 1).toLowerCase() +
-      name.replaceFirst('Route', '').substring(1);
+  // constantName = camelCase từ routeClassName bỏ "Route"
+  // VenueRoute → venue, GoogleMapRoute → googleMap
+  final baseName = name.replaceFirst('Route', '');
+  final constantName = baseName.substring(0, 1).toLowerCase() + baseName.substring(1);
 
-  // 1. LUÔN ĐẢM BẢO IMPORT (Ngay cả khi route đã tồn tại)
-  final routerContent = routerFile.readAsStringSync();
+  // 1. Inject import vào app_router.dart (app_router import tất cả pages)
   final newRouter = _injectImport(
     content: routerContent,
-    importLine: "import '../../$importPath';",
+    importLine: "import 'package:dat_san_247_mobile/$importPath';",
   );
-  routerFile.writeAsStringSync(newRouter);
+  File(_routerFile).writeAsStringSync(newRouter);
 
-  // 2. LUÔN ĐẢM BẢO CONSTANT
-  final currentRouteNames = routeNamesFile.readAsStringSync();
-  if (!currentRouteNames.contains('static const String $constantName = ')) {
-    final newRouteNames = _injectConstant(
-      content: currentRouteNames,
+  // 2. Thêm constant vào RouteNames nếu chưa có
+  if (!routeNamesContent.contains('static const String $constantName =')) {
+    final newNames = _injectConstant(
+      content: routeNamesContent,
       name: constantName,
       path: path,
       group: group,
     );
-    routeNamesFile.writeAsStringSync(newRouteNames);
+    File(_routeNamesFile).writeAsStringSync(newNames);
   }
 
-  // 3. CHỈ THÊM ROUTE BLOCK NẾU CHƯA CÓ
-  final currentRoutes = routesFile.readAsStringSync();
-  if (currentRoutes.contains('class $name extends GoRouteData')) {
-    if (!isQuiet)
-      _warn('⚠️  Route "$name" đã có block definition. Bỏ qua bước này.');
-    return true; // Vẫn tính là thành công để báo kết quả
-  }
-
-  if (!isQuiet) {
-    print('  $_green●$_reset Adding Route Block: $_bold$name$_reset');
+  // 3. Thêm route block vào app_routes.dart nếu chưa có
+  if (routesContent.contains('class $name extends GoRouteData')) {
+    return false; // đã tồn tại
   }
 
   final routeBlock = _buildRouteBlock(
@@ -205,18 +183,14 @@ bool _generate({
     page: page,
     properties: properties,
   );
-  final newRoutes = _injectRoute(
-    content: currentRoutes,
-    routeBlock: routeBlock,
-    group: group,
-  );
-  routesFile.writeAsStringSync(newRoutes);
+  final newRoutes = _injectRoute(content: routesContent, routeBlock: routeBlock, group: group);
+  File(_routesFile).writeAsStringSync(newRoutes);
 
   return true;
 }
 
 // =============================================================================
-// BUILDERS & INJECTORS
+// BUILDERS
 // =============================================================================
 String _buildRouteBlock({
   required String name,
@@ -224,126 +198,142 @@ String _buildRouteBlock({
   required String page,
   required List<Map<String, String>> properties,
 }) {
-  final fieldsStr = properties
-      .map((e) => '  final ${e['type']} ${e['name']};')
-      .join('\n');
+  final fields = properties.map((p) => '  final ${p['type']} ${p['name']};').join('\n');
 
-  final constructorParams = properties
-      .map((k) {
-        String def = '""';
-        if (k['type'] == 'bool') def = 'false';
-        else if (k['type'] == 'int') def = '0';
-        else if (k['type'] == 'double') def = '0.0';
-        else if (k['type']!.contains('?')) def = 'null';
-        else if (!['String', 'bool', 'int', 'double'].contains(k['type'])) {
-           // Complex types should be required if not nullable, or have a factory default
-           // For simple tool, we'll use 'required' or just omit default
-           return 'required this.${k['name']}';
-        }
-        return 'this.${k['name']} = $def';
+  final ctorParams = properties
+      .map((p) {
+        final type = p['type']!;
+        final paramName = p['name']!;
+        // Nullable types → default null, primitives → default values, complex → required
+        if (type.endsWith('?')) return 'this.$paramName = null';
+        return switch (type) {
+          'bool' => 'this.$paramName = false',
+          'int' => 'this.$paramName = 0',
+          'double' => 'this.$paramName = 0.0',
+          'String' => 'this.$paramName = ""',
+          _ => 'required this.$paramName', // complex/enum → required
+        };
       })
       .join(', ');
-  
-  final constructor = properties.isEmpty
-      ? '  const $name();'
-      : '  const $name({$constructorParams});';
 
-  final passParams = properties
-      .map((k) => '${k['name']}: ${k['name']}')
-      .join(', ');
-  final buildBody = properties.isEmpty ? 'const $page()' : '$page($passParams)';
+  final constructor = properties.isEmpty ? '  const $name();' : '  const $name({$ctorParams});';
+
+  final passArgs = properties.map((p) => '${p['name']}: ${p['name']}').join(', ');
+  final buildReturn = properties.isEmpty ? 'const $page()' : '$page($passArgs)';
 
   return '''
 @TypedGoRoute<$name>(path: RouteNames.$constantName)
 class $name extends GoRouteData with \$$name {
-${fieldsStr.isNotEmpty ? '$fieldsStr\n' : ''}$constructor
+${fields.isNotEmpty ? '$fields\n' : ''}$constructor
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => $buildBody;
+  Widget build(BuildContext context, GoRouterState state) => $buildReturn;
 }
 ''';
 }
 
+// =============================================================================
+// INJECTORS
+// =============================================================================
 String _injectConstant({
   required String content,
   required String name,
   required String path,
   required String group,
 }) {
-  final groupMarker = '// $group';
-  int index = content.indexOf(groupMarker);
-  
-  // If group not found, look for similar markers or create one
-  if (index == -1 && group == 'Staff') {
-    index = content.indexOf('// Venue Staff'); // Check existing name
-    if (index == -1) index = content.indexOf('// Owner'); // fallback to near group
-  }
-  
-  if (index == -1) index = content.indexOf('// Main App');
+  final newLine = "  static const String $name = '$path';";
+  final groupMarker = '// ── $group';
 
-  if (index == -1) {
-    final int lastBrace = content.lastIndexOf('}');
+  // Tìm group marker (// ── Auth, // ── Main App, ...)
+  final markerIndex = content.indexOf(groupMarker);
+
+  if (markerIndex == -1) {
+    // Group chưa tồn tại → thêm section mới trước dấu } cuối
+    final lastBrace = content.lastIndexOf('}');
     if (lastBrace == -1) return content;
-    return '${content.substring(0, lastBrace).trimRight()}\n  // $group\n  static const String $name = \'$path\';\n}';
+    final before = content.substring(0, lastBrace).trimRight();
+    return '$before\n\n  // ── $group ────────────────────────────────────────\n$newLine\n}';
   }
 
-  // Find the end of the current group (next marker or empty line with spacing)
-  final lineEnd = content.indexOf('\n', index);
-  // Find next static const or next group or end of class
-  final nextGroup = content.indexOf('//', lineEnd + 1);
-  final endOfClass = content.indexOf('}', lineEnd + 1);
-  
-  int insertAt = endOfClass;
-  if (nextGroup != -1 && nextGroup < endOfClass) {
-    insertAt = nextGroup;
-  }
+  // Tìm vị trí cuối của group hiện tại (trước group tiếp theo hoặc trước })
+  final afterMarker = content.indexOf('\n', markerIndex) + 1;
+  final nextSection = content.indexOf('\n  // ──', afterMarker);
+  final closingBrace = content.lastIndexOf('}');
 
-  return '${content.substring(0, insertAt).trimRight()}\n  static const String $name = \'$path\';\n${content.substring(insertAt).trimLeft()}';
+  final insertAt = (nextSection != -1 && nextSection < closingBrace) ? nextSection : closingBrace;
+
+  return '${content.substring(0, insertAt).trimRight()}\n$newLine\n${content.substring(insertAt).trimLeft()}';
 }
 
-String _injectRoute({
-  required String content,
-  required String routeBlock,
-  required String group,
-}) {
-  final groupComment = '// ─── $group ';
+String _injectRoute({required String content, required String routeBlock, required String group}) {
+  // Tìm group comment trong app_routes.dart: // ─── Group ───
+  final groupComment = '// ─── $group';
   final groupIndex = content.indexOf(groupComment);
 
   if (groupIndex != -1) {
-    final nextGroupIndex = content.indexOf(
-      '\n// ───',
-      groupIndex + groupComment.length,
-    );
-    final insertAt = nextGroupIndex != -1 ? nextGroupIndex : content.length;
+    // Insert trước group section tiếp theo
+    final nextGroup = content.indexOf('\n// ───', groupIndex + groupComment.length);
+    final insertAt = nextGroup != -1 ? nextGroup : content.length;
     return '${content.substring(0, insertAt).trimRight()}\n\n$routeBlock\n${content.substring(insertAt).trimLeft()}';
   }
-  return '${content.trim()}\n\n$routeBlock\n';
+
+  // Không có group section → append cuối file
+  return '${content.trimRight()}\n\n// ─── $group ─────────────────────────────────────────\n$routeBlock\n';
 }
 
 String _injectImport({required String content, required String importLine}) {
   if (content.contains(importLine)) return content;
   final lines = content.split('\n');
-  final int lastImport = lines.lastIndexWhere(
-    (l) => l.trim().startsWith('import '),
-  );
-  if (lastImport == -1) return '$importLine\n$content';
-  lines.insert(lastImport + 1, importLine);
+  final lastImportIdx = lines.lastIndexWhere((l) => l.trimLeft().startsWith('import '));
+  if (lastImportIdx == -1) {
+    return '$importLine\n$content';
+  }
+  lines.insert(lastImportIdx + 1, importLine);
   return lines.join('\n');
 }
 
 // =============================================================================
 // HELPERS
 // =============================================================================
+List<Map<String, String>> _parseProperties(String content, int classStart) {
+  final buildIndex = content.indexOf('Widget build', classStart);
+  final propRegex = RegExp(r'^\s*final\s+([\w<>?,\s]+)\s+(\w+);', multiLine: true);
+  final result = <Map<String, String>>[];
+
+  for (final m in propRegex.allMatches(content)) {
+    if (m.start <= classStart) continue;
+    if (buildIndex != -1 && m.start >= buildIndex) break;
+    final propName = m.group(2)!;
+    if (propName == 'key') continue; // skip GlobalKey/Key fields
+    result.add({'type': m.group(1)!.trim(), 'name': propName});
+  }
+  return result;
+}
+
+String _detectGroup(String? markerGroup, String filePath) {
+  if (markerGroup != null && markerGroup.isNotEmpty) return markerGroup;
+  // Auto-detect từ folder structure
+  if (filePath.contains('/venue_staff/') || filePath.contains('\\venue_staff\\')) return 'Staff';
+  if (filePath.contains('/owner/') || filePath.contains('\\owner\\')) return 'Owner';
+  if (filePath.contains('/auth/') || filePath.contains('\\auth\\')) return 'Auth';
+  return 'Main App';
+}
+
+String _toLibRelativePath(String filePath) {
+  // Normalize path separator
+  final normalized = filePath.replaceAll('\\', '/');
+  final libIndex = normalized.lastIndexOf('/lib/');
+  if (libIndex != -1) return normalized.substring(libIndex + 1); // includes "lib/"
+  if (normalized.startsWith('lib/')) return normalized;
+  return normalized;
+}
+
 Map<String, String> _parseArgs(List<String> args) {
   final map = <String, String>{};
   for (int i = 0; i < args.length; i++) {
     if (args[i].startsWith('--')) {
       final key = args[i].substring(2);
-      if (i + 1 < args.length && !args[i + 1].startsWith('--')) {
-        map[key] = args[i + 1];
-        i++;
-      } else
-        map[key] = 'true';
+      map[key] = (i + 1 < args.length && !args[i + 1].startsWith('--')) ? args[++i] : 'true';
     }
   }
   return map;
@@ -351,24 +341,35 @@ Map<String, String> _parseArgs(List<String> args) {
 
 void _listRoutes() {
   final content = File(_routesFile).readAsStringSync();
-  final regex = RegExp(
-    r"@TypedGoRoute<(\w+)>\(path: (?:RouteNames\.(\w+)|'([^']+)')\)",
-  );
-  print('\n$_bold$_cyan🛣️  Danh sách Routes:$_reset');
+  final regex = RegExp(r"@TypedGoRoute<(\w+)>\(path: (?:RouteNames\.(\w+)|'([^']+)')\)");
+  stdout.writeln('\n$_bold$_cyan🛣️  Danh sách Routes:$_reset\n');
+  var count = 0;
   for (final m in regex.allMatches(content)) {
-    final name = m.group(1);
+    final routeName = m.group(1);
     final path = m.group(2) != null ? 'RouteNames.${m.group(2)}' : m.group(3);
-    print('  $_green●$_reset $_bold$name$_reset → $path');
+    stdout.writeln('  $_green●$_reset $_bold$routeName$_reset → $path');
+    count++;
   }
+  stdout.writeln('\n  Tổng: $_bold$count$_reset routes');
 }
 
 void _printHelp() {
-  print('''
-$_bold$_cyan🛣️  Route Generator v6 (Typed Only)$_reset
-- Chỉ sinh Constant cho RouteNames.
-- Tự động sinh constructor với default values an toàn.
+  stdout.writeln('''
+$_bold$_cyan🛣️  Route Generator$_reset
+
+Cách dùng:
+  dart run tools/generate_route.dart --scan    Quét features/ và generate routes
+  dart run tools/generate_route.dart --list    Liệt kê routes hiện có
+  dart run tools/generate_route.dart --help    Hiển thị help này
+
+Đánh dấu page để scan:
+  // @route: /my-path
+  // @route: /my-path [Group Name]
+  class MyPage extends StatelessWidget { ... }
+
+Sau khi chạy --scan, nhớ chạy Build Runner để regenerate app_routes.g.dart.
 ''');
 }
 
-void _error(String msg) => print('$_red❌ ERROR: $msg$_reset');
-void _warn(String msg) => print('$_yellow$msg$_reset');
+void _error(String msg) => stdout.writeln('$_red❌  $msg$_reset');
+void _warn(String msg) => stdout.writeln('$_yellow⚠️   $msg$_reset');

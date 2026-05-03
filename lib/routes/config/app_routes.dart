@@ -62,7 +62,7 @@ import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pa
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/weekly_schedule_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentation/pages/staff_management_page.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/staff_profile/presentation/pages/staff_profile_page.dart';
-import 'package:dat_san_247_mobile/routes/constants/route_names.dart';
+import 'package:dat_san_247_mobile/routes/config/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/payment_return_page.dart';
 import 'package:go_router/go_router.dart';
