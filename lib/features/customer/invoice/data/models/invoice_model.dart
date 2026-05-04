@@ -1,3 +1,6 @@
+// ignore_for_file: constant_identifier_names
+// Reason: enum values are intentionally UPPER_SNAKE_CASE to match backend Postgres enum string values 1:1.
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'invoice_model.freezed.dart';

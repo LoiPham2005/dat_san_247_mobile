@@ -7,7 +7,11 @@
       "Skill(shared)",
       "Skill(shared:*)",
       "Bash(grep -r 'class.*Notifier\\\\|abstract.*Notifier\\\\|$Notifier' /Users/loipd/.pub-cache/hosted/pub.dev/riverpod-3.0.3/lib/src/notifier/)",
-      "Bash(grep -n \"context.read<OwnerVenueServicesCubit>\\\\|context\\\\s*$\" /Users/loipd/personal/dat_san_247_mobile/lib/features/owner/venue/presentation/pages/owner_venue_services_page.dart)"
+      "Bash(grep -n \"context.read<OwnerVenueServicesCubit>\\\\|context\\\\s*$\" /Users/loipd/personal/dat_san_247_mobile/lib/features/owner/venue/presentation/pages/owner_venue_services_page.dart)",
+      "Bash(grep -rEln \"^enum [A-Z][A-Za-z]* \\\\{ [A-Z_]+\\(,|;\\)\" --include=\"*.dart\" .)",
+      "Bash(grep -rEln \"^\\\\s+[A-Z][A-Z_]+\\(,|;\\)\\\\s*$\" --include=\"*.dart\" .)",
+      "Bash(xargs -I{} grep -lE \"^enum [A-Z]\" {})",
+      "Bash(grep -E \"^\\\\s+[A-Z][A-Z_]+\\(,|;\\)\\\\s*$|enum.*\\\\{ [A-Z][A-Z_]\" /Users/loipd/personal/dat_san_247_mobile/lib/features/venue_staff/dashboard/data/models/staff_dashboard_models.dart)"
     ]
   }
 }

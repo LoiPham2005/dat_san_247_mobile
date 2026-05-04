@@ -1,3 +1,6 @@
+// ignore_for_file: constant_identifier_names
+// Reason: enum values are intentionally UPPER_SNAKE_CASE to match backend Postgres enum string values 1:1.
+
 import 'package:equatable/equatable.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/check_in/data/models/check_in_models.dart';
 

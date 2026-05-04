@@ -63,6 +63,11 @@ Future<Result<ApiResponse<T>>>
 ### After any code-gen change
 Run task: **⚡ Build Runner: Build**
 
+### Enum naming convention
+- **Enum mới**: dùng `lowerCamelCase` + `@JsonValue('UPPERCASE')` để map backend value (xem [auth_enums.dart](lib/features/auth/data/models/auth_enums.dart) làm tham chiếu).
+- **Enum cũ UPPERCASE** (`BookingStatus.PENDING`, `VenueStatus.APPROVED`...): cố ý mirror tên enum Postgres ở backend → giữ nguyên, file đã có `// ignore_for_file: constant_identifier_names` ở đầu kèm lý do. Đừng đổi vì sẽ break ~300+ references và cần map `apiValue` thủ công cho mỗi enum.
+- **Khi thêm value mới vào enum cũ**: viết UPPERCASE để nhất quán với các value sẵn có trong file đó.
+
 ## Skills
 Use these for step-by-step workflows:
 - `.claude/skills/commands/` — toàn bộ Makefile targets + VSCode Tasks + Dart tools
