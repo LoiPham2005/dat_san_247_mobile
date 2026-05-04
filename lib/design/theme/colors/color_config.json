@@ -65,11 +65,11 @@
                 "green": "0xFFF4F6F9"
             },
             "card": {
-                "light": "Colors.white",
+                "light": "0xFFFFFFFF",
                 "dark": "0xFF1A1D23",
-                "blue": "Colors.white",
-                "pink": "Colors.white",
-                "green": "Colors.white"
+                "blue": "0xFFFFFFFF",
+                "pink": "0xFFFFFFFF",
+                "green": "0xFFFFFFFF"
             },
             "input": {
                 "light": "0xFFF0F2F5",
@@ -79,11 +79,11 @@
                 "green": "0xFFF0F2F5"
             },
             "modal": {
-                "light": "Colors.white",
+                "light": "0xFFFFFFFF",
                 "dark": "0xFF1A1D23",
-                "blue": "Colors.white",
-                "pink": "Colors.white",
-                "green": "Colors.white"
+                "blue": "0xFFFFFFFF",
+                "pink": "0xFFFFFFFF",
+                "green": "0xFFFFFFFF"
             }
         },
         "text": {
@@ -116,11 +116,11 @@
                 "green": "0xFFCDD1D9"
             },
             "onPrimary": {
-                "light": "Colors.white",
+                "light": "0xFFFFFFFF",
                 "dark": "0xFF0F1117",
-                "blue": "Colors.white",
-                "pink": "Colors.white",
-                "green": "Colors.white"
+                "blue": "0xFFFFFFFF",
+                "pink": "0xFFFFFFFF",
+                "green": "0xFFFFFFFF"
             }
         },
         "border": {

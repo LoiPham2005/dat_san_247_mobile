@@ -384,8 +384,6 @@ class ThemeGen {
     buf.write(_genHeader('lib/gen/theme/color_palettes.dart'));
     buf.writeln("import 'package:flutter/material.dart';");
     buf.writeln("import 'color_tokens.dart';");
-    if (_needsAppColorsImport(tokens))
-      buf.writeln("import '../app_colors.dart';");
     buf.writeln('');
     buf.writeln('enum AppColorTheme { ${themeNames.join(', ')} }');
     buf.writeln('');
@@ -465,22 +463,9 @@ class ThemeGen {
     return List<String>.from(config['themes'] as List);
   }
 
-  bool _isValidColorValue(String val) => _isHex(val) || _isDartRef(val);
+  bool _isValidColorValue(String val) => _isHex(val);
   bool _isHex(String val) => RegExp(r'^0x[0-9A-Fa-f]{8}$').hasMatch(val);
-  bool _isDartRef(String val) =>
-      RegExp(r'^[A-Z][A-Za-z]*\.[a-zA-Z][a-zA-Z0-9]*$').hasMatch(val);
-  String _expr(String raw) => _isHex(raw) ? 'Color($raw)' : raw;
-
-  bool _needsAppColorsImport(Map<String, dynamic> tokens) {
-    for (final group in tokens.values) {
-      for (final valMap in (group as Map<String, dynamic>).values) {
-        for (final v in (valMap as Map<String, dynamic>).values) {
-          if ((v as String).startsWith('AppColors')) return true;
-        }
-      }
-    }
-    return false;
-  }
+  String _expr(String raw) => 'Color($raw)';
 
   String _cls(String key) =>
       'App${key[0].toUpperCase()}${key.substring(1)}Colors';

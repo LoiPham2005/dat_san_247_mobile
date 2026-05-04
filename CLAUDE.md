@@ -63,6 +63,12 @@ Future<Result<ApiResponse<T>>>
 ### After any code-gen change
 Run task: **⚡ Build Runner: Build**
 
+### Theme & color usage
+- **Theme-aware color** (đổi theo light/dark/blue/pink/green): dùng `context.colors.brand.primary`, `context.colors.bg.page`, `context.colors.text.title`, … Nguồn: [color_config.json](lib/design/theme/colors/color_config.json) → gen ra [color_tokens.dart](lib/gen/theme/color_tokens.dart) + [color_palettes.dart](lib/gen/theme/color_palettes.dart).
+- **Static color** (không đổi theo theme): dùng `AppColors.white`, `AppColors.facebook`, `AppColors.grey`. Section "CORE" ở đầu [app_colors.dart](lib/design/theme/styles/app_colors.dart).
+- **`AppColors.textPrimary` / `AppColors.primaryLightBrand` / `AppColors.mutedLight`...**: **LEGACY** — đã `@Deprecated`. Code mới dùng token (`context.colors.X.Y`); code cũ migrate dần.
+- Thêm theme/token mới: edit JSON → `make theme-gen` (hoặc `make theme-sync` để fill missing). Tool chỉ chấp nhận hex `0xAARRGGBB`, không cho `Colors.xxx` reference nữa.
+
 ### Enum naming convention
 - **Enum mới**: dùng `lowerCamelCase` + `@JsonValue('UPPERCASE')` để map backend value (xem [auth_enums.dart](lib/features/auth/data/models/auth_enums.dart) làm tham chiếu).
 - **Enum cũ UPPERCASE** (`BookingStatus.PENDING`, `VenueStatus.APPROVED`...): cố ý mirror tên enum Postgres ở backend → giữ nguyên, file đã có `// ignore_for_file: constant_identifier_names` ở đầu kèm lý do. Đừng đổi vì sẽ break ~300+ references và cần map `apiValue` thủ công cho mỗi enum.
