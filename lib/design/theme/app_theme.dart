@@ -1,40 +1,35 @@
-// 📁 lib/core/theme/app_theme.dart
-import 'package:flutter/material.dart';
+// 📁 lib/design/theme/app_theme.dart
 import 'package:dat_san_247_mobile/gen/fonts.gen.dart';
+import 'package:flutter/material.dart';
 
-import '../../gen/theme/color_palettes.dart';
-import '../../gen/theme/color_tokens.dart';
 import 'providers/theme_state.dart';
+import 'styles/app_color_tokens.dart';
 
 enum AppThemeMode { light, dark, system }
 
 class AppTheme {
   AppTheme._();
 
-  /// Delegate sang AppColorPalettes — không hardcode ở đây nữa
-  static Map<AppColorTheme, String> get themeNames => AppColorPalettes.labels;
-  static Map<AppColorTheme, IconData> get themeIcons => AppColorPalettes.icons;
-  static List<AppColorTheme> get allThemes => AppColorPalettes.all;
+  static List<AppPalette> get allThemes => AppPalette.values;
 
-  /// Shorthand dùng tại app.dart — không cần khai báo Brightness thủ công
   static ThemeData light(ThemeState state) =>
-      build(palette: state.colorType, brightness: Brightness.light);
+      build(palette: state.palette, brightness: Brightness.light);
 
   static ThemeData dark(ThemeState state) =>
-      build(palette: state.colorType, brightness: Brightness.dark);
+      build(palette: state.palette, brightness: Brightness.dark);
 
   static ThemeData build({
-    required AppColorTheme palette,
+    required AppPalette palette,
     required Brightness brightness,
   }) {
-    final tokens = AppColorPalettes.of(palette);
+    final tokens = palette.tokens;
     final colorScheme = _buildScheme(tokens, brightness);
 
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: tokens.bg.page,
+      scaffoldBackgroundColor: tokens.bgPage,
       fontFamily: FontFamily.inter,
       extensions: [tokens],
     );
@@ -44,15 +39,15 @@ class AppTheme {
   static ColorScheme _buildScheme(AppColorTokens t, Brightness b) =>
       ColorScheme(
         brightness: b,
-        primary: t.brand.primary,
-        onPrimary: t.text.onPrimary,
-        secondary: t.brand.secondary,
-        onSecondary: t.text.onPrimary,
-        surface: t.bg.card,
-        onSurface: t.text.title,
-        error: t.status.error,
+        primary: t.brandPrimary,
+        onPrimary: t.textOnPrimary,
+        secondary: t.brandSecondary,
+        onSecondary: t.textOnPrimary,
+        surface: t.bgCard,
+        onSurface: t.textTitle,
+        error: t.statusError,
         onError: Colors.white,
-        outline: t.border.defaultColor,
-        shadow: t.surface.shadow,
+        outline: t.borderDefault,
+        shadow: t.surfaceShadow,
       );
 }

@@ -29,30 +29,6 @@
       "default": "build"
     },
     {
-      "id": "themeAction",
-      "type": "pickString",
-      "description": "Theme Gen action",
-      "options": [
-        {
-          "label": "Gen — generate theme code",
-          "value": ""
-        },
-        {
-          "label": "Expand — add new tokens to all themes",
-          "value": "--expand"
-        },
-        {
-          "label": "Sync — sync keys from light theme",
-          "value": "--sync"
-        },
-        {
-          "label": "Preview — dry run (no file changes)",
-          "value": "--dry-run"
-        }
-      ],
-      "default": ""
-    },
-    {
       "id": "l10nAction",
       "type": "pickString",
       "description": "Localization action",
@@ -166,8 +142,8 @@
           "value": "fvm flutter pub upgrade --major-versions"
         },
         {
-          "label": "Full Regenerate — clean → get → l10n → theme → bloc → build_runner",
-          "value": "fvm flutter clean && fvm flutter pub get && fvm flutter gen-l10n && fvm dart run tools/theme_gen.dart && fvm dart run tools/generate_bloc_helper.dart && fvm dart run build_runner build --delete-conflicting-outputs"
+          "label": "Full Regenerate — clean → get → l10n → bloc → build_runner",
+          "value": "fvm flutter clean && fvm flutter pub get && fvm flutter gen-l10n && fvm dart run tools/generate_bloc_helper.dart && fvm dart run build_runner build --delete-conflicting-outputs"
         }
       ],
       "default": "fvm flutter pub get"
@@ -333,12 +309,6 @@
         "panel": "dedicated",
         "clear": true
       }
-    },
-    {
-      "label": "🎨 Theme Generator",
-      "type": "shell",
-      "command": "fvm dart run tools/theme_gen.dart ${input:themeAction}",
-      "group": "build"
     },
     {
       "label": "🌐 Localization (l10n)",

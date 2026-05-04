@@ -64,10 +64,12 @@ Future<Result<ApiResponse<T>>>
 Run task: **⚡ Build Runner: Build**
 
 ### Theme & color usage
-- **Theme-aware color** (đổi theo light/dark/blue/pink/green): dùng `context.colors.brand.primary`, `context.colors.bg.page`, `context.colors.text.title`, … Nguồn: [color_config.json](lib/design/theme/colors/color_config.json) → gen ra [color_tokens.dart](lib/gen/theme/color_tokens.dart) + [color_palettes.dart](lib/gen/theme/color_palettes.dart).
+- **Stack**: `theme_tailor` (codegen `copyWith`/`lerp`/`==`/`hashCode` + extension trên `BuildContext`) + Material3 `ThemeExtension` + Riverpod state.
+- **Theme-aware color** (đổi theo light/dark/blue/pink/green): dùng trực tiếp `context.brandPrimary`, `context.bgPage`, `context.textTitle`, … (21 getters tự sinh trong [.tailor.dart](lib/design/theme/styles/app_color_tokens.tailor.dart)). Nguồn: [app_color_tokens.dart](lib/design/theme/styles/app_color_tokens.dart) — flat naming `<group><Field>`.
 - **Static color** (không đổi theo theme): dùng `AppColors.white`, `AppColors.facebook`, `AppColors.grey`. Section "CORE" ở đầu [app_colors.dart](lib/design/theme/styles/app_colors.dart).
-- **`AppColors.textPrimary` / `AppColors.primaryLightBrand` / `AppColors.mutedLight`...**: **LEGACY** — đã `@Deprecated`. Code mới dùng token (`context.colors.X.Y`); code cũ migrate dần.
-- Thêm theme/token mới: edit JSON → `make theme-gen` (hoặc `make theme-sync` để fill missing). Tool chỉ chấp nhận hex `0xAARRGGBB`, không cho `Colors.xxx` reference nữa.
+- **`AppColors.textPrimary` / `AppColors.primaryLightBrand` / `AppColors.mutedLight`...**: **LEGACY** — đã `@Deprecated`. Code mới dùng token (`context.X`); code cũ migrate dần.
+- Thêm token mới: thêm `final Color xxx` + `required this.xxx` vào constructor + 1 dòng vào MỖI static instance (light/dark/blue/pink/green) → chạy `build_runner build` regen `.tailor.dart`.
+- Thêm theme mới: thêm 1 static instance + 1 entry vào enum `AppColorTheme`.
 
 ### Enum naming convention
 - **Enum mới**: dùng `lowerCamelCase` + `@JsonValue('UPPERCASE')` để map backend value (xem [auth_enums.dart](lib/features/auth/data/models/auth_enums.dart) làm tham chiếu).

@@ -1,6 +1,6 @@
 import 'package:dat_san_247_mobile/core/data/storage/local/local_storage_provider.dart';
 import 'package:dat_san_247_mobile/design/theme/app_theme.dart';
-import 'package:dat_san_247_mobile/gen/theme/color_palettes.dart';
+import 'package:dat_san_247_mobile/design/theme/styles/app_color_tokens.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'theme_state.dart';
 
@@ -12,14 +12,14 @@ class ThemeNotifier extends _$ThemeNotifier {
   ThemeState build() {
     final storage = ref.watch(localStorageServiceProvider);
     return ThemeState(
-      colorType: _parseEnum(AppColorTheme.values, storage.getThemeColor(), fallback: AppColorTheme.light),
+      palette: _parseEnum(AppPalette.values, storage.getThemeColor(), fallback: AppPalette.light),
       themeMode: _parseEnum(AppThemeMode.values, storage.getThemeMode(), fallback: AppThemeMode.light),
     );
   }
 
-  Future<void> changeColor(AppColorTheme colorType) async {
-    await ref.read(localStorageServiceProvider).saveThemeColor(colorType.name);
-    state = state.copyWith(colorType: colorType);
+  Future<void> changePalette(AppPalette palette) async {
+    await ref.read(localStorageServiceProvider).saveThemeColor(palette.name);
+    state = state.copyWith(palette: palette);
   }
 
   Future<void> changeMode(AppThemeMode mode) async {

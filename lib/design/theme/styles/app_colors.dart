@@ -3,9 +3,9 @@
 // ⚠️ HƯỚNG DẪN DÙNG MÀU:
 //
 // 1) MÀU THEO THEME (đổi theo light/dark/blue/pink/green):
-//    → Dùng `context.colors.brand.primary`, `context.colors.bg.page`, …
-//    → Định nghĩa trong: lib/design/theme/colors/color_config.json
-//    → Type-safe gen: lib/gen/theme/color_tokens.dart
+//    → Dùng `context.brandPrimary`, `context.bgPage`, `context.textTitle`, …
+//    → Định nghĩa trong: lib/design/theme/styles/app_color_tokens.dart
+//    → Codegen: theme_tailor sinh `app_color_tokens.tailor.dart`
 //
 // 2) MÀU CỐ ĐỊNH (không bao giờ đổi theo theme):
 //    → Dùng `AppColors.xxx` trong file này
@@ -13,7 +13,7 @@
 //
 // 3) MÀU "LEGACY" bên dưới (primaryLightBrand, mutedLight, …):
 //    → ❗ Đây là **LEGACY** từ giai đoạn đầu — trùng ý đồ với token theme.
-//    → Code mới NÊN dùng `context.colors.X.Y` để hỗ trợ multi-theme.
+//    → Code mới NÊN dùng `context.X` (token) để hỗ trợ multi-theme.
 //    → Khi rảnh: migrate dần các reference sang token. Không thêm mới ở section này.
 
 import 'package:flutter/material.dart';
@@ -40,33 +40,33 @@ class AppColors {
 
   // ═══════════════════════════════════════════════════════════════
   // ⚠️ LEGACY — Trùng ý đồ với token theme. Migrate sang
-  //    context.colors.X.Y khi có dịp. KHÔNG thêm mới ở đây.
+  //    context.X khi có dịp. KHÔNG thêm mới ở đây.
   // ═══════════════════════════════════════════════════════════════
 
-  // ─── Semantic Text → context.colors.text.* ───
-  @Deprecated('Dùng context.colors.text.title')
+  // ─── Semantic Text → context.textXxx ───
+  @Deprecated('Dùng context.textTitle')
   static const Color textPrimary = Color(0xFF1A1D23);
 
-  @Deprecated('Dùng context.colors.text.body')
+  @Deprecated('Dùng context.textBody')
   static const Color textSecondary = Color(0xFF4A4F5A);
 
-  @Deprecated('Dùng context.colors.text.hint')
+  @Deprecated('Dùng context.textSub')
   static const Color textHint = Color(0xFF9098A9);
 
-  @Deprecated('Dùng context.colors.text.disabled')
+  @Deprecated('Dùng context.textDisabled')
   static const Color textDisabled = Color(0xFFCDD1D9);
 
-  // ─── Status → context.colors.status.* ───
-  @Deprecated('Dùng context.colors.status.success')
+  // ─── Status → context.statusXxx ───
+  @Deprecated('Dùng context.statusSuccess')
   static const Color success = Color(0xFF43A047);
 
-  @Deprecated('Dùng context.colors.status.warning')
+  @Deprecated('Dùng context.statusWarning')
   static const Color warning = Color(0xFFFFB300);
 
-  @Deprecated('Dùng context.colors.status.error')
+  @Deprecated('Dùng context.statusError')
   static const Color error = Color(0xFFE53935);
 
-  @Deprecated('Dùng context.colors.status.info')
+  @Deprecated('Dùng context.statusInfo')
   static const Color info = Color(0xFF1E88E5);
 
   // ─── Light theme palette (Shadcn/Tailwind sync) — migrate dần sang token ───

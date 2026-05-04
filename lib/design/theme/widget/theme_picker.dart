@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/app_theme.dart';
 import 'package:dat_san_247_mobile/design/theme/providers/theme_notifier.dart';
+import 'package:dat_san_247_mobile/design/theme/styles/app_color_tokens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../../../gen/theme/color_palettes.dart';
 
 class ThemePicker extends ConsumerWidget {
   const ThemePicker({super.key});
@@ -33,12 +32,12 @@ class ThemePicker extends ConsumerWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final themeType = AppTheme.allThemes[index];
-                final isSelected = state.colorType == themeType;
+                final isSelected = state.palette == themeType;
 
                 return _ThemeColorButton(
                   themeType: themeType,
                   isSelected: isSelected,
-                  onTap: () => notifier.changeColor(themeType),
+                  onTap: () => notifier.changePalette(themeType),
                 );
               },
             ),
@@ -90,7 +89,7 @@ class ThemePicker extends ConsumerWidget {
 
 // ✅ Theme Color Button
 class _ThemeColorButton extends StatelessWidget {
-  final AppColorTheme themeType;
+  final AppPalette themeType;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -112,7 +111,7 @@ class _ThemeColorButton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(AppTheme.themeIcons[themeType], size: 24.sp),
+            Icon(themeType.icon, size: 24.sp),
             SizedBox(height: 4.h),
             Text(
               themeType.name.toUpperCase(),

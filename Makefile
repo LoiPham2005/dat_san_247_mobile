@@ -43,11 +43,9 @@ help:
 	@echo "  make icons           - Tạo App Icons"
 	@echo "  make splash          - Tạo Native Splash"
 	@echo ""
-	@echo "🎨 THEME GEN"
-	@echo "  make theme-expand      - Thêm theme mới (có trong meta) vào tất cả tokens + gen"
-	@echo "  make theme-sync        - Sync key từ 'light' sang các themes khác + gen code"
-	@echo "  make theme-gen         - Gen code (tất cả themes phải đồng đều key)"
-	@echo "  make theme-preview     - Xem trước output, không ghi file"
+	@echo "🎨 THEME"
+	@echo "  Token mới: edit lib/design/theme/styles/app_color_tokens.dart"
+	@echo "  Regen:     fvm dart run build_runner build --delete-conflicting-outputs"
 	@echo ""
 	@echo "🛠️ REFACTORING"
 	@echo "  make rename-package name=\"new_name\" - Đổi tên package (pubspec & dart files)"
@@ -88,18 +86,6 @@ gen-assets:
 
 bloc_gen:
 	dart tools/generate_bloc_helper.dart
-
-theme-expand:
-	fvm dart run tools/theme_gen.dart --expand
-
-theme-sync:
-	fvm dart run tools/theme_gen.dart --sync
-
-theme-gen:
-	fvm dart run tools/theme_gen.dart
-
-theme-preview:
-	fvm dart run tools/theme_gen.dart --dry-run
 
 route-list:
 	dart tools/generate_route.dart --list

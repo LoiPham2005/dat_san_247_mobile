@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:dat_san_247_mobile/design/theme/app_theme.dart';
+import 'package:dat_san_247_mobile/design/theme/styles/app_color_tokens.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../gen/theme/color_palettes.dart';
 
 part 'theme_state.freezed.dart';
 
 @freezed
 abstract class ThemeState with _$ThemeState {
   const factory ThemeState({
-    @Default(AppColorTheme.light) AppColorTheme colorType,
+    @Default(AppPalette.light) AppPalette palette,
     @Default(AppThemeMode.light) AppThemeMode themeMode,
   }) = _ThemeState;
 

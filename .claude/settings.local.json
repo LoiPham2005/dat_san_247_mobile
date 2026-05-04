@@ -11,7 +11,8 @@
       "Bash(grep -rEln \"^enum [A-Z][A-Za-z]* \\\\{ [A-Z_]+\\(,|;\\)\" --include=\"*.dart\" .)",
       "Bash(grep -rEln \"^\\\\s+[A-Z][A-Z_]+\\(,|;\\)\\\\s*$\" --include=\"*.dart\" .)",
       "Bash(xargs -I{} grep -lE \"^enum [A-Z]\" {})",
-      "Bash(grep -E \"^\\\\s+[A-Z][A-Z_]+\\(,|;\\)\\\\s*$|enum.*\\\\{ [A-Z][A-Z_]\" /Users/loipd/personal/dat_san_247_mobile/lib/features/venue_staff/dashboard/data/models/staff_dashboard_models.dart)"
+      "Bash(grep -E \"^\\\\s+[A-Z][A-Z_]+\\(,|;\\)\\\\s*$|enum.*\\\\{ [A-Z][A-Z_]\" /Users/loipd/personal/dat_san_247_mobile/lib/features/venue_staff/dashboard/data/models/staff_dashboard_models.dart)",
+      "Bash(fvm flutter *)"
     ]
   }
 }
