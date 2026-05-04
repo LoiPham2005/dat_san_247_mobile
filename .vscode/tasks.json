@@ -143,7 +143,7 @@
         },
         {
           "label": "Full Regenerate — clean → get → l10n → bloc → build_runner",
-          "value": "fvm flutter clean && fvm flutter pub get && fvm flutter gen-l10n && fvm dart run tools/generate_bloc_helper.dart && fvm dart run build_runner build --delete-conflicting-outputs"
+          "value": "fvm flutter clean && fvm flutter pub get && fvm flutter gen-l10n && fvm dart run build_runner build --delete-conflicting-outputs"
         }
       ],
       "default": "fvm flutter pub get"
