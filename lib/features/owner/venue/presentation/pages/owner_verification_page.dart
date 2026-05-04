@@ -1,72 +1,47 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
-import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
-import 'package:dat_san_247_mobile/features/owner/venue/presentation/cubit/owner_verification_cubit.dart';
+import 'package:dat_san_247_mobile/features/owner/venue/presentation/providers/owner_verification_notifier.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // O-13: Xác Minh Venue
-// DB: venue_verifications (venue_id), files
 // ══════════════════════════════════════════════════════════════════════════════
-class OwnerVerificationPage extends StatelessWidget {
+class OwnerVerificationPage extends HookConsumerWidget {
   final String venueId;
   final String venueName;
-  const OwnerVerificationPage({super.key, required this.venueId, required this.venueName});
+  const OwnerVerificationPage(
+      {super.key, required this.venueId, required this.venueName});
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<OwnerVerificationCubit>()..fetchVerification(venueId),
-      child: BlocListener<OwnerVerificationCubit, BaseState<OwnerVerificationState>>(
-        listenWhen: (prev, curr) => curr.isSuccess || curr.isFailure,
-        listener: (context, state) {
-          if (state.isFailure && state.error != null) {
-            getIt<ToastService>().error(state.error!);
-          } else if (state.isSuccess && state.message != null) {
-            getIt<ToastService>().success(state.message!);
-          }
-        },
-        child: _OwnerVerificationView(venueId: venueId, venueName: venueName),
-      ),
-    );
-  }
-}
-
-class _OwnerVerificationView extends StatefulWidget {
-  final String venueId;
-  final String venueName;
-  const _OwnerVerificationView({required this.venueId, required this.venueName});
-
-  @override
-  State<_OwnerVerificationView> createState() => _OwnerVerificationViewState();
-}
-
-class _OwnerVerificationViewState extends State<_OwnerVerificationView> {
   static const Color _brand = Color(0xFF0891B2);
   static const Color _brandDark = Color(0xFF0E7490);
 
-  bool _showForm = false;
-
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OwnerVerificationCubit, BaseState<OwnerVerificationState>>(
-      builder: (context, state) {
-        final ver = state.data?.verification;
-        final filePaths = state.data?.filePaths ?? {};
-        final isSubmitting = state.data?.isSubmitting ?? false;
-        final allFilesSelected = filePaths.length == 4 && filePaths.values.every((v) => v != null);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final showForm = useState(false);
+    final provider = ownerVerificationProvider(venueId);
+    final state = ref.watch(provider);
+    final notifier = ref.read(provider.notifier);
 
-        if (state.isLoading && !state.hasData) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
+    useAsyncValueListener(provider: provider, ref: ref);
 
-        return Scaffold(
+    final data = state.value;
+    final ver = data?.verification;
+    final filePaths = data?.filePaths ?? {};
+    final isSubmitting = data?.isSubmitting ?? false;
+    final allFilesSelected =
+        filePaths.length == 4 && filePaths.values.every((v) => v != null);
+
+    if (state.isLoading && data == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    return Scaffold(
           backgroundColor: const Color(0xFFF4F6FA),
           body: CustomScrollView(slivers: [
             // ── AppBar ──
@@ -79,7 +54,7 @@ class _OwnerVerificationViewState extends State<_OwnerVerificationView> {
                 background: Container(
                   decoration: const BoxDecoration(gradient: LinearGradient(colors: [_brandDark, _brand], begin: Alignment.topLeft, end: Alignment.bottomRight)),
                   child: SafeArea(child: Padding(padding: const EdgeInsets.fromLTRB(20, 46, 20, 0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(widget.venueName, style: const TextStyle(color: Colors.white70, fontSize: 11), overflow: TextOverflow.ellipsis),
+                    Text(venueName, style: const TextStyle(color: Colors.white70, fontSize: 11), overflow: TextOverflow.ellipsis),
                     // const Text('Xác Minh Venue', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 8),
                     if (ver != null)
@@ -101,12 +76,12 @@ class _OwnerVerificationViewState extends State<_OwnerVerificationView> {
               if (ver == null || !ver.isApproved) const SizedBox(height: 12),
 
               // ── Upload form toggle ──
-              if (ver == null || ver.canResubmit || (ver.isPending && !_showForm)) ...[
+              if (ver == null || ver.canResubmit || (ver.isPending && !showForm.value)) ...[
                 if (ver?.isPending == true)
                   _InfoBox(Icons.hourglass_top_rounded, AppColors.warning, 'Hồ sơ đang được xét duyệt', 'Vui lòng chờ 1-3 ngày làm việc. Bạn sẽ nhận thông báo khi có kết quả.')
                 else if (ver == null || ver.canResubmit)
                   GestureDetector(
-                    onTap: () { HapticFeedback.selectionClick(); setState(() => _showForm = true); },
+                    onTap: () { HapticFeedback.selectionClick(); showForm.value = true; },
                     child: Container(
                       width: double.infinity, padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(gradient: LinearGradient(colors: [_brand.withValues(alpha: 0.05), _brand.withValues(alpha: 0.12)]), borderRadius: BorderRadius.circular(14), border: Border.all(color: _brand.withValues(alpha: 0.3))),
@@ -124,13 +99,13 @@ class _OwnerVerificationViewState extends State<_OwnerVerificationView> {
               ],
 
               // ── Upload form ──
-              if (_showForm) ...[
+              if (showForm.value) ...[
                 const SizedBox(height: 4),
                 _UploadFormCard(
                   filePaths: filePaths,
-                  onFileChanged: (key, path) => context.read<OwnerVerificationCubit>().updateFilePath(key, path),
-                  onCancel: () => setState(() => _showForm = false),
-                  onSubmit: allFilesSelected ? () => context.read<OwnerVerificationCubit>().submitVerification(widget.venueId) : null,
+                  onFileChanged: notifier.updateFilePath,
+                  onCancel: () => showForm.value = false,
+                  onSubmit: allFilesSelected ? notifier.submitVerification : null,
                   isSubmitting: isSubmitting,
                 ),
               ],
@@ -145,8 +120,6 @@ class _OwnerVerificationViewState extends State<_OwnerVerificationView> {
             ]))),
           ]),
         );
-      }
-    );
   }
 }
 

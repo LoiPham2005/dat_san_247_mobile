@@ -1,9 +1,8 @@
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/cubit/staff_dashboard_cubit.dart';
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
+import 'package:dat_san_247_mobile/features/venue_staff/dashboard/presentation/providers/staff_dashboard_notifier.dart';
 import 'package:dat_san_247_mobile/features/venue_staff/dashboard/data/models/staff_dashboard_models.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:dat_san_247_mobile/routes/base/annotations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -19,14 +18,14 @@ import 'package:dat_san_247_mobile/features/venue_staff/check_in/presentation/pa
 import 'package:dat_san_247_mobile/features/venue_staff/schedule/presentation/pages/today_schedule_page.dart';
 
 @route
-class StaffDashboardPage extends StatefulWidget {
+class StaffDashboardPage extends ConsumerStatefulWidget {
   const StaffDashboardPage({super.key});
 
   @override
-  State<StaffDashboardPage> createState() => _StaffDashboardPageState();
+  ConsumerState<StaffDashboardPage> createState() => _StaffDashboardPageState();
 }
 
-class _StaffDashboardPageState extends State<StaffDashboardPage> {
+class _StaffDashboardPageState extends ConsumerState<StaffDashboardPage> {
   static const Color _brand = Color(0xFF7C3AED);
   static const Color _brandDark = Color(0xFF4C1D95);
 
@@ -39,57 +38,51 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<StaffDashboardCubit>()..initDashboard(),
-      child: BlocBuilder<StaffDashboardCubit, BaseState<StaffDashboardState>>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Scaffold(body: Center(child: CircularProgressIndicator(color: _brand)));
-          }
+    final state = ref.watch(staffDashboardProvider);
+    final notifier = ref.read(staffDashboardProvider.notifier);
 
-          if (state.isFailure) {
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
-                    const SizedBox(height: 16),
-                    Text('Lỗi: ${state.error ?? 'Đã xảy ra lỗi'}', 
-                      style: const TextStyle(color: AppColors.textPrimary)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: _brand),
-                      onPressed: () => context.read<StaffDashboardCubit>().initDashboard(),
-                      child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
-                    ),
-                  ],
-                ),
+    useAsyncValueListener(provider: staffDashboardProvider, ref: ref);
+
+    if (state.isLoading && state.value == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator(color: _brand)));
+    }
+
+    if (state.hasError && state.value == null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
+              const SizedBox(height: 16),
+              Text('Lỗi: ${state.error}',
+                  style: const TextStyle(color: AppColors.textPrimary)),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: _brand),
+                onPressed: notifier.refresh,
+                child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
               ),
-            );
-          }
+            ],
+          ),
+        ),
+      );
+    }
 
-          final data = state.data?.dashboardData;
-          if (data == null) {
-            return const Scaffold(body: Center(child: Text('Không có dữ liệu')));
-          }
-
-          return Scaffold(
-            backgroundColor: const Color(0xFFF4F6FA),
-            body: RefreshIndicator(
-              color: _brand,
-              onRefresh: () => context.read<StaffDashboardCubit>().initDashboard(),
-              child: CustomScrollView(
-                slivers: [
-                  _buildHeader(data),
-                  SliverToBoxAdapter(child: _buildBody(context, data)),
-                ],
-              ),
-            ),
-            floatingActionButton: _buildQrFab(context),
-          );
-        },
+    final data = state.value!;
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FA),
+      body: RefreshIndicator(
+        color: _brand,
+        onRefresh: notifier.refresh,
+        child: CustomScrollView(
+          slivers: [
+            _buildHeader(data),
+            SliverToBoxAdapter(child: _buildBody(context, data)),
+          ],
+        ),
       ),
+      floatingActionButton: _buildQrFab(context),
     );
   }
 

@@ -1,32 +1,34 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:go_router/go_router.dart';
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/booking_models.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/data/models/time_slot_model.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/booking_request.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/booking_confirm_cubit.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
-import '../widgets/booking_summary_card.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/data/models/time_slot_model.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/providers/booking_confirm_notifier.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
+
 import '../widgets/addons_card.dart';
-import '../widgets/promo_card.dart';
+import '../widgets/booking_summary_card.dart';
 import '../widgets/note_card.dart';
 import '../widgets/payment_method_card.dart';
-import '../widgets/refund_policy_card.dart';
 import '../widgets/price_summary_card.dart';
+import '../widgets/promo_card.dart';
+import '../widgets/refund_policy_card.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // C-06: Màn Xác Nhận Đặt Sân
 // ──────────────────────────────────────────────────────────────────────────
-class BookingConfirmPage extends StatefulWidget {
+class BookingConfirmPage extends HookConsumerWidget {
   final String courtId;
   final String courtName;
   final String venueId;
   final String venueName;
   final String venueAddress;
-  final String bookingDate; // yyyy-MM-dd
+  final String bookingDate;
   final List<TimeSlotModel> selectedSlots;
 
   const BookingConfirmPage({
@@ -40,34 +42,19 @@ class BookingConfirmPage extends StatefulWidget {
     required this.selectedSlots,
   });
 
-  @override
-  State<BookingConfirmPage> createState() => _BookingConfirmPageState();
-}
-
-class _BookingConfirmPageState extends State<BookingConfirmPage> {
-  final _noteController = TextEditingController();
-  final _promoController = TextEditingController();
-  String _selectedPayment = 'MOMO';
-  PromotionModel? _appliedPromo;
-  bool _isApplyingPromo = false;
-
-  final List<BookingAddonModel> _addons = [];
-
-  // Mock services từ venue_services
-  final List<VenueServiceModel> _mockServices = [
+  static final _mockServices = [
     VenueServiceModel(id: 's1', venueId: 'v1', name: 'Thuê áo đá bóng', price: 30000, unit: 'UNIT'),
     VenueServiceModel(id: 's2', venueId: 'v1', name: 'Nước uống Pocari', price: 15000, unit: 'UNIT'),
     VenueServiceModel(id: 's3', venueId: 'v1', name: 'Bơm bóng', price: 10000, unit: 'SESSION'),
   ];
 
-  // Mock refund rules từ refund_policies + refund_rules
-  final List<RefundRuleModel> _refundRules = [
+  static final _refundRules = [
     RefundRuleModel(cancelBeforeHours: 24, refundPercentage: 100, description: 'Hủy trước giờ trên 24h: hoàn tiền 100%'),
     RefundRuleModel(cancelBeforeHours: 4, refundPercentage: 50, description: 'Hủy trước từ 4h đến 24h: hoàn tiền 50%'),
     RefundRuleModel(cancelBeforeHours: 0, refundPercentage: 0, description: 'Hủy trong vòng 4h trước giờ: không hoàn tiền'),
   ];
 
-  final _paymentMethods = [
+  static const _paymentMethods = [
     {'id': 'MOMO', 'label': 'MoMo', 'icon': '💜'},
     {'id': 'VNPAY', 'label': 'VNPay', 'icon': '🔵'},
     {'id': 'ZALOPAY', 'label': 'ZaloPay', 'icon': '🟢'},
@@ -75,49 +62,69 @@ class _BookingConfirmPageState extends State<BookingConfirmPage> {
     {'id': 'CASH', 'label': 'Tiền mặt', 'icon': '💵'},
   ];
 
-  double get _subTotal => widget.selectedSlots.fold(0, (s, slot) => s + slot.price);
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final noteController = useTextEditingController();
+    final promoController = useTextEditingController();
+    final selectedPayment = useState('MOMO');
+    final appliedPromo = useState<PromotionModel?>(null);
+    final isApplyingPromo = useState(false);
+    final addons = useState<List<BookingAddonModel>>([]);
 
-  double get _addonTotal => _addons.fold(0, (s, a) => s + a.totalPrice);
+    final state = ref.watch(bookingConfirmProvider);
+    final notifier = ref.read(bookingConfirmProvider.notifier);
+    final isLoading = state.isLoading;
 
-  double get _discountAmount {
-    if (_appliedPromo == null) return 0;
-    if (_appliedPromo!.discountType == 'PERCENTAGE') {
-      final disc = (_subTotal + _addonTotal) * _appliedPromo!.discountValue / 100;
-      return _appliedPromo!.maxDiscountAmount != null
-          ? disc.clamp(0, _appliedPromo!.maxDiscountAmount!)
-          : disc;
-    }
-    return _appliedPromo!.discountValue;
-  }
+    final subTotal = selectedSlots.fold<double>(0, (s, slot) => s + slot.price);
+    final addonTotal = addons.value.fold<double>(0, (s, a) => s + a.totalPrice);
+    final discountAmount = _computeDiscount(appliedPromo.value, subTotal + addonTotal);
+    final totalAmount =
+        (subTotal + addonTotal - discountAmount).clamp(0, double.infinity).toDouble();
 
-  double get _totalAmount => (_subTotal + _addonTotal - _discountAmount).clamp(0, double.infinity);
+    RiverpodListeners.async$(
+      ref: ref,
+      context: context,
+      provider: bookingConfirmProvider,
+      notifier: notifier,
+      onSuccess: (data) {
+        if (data == null) return;
+        context.push('/payment', extra: {
+          'bookingCode': data.bookingCode,
+          'venueName': venueName,
+          'courtName': courtName,
+          'bookingDate': data.bookingDate,
+          'startTime': data.startTime,
+          'endTime': data.endTime,
+          'totalAmount': data.totalAmount,
+          'paymentMethod': selectedPayment.value,
+        });
+      },
+    );
 
-  void _onAddonToggle(VenueServiceModel service) {
-    setState(() {
-      final idx = _addons.indexWhere((a) => a.serviceId == service.id);
+    void onAddonToggle(VenueServiceModel service) {
+      final current = [...addons.value];
+      final idx = current.indexWhere((a) => a.serviceId == service.id);
       if (idx >= 0) {
-        _addons.removeAt(idx);
+        current.removeAt(idx);
       } else {
-        _addons.add(BookingAddonModel(
+        current.add(BookingAddonModel(
           serviceId: service.id,
           name: service.name,
           pricePerUnit: service.price,
           unit: service.unit,
         ));
       }
-    });
-  }
+      addons.value = current;
+    }
 
-  Future<void> _applyPromo() async {
-    final code = _promoController.text.trim();
-    if (code.isEmpty) return;
-    setState(() => _isApplyingPromo = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    setState(() {
-      _isApplyingPromo = false;
-      // Mock: mã WELCOME20 → 20% off
+    Future<void> applyPromo() async {
+      final code = promoController.text.trim();
+      if (code.isEmpty) return;
+      isApplyingPromo.value = true;
+      await Future.delayed(const Duration(milliseconds: 800));
+      isApplyingPromo.value = false;
       if (code.toUpperCase() == 'WELCOME20') {
-        _appliedPromo = PromotionModel(
+        appliedPromo.value = PromotionModel(
           id: 'promo-1',
           code: 'WELCOME20',
           name: 'Chào mừng thành viên mới',
@@ -132,36 +139,29 @@ class _BookingConfirmPageState extends State<BookingConfirmPage> {
       } else {
         toast.error('❌ Mã giảm giá không hợp lệ hoặc đã hết hạn.');
       }
-    });
-  }
+    }
 
-  void _submitBooking() {
-    final cubit = context.read<BookingConfirmCubit>();
-
-    final items = widget.selectedSlots.map((slot) {
-      return BookingItemRequest(
-        courtId: widget.courtId,
-        startTime: slot.startTime,
-        endTime: slot.endTime,
+    void submitBooking() {
+      final items = selectedSlots
+          .map((slot) => BookingItemRequest(
+                courtId: courtId,
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+              ))
+          .toList();
+      final request = CreateBookingRequest(
+        venueId: venueId,
+        bookingDate: bookingDate,
+        items: items,
+        paymentMethod: selectedPayment.value,
+        voucherCode: appliedPromo.value?.code,
+        note: noteController.text,
       );
-    }).toList();
+      notifier.createBooking(request);
+    }
 
-    final request = CreateBookingRequest(
-      venueId: widget.venueId,
-      bookingDate: widget.bookingDate,
-      items: items,
-      paymentMethod: _selectedPayment,
-      voucherCode: _appliedPromo?.code,
-      note: _noteController.text,
-    );
-
-    cubit.createBooking(request);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final fmt = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
-    final formattedTotal = fmt.format(_totalAmount);
+    final formattedTotal = fmt.format(totalAmount);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
@@ -174,138 +174,125 @@ class _BookingConfirmPageState extends State<BookingConfirmPage> {
         ),
         title: const Text('Xác nhận đặt sân',
             style: TextStyle(
-                fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary)),
       ),
-      body: BlocListener<BookingConfirmCubit, BaseState<BookingResponse>>(
-        listener: (context, state) {
-          state.maybeWhen(
-            success: (data, message) {
-              context.push('/payment', extra: {
-                'bookingCode': data.bookingCode,
-                'venueName': widget.venueName,
-                'courtName': widget.courtName,
-                'bookingDate': data.bookingDate,
-                'startTime': data.startTime,
-                'endTime': data.endTime,
-                'totalAmount': data.totalAmount,
-                'paymentMethod': _selectedPayment,
-              });
-            },
-            failure: (error, data) {
-              toast.error(error);
-            },
-            orElse: () {},
-          );
-        },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BookingSummaryCard(
-                courtName: widget.courtName,
-                venueName: widget.venueName,
-                venueAddress: widget.venueAddress,
-                bookingDate: widget.bookingDate,
-                selectedSlots: widget.selectedSlots,
-              ),
-              const SizedBox(height: 16),
-              AddonsCard(
-                services: _mockServices,
-                selectedAddons: _addons,
-                onToggle: _onAddonToggle,
-              ),
-              const SizedBox(height: 16),
-              PromoCard(
-                appliedPromo: _appliedPromo,
-                controller: _promoController,
-                isApplying: _isApplyingPromo,
-                onApply: _applyPromo,
-                onRemove: () => setState(() => _appliedPromo = null),
-              ),
-              const SizedBox(height: 16),
-              NoteCard(controller: _noteController),
-              const SizedBox(height: 16),
-              PaymentMethodCard(
-                selectedPayment: _selectedPayment,
-                paymentMethods: _paymentMethods.map((e) => Map<String, String>.from(e)).toList(),
-                onChanged: (v) => setState(() => _selectedPayment = v),
-              ),
-              const SizedBox(height: 16),
-              RefundPolicyCard(refundRules: _refundRules),
-              const SizedBox(height: 16),
-              PriceSummaryCard(
-                subTotal: _subTotal,
-                addonTotal: _addonTotal,
-                discountAmount: _discountAmount,
-                totalAmount: _totalAmount,
-                selectedSlotsCount: widget.selectedSlots.length,
-                hasAppliedPromo: _appliedPromo != null,
-              ),
-              const SizedBox(height: 100),
-            ],
-          ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BookingSummaryCard(
+              courtName: courtName,
+              venueName: venueName,
+              venueAddress: venueAddress,
+              bookingDate: bookingDate,
+              selectedSlots: selectedSlots,
+            ),
+            const SizedBox(height: 16),
+            AddonsCard(
+              services: _mockServices,
+              selectedAddons: addons.value,
+              onToggle: onAddonToggle,
+            ),
+            const SizedBox(height: 16),
+            PromoCard(
+              appliedPromo: appliedPromo.value,
+              controller: promoController,
+              isApplying: isApplyingPromo.value,
+              onApply: applyPromo,
+              onRemove: () => appliedPromo.value = null,
+            ),
+            const SizedBox(height: 16),
+            NoteCard(controller: noteController),
+            const SizedBox(height: 16),
+            PaymentMethodCard(
+              selectedPayment: selectedPayment.value,
+              paymentMethods: _paymentMethods.map((e) => Map<String, String>.from(e)).toList(),
+              onChanged: (v) => selectedPayment.value = v,
+            ),
+            const SizedBox(height: 16),
+            RefundPolicyCard(refundRules: _refundRules),
+            const SizedBox(height: 16),
+            PriceSummaryCard(
+              subTotal: subTotal,
+              addonTotal: addonTotal,
+              discountAmount: discountAmount,
+              totalAmount: totalAmount,
+              selectedSlotsCount: selectedSlots.length,
+              hasAppliedPromo: appliedPromo.value != null,
+            ),
+            const SizedBox(height: 100),
+          ],
         ),
       ),
-      bottomNavigationBar: _buildBottomBar(formattedTotal),
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 16,
+            bottom: MediaQuery.of(context).padding.bottom + 16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(
+                color: AppColors.black.withOpacity(0.06),
+                blurRadius: 12,
+                offset: const Offset(0, -4))
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Tổng cộng',
+                      style: TextStyle(color: AppColors.textHint, fontSize: 12)),
+                  Text(formattedTotal,
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primaryLightBrand)),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: isLoading ? null : submitBooking,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryLightBrand,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2.5, color: AppColors.white))
+                  : const Text('Thanh toán ngay',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildBottomBar(String formattedTotal) {
-    return BlocBuilder<BookingConfirmCubit, BaseState<BookingResponse>>(
-      builder: (context, state) {
-        final isLoading = state.isLoading;
-        return Container(
-          padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 16,
-              bottom: MediaQuery.of(context).padding.bottom + 16),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: AppColors.black.withOpacity(0.06),
-                  blurRadius: 12,
-                  offset: const Offset(0, -4))
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Tổng cộng', style: TextStyle(color: AppColors.textHint, fontSize: 12)),
-                    Text(formattedTotal,
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primaryLightBrand)),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: isLoading ? null : _submitBooking,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryLightBrand,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: isLoading
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.white))
-                    : const Text('Thanh toán ngay',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.white)),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  double _computeDiscount(PromotionModel? promo, double subTotal) {
+    if (promo == null) return 0;
+    if (promo.discountType == 'PERCENTAGE') {
+      final disc = subTotal * promo.discountValue / 100;
+      return promo.maxDiscountAmount != null
+          ? disc.clamp(0, promo.maxDiscountAmount!).toDouble()
+          : disc;
+    }
+    return promo.discountValue;
   }
 }

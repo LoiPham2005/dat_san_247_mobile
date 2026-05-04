@@ -3,19 +3,18 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/services/permission/permission_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/data/models/venue_search_result_model.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/providers/venue_search_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../cubit/venue_search_cubit.dart';
 import '../widgets/map_ui_components.dart';
 import '../widgets/venue_detail_panel.dart';
 import '../widgets/venue_list_panel.dart';
@@ -45,19 +44,16 @@ class VenueMapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<VenueSearchCubit>(),
-      child: _VenueMapPageContent(
-        venues: venues,
-        initialLat: initialLat,
-        initialLng: initialLng,
-        initialZoom: initialZoom,
-      ),
+    return _VenueMapPageContent(
+      venues: venues,
+      initialLat: initialLat,
+      initialLng: initialLng,
+      initialZoom: initialZoom,
     );
   }
 }
 
-class _VenueMapPageContent extends StatefulWidget {
+class _VenueMapPageContent extends ConsumerStatefulWidget {
   final List<VenueSearchResultModel> venues;
   final double? initialLat;
   final double? initialLng;
@@ -71,10 +67,10 @@ class _VenueMapPageContent extends StatefulWidget {
   });
 
   @override
-  State<_VenueMapPageContent> createState() => _VenueMapPageContentState();
+  ConsumerState<_VenueMapPageContent> createState() => _VenueMapPageContentState();
 }
 
-class _VenueMapPageContentState extends State<_VenueMapPageContent> {
+class _VenueMapPageContentState extends ConsumerState<_VenueMapPageContent> {
   final MapController _mapController = MapController();
   final DraggableScrollableController _sheetCtrl =
       DraggableScrollableController();
@@ -132,7 +128,7 @@ class _VenueMapPageContentState extends State<_VenueMapPageContent> {
     _searchQuery = _searchController.text.trim();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.venues.isEmpty) {
-        context.read<VenueSearchCubit>().searchVenues({});
+        ref.read(venueSearchProvider.notifier).searchVenues({});
       } else {
         _fitAllVenues();
       }
@@ -190,7 +186,7 @@ class _VenueMapPageContentState extends State<_VenueMapPageContent> {
     });
 
     if (widget.venues.isEmpty) {
-      context.read<VenueSearchCubit>().searchVenues({
+      ref.read(venueSearchProvider.notifier).searchVenues({
         'keyword': _searchQuery,
         if (_sportFilter != 'Tất cả') 'sport_type': _sportFilter,
       });
@@ -258,20 +254,18 @@ class _VenueMapPageContentState extends State<_VenueMapPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<VenueSearchCubit,
-        BaseState<List<VenueSearchResultModel>>>(
-      listener: (context, state) {
-        if (state.isSuccess) {
-          setState(() {
-            _effectiveVenues = state.data ?? [];
-          });
-          Future.delayed(const Duration(milliseconds: 300), () {
-            if (mounted) _fitAllVenues();
-          });
-        }
-      },
-      builder: (context, state) {
-        return Scaffold(
+    ref.listen<AsyncValue<List<VenueSearchResultModel>>>(venueSearchProvider,
+        (prev, next) {
+      next.whenOrNull(data: (data) {
+        setState(() => _effectiveVenues = data);
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) _fitAllVenues();
+        });
+      });
+    });
+
+    final state = ref.watch(venueSearchProvider);
+    return Scaffold(
           backgroundColor: const Color(0xFF0F1923),
           resizeToAvoidBottomInset: false,
           body: Stack(
@@ -302,8 +296,6 @@ class _VenueMapPageContentState extends State<_VenueMapPageContent> {
             ],
           ),
         );
-      },
-    );
   }
 
   Widget _buildMap() {
@@ -462,7 +454,7 @@ class _VenueMapPageContentState extends State<_VenueMapPageContent> {
                           _selected = null;
                         });
                         if (widget.venues.isEmpty) {
-                          context.read<VenueSearchCubit>().searchVenues({
+                          ref.read(venueSearchProvider.notifier).searchVenues({
                             'keyword': _searchQuery,
                             if (_sportFilter != 'Tất cả')
                               'sport_type': _sportFilter,

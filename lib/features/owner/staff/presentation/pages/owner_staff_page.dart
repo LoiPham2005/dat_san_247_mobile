@@ -1,50 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
 import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/staff/data/models/staff_models.dart';
-import 'package:dat_san_247_mobile/features/owner/staff/presentation/cubit/owner_staff_cubit.dart';
+import 'package:dat_san_247_mobile/features/owner/staff/presentation/providers/owner_staff_notifier.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // O-10: Quản Lý Nhân Viên
-// DB: venue_staff (venue_id), users, venue_staff_invites
 // ══════════════════════════════════════════════════════════════════════════════
-class OwnerStaffPage extends StatelessWidget {
+class OwnerStaffPage extends ConsumerStatefulWidget {
   final String venueId;
   final String venueName;
   const OwnerStaffPage({super.key, required this.venueId, required this.venueName});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<OwnerStaffCubit>()..fetchStaffData(venueId),
-      child: BlocListener<OwnerStaffCubit, BaseState<OwnerStaffState>>(
-        listenWhen: (prev, curr) => curr.isFailure,
-        listener: (context, state) {
-          if (state.error != null) {
-            getIt<ToastService>().error(state.error!);
-          }
-        },
-        child: _OwnerStaffView(venueId: venueId, venueName: venueName),
-      ),
-    );
-  }
+  ConsumerState<OwnerStaffPage> createState() => _OwnerStaffPageState();
 }
 
-class _OwnerStaffView extends StatefulWidget {
-  final String venueId;
-  final String venueName;
-  const _OwnerStaffView({required this.venueId, required this.venueName});
-
-  @override
-  State<_OwnerStaffView> createState() => _OwnerStaffViewState();
-}
-
-class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProviderStateMixin {
+class _OwnerStaffPageState extends ConsumerState<OwnerStaffPage>
+    with SingleTickerProviderStateMixin {
   static const Color _brand = Color(0xFF0891B2);
   static const Color _brandDark = Color(0xFF0E7490);
   late TabController _tabCtrl;
@@ -63,18 +41,23 @@ class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProvi
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OwnerStaffCubit, BaseState<OwnerStaffState>>(
-      builder: (context, state) {
-        final staffMembers = state.data?.staffMembers ?? [];
-        final pendingInvites = state.data?.pendingInvites ?? [];
+    final provider = ownerStaffProvider(widget.venueId);
+    final state = ref.watch(provider);
+    useAsyncValueListener(provider: provider, ref: ref);
 
-        final activeStaff = staffMembers.where((s) => s.isActive).toList();
-        final inactiveStaff = staffMembers.where((s) => !s.isActive).toList();
-        final filteredInvites = pendingInvites
-            .where((i) => i.status == StaffInviteStatus.PENDING || i.status == StaffInviteStatus.EXPIRED)
-            .toList();
+    final data = state.value;
+    final staffMembers = data?.staffMembers ?? [];
+    final pendingInvites = data?.pendingInvites ?? [];
 
-        return Scaffold(
+    final activeStaff = staffMembers.where((s) => s.isActive).toList();
+    final inactiveStaff = staffMembers.where((s) => !s.isActive).toList();
+    final filteredInvites = pendingInvites
+        .where((i) =>
+            i.status == StaffInviteStatus.PENDING ||
+            i.status == StaffInviteStatus.EXPIRED)
+        .toList();
+
+    return Scaffold(
           backgroundColor: const Color(0xFFF4F6FA),
           body: NestedScrollView(
             headerSliverBuilder: (_, __) => [
@@ -152,8 +135,6 @@ class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProvi
             label: const Text('Mời Nhân Viên', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         );
-      },
-    );
   }
 
   Widget _buildStaffList(List<OwnerStaffModel> staff, String emptyMsg, Function(OwnerStaffModel) onAction,
@@ -178,7 +159,7 @@ class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProvi
         itemBuilder: (_, i) => _InviteCard(
               invite: invites[i],
               onRevoke: () => _confirmRevokeInvite(context, invites[i]),
-              onForceAccept: () => context.read<OwnerStaffCubit>().forceAcceptInvite(widget.venueId, invites[i].id),
+              onForceAccept: () => ref.read(ownerStaffProvider(widget.venueId).notifier).forceAcceptInvite(invites[i].id),
             ));
   }
 
@@ -270,7 +251,7 @@ class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProvi
                                     return;
                                   }
                                   Navigator.pop(ctx);
-                                  context.read<OwnerStaffCubit>().inviteStaff(widget.venueId, email, selectedRole);
+                                  ref.read(ownerStaffProvider(widget.venueId).notifier).inviteStaff(email, selectedRole);
                                   HapticFeedback.mediumImpact();
                                   _tabCtrl.animateTo(2);
                                 },
@@ -305,7 +286,7 @@ class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProvi
                 ElevatedButton(
                     onPressed: () {
                       Navigator.pop(ctx);
-                      context.read<OwnerStaffCubit>().updateStaffStatus(widget.venueId, staff.id, false);
+                      ref.read(ownerStaffProvider(widget.venueId).notifier).updateStaffStatus(staff.id, false);
                       HapticFeedback.mediumImpact();
                     },
                     style: ElevatedButton.styleFrom(
@@ -329,7 +310,7 @@ class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProvi
                 ElevatedButton(
                     onPressed: () {
                       Navigator.pop(ctx);
-                      context.read<OwnerStaffCubit>().updateStaffStatus(widget.venueId, staff.id, true);
+                      ref.read(ownerStaffProvider(widget.venueId).notifier).updateStaffStatus(staff.id, true);
                       HapticFeedback.mediumImpact();
                     },
                     style: ElevatedButton.styleFrom(
@@ -353,7 +334,7 @@ class _OwnerStaffViewState extends State<_OwnerStaffView> with SingleTickerProvi
                 ElevatedButton(
                     onPressed: () {
                       Navigator.pop(ctx);
-                      context.read<OwnerStaffCubit>().revokeInvite(widget.venueId, invite.id);
+                      ref.read(ownerStaffProvider(widget.venueId).notifier).revokeInvite(invite.id);
                       HapticFeedback.mediumImpact();
                     },
                     style: ElevatedButton.styleFrom(

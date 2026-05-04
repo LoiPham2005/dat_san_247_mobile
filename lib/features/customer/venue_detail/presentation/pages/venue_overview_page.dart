@@ -1,42 +1,31 @@
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/common/utils/logger.dart';
-
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/time_slot_model.dart'
     as booking;
 import 'package:dat_san_247_mobile/features/customer/recurring_booking/data/repositories/recurring_booking_repository.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_detail/data/models/venue_overview_model.dart';
-import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/cubit/venue_overview_cubit.dart';
-import 'package:dat_san_247_mobile/routes/config/route_names.dart';
+import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/providers/venue_overview_notifier.dart';
 import 'package:dat_san_247_mobile/features/shared/widgets/app_date_picker.dart';
+import 'package:dat_san_247_mobile/routes/config/route_names.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 
-
-class VenueOverviewPage extends StatelessWidget {
+class VenueOverviewPage extends ConsumerWidget {
   final String slugOrId;
-
   const VenueOverviewPage({super.key, required this.slugOrId});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => GetIt.I<VenueOverviewCubit>()..init(slugOrId),
-      child: VenueOverviewView(slugOrId: slugOrId),
-    );
-  }
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = venueOverviewProvider(slugOrId);
+    final state = ref.watch(provider);
+    final notifier = ref.read(provider.notifier);
+    final model = state.value;
+    final isRecurringMode = model?.bookingMode == VenueBookingMode.recurring;
 
-class VenueOverviewView extends StatelessWidget {
-  final String slugOrId;
-  const VenueOverviewView({super.key, required this.slugOrId});
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
@@ -46,50 +35,42 @@ class VenueOverviewView extends StatelessWidget {
         foregroundColor: Colors.black,
         elevation: 0,
         actions: [
-          Builder(builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.calendar_month),
-              onPressed: () async {
-                final cubit = context.read<VenueOverviewCubit>();
-                final selected = await AppDatePicker.show(
-                  context: context,
-                  initialDate: cubit.selectedDate,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 30)),
-                  title: 'Chọn ngày xem lịch',
-                );
-                if (selected != null) {
-                  await cubit.fetchSchedule(slugOrId, selected);
-                }
-              },
-            );
-          }),
+          IconButton(
+            icon: const Icon(Icons.calendar_month),
+            onPressed: () async {
+              final selected = await AppDatePicker.show(
+                context: context,
+                initialDate: notifier.selectedDate,
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 30)),
+                title: 'Chọn ngày xem lịch',
+              );
+              if (selected != null) {
+                await notifier.fetchSchedule(selected);
+              }
+            },
+          ),
         ],
       ),
-      body: BlocBuilder<VenueOverviewCubit, BaseState<VenueOverviewModel>>(
-        builder: (context, state) {
-          final model = state.data;
-          final isRecurringMode =
-              model?.bookingMode == VenueBookingMode.recurring;
-
-          return Column(
-            children: [
-              _buildDateSelector(context),
-              _buildLegend(),
-              _buildActionHeader(context),
-              if (isRecurringMode) _buildRecurringInfo(context, model!),
-              Expanded(
-                child: _buildGrid(context),
-              ),
-              _buildBottomBar(context),
-            ],
-          );
-        },
+      body: Column(
+        children: [
+          _buildDateSelector(context, notifier),
+          _buildLegend(),
+          _buildActionHeader(context, notifier, model),
+          if (isRecurringMode && model != null)
+            _buildRecurringInfo(context, notifier, model),
+          Expanded(child: _buildGrid(context, notifier, state)),
+          _buildBottomBar(context, notifier, model),
+        ],
       ),
     );
   }
 
-  Widget _buildRecurringInfo(BuildContext context, VenueOverviewModel model) {
+  Widget _buildRecurringInfo(
+    BuildContext context,
+    VenueOverviewNotifier notifier,
+    VenueOverviewModel model,
+  ) {
     final config = model.recurringConfig!;
     final daysStr = config.repeatType == 'DAILY'
         ? 'hằng ngày'
@@ -109,8 +90,7 @@ class VenueOverviewView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.repeat_on_rounded,
-                  size: 16, color: Colors.orange),
+              const Icon(Icons.repeat_on_rounded, size: 16, color: Colors.orange),
               const SizedBox(width: 8),
               const Text('CHẾ ĐỘ ĐẶT CỐ ĐỊNH ĐANG BẬT',
                   style: TextStyle(
@@ -119,9 +99,7 @@ class VenueOverviewView extends StatelessWidget {
                       color: Colors.orange)),
               const Spacer(),
               GestureDetector(
-                onTap: () => context
-                    .read<VenueOverviewCubit>()
-                    .setBookingMode(VenueBookingMode.regular),
+                onTap: () => notifier.setBookingMode(VenueBookingMode.regular),
                 child: const Text('Hủy',
                     style: TextStyle(
                         fontSize: 11,
@@ -164,94 +142,85 @@ class VenueOverviewView extends StatelessWidget {
     }
   }
 
-  Widget _buildDateSelector(BuildContext context) {
-    return BlocBuilder<VenueOverviewCubit, BaseState<VenueOverviewModel>>(
-      builder: (context, state) {
-        final cubit = context.read<VenueOverviewCubit>();
-        final today = DateTime.now();
-        final dates = List.generate(14, (i) => today.add(Duration(days: i)));
+  Widget _buildDateSelector(BuildContext context, VenueOverviewNotifier notifier) {
+    final today = DateTime.now();
+    final dates = List.generate(14, (i) => today.add(Duration(days: i)));
 
-        return Container(
-          color: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 80,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemBuilder: (context, index) {
-                    final date = dates[index];
-                    final isSelected = DateFormat('yyyyMMdd').format(date) ==
-                        DateFormat('yyyyMMdd').format(cubit.selectedDate);
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 80,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemBuilder: (context, index) {
+                final date = dates[index];
+                final isSelected = DateFormat('yyyyMMdd').format(date) ==
+                    DateFormat('yyyyMMdd').format(notifier.selectedDate);
 
-                    return GestureDetector(
-                      onTap: () => cubit.fetchSchedule(slugOrId, date),
-                      child: Container(
-                        width: 80,
-                        decoration: BoxDecoration(
+                return GestureDetector(
+                  onTap: () => notifier.fetchSchedule(date),
+                  child: Container(
+                    width: 80,
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primaryLightBrand : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
                           color: isSelected
                               ? AppColors.primaryLightBrand
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: isSelected
-                                  ? AppColors.primaryLightBrand
-                                  : AppColors.borderLight),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              DateFormat('E').format(date),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isSelected ? Colors.white : Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              DateFormat('dd/MM').format(date),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isSelected ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 8),
-                  itemCount: dates.length,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today,
-                        size: 14, color: AppColors.primaryLightBrand),
-                    const SizedBox(width: 8),
-                    Text(
-                      DateFormat('EEEE, dd/MM/yyyy', 'vi_VN')
-                          .format(cubit.selectedDate),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: AppColors.textPrimary),
+                              : AppColors.borderLight),
                     ),
-                  ],
-                ),
-              ),
-            ],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          DateFormat('E').format(date),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isSelected ? Colors.white : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          DateFormat('dd/MM').format(date),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isSelected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemCount: dates.length,
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today,
+                    size: 14, color: AppColors.primaryLightBrand),
+                const SizedBox(width: 8),
+                Text(
+                  DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(notifier.selectedDate),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: AppColors.textPrimary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -261,8 +230,7 @@ class VenueOverviewView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _legendItem('Trống', Colors.white,
-              borderColor: AppColors.borderLight),
+          _legendItem('Trống', Colors.white, borderColor: AppColors.borderLight),
           const SizedBox(width: 16),
           _legendItem('Đã đặt', const Color(0xFFFECDD3),
               borderColor: const Color(0xFFFDA4AF)),
@@ -293,55 +261,47 @@ class VenueOverviewView extends StatelessWidget {
     );
   }
 
-  Widget _buildActionHeader(BuildContext context) {
-    return BlocBuilder<VenueOverviewCubit, BaseState<VenueOverviewModel>>(
-      builder: (context, state) {
-        final mode = state.data?.bookingMode ?? VenueBookingMode.regular;
+  Widget _buildActionHeader(
+    BuildContext context,
+    VenueOverviewNotifier notifier,
+    VenueOverviewModel? model,
+  ) {
+    final mode = model?.bookingMode ?? VenueBookingMode.regular;
 
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              _modeButton(
-                context,
-                label: 'ĐẶT LẺ',
-                icon: Icons.calendar_today_rounded,
-                isActive: mode == VenueBookingMode.regular,
-                onTap: () => context
-                    .read<VenueOverviewCubit>()
-                    .setBookingMode(VenueBookingMode.regular),
-              ),
-              const SizedBox(width: 12),
-              _modeButton(
-                context,
-                label: 'ĐẶT CỐ ĐỊNH',
-                icon: Icons.repeat_rounded,
-                isActive: mode == VenueBookingMode.recurring,
-                onTap: () async {
-                  if (mode == VenueBookingMode.recurring) return;
-                  final config =
-                      await _showRecurringSheet(context, state.data!.venueId);
-                  if (config != null) {
-                    if (context.mounted) {
-                      context.read<VenueOverviewCubit>().setBookingMode(
-                          VenueBookingMode.recurring,
-                          config: config);
-                    }
-                  }
-                },
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          _modeButton(
+            label: 'ĐẶT LẺ',
+            icon: Icons.calendar_today_rounded,
+            isActive: mode == VenueBookingMode.regular,
+            onTap: () => notifier.setBookingMode(VenueBookingMode.regular),
           ),
-        );
-      },
+          const SizedBox(width: 12),
+          _modeButton(
+            label: 'ĐẶT CỐ ĐỊNH',
+            icon: Icons.repeat_rounded,
+            isActive: mode == VenueBookingMode.recurring,
+            onTap: () async {
+              if (mode == VenueBookingMode.recurring || model == null) return;
+              final config = await _showRecurringSheet(context, notifier, model.venueId);
+              if (config != null && context.mounted) {
+                notifier.setBookingMode(VenueBookingMode.recurring, config: config);
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _modeButton(BuildContext context,
-      {required String label,
-      required IconData icon,
-      required bool isActive,
-      required VoidCallback onTap}) {
+  Widget _modeButton({
+    required String label,
+    required IconData icon,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -351,14 +311,11 @@ class VenueOverviewView extends StatelessWidget {
             color: isActive ? AppColors.primaryLightBrand : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: isActive
-                    ? AppColors.primaryLightBrand
-                    : AppColors.borderLight),
+                color: isActive ? AppColors.primaryLightBrand : AppColors.borderLight),
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                        color:
-                            AppColors.primaryLightBrand.withValues(alpha: 0.2),
+                        color: AppColors.primaryLightBrand.withValues(alpha: 0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 4))
                   ]
@@ -386,7 +343,10 @@ class VenueOverviewView extends StatelessWidget {
   }
 
   Future<RecurringBookingConfig?> _showRecurringSheet(
-      BuildContext context, String venueId) {
+    BuildContext context,
+    VenueOverviewNotifier notifier,
+    String venueId,
+  ) {
     return showModalBottomSheet<RecurringBookingConfig>(
       context: context,
       isScrollControlled: true,
@@ -394,363 +354,332 @@ class VenueOverviewView extends StatelessWidget {
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => _RecurringBookingSheet(
         venueId: venueId,
-        initialDate: context.read<VenueOverviewCubit>().selectedDate,
+        initialDate: notifier.selectedDate,
       ),
     );
   }
 
-  Widget _buildGrid(BuildContext context) {
-    return BlocBuilder<VenueOverviewCubit, BaseState<VenueOverviewModel>>(
-      builder: (context, state) {
-        return state.whenReady(
-          loading: (data) => const Center(child: CircularProgressIndicator()),
-          failure: (error, data) => Center(child: Text(error)),
-          success: (model, message) {
-            if (model.courts.isEmpty) {
-              return const Center(child: Text('Không có sân nào.'));
-            }
+  Widget _buildGrid(
+    BuildContext context,
+    VenueOverviewNotifier notifier,
+    AsyncValue<VenueOverviewModel> state,
+  ) {
+    return switch (state) {
+      AsyncData(:final value) => value.courts.isEmpty
+          ? const Center(child: Text('Không có sân nào.'))
+          : _buildGridContent(context, notifier, value),
+      AsyncError(:final error) => Center(child: Text('$error')),
+      _ => const Center(child: CircularProgressIndicator()),
+    };
+  }
 
-            final allSlots = model.courts
-                .expand((c) => c.slots.map((s) => s.startTime))
-                .toSet()
-                .toList()
-              ..sort();
+  Widget _buildGridContent(
+    BuildContext context,
+    VenueOverviewNotifier notifier,
+    VenueOverviewModel model,
+  ) {
+    final allSlots = model.courts
+        .expand((c) => c.slots.map((s) => s.startTime))
+        .toSet()
+        .toList()
+      ..sort();
 
-            return RefreshIndicator(
-              onRefresh: () => context.read<VenueOverviewCubit>().fetchSchedule(
-                  slugOrId, context.read<VenueOverviewCubit>().selectedDate),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // --- LEFT FIXED COLUMN (COURT NAMES) ---
-                    Column(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 40,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLightBrand
-                                .withValues(alpha: 0.08),
-                            border: Border(
-                              right: BorderSide(
-                                  color: AppColors.borderLight
-                                      .withValues(alpha: 0.5),
-                                  width: 0.5),
-                              bottom: const BorderSide(
-                                  color: AppColors.borderLight, width: 0.5),
-                            ),
-                          ),
-                          child: const Text('SÂN \\ GIỜ',
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary)),
-                        ),
-                        ...model.courts.map((court) => Container(
-                              width: 100,
-                              height: 50,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              alignment: Alignment.centerLeft,
-                              decoration: BoxDecoration(
-                                color: AppColors.mutedLight,
-                                border: Border(
-                                  bottom: BorderSide(
-                                      color: AppColors.borderLight
-                                          .withValues(alpha: 0.2),
-                                      width: 0.5),
-                                  right: BorderSide(
-                                      color: AppColors.borderLight
-                                          .withValues(alpha: 0.5),
-                                      width: 0.5),
-                                ),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(court.name,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11,
-                                          color: AppColors.textPrimary),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis),
-                                  const Text('Bóng đá',
-                                      style: TextStyle(
-                                          fontSize: 8,
-                                          color: AppColors.textSecondary)),
-                                ],
-                              ),
-                            )),
-                      ],
+    return RefreshIndicator(
+      onRefresh: () => notifier.fetchSchedule(notifier.selectedDate),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                Container(
+                  width: 100,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLightBrand.withValues(alpha: 0.08),
+                    border: Border(
+                      right: BorderSide(
+                          color: AppColors.borderLight.withValues(alpha: 0.5),
+                          width: 0.5),
+                      bottom: const BorderSide(
+                          color: AppColors.borderLight, width: 0.5),
                     ),
-
-                    // --- RIGHT SCROLLABLE GRID (TIME SLOTS) ---
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 40,
-                              color: AppColors.primaryLightBrand
-                                  .withValues(alpha: 0.08),
-                              child: Row(
-                                children: allSlots
-                                    .map((time) => SizedBox(
-                                          width: 50,
-                                          child: Stack(
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                              Positioned(
-                                                left: -0.5,
-                                                top: 25,
-                                                child: Container(
-                                                    width: 1,
-                                                    height: 15,
-                                                    color: AppColors
-                                                        .primaryLightBrand
-                                                        .withValues(
-                                                            alpha: 0.5)),
-                                              ),
-                                              Positioned(
-                                                left: -25,
-                                                top: 5,
-                                                child: SizedBox(
-                                                  width: 50,
-                                                  child: Text(time,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: const TextStyle(
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: AppColors
-                                                              .textSecondary)),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ))
-                                    .toList(),
-                              ),
-                            ),
-                            ...model.courts.map((court) => Row(
-                                  children: allSlots.map((time) {
-                                    final slot = court.slots.firstWhere(
-                                        (s) => s.startTime == time,
-                                        orElse: () => TimeSlotModel(
-                                            startTime: time,
-                                            endTime: '',
-                                            isAvailable: false));
-                                    return GestureDetector(
-                                      onTap: slot.isAvailable
-                                          ? () => context
-                                              .read<VenueOverviewCubit>()
-                                              .toggleSlot(court.id, time)
-                                          : null,
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                                color: AppColors.borderLight,
-                                                width: 0.5),
-                                            right: BorderSide(
-                                                color: AppColors.borderLight,
-                                                width: 0.5),
-                                          ),
-                                        ),
-                                        child: Container(
-                                          margin: const EdgeInsets.all(1),
-                                          color: !slot.isAvailable
-                                              ? const Color(0xFFFFF1F2)
-                                              : (slot.isSelected
-                                                  ? AppColors.primaryLightBrand
-                                                  : Colors.white),
-                                          child: slot.isSelected
-                                              ? const Icon(Icons.check_rounded,
-                                                  color: Colors.white, size: 14)
-                                              : !slot.isAvailable
-                                                  ? CustomPaint(
-                                                      painter: StripedPainter())
-                                                  : null,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                )),
-                          ],
+                  ),
+                  child: const Text('SÂN \\ GIỜ',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary)),
+                ),
+                ...model.courts.map((court) => Container(
+                      width: 100,
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.centerLeft,
+                      decoration: BoxDecoration(
+                        color: AppColors.mutedLight,
+                        border: Border(
+                          bottom: BorderSide(
+                              color: AppColors.borderLight.withValues(alpha: 0.2),
+                              width: 0.5),
+                          right: BorderSide(
+                              color: AppColors.borderLight.withValues(alpha: 0.5),
+                              width: 0.5),
                         ),
                       ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(court.name,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                  color: AppColors.textPrimary),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                          const Text('Bóng đá',
+                              style: TextStyle(
+                                  fontSize: 8, color: AppColors.textSecondary)),
+                        ],
+                      ),
+                    )),
+              ],
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 40,
+                      color: AppColors.primaryLightBrand.withValues(alpha: 0.08),
+                      child: Row(
+                        children: allSlots
+                            .map((time) => SizedBox(
+                                  width: 50,
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Positioned(
+                                        left: -0.5,
+                                        top: 25,
+                                        child: Container(
+                                            width: 1,
+                                            height: 15,
+                                            color: AppColors.primaryLightBrand
+                                                .withValues(alpha: 0.5)),
+                                      ),
+                                      Positioned(
+                                        left: -25,
+                                        top: 5,
+                                        child: SizedBox(
+                                          width: 50,
+                                          child: Text(time,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.textSecondary)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
                     ),
+                    ...model.courts.map((court) => Row(
+                          children: allSlots.map((time) {
+                            final slot = court.slots.firstWhere(
+                                (s) => s.startTime == time,
+                                orElse: () => TimeSlotModel(
+                                    startTime: time,
+                                    endTime: '',
+                                    isAvailable: false));
+                            return GestureDetector(
+                              onTap: slot.isAvailable
+                                  ? () => notifier.toggleSlot(court.id, time)
+                                  : null,
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: AppColors.borderLight, width: 0.5),
+                                    right: BorderSide(
+                                        color: AppColors.borderLight, width: 0.5),
+                                  ),
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.all(1),
+                                  color: !slot.isAvailable
+                                      ? const Color(0xFFFFF1F2)
+                                      : (slot.isSelected
+                                          ? AppColors.primaryLightBrand
+                                          : Colors.white),
+                                  child: slot.isSelected
+                                      ? const Icon(Icons.check_rounded,
+                                          color: Colors.white, size: 14)
+                                      : !slot.isAvailable
+                                          ? CustomPaint(painter: StripedPainter())
+                                          : null,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        )),
                   ],
                 ),
               ),
-            );
-          },
-        );
-      },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildBottomBar(BuildContext context) {
-    return BlocBuilder<VenueOverviewCubit, BaseState<VenueOverviewModel>>(
-      builder: (context, state) {
-        final listSelected = state.data?.courts
-                .expand((c) => c.slots.where((s) => s.isSelected))
-                .toList() ??
-            [];
-        if (listSelected.isEmpty) return const SizedBox.shrink();
+  Widget _buildBottomBar(
+    BuildContext context,
+    VenueOverviewNotifier notifier,
+    VenueOverviewModel? model,
+  ) {
+    final listSelected =
+        model?.courts.expand((c) => c.slots.where((s) => s.isSelected)).toList() ?? [];
+    if (listSelected.isEmpty) return const SizedBox.shrink();
 
-        final totalDuration = listSelected.length * 30; // 30 min per slot
-        final totalPrice =
-            listSelected.fold(0.0, (sum, slot) => sum + slot.price);
-        final isRecurringMode =
-            state.data?.bookingMode == VenueBookingMode.recurring;
+    final totalDuration = listSelected.length * 30;
+    final totalPrice = listSelected.fold(0.0, (sum, slot) => sum + slot.price);
+    final isRecurringMode = model?.bookingMode == VenueBookingMode.recurring;
 
-        return Container(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 20,
+    return Container(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: MediaQuery.of(context).padding.bottom + 20,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -8),
           ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 24,
-                offset: const Offset(0, -8),
-              ),
-            ],
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 4,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${listSelected.length} Ca ($totalDuration phút)',
-                      style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      '${NumberFormat('#,###', 'vi_VN').format(totalPrice)} đ',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primaryLightBrand,
-                      ),
-                    ),
-                  ],
+        ],
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${listSelected.length} Ca ($totalDuration phút)',
+                  style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 6,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final model = state.data!;
-                    if (isRecurringMode) {
-                      Logger.info('Continue button clicked (RECURRING mode)');
-                      await _handleRecurringSubmit(context, model);
-                      return;
-                    }
-
-                    // Original Regular Booking Logic
-                    final selectedSlotsMap =
-                        <String, List<booking.TimeSlotModel>>{};
-                    for (var court in model.courts) {
-                      final selectedInCourt =
-                          court.slots.where((s) => s.isSelected).toList();
-                      if (selectedInCourt.isNotEmpty) {
-                        selectedSlotsMap[court.id] = selectedInCourt
-                            .map((s) => booking.TimeSlotModel(
-                                  startTime: s.startTime,
-                                  endTime: s.endTime,
-                                  price: s.price,
-                                  status: booking.TimeSlotStatus.AVAILABLE,
-                                ))
-                            .toList();
-                      }
-                    }
-
-                    if (selectedSlotsMap.isEmpty) return;
-
-                    final firstCourtId = selectedSlotsMap.keys.first;
-                    final firstCourtName = model.courts
-                        .firstWhere((c) => c.id == firstCourtId)
-                        .name;
-
-                    await context.push(RouteNames.bookingConfirm, extra: {
-                      'courtId': firstCourtId,
-                      'courtName': firstCourtName,
-                      'venueId': model.venueId,
-                      'venueName': model.venueName,
-                      'venueAddress': model.venueAddress,
-                      'bookingDate': DateFormat('yyyy-MM-dd').format(
-                          context.read<VenueOverviewCubit>().selectedDate),
-                      'selectedSlots': selectedSlotsMap[firstCourtId],
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryLightBrand,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    elevation: 8,
-                    shadowColor:
-                        AppColors.primaryLightBrand.withValues(alpha: 0.4),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(isRecurringMode ? 'Đặt sân cố định' : 'Tiếp tục',
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w900)),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 12),
-                    ],
-                  ),
+                Text(
+                  '${NumberFormat('#,###', 'vi_VN').format(totalPrice)} đ',
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primaryLightBrand),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        );
-      },
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 6,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (model == null) return;
+                if (isRecurringMode) {
+                  Logger.info('Continue button clicked (RECURRING mode)');
+                  await _handleRecurringSubmit(context, notifier, model);
+                  return;
+                }
+
+                final selectedSlotsMap = <String, List<booking.TimeSlotModel>>{};
+                for (var court in model.courts) {
+                  final selectedInCourt =
+                      court.slots.where((s) => s.isSelected).toList();
+                  if (selectedInCourt.isNotEmpty) {
+                    selectedSlotsMap[court.id] = selectedInCourt
+                        .map((s) => booking.TimeSlotModel(
+                              startTime: s.startTime,
+                              endTime: s.endTime,
+                              price: s.price,
+                              status: booking.TimeSlotStatus.AVAILABLE,
+                            ))
+                        .toList();
+                  }
+                }
+
+                if (selectedSlotsMap.isEmpty) return;
+
+                final firstCourtId = selectedSlotsMap.keys.first;
+                final firstCourtName =
+                    model.courts.firstWhere((c) => c.id == firstCourtId).name;
+
+                await context.push(RouteNames.bookingConfirm, extra: {
+                  'courtId': firstCourtId,
+                  'courtName': firstCourtName,
+                  'venueId': model.venueId,
+                  'venueName': model.venueName,
+                  'venueAddress': model.venueAddress,
+                  'bookingDate': DateFormat('yyyy-MM-dd').format(notifier.selectedDate),
+                  'selectedSlots': selectedSlotsMap[firstCourtId],
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryLightBrand,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                elevation: 8,
+                shadowColor: AppColors.primaryLightBrand.withValues(alpha: 0.4),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(isRecurringMode ? 'Đặt sân cố định' : 'Tiếp tục',
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w900)),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 12),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _handleRecurringSubmit(
-      BuildContext context, VenueOverviewModel model) async {
+    BuildContext context,
+    VenueOverviewNotifier notifier,
+    VenueOverviewModel model,
+  ) async {
     final listSelected =
         model.courts.expand((c) => c.slots.where((s) => s.isSelected)).toList();
 
     Logger.info('Handle Recurring Submit: ${listSelected.length} total slots selected');
+    if (listSelected.isEmpty) return;
 
-    if (listSelected.isEmpty) {
-      Logger.warning('Handle Recurring Submit: No slots selected, returning.');
-      return;
-    }
-
-    Logger.info('Showing confirmation dialog...');
-    // Show confirmation
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -758,47 +687,31 @@ class VenueOverviewView extends StatelessWidget {
         content: Text(
             'Bạn đang thực hiện đăng ký cố định cho ${listSelected.length} ca đã chọn. Tiếp tục?'),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Hủy')),
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Đồng ý')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Hủy')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Đồng ý')),
         ],
       ),
     );
+    if (confirmed != true) return;
 
-    if (confirmed != true) {
-      Logger.info('Recurring booking confirmation cancelled/dismissed ($confirmed)');
-      return;
-    }
-
-    // Show loading using ToastService (Non-blocking)
     toast.loading('Đang xử lý yêu cầu...');
 
     final repo = GetIt.I<RecurringBookingRepository>();
     final config = model.recurringConfig!;
-    final startDateStr = DateFormat('yyyy-MM-dd')
-        .format(context.read<VenueOverviewCubit>().selectedDate);
+    final startDateStr = DateFormat('yyyy-MM-dd').format(notifier.selectedDate);
 
     int successCount = 0;
     int failCount = 0;
-
-    Logger.info('Confirmed recurring booking for ${listSelected.length} slots. Starting requests...');
 
     try {
       for (var court in model.courts) {
         final selectedInCourt = court.slots.where((s) => s.isSelected).toList()
           ..sort((a, b) => a.startTime.compareTo(b.startTime));
-
         if (selectedInCourt.isEmpty) continue;
 
-        // Merge contiguous slots for better user experience and fewer API calls
         final mergedSlots = _mergeTimeSlots(selectedInCourt);
-        Logger.info('Court ${court.name}: ${selectedInCourt.length} slots merged into ${mergedSlots.length} requests');
 
         for (var slot in mergedSlots) {
-          Logger.info('Sending recurring request: ${court.name} | ${slot.startTime} - ${slot.endTime}');
           final result = await repo.createRecurringBooking(
             venueId: model.venueId,
             courtId: court.id,
@@ -811,7 +724,6 @@ class VenueOverviewView extends StatelessWidget {
                 ? DateFormat('yyyy-MM-dd').format(config.endDate!)
                 : null,
           );
-
           result.fold(
             onSuccess: (data) => successCount++,
             onFailure: (f) => failCount++,
@@ -827,10 +739,7 @@ class VenueOverviewView extends StatelessWidget {
     if (!context.mounted) return;
 
     if (successCount > 0) {
-      context
-          .read<VenueOverviewCubit>()
-          .setBookingMode(VenueBookingMode.regular);
-
+      notifier.setBookingMode(VenueBookingMode.regular);
       await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -838,8 +747,7 @@ class VenueOverviewView extends StatelessWidget {
           content: Text(
               'Đã gửi yêu cầu cho $successCount dải giờ. Chủ sân sẽ duyệt sớm cho bạn.${failCount > 0 ? '\n(Có $failCount yêu cầu bị lỗi)' : ''}'),
           actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx), child: const Text('Đóng')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Đóng')),
           ],
         ),
       );
@@ -848,28 +756,21 @@ class VenueOverviewView extends StatelessWidget {
     }
   }
 
-  /// Helper to merge contiguous time slots
   List<TimeSlotModel> _mergeTimeSlots(List<TimeSlotModel> slots) {
     if (slots.isEmpty) return [];
-
-    final List<TimeSlotModel> merged = [];
+    final merged = <TimeSlotModel>[];
     TimeSlotModel? current;
-
     for (var slot in slots) {
       if (current == null) {
         current = slot;
+      } else if (current.endTime == slot.startTime) {
+        current = current.copyWith(endTime: slot.endTime);
       } else {
-        // Check if contiguous (end of current == start of next)
-        if (current.endTime == slot.startTime) {
-          current = current.copyWith(endTime: slot.endTime);
-        } else {
-          merged.add(current);
-          current = slot;
-        }
+        merged.add(current);
+        current = slot;
       }
     }
     if (current != null) merged.add(current);
-
     return merged;
   }
 }
@@ -919,8 +820,6 @@ class _RecurringBookingSheetState extends State<_RecurringBookingSheet> {
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
           ),
           const SizedBox(height: 24),
-
-          // Repeat Type
           const Text('Tần suất lặp',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
@@ -940,8 +839,6 @@ class _RecurringBookingSheetState extends State<_RecurringBookingSheet> {
             ],
           ),
           const SizedBox(height: 24),
-
-          // Days Selector
           if (_repeatType == 'WEEKLY') ...[
             const Text('Lặp lại vào các ngày',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
@@ -958,9 +855,7 @@ class _RecurringBookingSheetState extends State<_RecurringBookingSheet> {
                   onTap: () {
                     setState(() {
                       if (isSelected) {
-                        if (_selectedDays.length > 1) {
-                          _selectedDays.remove(dayNum);
-                        }
+                        if (_selectedDays.length > 1) _selectedDays.remove(dayNum);
                       } else {
                         _selectedDays.add(dayNum);
                       }
@@ -971,8 +866,6 @@ class _RecurringBookingSheetState extends State<_RecurringBookingSheet> {
             ),
             const SizedBox(height: 24),
           ],
-
-          // End Date
           const Text('Ngày kết thúc (Tùy chọn)',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
@@ -1014,7 +907,6 @@ class _RecurringBookingSheetState extends State<_RecurringBookingSheet> {
             ),
           ),
           const SizedBox(height: 32),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -1029,8 +921,7 @@ class _RecurringBookingSheetState extends State<_RecurringBookingSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryLightBrand,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               child: const Text('Bật chế độ đặt cố định',
                   style: TextStyle(
@@ -1071,8 +962,7 @@ class _ChoiceChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _ChoiceChip(
-      {required this.label, required this.selected, required this.onTap});
+  const _ChoiceChip({required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -1084,9 +974,7 @@ class _ChoiceChip extends StatelessWidget {
           color: selected ? AppColors.primaryLightBrand : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: selected
-                  ? AppColors.primaryLightBrand
-                  : AppColors.borderLight),
+              color: selected ? AppColors.primaryLightBrand : AppColors.borderLight),
         ),
         child: Text(
           label,
@@ -1106,8 +994,7 @@ class _DayChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _DayChip(
-      {required this.label, required this.selected, required this.onTap});
+  const _DayChip({required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -1121,9 +1008,7 @@ class _DayChip extends StatelessWidget {
           color: selected ? AppColors.primaryLightBrand : Colors.white,
           shape: BoxShape.circle,
           border: Border.all(
-              color: selected
-                  ? AppColors.primaryLightBrand
-                  : AppColors.borderLight),
+              color: selected ? AppColors.primaryLightBrand : AppColors.borderLight),
         ),
         child: Text(
           label,

@@ -1,19 +1,19 @@
 import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import 'package:dat_san_247_mobile/features/owner/venue/presentation/cubit/owner_venue_cubit.dart';
+import 'package:dat_san_247_mobile/features/owner/venue/presentation/providers/owner_venue_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-class OwnerAddVenuePage extends StatefulWidget {
+class OwnerAddVenuePage extends ConsumerStatefulWidget {
   const OwnerAddVenuePage({super.key});
 
   @override
-  State<OwnerAddVenuePage> createState() => _OwnerAddVenuePageState();
+  ConsumerState<OwnerAddVenuePage> createState() => _OwnerAddVenuePageState();
 }
 
-class _OwnerAddVenuePageState extends State<OwnerAddVenuePage> {
+class _OwnerAddVenuePageState extends ConsumerState<OwnerAddVenuePage> {
   static const Color _brand = Color(0xFF1565C0);
 
   final _nameCtrl = TextEditingController();
@@ -174,7 +174,7 @@ class _OwnerAddVenuePageState extends State<OwnerAddVenuePage> {
                       toast.error('Vui lòng nhập đầy đủ thông tin bắt buộc');
                       return;
                     }
-                    context.read<OwnerVenueCubit>().createVenue(
+                    ref.read(ownerVenueProvider.notifier).createVenue(
                           name: _nameCtrl.text,
                           address: _addressCtrl.text,
                           city: _cityCtrl.text,

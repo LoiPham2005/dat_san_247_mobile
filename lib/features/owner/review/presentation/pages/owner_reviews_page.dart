@@ -1,52 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
-import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/review/data/models/owner_review_model.dart';
-import 'package:dat_san_247_mobile/features/owner/review/presentation/cubit/owner_review_cubit.dart';
+import 'package:dat_san_247_mobile/features/owner/review/presentation/providers/owner_review_notifier.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class OwnerReviewsPage extends StatelessWidget {
+class OwnerReviewsPage extends ConsumerWidget {
   final String? venueId;
   final String? venueName;
   const OwnerReviewsPage({super.key, this.venueId, this.venueName});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<OwnerReviewCubit>()..fetchReviews(venueId: venueId),
-      child: BlocListener<OwnerReviewCubit, BaseState<OwnerReviewState>>(
-        listenWhen: (prev, curr) => curr.isSuccess || curr.isFailure,
-        listener: (context, state) {
-          if (state.isFailure && state.error != null) {
-            getIt<ToastService>().error(state.error!);
-          } else if (state.isSuccess && state.message != null) {
-            getIt<ToastService>().success(state.message!);
-          }
-        },
-        child: _OwnerReviewsView(venueName: venueName),
-      ),
-    );
-  }
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ownerReviewProvider(venueId);
+    final state = ref.watch(provider);
+    final notifier = ref.read(provider.notifier);
 
-class _OwnerReviewsView extends StatelessWidget {
-  final String? venueName;
-  const _OwnerReviewsView({this.venueName});
+    useAsyncValueListener(provider: provider, ref: ref);
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Đánh Giá của Khách', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text('Đánh Giá của Khách',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             if (venueName != null)
-              Text(venueName!, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+              Text(venueName!,
+                  style: const TextStyle(
+                      fontSize: 10, color: AppColors.textSecondary)),
           ],
         ),
         backgroundColor: Colors.white,
@@ -54,44 +38,39 @@ class _OwnerReviewsView extends StatelessWidget {
         elevation: 0,
         centerTitle: false,
       ),
-      body: BlocBuilder<OwnerReviewCubit, BaseState<OwnerReviewState>>(
-        builder: (context, state) {
-          if (state.isLoading && !state.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final reviews = state.data?.reviews ?? [];
-
-          if (reviews.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.rate_review_outlined, size: 64, color: Colors.grey.shade300),
-                  const SizedBox(height: 16),
-                  const Text('Chưa có đánh giá nào', style: TextStyle(color: AppColors.textHint)),
-                ],
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () => context.read<OwnerReviewCubit>().fetchReviews(venueId: state.data?.currentVenueId),
+      body: switch (state) {
+        AsyncData(:final value) when value.isEmpty => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.rate_review_outlined,
+                    size: 64, color: Colors.grey.shade300),
+                const SizedBox(height: 16),
+                const Text('Chưa có đánh giá nào',
+                    style: TextStyle(color: AppColors.textHint)),
+              ],
+            ),
+          ),
+        AsyncData(:final value) => RefreshIndicator(
+            onRefresh: notifier.refresh,
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: reviews.length,
-              itemBuilder: (ctx, i) => _ReviewCard(review: reviews[i]),
+              itemCount: value.length,
+              itemBuilder: (ctx, i) =>
+                  _ReviewCard(review: value[i], notifier: notifier),
             ),
-          );
-        },
-      ),
+          ),
+        AsyncError(:final error) => Center(child: Text('Lỗi: $error')),
+        _ => const Center(child: CircularProgressIndicator()),
+      },
     );
   }
 }
 
 class _ReviewCard extends StatelessWidget {
   final OwnerReviewModel review;
-  const _ReviewCard({required this.review});
+  final OwnerReviewNotifier notifier;
+  const _ReviewCard({required this.review, required this.notifier});
 
   @override
   Widget build(BuildContext context) {
@@ -327,7 +306,7 @@ class _ReviewCard extends StatelessWidget {
                   onPressed: () {
                     if (replyCtrl.text.trim().isEmpty) return;
                     Navigator.pop(ctx);
-                    context.read<OwnerReviewCubit>().replyReview(review.id, replyCtrl.text.trim());
+                    notifier.replyReview(review.id, replyCtrl.text.trim());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0891B2),

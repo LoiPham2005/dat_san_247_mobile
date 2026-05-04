@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude --usage)",
+      "Bash(claude usage *)",
+      "Bash(dart analyze *)",
+      "Skill(shared)",
+      "Skill(shared:*)",
+      "Bash(grep -r 'class.*Notifier\\\\|abstract.*Notifier\\\\|$Notifier' /Users/loipd/.pub-cache/hosted/pub.dev/riverpod-3.0.3/lib/src/notifier/)",
+      "Bash(grep -n \"context.read<OwnerVenueServicesCubit>\\\\|context\\\\s*$\" /Users/loipd/personal/dat_san_247_mobile/lib/features/owner/venue/presentation/pages/owner_venue_services_page.dart)"
+    ]
+  }
+}

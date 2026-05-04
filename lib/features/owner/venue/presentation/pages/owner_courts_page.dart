@@ -1,43 +1,27 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:dat_san_247_mobile/core/base/di/injection.dart';
+import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/pages/owner_court_pricing_page.dart';
+import 'package:dat_san_247_mobile/features/owner/venue/presentation/providers/owner_venue_detail_sub_notifiers.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/presentation/widgets/court_card.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
-import 'package:dat_san_247_mobile/features/owner/venue/presentation/cubit/owner_venue_detail_sub_cubits.dart';
-import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // O-04: Quản Lý Sân (Courts)
 // ──────────────────────────────────────────────────────────────────────────
-class OwnerCourtsPage extends StatelessWidget {
+class OwnerCourtsPage extends ConsumerStatefulWidget {
   final String venueId;
   final String venueName;
   const OwnerCourtsPage({super.key, required this.venueId, required this.venueName});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<OwnerCourtsCubit>()..fetchCourts(venueId),
-      child: _OwnerCourtsView(venueId: venueId, venueName: venueName),
-    );
-  }
+  ConsumerState<OwnerCourtsPage> createState() => _OwnerCourtsPageState();
 }
 
-class _OwnerCourtsView extends StatefulWidget {
-  final String venueId;
-  final String venueName;
-  const _OwnerCourtsView({required this.venueId, required this.venueName});
-
-  @override
-  State<_OwnerCourtsView> createState() => _OwnerCourtsViewState();
-}
-
-class _OwnerCourtsViewState extends State<_OwnerCourtsView> {
+class _OwnerCourtsPageState extends ConsumerState<OwnerCourtsPage> {
   static const Color _brand = Color(0xFF0891B2);
   static const Color _brandDark = Color(0xFF0E7490);
 
@@ -45,13 +29,13 @@ class _OwnerCourtsViewState extends State<_OwnerCourtsView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OwnerCourtsCubit, BaseState<List<OwnerCourtModel>>>(
-      builder: (context, state) {
-        final courts = state.data ?? [];
-        final filtered = _showInactive ? courts : courts.where((c) => c.isActive).toList();
-        final activeCount = courts.where((c) => c.isActive).length;
+    final provider = ownerCourtsProvider(widget.venueId);
+    final state = ref.watch(provider);
+    final courts = state.value ?? [];
+    final filtered = _showInactive ? courts : courts.where((c) => c.isActive).toList();
+    final activeCount = courts.where((c) => c.isActive).length;
 
-        return Scaffold(
+    return Scaffold(
           backgroundColor: const Color(0xFFF4F6FA),
           body: CustomScrollView(
             slivers: [
@@ -99,8 +83,6 @@ class _OwnerCourtsViewState extends State<_OwnerCourtsView> {
             label: const Text('Thêm Sân', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         );
-      },
-    );
   }
 
   Widget _buildHeader(int total, int active) => SliverAppBar(
@@ -270,7 +252,7 @@ class _OwnerCourtsViewState extends State<_OwnerCourtsView> {
                           return;
                         }
                         Navigator.pop(ctx);
-                        context.read<OwnerCourtsCubit>().addCourt(widget.venueId, {
+                        ref.read(ownerCourtsProvider(widget.venueId).notifier).addCourt({
                           'name': nameCtrl.text,
                           'price_per_hour': int.tryParse(priceCtrl.text) ?? 0,
                           'surface_type': surface?.name,
@@ -362,7 +344,7 @@ class _OwnerCourtsViewState extends State<_OwnerCourtsView> {
                 child: TextButton.icon(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    context.read<OwnerCourtsCubit>().deleteCourt(widget.venueId, court.id);
+                    ref.read(ownerCourtsProvider(widget.venueId).notifier).deleteCourt(court.id);
                   },
                   icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 18),
                   label: const Text('Xóa Sân', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),

@@ -1,14 +1,11 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
-import 'package:dat_san_247_mobile/core/base/state/base_status.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
-import 'package:dat_san_247_mobile/features/owner/venue/presentation/cubit/owner_venue_detail_cubit.dart';
-import 'package:dat_san_247_mobile/features/owner/venue/presentation/cubit/owner_venue_detail_sub_cubits.dart';
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
+import 'package:dat_san_247_mobile/features/owner/venue/presentation/providers/owner_venue_detail_notifier.dart';
+import 'package:dat_san_247_mobile/features/owner/venue/presentation/providers/owner_venue_detail_sub_notifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart'; // DateFormat for schedule exceptions
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
@@ -30,27 +27,19 @@ class OwnerVenueManagePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => getIt<OwnerVenueDetailCubit>()..fetchVenueDetail(venueId)),
-        BlocProvider(create: (_) => getIt<OwnerVenueAmenitiesCubit>()..fetchAmenities(venueId)),
-        BlocProvider(create: (_) => getIt<OwnerVenueHoursCubit>()..fetchHours(venueId)),
-        BlocProvider(create: (_) => getIt<OwnerVenueMediaCubit>()..fetchMedia(venueId)),
-      ],
-      child: _OwnerVenueManageView(venueId: venueId),
-    );
+    return _OwnerVenueManageView(venueId: venueId);
   }
 }
 
-class _OwnerVenueManageView extends StatefulWidget {
+class _OwnerVenueManageView extends ConsumerStatefulWidget {
   final String venueId;
   const _OwnerVenueManageView({required this.venueId});
 
   @override
-  State<_OwnerVenueManageView> createState() => _OwnerVenueManageViewState();
+  ConsumerState<_OwnerVenueManageView> createState() => _OwnerVenueManageViewState();
 }
 
-class _OwnerVenueManageViewState extends State<_OwnerVenueManageView>
+class _OwnerVenueManageViewState extends ConsumerState<_OwnerVenueManageView>
     with SingleTickerProviderStateMixin {
   static const Color _brand = Color(0xFF0891B2);
   static const Color _brandDark = Color(0xFF0E7490);
@@ -73,38 +62,26 @@ class _OwnerVenueManageViewState extends State<_OwnerVenueManageView>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OwnerVenueDetailCubit, BaseState<OwnerVenueModel>>(
-      builder: (context, state) {
-        if (state.status == BaseStatus.initial || (state.isLoading && !state.hasData)) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
+    final detailProvider = ownerVenueDetailProvider(widget.venueId);
+    final detailState = ref.watch(detailProvider);
+    final detailNotifier = ref.read(detailProvider.notifier);
 
-        return BlocListener<OwnerVenueDetailCubit, BaseState<OwnerVenueModel>>(
-          listenWhen: (prev, curr) => prev.status != curr.status,
-          listener: (context, state) {
-            if (state.isSuccess) {
-              getIt<ToastService>().success('Cập nhật thông tin thành công');
-            } else if (state.isFailure) {
-              getIt<ToastService>().error(state.error ?? 'Cập nhật thất bại');
-            }
-          },
-          child: _buildScaffold(context, state),
-        );
-      },
-    );
-  }
+    useAsyncValueListener(provider: detailProvider, ref: ref);
 
-  Widget _buildScaffold(BuildContext context, BaseState<OwnerVenueModel> state) {
-    if (state.isFailure && !state.hasData) {
+    if (detailState.isLoading && detailState.value == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (detailState.hasError && detailState.value == null) {
       return Scaffold(
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(state.error ?? 'Lỗi tải chi tiết sân'),
+              Text('${detailState.error}'),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => context.read<OwnerVenueDetailCubit>().refresh(widget.venueId),
+                onPressed: detailNotifier.refresh,
                 child: const Text('Thử lại'),
               ),
             ],
@@ -113,7 +90,11 @@ class _OwnerVenueManageViewState extends State<_OwnerVenueManageView>
       );
     }
 
-    final venue = state.data!;
+    final venue = detailState.value!;
+    return _buildScaffold(context, venue, detailNotifier);
+  }
+
+  Widget _buildScaffold(BuildContext context, OwnerVenueModel venue, OwnerVenueDetailNotifier detailNotifier) {
 
     return Scaffold(
           backgroundColor: const Color(0xFFF4F6FA),
@@ -187,60 +168,73 @@ class _OwnerVenueManageViewState extends State<_OwnerVenueManageView>
             body: TabBarView(
               controller: _tabCtrl,
               children: [
-                _BasicInfoTab(venue: venue, sportTypes: venue.sportTypes, allSports: _allSports,
-                  onSportToggle: (newList) {
-                    context.read<OwnerVenueDetailCubit>().updateVenue(venue.id, {'sport_types': newList});
-                  },
-                  onSave: (data) {
-                    context.read<OwnerVenueDetailCubit>().updateVenue(venue.id, data);
-                  },
+                _BasicInfoTab(
+                  venue: venue,
+                  sportTypes: venue.sportTypes,
+                  allSports: _allSports,
+                  onSportToggle: (newList) =>
+                      detailNotifier.updateVenue({'sport_types': newList}),
+                  onSave: detailNotifier.updateVenue,
                 ),
-                BlocBuilder<OwnerVenueAmenitiesCubit, BaseState<List<AmenityModel>>>(
-                  builder: (context, amState) => _AmenitiesTab(
-                    amenities: amState.data ?? [],
+                Consumer(builder: (context, ref, _) {
+                  final amProvider = ownerVenueAmenitiesProvider(venue.id);
+                  final amState = ref.watch(amProvider);
+                  final amNotifier = ref.read(amProvider.notifier);
+                  return _AmenitiesTab(
+                    amenities: amState.value ?? [],
                     isLoading: amState.isLoading,
-                    onAdd: (a) => context.read<OwnerVenueAmenitiesCubit>().addAmenity(venue.id, a.name, a.icon),
-                    onDelete: (id) => context.read<OwnerVenueAmenitiesCubit>().deleteAmenity(venue.id, id),
-                    onToggleFree: (id) => context.read<OwnerVenueAmenitiesCubit>().toggleFree(venue.id, id),
-                  ),
-                ),
-                BlocBuilder<OwnerVenueHoursCubit, BaseState<VenueHoursState>>(
-                  builder: (context, hrState) => _OperatingHoursTab(
-                    hours: hrState.data?.hours ?? [],
-                    exceptions: hrState.data?.exceptions ?? [],
+                    onAdd: (a) => amNotifier.addAmenity(a.name, a.icon),
+                    onDelete: amNotifier.deleteAmenity,
+                    onToggleFree: amNotifier.toggleFree,
+                  );
+                }),
+                Consumer(builder: (context, ref, _) {
+                  final hrProvider = ownerVenueHoursProvider(venue.id);
+                  final hrState = ref.watch(hrProvider);
+                  final hrNotifier = ref.read(hrProvider.notifier);
+                  return _OperatingHoursTab(
+                    hours: hrState.value?.hours ?? [],
+                    exceptions: hrState.value?.exceptions ?? [],
                     isLoading: hrState.isLoading,
                     onHoursChange: (day, opening, closing, closed) {
-                      final currentHours = hrState.data?.hours ?? [];
+                      final currentHours = hrState.value?.hours ?? [];
                       final updated = currentHours.map((h) {
                         if (h.dayOfWeek == day) {
-                          return h.copyWith(openingTime: opening, closingTime: closing, isClosed: closed);
+                          return h.copyWith(
+                              openingTime: opening,
+                              closingTime: closing,
+                              isClosed: closed);
                         }
                         return h;
                       }).toList();
-                      context.read<OwnerVenueHoursCubit>().updateHours(venue.id, updated);
+                      hrNotifier.updateHours(updated);
                     },
-                    onAddException: (ex) => context.read<OwnerVenueHoursCubit>().addException(venue.id, ex),
-                    onDeleteException: (id) => context.read<OwnerVenueHoursCubit>().deleteException(venue.id, id),
-                  ),
-                ),
-                BlocBuilder<OwnerVenueMediaCubit, BaseState<VenueMediaState>>(
-                  builder: (context, mState) => _MediaTab(
-                    media: mState.data?.media ?? [],
-                    pendingFiles: mState.data?.pendingFiles ?? [],
+                    onAddException: hrNotifier.addException,
+                    onDeleteException: hrNotifier.deleteException,
+                  );
+                }),
+                Consumer(builder: (context, ref, _) {
+                  final mProvider = ownerVenueMediaProvider(venue.id);
+                  final mState = ref.watch(mProvider);
+                  final mNotifier = ref.read(mProvider.notifier);
+                  return _MediaTab(
+                    media: mState.value?.media ?? [],
+                    pendingFiles: mState.value?.pendingFiles ?? [],
                     isLoading: mState.isLoading,
                     onPickImages: () async {
                       final picker = ImagePicker();
                       final xFiles = await picker.pickMultiImage();
                       if (xFiles.isNotEmpty) {
-                        context.read<OwnerVenueMediaCubit>().pickImages(xFiles.map((x) => File(x.path)).toList());
+                        mNotifier.pickImages(
+                            xFiles.map((x) => File(x.path)).toList());
                       }
                     },
-                    onRemovePending: (index) => context.read<OwnerVenueMediaCubit>().removePending(index),
-                    onSavePending: () => context.read<OwnerVenueMediaCubit>().savePending(venue.id),
-                    onDelete: (id) => context.read<OwnerVenueMediaCubit>().deleteMedia(venue.id, id),
-                    onSetCover: (id) => context.read<OwnerVenueMediaCubit>().setCover(venue.id, id),
-                  ),
-                ),
+                    onRemovePending: mNotifier.removePending,
+                    onSavePending: mNotifier.savePending,
+                    onDelete: mNotifier.deleteMedia,
+                    onSetCover: mNotifier.setCover,
+                  );
+                }),
               ],
             ),
           ),

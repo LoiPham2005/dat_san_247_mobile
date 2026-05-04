@@ -8,30 +8,20 @@ import 'package:dat_san_247_mobile/features/auth/presentation/pages/otp_page.dar
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/register_page.dart';
 import 'package:dat_san_247_mobile/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/data/models/my_booking_models.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/booking_confirm_cubit.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/booking_detail_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_confirm_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_detail_page.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/review_cubit.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/booking_success_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/cancel_booking_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/payment_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/time_slot_picker_page.dart';
 import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/write_review_page.dart';
 import 'package:dat_san_247_mobile/features/customer/deals/presentation/pages/deals_page.dart';
-import 'package:dat_san_247_mobile/features/customer/favorite/presentation/cubit/favorite_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/favorite/presentation/pages/favorite_venues_page.dart';
-import 'package:dat_san_247_mobile/features/customer/invoice/presentation/cubit/invoice_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/invoice/presentation/pages/invoice_list_page.dart';
 import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
 import 'package:dat_san_247_mobile/features/customer/notification/presentation/pages/notifications_page.dart';
 import 'package:dat_san_247_mobile/features/customer/promotions/presentation/pages/promotions_page.dart';
-import 'package:dat_san_247_mobile/features/customer/promotions/presentation/cubit/promotion_cubit.dart';
-import 'package:dat_san_247_mobile/features/customer/support/presentation/cubit/support_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/support/presentation/pages/support_ticket_list_page.dart';
-import 'package:dat_san_247_mobile/features/customer/recurring_booking/presentation/cubit/recurring_booking_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/recurring_booking/presentation/pages/recurring_booking_page.dart';
 import 'package:dat_san_247_mobile/features/customer/profile/presentation/pages/profile_settings_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_map_page.dart';
@@ -39,7 +29,6 @@ import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/hom
 import 'package:dat_san_247_mobile/features/customer/venue_detail/presentation/pages/venue_detail_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_search_page.dart';
-import 'package:dat_san_247_mobile/features/customer/waitlist/presentation/cubit/waitlist_cubit.dart';
 import 'package:dat_san_247_mobile/features/customer/waitlist/presentation/pages/my_waitlist_page.dart';
 import 'package:dat_san_247_mobile/features/customer/wallet/presentation/pages/wallet_page.dart';
 import 'package:dat_san_247_mobile/features/owner/main/presentation/pages/owner_shell_page.dart';
@@ -218,17 +207,14 @@ class BookingConfirmRoute extends GoRouteData with $BookingConfirmRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extra = $extra ?? {};
-    return BlocProvider(
-      create: (context) => getIt<BookingConfirmCubit>(),
-      child: BookingConfirmPage(
-        courtId: extra['courtId'] ?? '',
-        courtName: extra['courtName'] ?? '',
-        venueId: extra['venueId'] ?? '',
-        venueName: extra['venueName'] ?? '',
-        venueAddress: extra['venueAddress'] ?? '',
-        bookingDate: extra['bookingDate'] ?? '',
-        selectedSlots: extra['selectedSlots'] ?? [],
-      ),
+    return BookingConfirmPage(
+      courtId: extra['courtId'] ?? '',
+      courtName: extra['courtName'] ?? '',
+      venueId: extra['venueId'] ?? '',
+      venueName: extra['venueName'] ?? '',
+      venueAddress: extra['venueAddress'] ?? '',
+      bookingDate: extra['bookingDate'] ?? '',
+      selectedSlots: extra['selectedSlots'] ?? [],
     );
   }
 }
@@ -306,10 +292,7 @@ class BookingDetailRoute extends GoRouteData with $BookingDetailRoute {
       cancellationDeadline: extra['cancellationDeadline'] != null ? DateTime.parse(extra['cancellationDeadline']) : null,
       createdAt: extra['createdAt'] != null ? DateTime.parse(extra['createdAt']) : DateTime.now(),
     );
-    return BlocProvider(
-      create: (context) => getIt<BookingDetailCubit>()..getBookingDetail(booking.id),
-      child: BookingDetailPage(booking: booking),
-    );
+    return BookingDetailPage(booking: booking);
   }
 }
 
@@ -319,7 +302,8 @@ class CancelBookingRoute extends GoRouteData with $CancelBookingRoute {
   final BookingDetailModel? $extra;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => CancelBookingPage(booking: $extra!);
+  Widget build(BuildContext context, GoRouterState state) =>
+      CancelBookingPage(booking: $extra!, bookingId: $extra!.id);
 }
 
 @TypedGoRoute<WriteReviewRoute>(path: RouteNames.writeReview)
@@ -330,12 +314,9 @@ class WriteReviewRoute extends GoRouteData with $WriteReviewRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final extra = $extra ?? {};
-    return BlocProvider(
-      create: (context) => getIt<ReviewCubit>(),
-      child: WriteReviewPage(
-        bookingId: extra['bookingId'] ?? '',
-        venueName: extra['venueName'] ?? '',
-      ),
+    return WriteReviewPage(
+      bookingId: extra['bookingId'] ?? '',
+      venueName: extra['venueName'] ?? '',
     );
   }
 }
@@ -346,22 +327,16 @@ class WriteReviewRoute extends GoRouteData with $WriteReviewRoute {
 class RecurringBookingRoute extends GoRouteData with $RecurringBookingRoute {
   const RecurringBookingRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return BlocProvider(
-      create: (context) => getIt<RecurringBookingCubit>()..getBookings(),
-      child: const RecurringBookingPage(),
-    );
-  }
+  Widget build(BuildContext context, GoRouterState state) =>
+      const RecurringBookingPage();
 }
 
 @TypedGoRoute<MyWaitlistRoute>(path: RouteNames.myWaitlist)
 class MyWaitlistRoute extends GoRouteData with $MyWaitlistRoute {
   const MyWaitlistRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) => BlocProvider(
-    create: (context) => getIt<WaitlistCubit>()..getWaitlist(),
-    child: const MyWaitlistPage(),
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      const MyWaitlistPage();
 }
 
 @TypedGoRoute<WalletRoute>(path: RouteNames.wallet)
@@ -375,32 +350,24 @@ class WalletRoute extends GoRouteData with $WalletRoute {
 class InvoiceListRoute extends GoRouteData with $InvoiceListRoute {
   const InvoiceListRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) => BlocProvider(
-    create: (context) => getIt<InvoiceCubit>()..fetchInvoices(),
-    child: const InvoiceListPage(),
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      const InvoiceListPage();
 }
 
 @TypedGoRoute<PromotionsRoute>(path: RouteNames.promotions)
 class PromotionsRoute extends GoRouteData with $PromotionsRoute {
   const PromotionsRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) => BlocProvider(
-    create: (context) => getIt<PromotionCubit>()..fetchAll(),
-    child: const PromotionsPage(),
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      const PromotionsPage();
 }
 
 @TypedGoRoute<FavoriteVenuesRoute>(path: RouteNames.favoriteVenues)
 class FavoriteVenuesRoute extends GoRouteData with $FavoriteVenuesRoute {
   const FavoriteVenuesRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return BlocProvider(
-      create: (context) => getIt<FavoriteCubit>()..getFavorites(),
-      child: const FavoriteVenuesPage(),
-    );
-  }
+  Widget build(BuildContext context, GoRouterState state) =>
+      const FavoriteVenuesPage();
 }
 
 @TypedGoRoute<NotificationsRoute>(path: RouteNames.notifications)
@@ -414,10 +381,8 @@ class NotificationsRoute extends GoRouteData with $NotificationsRoute {
 class SupportTicketListRoute extends GoRouteData with $SupportTicketListRoute {
   const SupportTicketListRoute();
   @override
-  Widget build(BuildContext context, GoRouterState state) => BlocProvider(
-    create: (context) => getIt<SupportCubit>()..fetchMyTickets(),
-    child: const SupportTicketListPage(),
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      const SupportTicketListPage();
 }
 
 @TypedGoRoute<ProfileSettingsRoute>(path: RouteNames.profileSettings)

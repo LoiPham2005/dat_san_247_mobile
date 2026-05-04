@@ -4,10 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:dat_san_247_mobile/features/customer/home/presentation/pages/home_page.dart';
 import 'package:dat_san_247_mobile/features/customer/venue_search/presentation/pages/venue_list_page.dart';
 import '../widgets/main_bottom_nav.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/presentation/cubit/my_bookings_cubit.dart';
-import 'package:dat_san_247_mobile/features/customer/booking/presentation/pages/my_bookings_page.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'tab_pages.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -61,10 +57,7 @@ class _MainShellPageState extends State<MainShellPage>
   late final List<Widget> _pages = [
     const HomePage(),
     const VenueListPage(),
-    BlocProvider(
-      create: (context) => getIt<MyBookingsCubit>()..getMyBookings(),
-      child: const MyBookingsPage(),
-    ), // index 2 = đặt sân (center button)
+    const MyBookingsPage(), // index 2 = đặt sân (center button)
     const DealsPage(),
     const ProfilePage(),
   ];

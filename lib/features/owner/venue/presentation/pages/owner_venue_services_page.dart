@@ -1,41 +1,27 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
 import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
 import 'package:dat_san_247_mobile/features/owner/venue/data/models/venue_models.dart';
-import 'package:dat_san_247_mobile/features/owner/venue/presentation/cubit/owner_venue_detail_sub_cubits.dart';
+import 'package:dat_san_247_mobile/features/owner/venue/presentation/providers/owner_venue_detail_sub_notifiers.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // O-06: Dịch Vụ Bán Kèm
-// DB: venue_services (venue_id), booking_addons
 // ══════════════════════════════════════════════════════════════════════════════
-class OwnerVenueServicesPage extends StatelessWidget {
+class OwnerVenueServicesPage extends ConsumerStatefulWidget {
   final String venueId;
   final String venueName;
-  const OwnerVenueServicesPage({super.key, required this.venueId, required this.venueName});
+  const OwnerVenueServicesPage(
+      {super.key, required this.venueId, required this.venueName});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<OwnerVenueServicesCubit>()..fetchServices(venueId),
-      child: _OwnerVenueServicesView(venueId: venueId, venueName: venueName),
-    );
-  }
+  ConsumerState<OwnerVenueServicesPage> createState() =>
+      _OwnerVenueServicesPageState();
 }
 
-class _OwnerVenueServicesView extends StatefulWidget {
-  final String venueId;
-  final String venueName;
-  const _OwnerVenueServicesView({required this.venueId, required this.venueName});
-
-  @override
-  State<_OwnerVenueServicesView> createState() => _OwnerVenueServicesViewState();
-}
-
-class _OwnerVenueServicesViewState extends State<_OwnerVenueServicesView>
+class _OwnerVenueServicesPageState extends ConsumerState<OwnerVenueServicesPage>
     with SingleTickerProviderStateMixin {
   static const Color _brand = Color(0xFF0891B2);
   static const Color _brandDark = Color(0xFF0E7490);
@@ -57,11 +43,11 @@ class _OwnerVenueServicesViewState extends State<_OwnerVenueServicesView>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OwnerVenueServicesCubit, BaseState<List<VenueServiceModel>>>(
-      builder: (context, state) {
-        final services = state.data ?? [];
-        final filtered =
-            _typeFilter == null ? services : services.where((s) => s.type == _typeFilter).toList();
+    final provider = ownerVenueServicesProvider(widget.venueId);
+    final state = ref.watch(provider);
+    final services = state.value ?? [];
+    final filtered =
+        _typeFilter == null ? services : services.where((s) => s.type == _typeFilter).toList();
 
         final availableCount = services.where((s) => s.isAvailable).length;
         final lowStockCount = services.where((s) => s.isLowStock).length;
@@ -181,8 +167,8 @@ class _OwnerVenueServicesViewState extends State<_OwnerVenueServicesView>
                             service: filtered[i],
                             onTap: () => _showEditSheet(context, filtered[i]),
                             onToggle: () {
-                              context.read<OwnerVenueServicesCubit>().updateService(
-                                  widget.venueId, filtered[i].id, {'is_available': !filtered[i].isAvailable});
+                              ref.read(ownerVenueServicesProvider(widget.venueId).notifier).updateService(
+                                  filtered[i].id, {'is_available': !filtered[i].isAvailable});
                               HapticFeedback.selectionClick();
                             },
                             onUpdateStock: () => _showUpdateStockSheet(context, filtered[i]),
@@ -201,8 +187,6 @@ class _OwnerVenueServicesViewState extends State<_OwnerVenueServicesView>
             label: const Text('Thêm Dịch Vụ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         );
-      },
-    );
   }
 
   void _showEditSheet(BuildContext context, VenueServiceModel? existing) {
@@ -338,12 +322,12 @@ class _OwnerVenueServicesViewState extends State<_OwnerVenueServicesView>
                           'stock_quantity': int.tryParse(stockCtrl.text) ?? 0,
                         };
 
+                        final servicesNotifier = ref.read(
+                            ownerVenueServicesProvider(widget.venueId).notifier);
                         if (isNew) {
-                          context.read<OwnerVenueServicesCubit>().addService(widget.venueId, data);
+                          servicesNotifier.addService(data);
                         } else {
-                          context
-                              .read<OwnerVenueServicesCubit>()
-                              .updateService(widget.venueId, existing.id, data);
+                          servicesNotifier.updateService(existing.id, data);
                         }
 
                         HapticFeedback.mediumImpact();
@@ -407,8 +391,8 @@ class _OwnerVenueServicesViewState extends State<_OwnerVenueServicesView>
                     onPressed: () {
                       Navigator.pop(ctx);
                       final newQty = int.tryParse(ctrl.text) ?? 0;
-                      context.read<OwnerVenueServicesCubit>().updateService(
-                          widget.venueId, service.id, {'stock_quantity': newQty});
+                      ref.read(ownerVenueServicesProvider(widget.venueId).notifier)
+                          .updateService(service.id, {'stock_quantity': newQty});
                       HapticFeedback.mediumImpact();
                     },
                     style: ElevatedButton.styleFrom(
@@ -436,7 +420,7 @@ class _OwnerVenueServicesViewState extends State<_OwnerVenueServicesView>
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    context.read<OwnerVenueServicesCubit>().deleteService(widget.venueId, service.id);
+                    ref.read(ownerVenueServicesProvider(widget.venueId).notifier).deleteService(service.id);
                     HapticFeedback.mediumImpact();
                   },
                   style: ElevatedButton.styleFrom(

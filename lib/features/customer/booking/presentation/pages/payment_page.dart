@@ -1,20 +1,23 @@
 import 'dart:async';
+
 import 'package:app_links/app_links.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:dat_san_247_mobile/core/base/di/injection.dart';
-import 'package:dat_san_247_mobile/core/base/state/bloc/base_state.dart';
+import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
 import 'package:dat_san_247_mobile/core/services/manager/toast_service.dart';
 import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
-import '../cubit/payment_cubit.dart';
+import 'package:dat_san_247_mobile/features/customer/booking/presentation/providers/payment_notifier.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ──────────────────────────────────────────────────────────────────────────
 // C-07: Màn Thanh Toán — tích hợp VNPAY / MoMo / ZaloPay / CASH / BANK
 // ──────────────────────────────────────────────────────────────────────────
-class PaymentPage extends StatelessWidget {
+const _gatewayMethods = {'VNPAY', 'MOMO', 'ZALOPAY'};
+
+class PaymentPage extends HookConsumerWidget {
   final String bookingCode;
   final String venueName;
   final String courtName;
@@ -37,267 +40,198 @@ class PaymentPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<PaymentCubit>(),
-      child: _PaymentView(
-        bookingCode: bookingCode,
-        venueName: venueName,
-        courtName: courtName,
-        bookingDate: bookingDate,
-        startTime: startTime,
-        endTime: endTime,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPolling = useState(false);
+    final hasOpenedBrowser = useState(false);
+    final pendingPaymentUrl = useState<String?>(null);
+
+    final state = ref.watch(paymentProvider);
+    final notifier = ref.read(paymentProvider.notifier);
+    final isLoadingUrl = state.isLoading;
+
+    void goToSuccess() {
+      context.go('/booking-success', extra: {
+        'bookingCode': bookingCode,
+        'checkInCode': '',
+        'venueName': venueName,
+        'courtName': courtName,
+        'bookingDate': bookingDate,
+        'startTime': startTime,
+        'endTime': endTime,
+        'totalAmount': totalAmount,
+      });
+    }
+
+    Future<void> pollPaymentStatus() async {
+      isPolling.value = true;
+      await Future.delayed(const Duration(seconds: 2));
+      final status = await notifier.pollPaymentStatus(bookingCode);
+      if (!context.mounted) return;
+      isPolling.value = false;
+      if (status == 'PAID') {
+        goToSuccess();
+      } else {
+        toast.info('Chưa nhận được xác nhận thanh toán. Vui lòng kiểm tra lại sau ít phút.');
+      }
+    }
+
+    Future<void> openPaymentUrl(String url) async {
+      try {
+        final uri = Uri.parse(url);
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!launched) {
+          await launchUrl(uri, mode: LaunchMode.platformDefault);
+        }
+        hasOpenedBrowser.value = true;
+      } catch (_) {
+        if (context.mounted) {
+          toast.error('Không thể mở trang thanh toán. Vui lòng thử lại.');
+        }
+      }
+    }
+
+    // Init: tạo URL thanh toán cho gateway
+    useEffect(() {
+      if (_gatewayMethods.contains(paymentMethod)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifier.createPaymentUrl(paymentMethod, bookingCode);
+        });
+      }
+      return null;
+    }, const []);
+
+    // Deep link listener
+    useEffect(() {
+      final appLinks = AppLinks();
+      void handle(Uri uri) {
+        if (uri.scheme == 'datsan247' && uri.host == 'payment-return') {
+          if (!isPolling.value) {
+            hasOpenedBrowser.value = true;
+            pollPaymentStatus();
+          }
+        }
+      }
+
+      final sub = appLinks.uriLinkStream.listen(handle);
+      appLinks.getInitialLink().then((uri) {
+        if (uri != null) handle(uri);
+      }).catchError((_) {});
+      return sub.cancel;
+    }, const []);
+
+    // App lifecycle: khi resume từ background, polling lại
+    useOnAppLifecycleStateChange((previous, next) {
+      if (next == AppLifecycleState.resumed &&
+          hasOpenedBrowser.value &&
+          !isPolling.value) {
+        Future.delayed(const Duration(seconds: 2), () {
+          if (context.mounted && hasOpenedBrowser.value && !isPolling.value) {
+            pollPaymentStatus();
+          }
+        });
+      }
+    });
+
+    RiverpodListeners.async$(
+      ref: ref,
+      context: context,
+      provider: paymentProvider,
+      notifier: notifier,
+      onSuccess: (url) => pendingPaymentUrl.value = url,
+    );
+
+    final fmt = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+    final methodInfo = _methodInfo(paymentMethod);
+    final isGateway = _gatewayMethods.contains(paymentMethod);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FA),
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: AppColors.textPrimary),
+          onPressed: () => context.pop(),
+        ),
+        title: const Text(
+          'Thanh toán',
+          style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _AmountCard(amount: totalAmount, fmt: fmt, methodInfo: methodInfo),
+            const SizedBox(height: 20),
+            _InfoCard(
+              courtName: courtName,
+              venueName: venueName,
+              bookingDate: bookingDate,
+              startTime: startTime,
+              endTime: endTime,
+              bookingCode: bookingCode,
+            ),
+            const SizedBox(height: 16),
+            if (isGateway)
+              _GatewayCard(
+                methodInfo: methodInfo,
+                paymentUrl: pendingPaymentUrl.value,
+                isPolling: isPolling.value,
+                hasOpened: hasOpenedBrowser.value,
+                onOpenBrowser: () {
+                  if (pendingPaymentUrl.value != null) {
+                    openPaymentUrl(pendingPaymentUrl.value!);
+                  }
+                },
+                onCheckStatus: pollPaymentStatus,
+              ),
+            if (paymentMethod == 'CASH') const _CashCard(),
+            if (paymentMethod == 'BANK_TRANSFER') const _BankTransferCard(),
+            const SizedBox(height: 100),
+          ],
+        ),
+      ),
+      bottomNavigationBar: _BottomBar(
+        fmt: fmt,
         totalAmount: totalAmount,
         paymentMethod: paymentMethod,
-      ),
-    );
-  }
-}
-
-class _PaymentView extends StatefulWidget {
-  final String bookingCode;
-  final String venueName;
-  final String courtName;
-  final String bookingDate;
-  final String startTime;
-  final String endTime;
-  final double totalAmount;
-  final String paymentMethod;
-
-  const _PaymentView({
-    required this.bookingCode,
-    required this.venueName,
-    required this.courtName,
-    required this.bookingDate,
-    required this.startTime,
-    required this.endTime,
-    required this.totalAmount,
-    required this.paymentMethod,
-  });
-
-  @override
-  State<_PaymentView> createState() => _PaymentViewState();
-}
-
-class _PaymentViewState extends State<_PaymentView> with WidgetsBindingObserver {
-  final _appLinks = AppLinks();
-  bool _isPolling = false;
-  bool _hasOpenedBrowser = false;
-  String? _pendingPaymentUrl;
-  StreamSubscription<Uri>? _deepLinkSub;
-
-  static const _gatewayMethods = {'VNPAY', 'MOMO', 'ZALOPAY'};
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _initDeepLink();
-
-    if (_gatewayMethods.contains(widget.paymentMethod)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<PaymentCubit>().createPaymentUrl(widget.paymentMethod, widget.bookingCode);
-      });
-    }
-  }
-
-  void _initDeepLink() async {
-    // Deep link khi app đang chạy nền (stream)
-    _deepLinkSub = _appLinks.uriLinkStream.listen(_handleDeepLink);
-
-    // Deep link khi app được mở lại từ deep link (initial)
-    try {
-      final initial = await _appLinks.getInitialLink();
-      if (initial != null) _handleDeepLink(initial);
-    } catch (_) {}
-  }
-
-  void _handleDeepLink(Uri uri) {
-    if (uri.scheme == 'datsan247' && uri.host == 'payment-return') {
-      if (mounted && !_isPolling) {
-        setState(() => _hasOpenedBrowser = true);
-        _pollPaymentStatus();
-      }
-    }
-  }
-
-  // Khi app resume từ background (MoMo/ZaloPay/VNPay WebView không trigger deep link)
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && _hasOpenedBrowser && !_isPolling) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted && _hasOpenedBrowser && !_isPolling) {
-          _pollPaymentStatus();
-        }
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _deepLinkSub?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _openPaymentUrl(String url) async {
-    try {
-      final uri = Uri.parse(url);
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (launched) {
-        setState(() => _hasOpenedBrowser = true);
-      } else {
-        await launchUrl(uri, mode: LaunchMode.platformDefault);
-        setState(() => _hasOpenedBrowser = true);
-      }
-    } catch (e) {
-      if (mounted) toast.error('Không thể mở trang thanh toán. Vui lòng thử lại.');
-    }
-  }
-
-  Future<void> _pollPaymentStatus() async {
-    if (!mounted) return;
-    setState(() => _isPolling = true);
-
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-
-    final cubit = context.read<PaymentCubit>();
-    final status = await cubit.pollPaymentStatus(widget.bookingCode);
-
-    if (!mounted) return;
-    setState(() => _isPolling = false);
-
-    if (status == 'PAID') {
-      _goToSuccess();
-    } else {
-      toast.info('Chưa nhận được xác nhận thanh toán. Vui lòng kiểm tra lại sau ít phút.');
-    }
-  }
-
-  void _goToSuccess() {
-    context.go('/booking-success', extra: {
-      'bookingCode': widget.bookingCode,
-      'checkInCode': '',
-      'venueName': widget.venueName,
-      'courtName': widget.courtName,
-      'bookingDate': widget.bookingDate,
-      'startTime': widget.startTime,
-      'endTime': widget.endTime,
-      'totalAmount': widget.totalAmount,
-    });
-  }
-
-  void _confirmCash() {
-    _goToSuccess();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final fmt = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
-    final methodInfo = _methodInfo(widget.paymentMethod);
-    final isGateway = _gatewayMethods.contains(widget.paymentMethod);
-
-    return BlocListener<PaymentCubit, BaseState<String>>(
-      listener: (context, state) {
-        state.maybeWhen(
-          success: (url, _) {
-            _pendingPaymentUrl = url;
-            setState(() {});
-          },
-          failure: (error, _) => toast.error(error.isNotEmpty ? error : 'Lỗi tạo URL thanh toán'),
-          orElse: () {},
-        );
-      },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF4F6FA),
-        appBar: AppBar(
-          backgroundColor: AppColors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-            onPressed: () => context.pop(),
-          ),
-          title: const Text(
-            'Thanh toán',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-          ),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // ── Amount Card ─────────────────────────────────────────
-              _AmountCard(
-                amount: widget.totalAmount,
-                fmt: fmt,
-                methodInfo: methodInfo,
-              ),
-              const SizedBox(height: 20),
-
-              // ── Order Info ──────────────────────────────────────────
-              _InfoCard(
-                courtName: widget.courtName,
-                venueName: widget.venueName,
-                bookingDate: widget.bookingDate,
-                startTime: widget.startTime,
-                endTime: widget.endTime,
-                bookingCode: widget.bookingCode,
-              ),
-              const SizedBox(height: 16),
-
-              // ── Gateway instructions ────────────────────────────────
-              if (isGateway) _GatewayCard(
-                methodInfo: methodInfo,
-                paymentUrl: _pendingPaymentUrl,
-                isPolling: _isPolling,
-                hasOpened: _hasOpenedBrowser,
-                onOpenBrowser: () {
-                  if (_pendingPaymentUrl != null) _openPaymentUrl(_pendingPaymentUrl!);
-                },
-                onCheckStatus: _pollPaymentStatus,
-              ),
-
-              // ── Cash info ───────────────────────────────────────────
-              if (widget.paymentMethod == 'CASH') const _CashCard(),
-
-              // ── Bank Transfer info ──────────────────────────────────
-              if (widget.paymentMethod == 'BANK_TRANSFER') const _BankTransferCard(),
-
-              const SizedBox(height: 100),
-            ],
-          ),
-        ),
-        bottomNavigationBar: _BottomBar(
-          fmt: fmt,
-          totalAmount: widget.totalAmount,
-          paymentMethod: widget.paymentMethod,
-          paymentUrl: _pendingPaymentUrl,
-          isPolling: _isPolling,
-          hasOpenedBrowser: _hasOpenedBrowser,
-          isLoadingUrl: BlocProvider.of<PaymentCubit>(context).state.isLoading,
-          onConfirmCash: _confirmCash,
-          onOpenBrowser: () {
-            if (_pendingPaymentUrl != null) _openPaymentUrl(_pendingPaymentUrl!);
-          },
-          onCheckStatus: _pollPaymentStatus,
-        ),
+        paymentUrl: pendingPaymentUrl.value,
+        isPolling: isPolling.value,
+        hasOpenedBrowser: hasOpenedBrowser.value,
+        isLoadingUrl: isLoadingUrl,
+        onConfirmCash: goToSuccess,
+        onOpenBrowser: () {
+          if (pendingPaymentUrl.value != null) {
+            openPaymentUrl(pendingPaymentUrl.value!);
+          }
+        },
+        onCheckStatus: pollPaymentStatus,
       ),
     );
   }
 
   Map<String, String> _methodInfo(String method) {
     switch (method) {
-      case 'MOMO':   return {'icon': '💜', 'label': 'MoMo',            'color': 'FF00AE11'};
-      case 'VNPAY':  return {'icon': '🏦', 'label': 'VNPay',           'color': '005BAA'};
-      case 'ZALOPAY':return {'icon': '🔵', 'label': 'ZaloPay',         'color': '0068FF'};
-      case 'CASH':   return {'icon': '💵', 'label': 'Tiền mặt',        'color': 'F59E0B'};
-      default:       return {'icon': '💳', 'label': method,             'color': '16A34A'};
+      case 'MOMO':
+        return {'icon': '💜', 'label': 'MoMo', 'color': 'FF00AE11'};
+      case 'VNPAY':
+        return {'icon': '🏦', 'label': 'VNPay', 'color': '005BAA'};
+      case 'ZALOPAY':
+        return {'icon': '🔵', 'label': 'ZaloPay', 'color': '0068FF'};
+      case 'CASH':
+        return {'icon': '💵', 'label': 'Tiền mặt', 'color': 'F59E0B'};
+      default:
+        return {'icon': '💳', 'label': method, 'color': '16A34A'};
     }
   }
 }
 
-// ── Sub-widgets ───────────────────────────────────────────────────────────
+// ── Sub-widgets (giữ nguyên từ file gốc) ──────────────────────────────────
 
 class _AmountCard extends StatelessWidget {
   final double amount;
@@ -318,23 +252,40 @@ class _AmountCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: const Color(0xFF16A34A).withValues(alpha: 0.35), blurRadius: 20, offset: const Offset(0, 8))],
+        boxShadow: [
+          BoxShadow(
+              color: const Color(0xFF16A34A).withValues(alpha: 0.35),
+              blurRadius: 20,
+              offset: const Offset(0, 8))
+        ],
       ),
       child: Column(
         children: [
-          const Text('Số tiền thanh toán', style: TextStyle(color: Colors.white70, fontSize: 14)),
+          const Text('Số tiền thanh toán',
+              style: TextStyle(color: Colors.white70, fontSize: 14)),
           const SizedBox(height: 8),
-          Text(fmt.format(amount), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5)),
+          Text(fmt.format(amount),
+              style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: -0.5)),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12)),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(methodInfo['icon']!, style: const TextStyle(fontSize: 20)),
                 const SizedBox(width: 8),
-                Text(methodInfo['label']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                Text(methodInfo['label']!,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15)),
               ],
             ),
           ),
@@ -363,7 +314,12 @@ class _InfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2))
+        ],
       ),
       child: Column(
         children: [
@@ -377,7 +333,6 @@ class _InfoCard extends StatelessWidget {
     );
   }
 
-  // Parse ISO datetime hoặc HH:mm → trả về HH:mm
   String _fmtTime(String raw) {
     try {
       if (raw.contains('T')) {
@@ -391,28 +346,28 @@ class _InfoCard extends StatelessWidget {
   }
 
   Widget _row(String label, String value, {bool isCode = false}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: AppColors.textHint, fontSize: 13)),
-        const SizedBox(width: 12),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: TextStyle(
-              color: isCode ? AppColors.primaryLightBrand : AppColors.textPrimary,
-              fontSize: 13,
-              fontWeight: isCode ? FontWeight.w900 : FontWeight.w600,
-              fontFamily: isCode ? 'monospace' : null,
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(color: AppColors.textHint, fontSize: 13)),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                value,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: isCode ? AppColors.primaryLightBrand : AppColors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: isCode ? FontWeight.w900 : FontWeight.w600,
+                  fontFamily: isCode ? 'monospace' : null,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }
 
 class _GatewayCard extends StatelessWidget {
@@ -440,18 +395,20 @@ class _GatewayCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)
+        ],
       ),
       child: Column(
         children: [
-          Text(
-            methodInfo['icon']!,
-            style: const TextStyle(fontSize: 40),
-          ),
+          Text(methodInfo['icon']!, style: const TextStyle(fontSize: 40)),
           const SizedBox(height: 12),
           Text(
             'Thanh toán qua ${methodInfo['label']}',
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+            style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary),
           ),
           const SizedBox(height: 8),
           Text(
@@ -459,16 +416,21 @@ class _GatewayCard extends StatelessWidget {
                 ? 'Sau khi thanh toán xong, nhấn "Kiểm tra kết quả" bên dưới.'
                 : 'Nhấn nút bên dưới để mở trang thanh toán ${methodInfo['label']}. Bạn sẽ được chuyển ra trình duyệt.',
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.5),
+            style: const TextStyle(
+                fontSize: 13, color: AppColors.textSecondary, height: 1.5),
           ),
           if (hasOpened && isPolling) ...[
             const SizedBox(height: 16),
             const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2)),
                 SizedBox(width: 10),
-                Text('Đang kiểm tra trạng thái...', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
+                Text('Đang kiểm tra trạng thái...',
+                    style: TextStyle(fontSize: 13, color: AppColors.textHint)),
               ],
             ),
           ],
@@ -561,18 +523,41 @@ class _BottomBar extends StatelessWidget {
     required this.onCheckStatus,
   });
 
+  bool get _isGateway => _gatewayMethods.contains(paymentMethod);
+
+  String get _methodLabel {
+    switch (paymentMethod) {
+      case 'MOMO':
+        return 'MoMo';
+      case 'VNPAY':
+        return 'VNPay';
+      case 'ZALOPAY':
+        return 'ZaloPay';
+      default:
+        return paymentMethod;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 16, bottom: MediaQuery.of(context).padding.bottom + 16),
+      padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, -4))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 12,
+              offset: const Offset(0, -4))
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Gateway: chưa mở browser
           if (_isGateway && !hasOpenedBrowser)
             _btn(
               label: isLoadingUrl ? 'Đang tạo liên kết...' : 'Mở trang thanh toán $_methodLabel',
@@ -580,7 +565,6 @@ class _BottomBar extends StatelessWidget {
               disabled: isLoadingUrl || paymentUrl == null,
               onTap: onOpenBrowser,
             ),
-          // Gateway: đã mở browser → kiểm tra kết quả
           if (_isGateway && hasOpenedBrowser) ...[
             _btn(
               label: isPolling ? 'Đang kiểm tra...' : 'Kiểm tra kết quả thanh toán',
@@ -591,16 +575,18 @@ class _BottomBar extends StatelessWidget {
             const SizedBox(height: 8),
             TextButton(
               onPressed: onOpenBrowser,
-              child: const Text('Mở lại trang thanh toán', style: TextStyle(color: AppColors.textHint, fontSize: 13)),
+              child: const Text('Mở lại trang thanh toán',
+                  style: TextStyle(color: AppColors.textHint, fontSize: 13)),
             ),
           ],
-          // Cash / Bank Transfer
           if (!_isGateway)
             _btn(
               label: paymentMethod == 'CASH'
                   ? 'Xác nhận — Thanh toán tại sân'
                   : 'Xác nhận — Tôi sẽ chuyển khoản',
-              icon: paymentMethod == 'CASH' ? Icons.check_circle_rounded : Icons.account_balance_rounded,
+              icon: paymentMethod == 'CASH'
+                  ? Icons.check_circle_rounded
+                  : Icons.account_balance_rounded,
               onTap: onConfirmCash,
             ),
         ],
@@ -608,18 +594,12 @@ class _BottomBar extends StatelessWidget {
     );
   }
 
-  bool get _isGateway => {'VNPAY', 'MOMO', 'ZALOPAY'}.contains(paymentMethod);
-
-  String get _methodLabel {
-    switch (paymentMethod) {
-      case 'MOMO':    return 'MoMo';
-      case 'VNPAY':   return 'VNPay';
-      case 'ZALOPAY': return 'ZaloPay';
-      default:        return paymentMethod;
-    }
-  }
-
-  Widget _btn({required String label, required IconData icon, required VoidCallback onTap, bool disabled = false}) {
+  Widget _btn({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool disabled = false,
+  }) {
     return SizedBox(
       width: double.infinity,
       height: 54,

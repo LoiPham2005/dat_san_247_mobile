@@ -1,50 +1,31 @@
 import 'package:dat_san_247_mobile/core/base/state/riverpod/riverpod_listeners.dart';
+import 'package:dat_san_247_mobile/design/theme/styles/app_colors.dart';
+import 'package:dat_san_247_mobile/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:dat_san_247_mobile/features/customer/main/presentation/pages/main_shell_page.dart';
+import 'package:dat_san_247_mobile/features/customer/profile/presentation/providers/profile_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import '../../../../../core/base/di/injection.dart';
-import '../../../../../core/base/state/bloc/base_state.dart';
-import '../../../../../design/theme/styles/app_colors.dart';
-import '../../../../auth/presentation/providers/auth_notifier.dart';
-import '../../../main/presentation/pages/main_shell_page.dart';
-import '../../data/models/profile_models.dart';
-import '../cubit/profile_cubit.dart';
 
 class ProfilePage extends HookConsumerWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ── Listen to logout success ──
-    useAsyncValueListener(
-      provider: authProvider,
-      ref: ref,
-      onSuccess: (_) {},
-    );
+    useAsyncValueListener(provider: authProvider, ref: ref);
+    useAsyncValueListener(provider: profileProvider, ref: ref);
 
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => getIt<ProfileCubit>()..fetchProfile()),
-      ],
-      child: BlocBuilder<ProfileCubit, BaseState<UserModel>>(
-        builder: (context, state) {
-          final user = state.data;
-          return _buildProfile(context, ref, state, user);
-        },
-      ),
-    );
-  }
+    final state = ref.watch(profileProvider);
+    final user = state.value;
+    final isLoading = state.isLoading;
 
-  Widget _buildProfile(BuildContext context, WidgetRef ref, BaseState<UserModel> state, UserModel? user) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            automaticallyImplyLeading:
-                context.canPop() && context.findAncestorWidgetOfExactType<MainShellPage>() == null,
+            automaticallyImplyLeading: context.canPop() &&
+                context.findAncestorWidgetOfExactType<MainShellPage>() == null,
             expandedHeight: 180,
             pinned: true,
             backgroundColor: AppColors.primaryLightBrand,
@@ -80,17 +61,22 @@ class ProfilePage extends HookConsumerWidget {
                                   height: 70,
                                 ),
                               )
-                            : const Icon(Icons.person_rounded, color: AppColors.white, size: 40),
+                            : const Icon(Icons.person_rounded,
+                                color: AppColors.white, size: 40),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        user?.fullName ?? (state.isLoading ? 'Đang tải...' : 'Chưa đăng nhập'),
+                        user?.fullName ??
+                            (isLoading ? 'Đang tải...' : 'Chưa đăng nhập'),
                         style: const TextStyle(
-                            color: AppColors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                            color: AppColors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
                       ),
                       Text(
                         user?.email ?? '',
-                        style: const TextStyle(color: AppColors.white70, fontSize: 13),
+                        style: const TextStyle(
+                            color: AppColors.white70, fontSize: 13),
                       ),
                     ],
                   ),
@@ -164,9 +150,11 @@ class ProfilePage extends HookConsumerWidget {
                         final ok = await showDialog<bool>(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                             title: const Text('Đăng xuất?'),
-                            content: const Text('Bạn sẽ cần đăng nhập lại để sử dụng ứng dụng.'),
+                            content: const Text(
+                                'Bạn sẽ cần đăng nhập lại để sử dụng ứng dụng.'),
                             actions: [
                               TextButton(
                                   onPressed: () => Navigator.pop(ctx, false),
@@ -191,7 +179,9 @@ class ProfilePage extends HookConsumerWidget {
                       },
                       icon: const Icon(Icons.logout_rounded, color: AppColors.error),
                       label: const Text('Đăng xuất',
-                          style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              color: AppColors.error,
+                              fontWeight: FontWeight.bold)),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.error, width: 1.5),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -223,7 +213,9 @@ class _ProfileSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: AppColors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))
+              color: AppColors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2))
         ],
       ),
       child: Column(
@@ -252,12 +244,13 @@ class _ProfileTile extends StatelessWidget {
   final String? trailing;
   final Color? trailingColor;
   final VoidCallback onTap;
-  const _ProfileTile(
-      {required this.icon,
-      required this.label,
-      this.trailing,
-      this.trailingColor,
-      required this.onTap});
+  const _ProfileTile({
+    required this.icon,
+    required this.label,
+    this.trailing,
+    this.trailingColor,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -270,7 +263,8 @@ class _ProfileTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(10)),
         child: Icon(icon, color: AppColors.primaryLightBrand, size: 20),
       ),
-      title: Text(label, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+      title: Text(label,
+          style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
       trailing: trailing != null
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
