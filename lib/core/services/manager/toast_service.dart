@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:injectable/injectable.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../base/di/injection.dart';
 
@@ -12,171 +13,64 @@ ToastService get toast => getIt<ToastService>();
 
 @LazySingleton()
 class ToastService {
-  // ═══════════════════════════════════════════════════════════════
-  // Typography & Themes
-  // ═══════════════════════════════════════════════════════════════
-
-  TextStyle _textStyle({bool isTitle = false}) => GoogleFonts.quicksand(
-    fontWeight: isTitle ? FontWeight.bold : FontWeight.w600,
-    fontSize: isTitle ? 15 : 14,
-    color: Colors.white,
-  );
+  // ── Default config cho toastification ──────────────────────────
+  static const _defaultDuration = Duration(seconds: 3);
+  static const _defaultAlignment = Alignment.topRight;
+  static const _defaultStyle = ToastificationStyle.fillColored;
 
   // ═══════════════════════════════════════════════════════════════
-  // TOAST METHODS
+  // TOAST METHODS — toastification
   // ═══════════════════════════════════════════════════════════════
 
-  void success(
-    String message, {
-    String? title,
-    Duration? duration,
-    BuildContext? context,
-  }) {
-    _showCustomToast(
-      message: message,
-      title: title,
-      duration: duration,
-      icon: Icons.check_circle_rounded,
-      backgroundColor: Colors.green.shade600,
-    );
-  }
+  void success(String message, {String? title, Duration? duration, BuildContext? context}) =>
+      _show(type: ToastificationType.success, message: message, title: title, duration: duration);
 
-  void error(
-    String message, {
-    String? title,
-    Duration? duration,
-    BuildContext? context,
-  }) {
-    _showCustomToast(
-      message: message,
-      title: title,
-      duration: duration,
-      icon: Icons.error_outline_rounded,
-      backgroundColor: Colors.red.shade600,
-    );
-  }
+  void error(String message, {String? title, Duration? duration, BuildContext? context}) =>
+      _show(type: ToastificationType.error, message: message, title: title, duration: duration);
 
-  void warning(
-    String message, {
-    String? title,
-    Duration? duration,
-    BuildContext? context,
-  }) {
-    _showCustomToast(
-      message: message,
-      title: title,
-      duration: duration,
-      icon: Icons.warning_amber_rounded,
-      backgroundColor: Colors.orange.shade700,
-    );
-  }
+  void warning(String message, {String? title, Duration? duration, BuildContext? context}) =>
+      _show(type: ToastificationType.warning, message: message, title: title, duration: duration);
 
-  void info(
-    String message, {
-    String? title,
-    Duration? duration,
-    BuildContext? context,
-  }) {
-    _showCustomToast(
-      message: message,
-      title: title,
-      duration: duration,
-      icon: Icons.info_outline_rounded,
-      backgroundColor: Colors.blue.shade600,
-    );
-  }
+  void info(String message, {String? title, Duration? duration, BuildContext? context}) =>
+      _show(type: ToastificationType.info, message: message, title: title, duration: duration);
 
-  // ═══════════════════════════════════════════════════════════════
-  // PRIVATE HELPER FOR CUSTOM TOASTS
-  // ═══════════════════════════════════════════════════════════════
-
-  void _showCustomToast({
+  void _show({
+    required ToastificationType type,
     required String message,
     String? title,
-    required IconData icon,
-    required Color backgroundColor,
     Duration? duration,
-    Alignment? alignment,
   }) {
-    SmartDialog.showToast(
-      '',
-      displayTime: duration ?? const Duration(seconds: 3),
-      alignment: alignment ?? Alignment.topRight,
-      animationType: SmartAnimationType.centerFade_otherSlide,
-      builder: (context) => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 70),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: backgroundColor.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: backgroundColor.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: Colors.white, size: 24),
-            const SizedBox(width: 12),
-            Flexible(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (title != null)
-                    Text(
-                      title,
-                      style: _textStyle(
-                        isTitle: true,
-                      ).copyWith(color: Colors.white, letterSpacing: 0.5),
-                    ),
-                  Text(
-                    message,
-                    style: _textStyle().copyWith(
-                      color: Colors.white.withOpacity(0.95),
-                      height: 1.2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // const SizedBox(width: 8),
-            // // Nút đóng (X)
-            // GestureDetector(
-            //   onTap: () => SmartDialog.dismiss(status: SmartStatus.toast),
-            //   child: Container(
-            //     padding: const EdgeInsets.all(4),
-            //     decoration: BoxDecoration(
-            //       color: Colors.white.withOpacity(0.2),
-            //       shape: BoxShape.circle,
-            //     ),
-            //     child: const Icon(Icons.close_rounded, color: Colors.white, size: 16),
-            //   ),
-            // ),
-          ],
-        ),
+    toastification.show(
+      type: type,
+      style: _defaultStyle,
+      alignment: _defaultAlignment,
+      autoCloseDuration: duration ?? _defaultDuration,
+      title: title != null
+          ? Text(title, style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 15))
+          : null,
+      description: Text(
+        message,
+        style: GoogleFonts.quicksand(fontWeight: FontWeight.w600, fontSize: 14),
       ),
+      showProgressBar: true,
+      borderRadius: BorderRadius.circular(16),
+      dragToClose: true,
+      applyBlurEffect: false,
+      closeButtonShowType: CloseButtonShowType.onHover,
     );
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // LOADING METHODS
+  // LOADING — flutter_smart_dialog (giữ nguyên)
   // ═══════════════════════════════════════════════════════════════
 
   void loading([String message = 'Đang tải...']) {
     SmartDialog.showLoading(
       msg: message,
-      maskColor: Colors.black.withOpacity(0.3),
+      maskColor: Colors.black.withValues(alpha: 0.3),
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -184,10 +78,7 @@ class ToastService {
             const SizedBox(height: 16),
             Text(
               message,
-              style: GoogleFonts.quicksand(
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: GoogleFonts.quicksand(fontWeight: FontWeight.w600, color: Colors.black87),
             ),
           ],
         ),
@@ -195,32 +86,33 @@ class ToastService {
     );
   }
 
-  /// Hiển thị loading quảng cáo (Toàn màn hình trắng)
+  /// Hiển thị loading quảng cáo (toàn màn trắng).
   void showAdLoading() {
     SmartDialog.showLoading(
       maskColor: Colors.white,
       builder: (context) => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-        ),
+        child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)),
       ),
     );
   }
 
-  void stopLoading() {
-    SmartDialog.dismiss(status: SmartStatus.loading);
-  }
+  void stopLoading() => SmartDialog.dismiss(status: SmartStatus.loading);
 
   // ═══════════════════════════════════════════════════════════════
   // DISMISS & UTILS
   // ═══════════════════════════════════════════════════════════════
 
+  /// Đóng tất cả: toast (toastification) + smart_dialog (loading/dialog).
   void dismiss() {
     SmartDialog.dismiss();
+    toastification.dismissAll();
   }
 
+  /// Đóng riêng toast (giữ loading/dialog).
+  void dismissToasts() => toastification.dismissAll();
+
   void fromException(dynamic exception) {
-    String message = 'Đã xảy ra lỗi';
+    var message = 'Đã xảy ra lỗi';
     if (exception is Exception) {
       message = exception.toString().replaceAll('Exception: ', '');
     } else {

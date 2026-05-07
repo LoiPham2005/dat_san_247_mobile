@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:toastification/toastification.dart';
 
 /// 🏠 Root Widget của ứng dụng
 ///
@@ -68,7 +69,11 @@ class _AppContent extends ConsumerWidget {
           final location = ErrorUtils.extractLocation(details);
           return AppErrorScreen(details: details, location: location);
         };
-        return FlutterSmartDialog.init()(context, child);
+        // Wrap thứ tự: Toastification (ngoài cùng) → SmartDialog → app.
+        // Cả 2 đều cần 1 widget wrapper riêng để hiển thị overlay.
+        return ToastificationWrapper(
+          child: FlutterSmartDialog.init()(context, child),
+        );
       },
     );
   }
