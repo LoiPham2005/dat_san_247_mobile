@@ -46,11 +46,11 @@ class ToastService {
       alignment: _defaultAlignment,
       autoCloseDuration: duration ?? _defaultDuration,
       title: title != null
-          ? Text(title, style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 15))
+          ? Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 15))
           : null,
       description: Text(
         message,
-        style: GoogleFonts.quicksand(fontWeight: FontWeight.w600, fontSize: 14),
+        style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
       ),
       showProgressBar: true,
       borderRadius: BorderRadius.circular(16),
